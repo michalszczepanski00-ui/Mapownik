@@ -87,6 +87,7 @@ $ch = curl_init($url);
 $caBundle = __DIR__ . '/certs/cacert.pem';
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 3,
+    CURLOPT_PROTOCOLS => CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
     CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => 45, CURLOPT_ENCODING => '',
     CURLOPT_USERAGENT => 'MSPortal-RCN/19.29 (+https://mapownik.swiadectwa.net)',
     CURLOPT_HTTPHEADER => ['Accept: application/gml+xml, text/xml'],

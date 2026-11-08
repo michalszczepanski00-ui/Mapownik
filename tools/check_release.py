@@ -74,5 +74,15 @@ elif lock_path.is_file():
         if path in vendor_now and vendor_now[path]!=digest:
             fail(ROOT/path,'Plik vendor zmieniony pod tym samym adresem — przeglądarki trzymają starą wersję (immutable). Zmień adres (nowy katalog lub ?v=), potem: check_release.py --update-vendor-lock')
 else:fail(lock_path,'Brak tools/vendor-lock.json — utwórz: check_release.py --update-vendor-lock')
+# 19.41.4-b: testy CLI poprawek bezpieczeństwa i parserów (bez sieci).
+if shutil.which('php'):
+    for test in ('test_audyt_19.41.4-b.php','test_identify_parse.php','test_wms_merge.php'):
+        if (ROOT/'tools'/test).is_file():
+            r=subprocess.run(['php',str(ROOT/'tools'/test)],capture_output=True,text=True)
+            if r.returncode!=0:fail(ROOT/'tools'/test,(r.stdout+r.stderr).strip()[-600:])
+else:skipped.append('php tests')
+# 19.41.4-b: sumy CSP skryptów wbudowanych w index.html muszą odpowiadać ich treści (inaczej biały ekran).
+csp=subprocess.run([sys.executable,str(ROOT/'tools'/'csp_hashes.py'),'--check'],capture_output=True,text=True)
+if csp.returncode!=0:fail(ROOT/'index.html',(csp.stderr or csp.stdout).strip() or 'Nieaktualne CSP')
 print(json.dumps({'version':version,'checked':counts,'failures':failures,'skipped':sorted(set(skipped))},ensure_ascii=False,indent=2))
 raise SystemExit(bool(failures))

@@ -5,6 +5,26 @@ require_once __DIR__ . '/_common.php';
 // Dependency stack identifier, intentionally independent of the MSPortal app version.
 const MAPOWNIK_VENDOR_RELEASE = 'vendor-react19.2.8-ol10.10.0-lucide1.47.0-v3';
 
+/**
+ * 19.41.4-b (audyt B4): sumy SHA-256 bibliotek z paczki wydania, wpisane na stałe w kodzie.
+ * Wcześniej manifest powstawał z tego, co serwer właśnie pobrał z esm.sh/jsDelivr (zaufanie przy
+ * pierwszym użyciu) — podmieniony plik na CDN trafiłby do wszystkich użytkowników. Teraz plik
+ * o innej treści jest odrzucany; brakujące biblioteki wgrywa się z paczki (katalog vendor/static/).
+ */
+const MAPOWNIK_VENDOR_PINNED = [
+    'react.js' => 'a18bbb96cfa025759778758b9b079f339b315a4eaf726512dcda19279a5f6cb8',
+    'react-jsx-runtime.js' => 'c3d764a345dc3929558cb71bb173458c2bf1a08afc69bab0a328a63067a9789d',
+    'react-dom.js' => 'c1413aa9e0b60d1bb35e0cb22ba7ffe841722548bb51c0db096b8a89262193ef',
+    'react-dom-client.js' => '108ce6f8fb9d67b16613b0802f6d702997e67f33ae919eab05cca245f38f648f',
+    'radix-dropdown.js' => 'e829da2f071c54e083e21239c475f113932ca82e58ebc1bcfa3ea31ae03c37a5',
+    'radix-tooltip.js' => 'e4cb07cdcccf31bf4f1e3b431d101c581108272a257aae2c3dd912e8e4c39309',
+    'proj4.js' => '75bae245a9f97490670a8c2413ad6e01d74b9a1f33aa3c2f8ff31fa28badce45',
+    'zod.js' => '1006ce709b8d924702e36c4cd1d864336e7fd9c459042a3686f93e641dc4ad65',
+    'lucide-react.js' => '87d49d7b8af8cd5bd6b2b4a5dc0bbd569a222a80674e7b4d652b7f3a90767f3b',
+    'openlayers.js' => 'b89af8ec3b76f564d515fd07fed3ec414aecf8f33f685b77b607451cb0c2029f',
+    'openlayers.css' => 'abc8afd72cc10bd29cc143f443bae4a6804bd3cb3fb262e6b6a6bc6c924ea34f',
+];
+
 function vendor_static_dir(): string {
     return dirname(__DIR__) . '/vendor/static';
 }
@@ -51,8 +71,7 @@ function vendor_manifest_entry(array $spec): ?array {
 function vendor_file_is_valid(array $spec): bool {
     $file = vendor_static_dir() . '/' . $spec['file'];
     if (!is_file($file) || (int)@filesize($file) < (int)$spec['min']) return false;
-    $entry = vendor_manifest_entry($spec);
-    $expected = is_array($entry) ? strtolower((string)($entry['sha256'] ?? '')) : '';
+    $expected = strtolower((string)(MAPOWNIK_VENDOR_PINNED[$spec['file']] ?? ''));
     if (!preg_match('/^[a-f0-9]{64}$/', $expected)) return false;
     $actual = @hash_file('sha256', $file);
     return is_string($actual) && hash_equals($expected, strtolower($actual));
@@ -71,7 +90,7 @@ function vendor_status_data(): array {
             'ok' => $ok,
             'file' => $spec['file'],
             'bytes' => is_file($path) ? (int)@filesize($path) : 0,
-            'sha256_expected' => is_array($entry) ? ($entry['sha256'] ?? null) : null,
+            'sha256_expected' => MAPOWNIK_VENDOR_PINNED[$spec['file']] ?? null,
             'integrity' => $ok ? 'verified' : ($manifestReady ? 'mismatch-or-missing' : 'manifest-missing-or-release-mismatch'),
         ];
     }
@@ -188,6 +207,11 @@ function build_one_vendor(string $key, array $spec, bool $refresh = false): arra
         }
     }
 
+    $pinned = strtolower((string)(MAPOWNIK_VENDOR_PINNED[$spec['file']] ?? ''));
+    if (!hash_equals($pinned, hash('sha256', $final))) {
+        if (vendor_file_is_valid($spec)) return ['ok' => true, 'mode' => 'stale-kept', 'file' => $spec['file'], 'error' => 'Pobrany plik różni się od wydania — zachowano dotychczasowy'];
+        return ['ok' => false, 'file' => $spec['file'], 'error' => 'Pobrany plik ma inną sumę SHA-256 niż wydanie — wgraj vendor/static/' . $spec['file'] . ' z paczki'];
+    }
     if (!atomic_write($target, $final)) {
         if (vendor_file_is_valid($spec)) return ['ok' => true, 'mode' => 'stale-kept', 'file' => $spec['file'], 'error' => 'Nie udało się nadpisać pliku'];
         return ['ok' => false, 'file' => $spec['file'], 'error' => 'Nie udało się zapisać pliku'];
@@ -218,7 +242,7 @@ function build_all_vendors(bool $refresh = false): array {
             $manifest['files'][$key] = [
                 'file' => $spec['file'],
                 'bytes' => (int)filesize($path),
-                'sha256' => hash_file('sha256', $path),
+                'sha256' => MAPOWNIK_VENDOR_PINNED[$spec['file']] ?? hash_file('sha256', $path),
             ];
         }
         atomic_write(vendor_manifest_file(), json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));

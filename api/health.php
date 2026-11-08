@@ -14,7 +14,10 @@ echo json_encode([
   'ok' => true,
   'app' => 'msportal',
   'version' => '19.41.4-server',
-  'php' => PHP_VERSION,
+  // 19.41.4-b (audyt B6): bez dokładnego numeru wydania PHP (ułatwia dobór znanych błędów); wystarczy gałąź.
+  'php' => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
+  // Poprawki bezpieczeństwa wgrane na wersję 19.41.4 (ZMIANY_19.41.4-b.md) — do sprawdzenia po wgraniu.
+  'patch' => '19.41.4-b',
   'curl' => function_exists('curl_init'),
   'allow_url_fopen' => filter_var((string)ini_get('allow_url_fopen'), FILTER_VALIDATE_BOOLEAN),
   'cache_writable' => $writable,

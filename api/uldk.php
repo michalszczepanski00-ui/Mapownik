@@ -40,7 +40,8 @@ $url = 'https://uldk.gugik.gov.pl/?' . http_build_query($params, '', '&', PHP_QU
 [$status, $body, $type, $error] = vendor_remote_get($url, 'text/plain, text/*;q=0.9, */*;q=0.5');
 
 if ($status < 200 || $status >= 300 || trim($body) === '') {
-    uldk_fail('Usługa ULDK jest chwilowo niedostępna' . ($error !== '' ? ': ' . $error : '.') , 502);
+    if ($error !== '') error_log('msportal uldk.php: ' . $error);
+    uldk_fail('Usługa ULDK jest chwilowo niedostępna.', 502);
 }
 
 $body = preg_replace('/^\xEF\xBB\xBF/', '', $body) ?? $body;

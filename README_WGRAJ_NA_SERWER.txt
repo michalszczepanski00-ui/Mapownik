@@ -1,3 +1,9 @@
+msportal 19.41.4-b — POPRAWKI BEZPIECZEŃSTWA (08.11.2026)
+Wersja aplikacji bez zmian. Wgranie i kontrola: ZMIANY_19.41.4-b.md (sekcja „Wgranie na serwer”).
+W skrócie: wgraj cały api/, potem data/.htaccess, index.html, setup-vendors.php, na końcu .htaccess;
+sprawdź api/health.php → "patch": "19.41.4-b". Błąd 500 po .htaccess → usuń linię „Options -Indexes”.
+setup-vendors.php działa już tylko z wiersza poleceń; brakujące biblioteki wgrywa się z paczki (vendor/).
+
 msportal 19.41.4 — HOSTING WSPÓŁDZIELONY (bez VPS)
 
 PEŁNA PACZKA 19.41.4 — AKTUALIZACJA DZIAŁAJĄCEGO PORTALU (np. /test22/ z 19.27.0)

@@ -28,6 +28,51 @@ function atomic_write(string $file, string $data): bool {
     return @rename($tmp, $file);
 }
 
+/**
+ * 19.41.4-b (audyt B7): wspólne utwardzenie cURL. Przekierowania tylko HTTP/HTTPS, najwyżej 5
+ * (integracje GUGiK przekierowują do serwerów gmin i powiatów, część z nich tylko po HTTP).
+ * Odpowiedź PO PRZEKIEROWANIU na adres prywatny/zastrzeżony (np. usługa zewnętrzna odsyła na 127.0.0.1
+ * albo 10.x) jest odrzucana — serwer nie może czytać sieci wewnętrznej hostingu. Bez przekierowania
+ * adres pochodzi z allowlisty w kodzie. Gdy hosting wychodzi do internetu przez serwer proxy, adres
+ * połączenia to adres proxy (zwykle prywatny), więc kontrola jest wtedy pomijana.
+ */
+function mapownik_curl_hardening(): array {
+    $options = [CURLOPT_MAXREDIRS => 5];
+    if (defined('CURLPROTO_HTTP') && defined('CURLPROTO_HTTPS')) {
+        $options[CURLOPT_PROTOCOLS] = CURLPROTO_HTTP | CURLPROTO_HTTPS;
+        $options[CURLOPT_REDIR_PROTOCOLS] = CURLPROTO_HTTP | CURLPROTO_HTTPS;
+    }
+    return $options;
+}
+
+function mapownik_outbound_proxy(): bool {
+    foreach (['https_proxy', 'HTTPS_PROXY', 'http_proxy', 'HTTP_PROXY', 'all_proxy', 'ALL_PROXY'] as $name) {
+        $value = getenv($name);
+        if (is_string($value) && trim($value) !== '') return true;
+    }
+    return false;
+}
+
+function mapownik_ip_is_public(string $ip): bool {
+    if ($ip === '') return true; // brak połączenia (błąd/timeout) — nic nie zostało odczytane
+    return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false;
+}
+
+/** Wykonuje przygotowany uchwyt cURL i zwraca [status, body, type, error] z kontrolą adresu docelowego. */
+function mapownik_curl_exec($ch): array {
+    $body = curl_exec($ch);
+    $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    $type = (string)curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+    $error = curl_error($ch);
+    $ip = (string)curl_getinfo($ch, CURLINFO_PRIMARY_IP);
+    $redirects = (int)curl_getinfo($ch, CURLINFO_REDIRECT_COUNT);
+    curl_close($ch);
+    if ($redirects > 0 && !mapownik_outbound_proxy() && !mapownik_ip_is_public($ip)) {
+        return [0, '', '', 'Odrzucono przekierowanie na adres wewnętrzny.'];
+    }
+    return [$status, is_string($body) ? $body : '', $type, $error];
+}
+
 function remote_get(string $url): array {
     if (function_exists('curl_init')) {
         $ch = curl_init($url);
@@ -43,13 +88,8 @@ function remote_get(string $url): array {
         ];
         $caBundle = mapownik_ca_bundle();
         if ($caBundle !== null) $options[CURLOPT_CAINFO] = $caBundle;
-        curl_setopt_array($ch, $options);
-        $body = curl_exec($ch);
-        $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        $type = (string)curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-        $error = curl_error($ch);
-        curl_close($ch);
-        return [$status, is_string($body) ? $body : '', $type, $error];
+        curl_setopt_array($ch, $options + mapownik_curl_hardening());
+        return mapownik_curl_exec($ch);
     }
 
     if (filter_var((string)ini_get('allow_url_fopen'), FILTER_VALIDATE_BOOLEAN)) {
@@ -58,6 +98,7 @@ function remote_get(string $url): array {
                 'timeout' => MAPOWNIK_TIMEOUT,
                 'user_agent' => MAPOWNIK_USER_AGENT,
                 'follow_location' => 1,
+                'max_redirects' => 5,
                 'ignore_errors' => true,
             ],
             'ssl' => array_filter(['verify_peer' => true, 'verify_peer_name' => true, 'allow_self_signed' => false, 'cafile' => mapownik_ca_bundle()]),
@@ -102,13 +143,8 @@ function vendor_remote_get(string $url, string $accept = '*/*', int $timeout = 3
         ];
         $caBundle = mapownik_ca_bundle();
         if ($caBundle !== null) $options[CURLOPT_CAINFO] = $caBundle;
-        curl_setopt_array($ch, $options);
-        $body = curl_exec($ch);
-        $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        $type = (string)curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-        $error = curl_error($ch);
-        curl_close($ch);
-        return [$status, is_string($body) ? $body : '', $type, $error];
+        curl_setopt_array($ch, $options + mapownik_curl_hardening());
+        return mapownik_curl_exec($ch);
     }
     if (filter_var((string)ini_get('allow_url_fopen'), FILTER_VALIDATE_BOOLEAN)) {
         $context = stream_context_create([
@@ -117,6 +153,7 @@ function vendor_remote_get(string $url, string $accept = '*/*', int $timeout = 3
                 'user_agent' => 'Mozilla/5.0 MSPortalVendor/19.41.4',
                 'header' => "Accept: {$accept}\r\n",
                 'follow_location' => 1,
+                'max_redirects' => 5,
                 'ignore_errors' => true,
             ],
             'ssl' => array_filter(['verify_peer' => true, 'verify_peer_name' => true, 'allow_self_signed' => false, 'cafile' => mapownik_ca_bundle()]),
@@ -235,13 +272,8 @@ function official_gis_http11_get(string $url, string $accept, int $timeout = 6):
     if (defined('CURL_HTTP_VERSION_1_1')) $options[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
     $caBundle = mapownik_ca_bundle();
     if ($caBundle !== null) $options[CURLOPT_CAINFO] = $caBundle;
-    curl_setopt_array($ch, $options);
-    $body = curl_exec($ch);
-    $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-    $type = (string)curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-    $error = curl_error($ch);
-    curl_close($ch);
-    return [$status, is_string($body) ? $body : '', $type, $error];
+    curl_setopt_array($ch, $options + mapownik_curl_hardening());
+    return mapownik_curl_exec($ch);
 }
 
 /**
@@ -679,15 +711,29 @@ function maintain_map_cache(): array {
     $root = cache_root();
     // 18.18.0: także pamięć wysokości NMT (jeden plik na punkt — wcześniej rosła
     // bez końca i na OVH wyczerpywała limit liczby plików).
-    $dirs = [$root . '/ortho', $root . '/topography', $root . '/wms', $root . '/orthophoto', $root . '/terrain-v2'];
+    // 19.41.4-b (audyt B2): także kafle i odpowiedzi „Czyj las” (BDL) — wcześniej nikt ich nie usuwał.
+    $dirs = [$root . '/ortho', $root . '/topography', $root . '/wms', $root . '/orthophoto', $root . '/terrain-v2', $root . '/forest'];
     $now = time();
     $removed = 0;
     $removedBytes = 0;
     // 18.18.0: katalogi krótkotrwałe — fragmenty eksportu do „Ponów”, liczniki
     // limitu eksportów, zapamiętane warianty identyfikacji.
-    foreach ([$root . '/export-chunks' => 86400, $root . '/export-rate' => 86400, $root . '/identify-winner' => 30 * 86400] as $dir => $maxAge) {
+    // 19.41.4-b (audyt B2): ceny RCN (ważne 3 dni, starsze służą tylko jako zapas przy awarii GUGiK)
+    // i limity udostępniania — wcześniej przybywało ich bez końca.
+    foreach ([$root . '/export-chunks' => 86400, $root . '/export-rate' => 86400, $root . '/identify-winner' => 30 * 86400,
+              $root . '/rcn' => 30 * 86400, $root . '/shared-rate' => 2 * 86400, $root . '/nominatim' => 7 * 86400] as $dir => $maxAge) {
         foreach (map_cache_files_iterator([$dir]) as $file) {
             if (($now - $file['mtime']) > $maxAge && @unlink($file['path'])) { $removed++; $removedBytes += $file['size']; }
+        }
+    }
+    // Pliki limitów per adres IP leżą obok blokad, których usuwać nie wolno — tylko wzorzec rate-*.
+    foreach ([$root . '/source-monitor/rate-*.json', $root . '/vps/rate-*.json', $root . '/dem/rate/*.json'] as $pattern) {
+        foreach (glob($pattern) ?: [] as $path) {
+            $mtime = (int)@filemtime($path);
+            if ($mtime > 0 && ($now - $mtime) > 86400) {
+                $size = (int)@filesize($path);
+                if (@unlink($path)) { $removed++; $removedBytes += $size; }
+            }
         }
     }
     $remainingTotal = 0;

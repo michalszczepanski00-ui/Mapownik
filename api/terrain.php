@@ -83,5 +83,6 @@ try {
         'diagnostics' => $diagnostics,
     ]);
 } catch (Throwable $e) {
-    terrain_fail('Nie udało się pobrać wysokości NMT: ' . $e->getMessage(), 502);
+    error_log('msportal terrain.php: ' . $e->getMessage());
+    terrain_fail('Nie udało się pobrać wysokości NMT — usługa GUGiK nie odpowiada. Spróbuj ponownie za chwilę.', 502);
 }

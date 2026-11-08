@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/_common.php';
+require_once __DIR__ . '/_shared_project_schema.php';
 
 /**
  * Udostępnianie projektu przez link.
@@ -64,24 +65,43 @@ function shared_project_reject(string $message, int $status = 400): never {
     exit;
 }
 
-function shared_project_limit_writes(): void {
+/**
+ * 19.41.4-b (audyt B3): limit na adres (IPv6 — na sieć /64): 60 zapisów na godzinę i 64 MB na dobę.
+ * Rekord to lista [czas, bajty]; dawny format (sama lista czasów) jest czytany jako 0 bajtów.
+ */
+const SHARED_PROJECT_DAILY_BYTES = 64 * 1024 * 1024;
+function shared_project_client_key(): string {
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? 'local');
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        $bin = @inet_pton($ip);
+        if (is_string($bin) && strlen($bin) === 16) $ip = bin2hex(substr($bin, 0, 8)) . '::/64';
+    }
+    return $ip;
+}
+function shared_project_limit_writes(int $bytes): void {
     $dir = cache_root() . '/shared-rate';
     if (!ensure_dir($dir)) shared_project_reject('Nie można przygotować zapisu projektu.', 503);
-    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? 'local');
-    $file = $dir . '/' . hash('sha256', $ip) . '.json';
+    $file = $dir . '/' . hash('sha256', shared_project_client_key()) . '.json';
     $fh = @fopen($file, 'c+');
     if (!$fh) shared_project_reject('Nie można przygotować zapisu projektu.', 503);
     if (!flock($fh, LOCK_EX)) { fclose($fh); shared_project_reject('Nie można przygotować zapisu projektu.', 503); }
     $now = time();
     $stored = json_decode(stream_get_contents($fh) ?: '[]', true);
-    $times = is_array($stored) ? array_values(array_filter($stored, static fn($v) => is_numeric($v) && (int)$v > $now - 3600)) : [];
-    if (count($times) >= 60) {
+    $entries = [];
+    foreach (is_array($stored) ? $stored : [] as $v) {
+        if (is_numeric($v)) $entries[] = [(int)$v, 0];
+        elseif (is_array($v) && isset($v[0], $v[1]) && is_numeric($v[0]) && is_numeric($v[1])) $entries[] = [(int)$v[0], (int)$v[1]];
+    }
+    $entries = array_values(array_filter($entries, static fn($e) => $e[0] > $now - 86400));
+    $lastHour = count(array_filter($entries, static fn($e) => $e[0] > $now - 3600));
+    $dayBytes = array_sum(array_column($entries, 1));
+    if ($lastHour >= 60 || $dayBytes + $bytes > SHARED_PROJECT_DAILY_BYTES) {
         flock($fh, LOCK_UN); fclose($fh);
         shared_project_reject('Zbyt wiele udostępnionych projektów. Spróbuj ponownie później.', 429);
     }
-    $times[] = $now;
+    $entries[] = [$now, $bytes];
     ftruncate($fh, 0); rewind($fh);
-    $ok = fwrite($fh, json_encode($times)) !== false;
+    $ok = fwrite($fh, json_encode($entries)) !== false;
     fflush($fh); flock($fh, LOCK_UN); fclose($fh);
     if (!$ok) shared_project_reject('Nie można przygotować zapisu projektu.', 503);
 }
@@ -158,12 +178,15 @@ if ($method === 'POST') {
     if (strlen($body) > SHARED_PROJECT_MAX_BYTES) {
         shared_project_reject('Projekt przekracza limit ' . (SHARED_PROJECT_MAX_BYTES / 1024 / 1024) . ' MB dla linku udostępniania.', 413);
     }
-    $decoded = json_decode($body, true);
-    if (!is_array($decoded) || ($decoded['format'] ?? null) !== 'mapownik-project' || !isset($decoded['objects']) || !is_array($decoded['objects'])) {
+    try {
+        $body = shared_project_normalize($body);
+    } catch (SharedProjectInvalid $e) {
+        shared_project_reject('To nie jest poprawny projekt MSPortalu (' . $e->getMessage() . ').', 422);
+    } catch (ValueError | JsonException $e) {
         shared_project_reject('To nie jest poprawny projekt MSPortalu.', 422);
     }
 
-    shared_project_limit_writes();
+    shared_project_limit_writes(strlen($body));
     $lock = shared_project_lock();
     if (random_int(1, SHARED_PROJECT_SWEEP_CHANCE) === 1) shared_project_sweep();
     shared_project_check_quota(strlen($body));

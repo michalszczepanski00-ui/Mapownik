@@ -1,6 +1,15 @@
 DirectoryIndex index.html
 
-<FilesMatch "^aktualizuj-.*[.]php$">
+# 19.41.4-b (audyt B5): bez listowania zawartości katalogów (audyt/, konfiguracja/, assets/…).
+# Jeśli hosting zwróci po tej zmianie błąd 500 (brak AllowOverride Options), usuń tę jedną linię.
+Options -Indexes
+
+# Skrypty serwisowe tylko z wiersza poleceń (19.41.4-b: także setup-vendors.php, audyt B4).
+<FilesMatch "^(aktualizuj-.*|setup-vendors)[.]php$">
+  Require all denied
+</FilesMatch>
+# 19.41.4-b (audyt B6): dokumentacja wydania, raporty, kopie i pliki narzędzi nie są publiczne.
+<FilesMatch "^((ZMIANY|RAPORT_AUDYTU|README|INSTRUKCJA)[^/]*[.](md|txt)|[.]htaccess[.]bak.*|.*[.](py|sh|sqlite|sqlite3|db|bak|log|lock|part))$">
   Require all denied
 </FilesMatch>
 
@@ -24,6 +33,18 @@ DirectoryIndex index.html
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set X-Frame-Options "SAMEORIGIN"
+  # 19.41.4-b (audyt B5): nagłówki ochronne. Pełna polityka skryptów (script-src z sumami) jest w <meta>
+  # w index.html; tutaj tylko reguły bezpieczne dla wszystkich stron i odpowiedzi.
+  Header always set Content-Security-Policy "object-src 'none'; base-uri 'self'; frame-ancestors 'self'"
+  Header always set Permissions-Policy "camera=(), microphone=(), payment=(), usb=(), geolocation=(self)"
+  Header always unset X-Powered-By
+  Header unset X-Powered-By
+  # HSTS tylko dla połączeń HTTPS (bez includeSubDomains — inne subdomeny mogą nie mieć certyfikatu).
+  <IfModule mod_version.c>
+    <IfVersion >= 2.4.10>
+      Header always set Strict-Transport-Security "max-age=31536000" "expr=%{HTTPS} == 'on' || %{HTTP:X-Forwarded-Proto} == 'https'"
+    </IfVersion>
+  </IfModule>
   <FilesMatch "\.(html)$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
   </FilesMatch>
@@ -89,6 +110,9 @@ DirectoryIndex index.html
   RewriteRule ^vps/api/(.*)$ api/vps.php?route=$1 [QSA,L]
   RewriteRule ^vps/ - [R=404,L]
   RewriteRule ^admin/?$ - [R=404,L]
+  # 19.41.4-b (audyt B5/B6): pliki bibliotek PHP (api/_*.php), raporty audytu i skrypty crona nie są adresami WWW.
+  RewriteRule ^api/_ - [R=404,L]
+  RewriteRule ^(audyt|cron|konfiguracja/README) - [R=404,L]
   RewriteRule ^api/ - [L]
   RewriteRule ^app-19\.41\.4/ - [L]
   RewriteRule ^app-[^/]+/ - [R=410,L]
@@ -99,7 +123,7 @@ DirectoryIndex index.html
   RewriteRule ^vendor/shims/ - [R=410,L]
   RewriteRule ^vendor/ - [L]
   RewriteRule ^assets/ - [L]
-  RewriteRule ^setup-vendors\.php$ - [L]
+  RewriteRule ^setup-vendors\.php$ - [R=404,L]
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]

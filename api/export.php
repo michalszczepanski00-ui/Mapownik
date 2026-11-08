@@ -67,37 +67,97 @@ $payload = json_decode($rawBody, true);
 if (!is_array($payload)) json_fail('Nieprawidłowe dane eksportu.');
 
 
-function enforce_export_rate_limit(string $mode): void {
+/**
+ * 19.41.4-b (audyt B1): limit liczony pod jedną blokadą z zapisem (wcześniej tylko odczyt — równoległe
+ * żądania przechodziły wszystkie). Dwa liczniki na adres:
+ *  - „s” — udane eksporty (jak dotąd: 20 / 10 min, pakiety 4 / h; „Ponów” po 409 ich nie zjada),
+ *  - „a” — wszystkie próby (40 / 10 min, pakiety 12 / h), żeby nieudane eksporty nie były nieograniczone.
+ * Adresy IPv6 liczone po sieci /64.
+ */
+function export_client_key(): string {
     $ip = (string)($_SERVER['REMOTE_ADDR'] ?? 'local');
-    $dir = cache_root() . '/export-rate';
-    if (!is_dir($dir)) @mkdir($dir, 0775, true);
-    $file = $dir . '/' . hash('sha256', $ip . '|' . $mode) . '.json';
-    $window = $mode === 'batch' ? 3600 : 600;
-    $limit = $mode === 'batch' ? 4 : 20;
-    $now = time(); $times = [];
-    $fh = @fopen($file, 'c+'); if (!$fh) return;
-    if (flock($fh, LOCK_EX)) {
-        $content = stream_get_contents($fh); $decoded = json_decode($content ?: '[]', true);
-        if (is_array($decoded)) $times = array_values(array_filter($decoded, fn($t) => is_numeric($t) && ((int)$t) > $now - $window));
-        if (count($times) >= $limit) { flock($fh, LOCK_UN); fclose($fh); json_fail('Zbyt wiele eksportów z tego adresu. Spróbuj ponownie później.', 429); }
-        flock($fh, LOCK_UN);
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        $bin = @inet_pton($ip);
+        if (is_string($bin) && strlen($bin) === 16) $ip = bin2hex(substr($bin, 0, 8)) . '::/64';
     }
-    fclose($fh);
+    return $ip;
 }
-// 18.18.0: do limitu liczą się tylko eksporty, które się udały. Wcześniej każde
-// „Ponów” po niekompletnym eksporcie (409) zjadało jeden z 4 pakietów na godzinę.
-function record_export_success(string $mode): void {
-    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? 'local');
-    $file = cache_root() . '/export-rate/' . hash('sha256', $ip . '|' . $mode) . '.json';
+function export_rate_file(string $mode): string {
+    return cache_root() . '/export-rate/' . hash('sha256', export_client_key() . '|' . $mode) . '.json';
+}
+function export_rate_update(string $mode, callable $change): void {
+    $file = export_rate_file($mode);
+    if (!ensure_dir(dirname($file))) return;
     $window = $mode === 'batch' ? 3600 : 600;
     $now = time();
     $fh = @fopen($file, 'c+'); if (!$fh) return;
-    if (flock($fh, LOCK_EX)) {
-        $decoded = json_decode(stream_get_contents($fh) ?: '[]', true);
-        $times = is_array($decoded) ? array_values(array_filter($decoded, fn($t) => is_numeric($t) && ((int)$t) > $now - $window)) : [];
-        $times[] = $now; ftruncate($fh, 0); rewind($fh); fwrite($fh, json_encode($times)); fflush($fh); flock($fh, LOCK_UN);
+    if (!flock($fh, LOCK_EX)) { fclose($fh); return; }
+    $decoded = json_decode(stream_get_contents($fh) ?: '[]', true);
+    // Dawny format (do 19.41.4): sama lista udanych eksportów.
+    if (is_array($decoded) && array_is_list($decoded)) $decoded = ['s' => $decoded, 'a' => $decoded];
+    $fresh = static fn($list) => array_values(array_filter(is_array($list) ? $list : [], static fn($t) => is_numeric($t) && ((int)$t) > $now - $window));
+    $state = ['s' => $fresh($decoded['s'] ?? []), 'a' => $fresh($decoded['a'] ?? [])];
+    try {
+        $state = $change($state, $now);
+        ftruncate($fh, 0); rewind($fh); fwrite($fh, json_encode($state)); fflush($fh);
+    } finally {
+        flock($fh, LOCK_UN); fclose($fh);
     }
-    fclose($fh);
+}
+function enforce_export_rate_limit(string $mode): void {
+    $successLimit = $mode === 'batch' ? 4 : 20;
+    $attemptLimit = $mode === 'batch' ? 12 : 40;
+    export_rate_update($mode, static function (array $state, int $now) use ($successLimit, $attemptLimit): array {
+        if (count($state['s']) >= $successLimit || count($state['a']) >= $attemptLimit) {
+            json_fail('Zbyt wiele eksportów z tego adresu. Spróbuj ponownie później.', 429);
+        }
+        $state['a'][] = $now;
+        return $state;
+    });
+}
+function record_export_success(string $mode): void {
+    export_rate_update($mode, static function (array $state, int $now): array { $state['s'][] = $now; return $state; });
+}
+/**
+ * 19.41.4-b (audyt B1): najwyżej 2 eksporty naraz na całym serwerze (jak NMT i analizy). Eksport trzyma
+ * proces PHP do 2–5 minut; bez tego kilka równoległych żądań zajmowało wszystkie procesy hostingu.
+ * Blokada zwalnia się sama przy zakończeniu skryptu.
+ */
+const EXPORT_SLOTS = 2;
+function export_acquire_slot(): void {
+    $dir = cache_root() . '/export-slots';
+    if (!ensure_dir($dir)) return;
+    for ($i = 0; $i < EXPORT_SLOTS; $i++) {
+        $h = @fopen($dir . "/slot-{$i}.lock", 'c');
+        if ($h === false) return;
+        if (@flock($h, LOCK_EX | LOCK_NB)) { $GLOBALS['EXPORT_SLOT'] = $h; return; }
+        fclose($h);
+    }
+    header('Retry-After: 30');
+    json_fail('Serwer wykonuje teraz inne eksporty. Spróbuj ponownie za pół minuty.', 429);
+}
+/**
+ * 19.41.4-b (audyt B1): limity złożoności rysowanych obiektów. Wierzchołki jak w imporcie projektu
+ * (geometryLimits.js: 100 000), otwory w poligonach — bo każdy otwór odtwarzany jest piksel po pikselu.
+ */
+const EXPORT_MAX_VERTICES = 100000;
+const EXPORT_MAX_HOLES = 200;
+const EXPORT_HOLE_PIXEL_BUDGET = 60000000;
+function export_check_object_limits(array $objects): void {
+    $vertices = 0; $holes = 0;
+    $countRing = static function ($ring) use (&$vertices): void { if (is_array($ring)) $vertices += count($ring); };
+    foreach ($objects as $obj) {
+        $g = is_array($obj) && is_array($obj['geometry'] ?? null) ? $obj['geometry'] : null;
+        if ($g === null) continue;
+        $c = is_array($g['coordinates'] ?? null) ? $g['coordinates'] : [];
+        $type = (string)($g['type'] ?? '');
+        if ($type === 'LineString') $countRing($c);
+        elseif ($type === 'Polygon') { foreach ($c as $ring) $countRing($ring); $holes += max(0, count($c) - 1); }
+        elseif ($type === 'MultiPolygon') foreach ($c as $poly) { if (!is_array($poly)) continue; foreach ($poly as $ring) $countRing($ring); $holes += max(0, count($poly) - 1); }
+        elseif ($type === 'Point') $vertices++;
+        if ($vertices > EXPORT_MAX_VERTICES) json_fail('Obiekty mają zbyt wiele wierzchołków do eksportu (limit ' . EXPORT_MAX_VERTICES . '). Uprość geometrię albo ukryj część obiektów.', 413);
+        if ($holes > EXPORT_MAX_HOLES) json_fail('Obiekty mają zbyt wiele otworów do eksportu (limit ' . EXPORT_MAX_HOLES . ').', 413);
+    }
 }
 
 function finite_num($value): bool { return is_int($value) || is_float($value) || (is_string($value) && is_numeric($value)); }
@@ -159,7 +219,10 @@ $caps = export_capabilities();
 $pixels = $width * $height;
 if ($mode === 'single' && $pixels > $caps['safe_single_pixels']) json_fail('Eksport przekracza bezpieczny limit pamięci dla pojedynczego obrazu. Użyj trybu pakietu kafli.', 413, ['safe_single_pixels'=>$caps['safe_single_pixels'],'requested_pixels'=>$pixels]);
 if ($mode === 'batch' && !$caps['batch']) json_fail('Pakiet kafli wymaga GD i ZipArchive na hostingu.', 501);
+export_check_object_limits($objects);
+export_acquire_slot();
 enforce_export_rate_limit($mode);
+$GLOBALS['EXPORT_HOLE_PIXELS_LEFT'] = EXPORT_HOLE_PIXEL_BUDGET;
 // 18.18.0: limit czasu z budżetem — przed jego końcem nie pobieramy już nowych
 // fragmentów, tylko zwracamy 409 z listą braków (zamiast błędu 500 bez pliku).
 $exportTimeLimit = $mode === 'batch' ? 300 : 120;
@@ -319,6 +382,9 @@ function draw_polygon_geom($img,array $rings,array $bbox,int $w,int $h,int $stro
         imagefill($mask,0,0,$black);imagefilledpolygon($mask,$holeLocal,(int)(count($holeLocal)/2),$white);
         $hx=[];$hy=[];for($i=0;$i<count($holeLocal);$i+=2){$hx[]=$holeLocal[$i];$hy[]=$holeLocal[$i+1];}
         $x0=max(0,min($hx));$x1=min($mw-1,max($hx));$y0=max(0,min($hy));$y1=min($mh-1,max($hy));
+        // 19.41.4-b (audyt B1): budżet odtwarzania otworów na całe żądanie (pętla po pikselach w PHP).
+        $GLOBALS['EXPORT_HOLE_PIXELS_LEFT'] = ($GLOBALS['EXPORT_HOLE_PIXELS_LEFT'] ?? EXPORT_HOLE_PIXEL_BUDGET) - max(0, ($x1-$x0+1)*($y1-$y0+1));
+        if ($GLOBALS['EXPORT_HOLE_PIXELS_LEFT'] < 0) { imagedestroy($mask); imagedestroy($under); json_fail('Otwory w poligonach są zbyt duże do eksportu w tej rozdzielczości. Zmniejsz rozdzielczość albo obszar.', 413); }
         for($yy=$y0;$yy<=$y1;$yy++)for($xx=$x0;$xx<=$x1;$xx++){
             if(imagecolorat($mask,$xx,$yy)===$white){imagesetpixel($img,$minX+$xx,$minY+$yy,imagecolorat($under,$xx,$yy));}
         }

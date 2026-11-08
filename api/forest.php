@@ -37,7 +37,8 @@ function forest_multi(array $urls, int $timeout): array {
     $mh = curl_multi_init(); $handles = [];
     foreach ($urls as $key => $url) {
         $ch = curl_init($url);
-        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_CONNECTTIMEOUT => 8, CURLOPT_TIMEOUT => $timeout, CURLOPT_USERAGENT => FOREST_UA, CURLOPT_ENCODING => '']);
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 3, CURLOPT_CONNECTTIMEOUT => 8, CURLOPT_TIMEOUT => $timeout, CURLOPT_USERAGENT => FOREST_UA, CURLOPT_ENCODING => '',
+            CURLOPT_PROTOCOLS => CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS]);
         if ($ca = forest_ca()) curl_setopt($ch, CURLOPT_CAINFO, $ca);
         curl_multi_add_handle($mh, $ch); $handles[$key] = $ch;
     }
@@ -49,6 +50,52 @@ function forest_multi(array $urls, int $timeout): array {
     }
     curl_multi_close($mh);
     return $out;
+}
+
+/**
+ * 19.41.4-b (audyt B2): limit zapytań do BDL na adres IP (tylko pobrania — odpowiedzi z cache bez limitu).
+ * Adresy IPv6 liczone po sieci /64, żeby zmiana adresu w obrębie jednego łącza nie omijała limitu.
+ */
+function forest_client_key(): string {
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? 'local');
+    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+        $bin = @inet_pton($ip);
+        if (is_string($bin) && strlen($bin) === 16) $ip = bin2hex(substr($bin, 0, 8)) . '::/64';
+    }
+    return hash('sha256', $ip);
+}
+function forest_rate_limit(string $bucket, int $limit, int $window): void {
+    $dir = FOREST_CACHE . '/rate';
+    if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) return;
+    $h = @fopen($dir . '/' . $bucket . '-' . substr(forest_client_key(), 0, 24) . '.json', 'c+');
+    if ($h === false) return;
+    try {
+        @flock($h, LOCK_EX);
+        $now = time();
+        $list = json_decode((string)stream_get_contents($h), true);
+        $list = array_values(array_filter(is_array($list) ? $list : [], static fn ($t) => is_int($t) && $now - $t < $window));
+        if (count($list) >= $limit) {
+            http_response_code(429); header('Retry-After: 60'); header('Content-Type: text/plain; charset=utf-8'); header('Cache-Control: no-store');
+            echo 'Zbyt wiele zapytań o mapę lasów z tego adresu — spróbuj za chwilę.'; exit;
+        }
+        $list[] = $now;
+        ftruncate($h, 0); rewind($h); fwrite($h, json_encode($list));
+    } finally { @flock($h, LOCK_UN); fclose($h); }
+}
+/**
+ * Czy zapytanie to kafel siatki mapy (EPSG:3857, kafle 512 px jak w dataCatalog.js)? Tylko takie trafiają do
+ * cache: liczba możliwych plików jest wtedy skończona. Inne zapytania (np. test diagnostyki w EPSG:2180)
+ * są obsługiwane, ale bez zapisu na dysk — dowolne BBOX-y nie mogą już zapełnić konta.
+ */
+function forest_is_grid_tile(string $crs, array $bbox, int $w, int $h): bool {
+    if ($crs !== 'EPSG:3857' || $w !== $h || !in_array($w, [256, 512, 1024], true)) return false;
+    $world = 40075016.68557849; $origin = -20037508.342789244;
+    $span = $bbox[2] - $bbox[0];
+    if ($span <= 0 || abs(($bbox[3] - $bbox[1]) - $span) > $span * 1e-6) return false;
+    $z = log($world / $span, 2);
+    if (abs($z - round($z)) > 1e-6 || $z < 0 || $z > 23) return false;
+    foreach ([($bbox[0] - $origin) / $span, ($bbox[1] - $origin) / $span] as $i) if (abs($i - round($i)) > 1e-4) return false;
+    return true;
 }
 
 /** <FIELDS a="…" b="…"/> z odpowiedzi ArcGIS → tablice pól (wartości bez spacji, bez „Null”). */
@@ -81,7 +128,9 @@ if (isset($_GET['wms'])) {
     header('Content-Type: image/png');
     header('Cache-Control: public, max-age=86400');
     header('X-Content-Type-Options: nosniff');
-    if (is_file($file) && time() - (int)filemtime($file) < FOREST_TILE_TTL) { readfile($file); exit; }
+    $cacheable = forest_is_grid_tile($crs, $bbox, $w, $h);
+    if ($cacheable && is_file($file) && time() - (int)filemtime($file) < FOREST_TILE_TTL) { readfile($file); exit; }
+    forest_rate_limit('map', 600, 600);
     $sym = static fn (string $fill, string $stroke) => '<PolygonSymbolizer><Fill><CssParameter name="fill">' . $fill . '</CssParameter><CssParameter name="fill-opacity">0.5</CssParameter></Fill>'
         . '<Stroke><CssParameter name="stroke">' . $stroke . '</CssParameter><CssParameter name="stroke-width">0.7</CssParameter></Stroke></PolygonSymbolizer>';
     $sld = '<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc">'
@@ -95,8 +144,13 @@ if (isset($_GET['wms'])) {
         http_response_code(502); header('Content-Type: text/plain; charset=utf-8'); header('Cache-Control: no-store');
         echo 'Bank Danych o Lasach nie odpowiedział (HTTP ' . $res['code'] . ').'; exit;
     }
-    @mkdir(dirname($file), 0775, true);
-    @file_put_contents($file . '.part', $res['body']) && @rename($file . '.part', $file);
+    if ($cacheable) {
+        @mkdir(dirname($file), 0775, true);
+        $part = $file . '.part.' . bin2hex(random_bytes(4));
+        @file_put_contents($part, $res['body']) && @rename($part, $file);
+    } else {
+        header('Cache-Control: no-store');
+    }
     echo $res['body'];
     exit;
 }
@@ -107,7 +161,8 @@ $y = filter_var($_GET['y'] ?? null, FILTER_VALIDATE_FLOAT);
 if ($x === false || $y === false || $x < 140000 || $x > 900000 || $y < 120000 || $y > 800000) {
     forest_json(['ok' => false, 'error' => 'Nieprawidłowe współrzędne (EPSG:2180: x = wschód, y = północ).'], 400);
 }
-$infoKey = hash('sha256', sprintf('%.1f|%.1f|v1', $x, $y));
+// 19.41.4-b (audyt B2): klucz co 1 m zamiast 0,1 m — informacja o wydzieleniu lasu nie zmienia się na 10 cm.
+$infoKey = hash('sha256', sprintf('%.0f|%.0f|v1', $x, $y));
 $infoFile = forest_cache_dir() . '/info-' . substr($infoKey, 0, 32) . '.json';
 if (is_file($infoFile) && time() - (int)filemtime($infoFile) < FOREST_INFO_TTL) {
     $cached = json_decode((string)file_get_contents($infoFile), true);
@@ -118,6 +173,7 @@ $gfi = static function (string $layer) use ($x, $y): string {
     return FOREST_WMS . '?' . http_build_query(['SERVICE' => 'WMS', 'VERSION' => '1.1.1', 'REQUEST' => 'GetFeatureInfo', 'LAYERS' => $layer, 'QUERY_LAYERS' => $layer, 'STYLES' => '',
         'SRS' => 'EPSG:2180', 'BBOX' => implode(',', [$x - $d, $y - $d, $x + $d, $y + $d]), 'WIDTH' => 5, 'HEIGHT' => 5, 'X' => 2, 'Y' => 2, 'INFO_FORMAT' => 'text/xml', 'FEATURE_COUNT' => 3]);
 };
+forest_rate_limit('info', 120, 600);
 $res = forest_multi(['lp' => $gfi('1'), 'inne' => $gfi('0'), 'range' => $gfi('4')], 20);
 if ($res['lp']['code'] !== 200 && $res['inne']['code'] !== 200) {
     forest_json(['ok' => false, 'error' => 'Bank Danych o Lasach nie odpowiedział.', 'code' => 'upstream', 'retryable' => true], 502);

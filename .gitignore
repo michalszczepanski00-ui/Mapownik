@@ -2,3 +2,6 @@
 # 19.32.0: baza RWDZ budowana skryptem, wgrywana osobno
 data/rwdz/*.sqlite
 data/rwdz/*.building
+
+# 19.41.4-b: paczki budowane lokalnie
+dist/

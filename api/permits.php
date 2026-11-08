@@ -27,7 +27,7 @@ const PERMITS_MAX_ITEMS = 400;
 const PERMITS_GEO_BUDGET_S = 12.0;
 const PERMITS_PARALLEL = 8;
 const PERMITS_MISSING_RETRY_S = 30 * 86400;
-
+require_once __DIR__ . '/_permits_privacy.php'; // 19.41.4-b: ukrywanie danych osób fizycznych (RODO)
 function permits_out(array $payload, int $status = 200): never {
     http_response_code($status);
     echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -91,8 +91,14 @@ if (!is_file(PERMITS_DB)) permits_out(['ok' => false, 'code' => 'no-data', 'erro
 if (!class_exists('PDO') || !in_array('sqlite', PDO::getAvailableDrivers(), true)) permits_out(['ok' => false, 'error' => 'Serwer nie ma PDO SQLite.'], 503);
 if (isset($_GET['status'])) {
     $meta = [];
-    $db = new PDO('sqlite:' . PERMITS_DB, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::SQLITE_ATTR_OPEN_FLAGS => PDO::SQLITE_OPEN_READONLY]);
-    foreach ($db->query('SELECT key, value FROM meta') as $row) $meta[$row['key']] = $row['value'];
+    // 19.41.4-b: uszkodzona albo niedokończona baza dawała błąd 500 bez odpowiedzi JSON.
+    try {
+        $db = new PDO('sqlite:' . PERMITS_DB, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::SQLITE_ATTR_OPEN_FLAGS => PDO::SQLITE_OPEN_READONLY]);
+        foreach ($db->query('SELECT key, value FROM meta') as $row) $meta[$row['key']] = $row['value'];
+    } catch (Throwable $e) {
+        error_log('msportal permits.php status: ' . $e->getMessage());
+        permits_out(['ok' => false, 'code' => 'bad-data', 'error' => 'Baza pozwoleń (data/rwdz/rwdz.sqlite) jest uszkodzona albo niekompletna — wgraj ją ponownie.'], 503);
+    }
     $update = @json_decode((string)@file_get_contents(dirname(PERMITS_GEO) . '/update-status.json'), true);
     $building = is_file(dirname(PERMITS_GEO) . '/update-state.json');
     permits_out(['ok' => true, 'dataDate' => $meta['data_date'] ?? null, 'builtAt' => $meta['built_at'] ?? null, 'cutoff' => $meta['cutoff'] ?? null,
@@ -124,7 +130,8 @@ try {
         CREATE TABLE IF NOT EXISTS parcel_xy (id TEXT PRIMARY KEY, x REAL, y REAL, ok INTEGER NOT NULL, at INTEGER NOT NULL);
         CREATE TABLE IF NOT EXISTS region_pt (key TEXT PRIMARY KEY, teryt TEXT, at INTEGER NOT NULL);');
 } catch (Throwable $e) {
-    permits_out(['ok' => false, 'error' => 'Nie można otworzyć bazy pozwoleń: ' . $e->getMessage()], 503);
+    error_log('msportal permits.php: ' . $e->getMessage());
+    permits_out(['ok' => false, 'error' => 'Nie można otworzyć bazy pozwoleń — spróbuj ponownie za chwilę.'], 503);
 }
 
 // ---- 1. obręby w promieniu (środek + 16 punktów na okręgu + 8 w połowie promienia), pamiętane po siatce 50 m
@@ -223,7 +230,7 @@ if ($hits) {
         [$d, [$px, $py], $pid] = $hits[(int)$row['id']];
         $items[] = [
             'id' => (int)$row['id'], 'src' => $row['src'], 'date' => $row['date_in'], 'dateDecision' => $row['date_dec'],
-            'number' => $row['number'], 'organ' => $row['organ_name'], 'investor' => $row['investor'], 'type' => $row['type'],
+            'number' => $row['number'], 'organ' => $row['organ_name'], 'investor' => permits_public_investor($row['investor']), 'type' => $row['type'],
             'category' => $row['category'], 'kind' => $row['kind_name'], 'intent' => $row['intent_name'], 'name' => $row['name'],
             'volume' => $row['volume'] !== null ? (float)$row['volume'] : null, 'status' => $row['status_name'], 'place' => $row['place'],
             'parcels' => $byInv[(int)$row['id']], 'parcel' => $pid, 'x' => round($px, 1), 'y' => round($py, 1), 'dist' => (int)round($d),

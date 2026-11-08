@@ -2,6 +2,10 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
+  <!-- 19.41.4-b (audyt B5): Content-Security-Policy. Skrypty tylko z tego serwera i trzy skrypty wbudowane
+       (sumy sha256 poniżej). Sumy przelicza tools/csp_hashes.py — wywołuje go tools/bump_version.py,
+       a tools/check_release.py sprawdza zgodność. Po ręcznej zmianie skryptu wbudowanego: python3 tools/csp_hashes.py -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-poEKaoNrN25FvChL5enWICR2xa5JBS1/1F/gtOflfTE=' 'sha256-uTYgaKp1OYHTpyEbmydot1V+lxBnywyCXG9aVOkfWLI=' 'sha256-ROwVD33s4ixTnNp7aOlZ6Wo7qxHWwz0KkB/DqYdMQjg='; style-src 'self' 'unsafe-inline' data:; img-src 'self' data: blob: https:; connect-src 'self' https:; font-src 'self' data:; worker-src 'self' blob: data:; child-src 'self' blob: data:; media-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="color-scheme" content="light dark" />
   <meta name="theme-color" content="#f2f4f8" />
@@ -86,10 +90,16 @@
 </head>
 <body>
   <!-- 19.28.0: pierwszy element dla klawiatury — od razu do wyszukiwarki (przyciski mapy są w kodzie strony wcześniej). -->
-  <a class="skip-link" href="#map-search-input" onclick="var i=document.getElementById('map-search-input');if(i){event.preventDefault();i.focus();}">Przejdź do wyszukiwarki</a>
+  <a class="skip-link" href="#map-search-input">Przejdź do wyszukiwarki</a>
   <!-- 19.28.0: ekran wczytywania zamiast pustej białej strony; React zastępuje go przy pierwszym renderze. -->
   <div id="root"><div class="boot-screen" role="status" aria-live="polite"><img src="./assets/mapownik-logo-icon.png?v=19.41.4" alt="" width="44" height="44" /><strong>msportal</strong><span>Wczytywanie mapy…</span></div></div>
   <script type="module">
+    // 19.41.4-b (audyt B5): obsługa linku „Przejdź do wyszukiwarki” tutaj, a nie w atrybucie onclick —
+    // polityka CSP strony nie dopuszcza skryptów w atrybutach HTML.
+    document.querySelector('.skip-link')?.addEventListener('click', (event) => {
+      const input = document.getElementById('map-search-input');
+      if (input) { event.preventDefault(); input.focus(); }
+    });
     const root = document.getElementById('root');
     function showError(title, detail, options = {}) {
       if (!root) return;
@@ -124,7 +134,7 @@
     // ~5 MB bibliotek przy każdym otwarciu aplikacji, a start czekał na jego
     // odpowiedź, zanim zaczął pobierać OpenLayers. Teraz aplikacja startuje od
     // razu; o stan bibliotek pytamy dopiero wtedy, gdy start się nie powiódł —
-    // tylko po to, żeby przy braku bibliotek przejść do setup-vendors.php.
+    // tylko po to, żeby przy braku bibliotek pokazać komunikat, co wgrać ponownie.
     async function vendorsKnownMissing() {
       try {
         const status = await fetchVendorStatus(5000);
@@ -164,13 +174,13 @@
           + ' Następnie otwórz verify-deployment.php — powinno być "deployment_consistent": true.',
           { preformatted: true, actionHref: './verify-deployment.php', actionLabel: 'Sprawdź wdrożenie (verify-deployment.php)' });
       } else if (await vendorsKnownMissing()) {
-        window.location.replace('./setup-vendors.php?auto=1');
+        // 19.41.4-b (audyt B4): bez automatycznego pobierania bibliotek z sieci przez setup-vendors.php.
+        showError('Brakuje bibliotek na serwerze',
+          'Pliki w katalogu vendor/static/ są niepełne albo różnią się od wydania 19.41.4.'
+          + '\n\nWgraj ponownie katalog vendor/ z paczki tej wersji (opcja „nadpisz zawsze”), a potem odśwież stronę (Ctrl+F5).',
+          { preformatted: true, actionHref: './verify-deployment.php', actionLabel: 'Sprawdź wdrożenie (verify-deployment.php)' });
       } else {
-        showError('msportal nie wystartował', String(error), {
-          preformatted: true,
-          actionHref: './setup-vendors.php?auto=1',
-          actionLabel: 'Przygotuj biblioteki lokalne',
-        });
+        showError('msportal nie wystartował', String(error), { preformatted: true });
       }
     }
   </script>

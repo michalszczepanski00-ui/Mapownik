@@ -49,10 +49,53 @@ function exact_rank(string $query, string $candidate): int {
     return 3;
 }
 
+/**
+ * 19.41.4-b (audyt Z3): zapasowe zapytania do Nominatim z serwera zgodnie z zasadami OSMF —
+ * własny User-Agent z adresem serwisu (zamiast udawania przeglądarki), pamięć wyników na 24 h
+ * i najwyżej 1 zapytanie na sekundę z całego hostingu (wszyscy użytkownicy dzielą jego adres IP).
+ */
+const NOMINATIM_USER_AGENT = 'MSPortal/19.41.4 (+https://mapownik.swiadectwa.net)';
+const NOMINATIM_CACHE_TTL = 86400;
+function nominatim_get(string $url): array {
+    $dir = cache_root() . '/nominatim';
+    $key = hash('sha256', $url);
+    $cacheFile = $dir . '/' . substr($key, 0, 2) . '/' . $key . '.json';
+    if (is_fresh($cacheFile, NOMINATIM_CACHE_TTL)) {
+        $body = (string)@file_get_contents($cacheFile);
+        if ($body !== '') return [200, $body, 'application/json', ''];
+    }
+    if (!ensure_dir($dir) || !function_exists('curl_init')) return [0, '', '', 'Brak zapisu w cache wyszukiwania.'];
+    $lock = @fopen($dir . '/.throttle', 'c+');
+    if ($lock === false) return [0, '', '', 'Brak zapisu w cache wyszukiwania.'];
+    $deadline = microtime(true) + 3.0;
+    while (!@flock($lock, LOCK_EX | LOCK_NB)) {
+        if (microtime(true) > $deadline) { fclose($lock); return [429, '', '', 'Wyszukiwarka jest zajęta.']; }
+        usleep(100000);
+    }
+    try {
+        $wait = (float)stream_get_contents($lock) + 1.1 - microtime(true);
+        if ($wait > 0) usleep((int)round(min(1.1, $wait) * 1000000));
+        $ch = curl_init($url);
+        $ca = mapownik_ca_bundle();
+        curl_setopt_array($ch, [CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 6, CURLOPT_TIMEOUT => 12,
+            CURLOPT_USERAGENT => NOMINATIM_USER_AGENT, CURLOPT_HTTPHEADER => ['Accept: application/json', 'Accept-Language: pl'],
+            CURLOPT_SSL_VERIFYPEER => true, CURLOPT_SSL_VERIFYHOST => 2, CURLOPT_ENCODING => '', CURLOPT_FOLLOWLOCATION => false]
+            + ($ca !== null ? [CURLOPT_CAINFO => $ca] : []));
+        $result = mapownik_curl_exec($ch);
+        ftruncate($lock, 0); rewind($lock); fwrite($lock, sprintf('%.3F', microtime(true))); fflush($lock);
+    } finally {
+        @flock($lock, LOCK_UN); fclose($lock);
+    }
+    [$status, $body] = $result;
+    if ($status === 200 && $body !== '' && is_array(json_decode($body, true))) atomic_write($cacheFile, $body);
+    return $result;
+}
+
 function nominatim_json(string $url): array {
-    [$status, $body, $type, $error] = vendor_remote_get($url, 'application/json, text/json;q=0.9, */*;q=0.5');
+    [$status, $body, $type, $error] = nominatim_get($url);
     if ($status < 200 || $status >= 300 || trim($body) === '') {
-        search_fail('Usługa wyszukiwania miejsc jest chwilowo niedostępna' . ($error !== '' ? ': ' . $error : '.'), 502);
+        if ($error !== '') error_log('msportal search.php nominatim: ' . $error);
+        search_fail('Usługa wyszukiwania miejsc jest chwilowo niedostępna.', $status === 429 ? 429 : 502);
     }
     $json = json_decode($body, true);
     if (!is_array($json)) {
@@ -298,7 +341,8 @@ function search_parcels(string $parcelQuery, string $locality = '', bool $exactI
     $url = 'https://uldk.gugik.gov.pl/?' . http_build_query($params, '', '&', PHP_QUERY_RFC3986);
     [$status, $body, $type, $error] = vendor_remote_get($url, 'text/plain, text/*;q=0.9, */*;q=0.5');
     if ($status < 200 || $status >= 300 || trim($body) === '') {
-        search_fail('Usługa ULDK jest chwilowo niedostępna' . ($error !== '' ? ': ' . $error : '.'), 502);
+        if ($error !== '') error_log('msportal search.php uldk: ' . $error);
+        search_fail('Usługa ULDK jest chwilowo niedostępna.', 502);
     }
 
     $body = preg_replace('/^\xEF\xBB\xBF/', '', $body) ?? $body;
@@ -372,7 +416,7 @@ function uug_rows(string $query): ?array {
 /** Zapas dla adresów, których UUG nie zna (np. Warszawa): OpenStreetMap, tylko wyniki z numerem domu. */
 function nominatim_address_items(string $query): array {
     $url = 'https://nominatim.openstreetmap.org/search?' . http_build_query(['q' => $query, 'countrycodes' => 'pl', 'accept-language' => 'pl', 'addressdetails' => '1', 'limit' => '6', 'format' => 'jsonv2'], '', '&', PHP_QUERY_RFC3986);
-    [$status, $body] = vendor_remote_get($url, 'application/json', 12, 6);
+    [$status, $body] = nominatim_get($url);
     $rows = $status >= 200 && $status < 300 ? json_decode((string)$body, true) : null;
     $items = [];
     foreach (is_array($rows) ? $rows : [] as $row) {

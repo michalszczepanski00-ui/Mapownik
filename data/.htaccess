@@ -1,0 +1,17 @@
+# 19.41.4-b (audyt B5): katalog danych zablokowany niezależnie od reguł mod_rewrite w głównym .htaccess.
+# Projekty udostępnione (data/shared/), baza pozwoleń (data/rwdz/) i baza msportal są dostępne tylko przez api/.
+# Wyjątek: publiczna lista instalacji KOWR (data/kowr/installations.json|csv), wczytywana przez przeglądarkę.
+<IfModule mod_authz_core.c>
+  Require all denied
+  <FilesMatch "^installations[.](json|csv)$">
+    Require all granted
+  </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+  <FilesMatch "^installations[.](json|csv)$">
+    Order deny,allow
+    Allow from all
+  </FilesMatch>
+</IfModule>

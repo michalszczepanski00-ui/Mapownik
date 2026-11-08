@@ -180,6 +180,12 @@ def main() -> int:
     bump(old, new, args.dry_run)
     if args.dry_run:
         return 0
+    # 19.41.4-b: skrypty wbudowane w index.html zawierają numer wersji — przelicz sumy CSP,
+    # inaczej przeglądarka zablokuje start aplikacji.
+    import subprocess
+    if subprocess.run([sys.executable, str(ROOT / "tools" / "csp_hashes.py")]).returncode != 0:
+        print("BŁĄD: nie udało się przeliczyć CSP w index.html (tools/csp_hashes.py)")
+        return 1
     problems = check(new)
     for p in problems:
         print("BŁĄD:", p)
