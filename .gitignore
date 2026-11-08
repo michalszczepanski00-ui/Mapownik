@@ -1,0 +1,4 @@
+
+# 19.32.0: baza RWDZ budowana skryptem, wgrywana osobno
+data/rwdz/*.sqlite
+data/rwdz/*.building

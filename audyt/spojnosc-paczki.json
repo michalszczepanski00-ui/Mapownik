@@ -1,0 +1,54 @@
+{
+  "javascriptFiles": 255,
+  "phpFiles": 21,
+  "preloadedModules": 244,
+  "missingImportsOrPreloads": [],
+  "syntaxErrors": [],
+  "vendorIntegrity": [
+    {
+      "file": "react.js",
+      "ok": true
+    },
+    {
+      "file": "react-jsx-runtime.js",
+      "ok": true
+    },
+    {
+      "file": "react-dom.js",
+      "ok": true
+    },
+    {
+      "file": "react-dom-client.js",
+      "ok": true
+    },
+    {
+      "file": "radix-dropdown.js",
+      "ok": true
+    },
+    {
+      "file": "radix-tooltip.js",
+      "ok": true
+    },
+    {
+      "file": "proj4.js",
+      "ok": true
+    },
+    {
+      "file": "zod.js",
+      "ok": true
+    },
+    {
+      "file": "lucide-react.js",
+      "ok": true
+    },
+    {
+      "file": "openlayers.js",
+      "ok": true
+    },
+    {
+      "file": "openlayers.css",
+      "ok": true
+    }
+  ],
+  "version": "18.16.1"
+}

@@ -1,0 +1,73 @@
+/* 19.8.2: wspólne odstępy i kompaktowy układ warstw / wysokości.
+   Po 31-ux.css: poniższe reguły zastępują historyczne ustawienia gęstości. */
+.app-shell:not(.is-mobile) .layers-panel--v2 .layer-group-title {
+  min-height: 28px; height: auto; padding: 0 6px; gap: 3px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0;
+}
+.app-shell:not(.is-mobile) .layers-panel--v2 .layer-group-toggle {
+  min-height: 28px; height: auto; padding: 0 3px; font: inherit;
+}
+.layers-panel--v2 input.layer-group-checkbox { order: 0; margin: 0 2px 0 4px; flex: 0 0 16px; width: 16px; height: 16px; }
+.app-shell:not(.is-mobile) .layers-panel--v2 .layer-row--compact {
+  min-height: 30px; padding-block: 0;
+}
+.app-shell:not(.is-mobile) .layers-panel--v2 .layer-row-main { min-height: 30px; }
+.layers-panel--v2 .layer-row-titleline strong,
+.layers-panel--v2 .layer-row--compact .layer-row-titleline strong,
+.layers-panel--v2 .layer-row.is-visible .layer-row-titleline strong,
+.layers-panel--v2 .layer-row--visible .layer-row-titleline strong {
+  font-size: 12px; font-weight: 400; line-height: 1.25;
+}
+.layers-panel--v2 .layer-row.is-visible:not(.layer-row--error) { background: color-mix(in srgb, var(--accent) 6%, var(--surface-solid)); }
+.layers-panel--v2 .layers-toolbar { padding-top: 8px; }
+
+.terrain-area-panel .terrain-area-body { display: flex; flex-direction: column; gap: 4px; padding: 5px 10px; flex: 1 1 auto; min-height: 0; overflow: auto; }
+.terrain-area-panel .terrain-area-results { gap: 4px; }
+.terrain-area-panel .terrain-area-intro { margin: 4px 0; font-size: 12px; line-height: 1.35; }
+.terrain-area-panel .terrain-selection-settings > summary,
+.terrain-area-panel .terrain-display-options > summary,
+.terrain-area-panel .terrain-result-sections > details > summary { cursor: pointer; font-size: 12px; padding: 4px 0; color: var(--text-muted); }
+.terrain-area-panel summary:hover { color: var(--text); }
+.terrain-area-panel summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.terrain-area-panel .terrain-area-controls { gap: 6px 12px; justify-content: flex-start; align-items: center; margin: 4px 0; }
+.terrain-area-panel .terrain-area-controls .terrain-accuracy { flex: 0 1 320px; max-width: 320px; }
+.terrain-area-panel .terrain-parcel-list { max-height: 90px; }
+.terrain-area-panel .terrain-area-actions { gap: 4px; flex-direction: row; align-content: start; }
+.terrain-area-panel .terrain-area-actions button { min-height: 28px; }
+.terrain-area-panel .terrain-area-empty { padding: 6px 8px; font-size: 12px; }
+.terrain-area-panel .terrain-rectangle-selector { padding: 5px 7px; gap: 8px; }
+.terrain-area-panel .terrain-profile-stats.ui-stats { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; margin: 0; }
+.terrain-area-panel .ui-stat { padding: 3px 6px; }
+.terrain-area-panel .ui-stat strong { font-size: 13px; }
+.terrain-area-panel .ui-stat small { font-size: 12px; }
+.terrain-area-panel .terrain-display-toolbar { display: flex; flex-wrap: wrap; align-items: start; gap: 4px 16px; }
+.terrain-area-panel .terrain-display-toolbar > .ui-field { flex: 0 1 360px; }
+.terrain-area-panel .terrain-display-options { flex: 1 1 280px; min-width: 0; }
+.terrain-area-panel .terrain-display-options > summary { min-height: 28px; display: list-item; }
+.terrain-area-panel .terrain-surface-controls { gap: 6px 12px; margin: 4px 0; }
+.terrain-area-panel .terrain-hypsometry { display: grid; grid-template-columns: minmax(100px, 1fr) auto; align-items: center; gap: 8px; }
+.terrain-area-panel .terrain-hypsometry-bar { height: 8px; }
+.terrain-area-panel .terrain-hypsometry-labels { gap: 12px; font-weight: 400; }
+.terrain-area-panel .terrain-slope-legend { gap: 3px 12px; margin: 0; }
+.terrain-area-panel .terrain-surface-readout { margin: 0; min-height: 16px; font-size: 12px; }
+.terrain-area-panel .terrain-result-sections { display: flex; flex-wrap: wrap; align-items: start; gap: 0 20px; }
+.terrain-area-panel .terrain-result-sections > details[open] { flex: 1 0 100%; min-width: 0; }
+.terrain-area-panel .terrain-data-details { font-size: 12px; }
+.terrain-area-panel .terrain-data-details .terrain-profile-note { text-align: left; opacity: 1; }
+.terrain-area-panel .terrain-area-footer { flex: 0 0 auto; padding: 4px 10px; border-top: 1px solid var(--border-soft); }
+.terrain-area-panel .terrain-report-actions { gap: 5px; margin: 0; }
+.terrain-area-panel .terrain-report-actions .ui-button { min-height: 28px; }
+.terrain-area-panel .terrain-profile-header { min-height: 34px; padding-block: 3px; }
+@media (max-width: 760px) {
+  .terrain-area-panel .terrain-profile-stats.ui-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .terrain-area-panel .terrain-display-toolbar > .ui-field,
+  .terrain-area-panel .terrain-display-options { flex: 1 1 100%; }
+}
+@media (pointer: coarse) {
+  .layers-panel--v2 input.layer-group-checkbox { margin: 12px 8px; width: 20px; height: 20px; flex-basis: 20px; }
+  .app-shell .layers-panel--v2 .layer-group-title,
+  .app-shell .layers-panel--v2 .layer-group-toggle,
+  .app-shell .layers-panel--v2 .layer-row-main { min-height: 44px; }
+  .terrain-area-panel .ui-button,
+  .terrain-area-panel summary { min-height: 44px; }
+}

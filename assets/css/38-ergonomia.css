@@ -1,0 +1,77 @@
+/* 19.39.0 — dopracowanie ergonomii bez zmiany układu: zwięźlejsze karty, akcje na wierzchu,
+   zaawansowane opcje zwinięte, poprawki łamania tekstu w wąskiej karcie (260 px). */
+
+/* ---- karta działki: nagłówek zamiast tabeli 5 wierszy ---- */
+.identify-headline { display: grid; gap: 2px; margin: 2px 2px 8px; }
+.identify-headline-title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.identify-headline-title strong { font-size: 17px; line-height: 1.2; color: var(--text); }
+.identify-headline-title span { font-size: var(--fs-sm); color: var(--text-muted); }
+.identify-headline-sub { font-size: var(--fs-sm); color: var(--text); font-weight: 550; }
+.identify-headline-id .identify-fact { padding: 0; background: transparent; border: 0; min-height: 0; display: flex; align-items: center; gap: 6px; }
+.identify-headline-id .identify-fact > span { flex: 0 0 auto; }
+.identify-headline-id .identify-fact strong { font-weight: 500; font-size: var(--fs-xs); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.identify-headline-id .identify-fact-value > button { min-width: 26px; min-height: 26px; width: 26px; height: 26px; }
+
+/* ---- karta działki: działania widoczne bez menu ---- */
+.app-shell .identify-panel .identify-actions.identify-actions--v3 { display: grid; gap: 6px; margin: 8px 0 4px; }
+.identify-actions-main { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.identify-actions-main > .ui-button { justify-content: center; min-width: 0; }
+.identify-actions-more { display: flex; gap: 4px; }
+.identify-actions-more > button {
+  flex: 1 1 auto; min-height: 28px; padding: 3px 5px; border: 1px solid var(--border); border-radius: 7px;
+  background: var(--surface-solid); color: var(--text); font: inherit; font-size: var(--fs-xs); font-weight: 550; cursor: pointer;
+  white-space: nowrap;
+}
+.identify-actions-more > button:hover, .identify-actions-more > button:focus-visible { border-color: var(--accent); color: var(--accent); background: var(--surface-hover); }
+
+/* ---- Analizy: stan „sprawdzanie” w wąskiej karcie ---- */
+/* Przycisk z postępem na całą szerokość, „Zatrzymaj” pod nim — wcześniej oba w jednym wierszu łamały się w pół słowa. */
+.analysis-run-row:has(.analysis-cancel-button) { flex-wrap: wrap; grid-template-columns: 1fr; }
+.analysis-run-row .analysis-cancel-button { flex: 1 0 100%; min-height: 28px; }
+:is(.screening-target-help, .analysis-run-row, .export-section) .ui-button-label { overflow-wrap: normal; word-break: normal; }
+/* Nazwa źródła w wynikach w całości (np. „BDOT10k · budynki”), wartość w osobnym wierszu, gdy brak miejsca. */
+.screening-row { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; row-gap: 3px; }
+.screening-row-title { flex: 1 1 auto; white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.25; }
+.screening-row > strong { flex: 0 0 auto; }
+.screening-row > .data-quality, .screening-row > small { flex: 1 0 100%; }
+.screening-row > .data-quality { flex: 0 0 auto; }
+
+/* ---- Eksport: zaawansowany eksport z serwera zwinięty ---- */
+.export-advanced { border: 1px solid var(--border); border-radius: 10px; background: var(--surface-solid); }
+.export-advanced > summary {
+  list-style: none; cursor: pointer; display: grid; grid-template-columns: auto 1fr; column-gap: 8px; padding: 9px 12px;
+  font-weight: 650; font-size: var(--fs-sm); color: var(--text);
+}
+.export-advanced > summary::-webkit-details-marker { display: none; }
+.export-advanced > summary::before { content: '▸'; grid-row: 1 / span 2; color: var(--text-muted); transition: transform .12s; }
+.export-advanced[open] > summary::before { transform: rotate(90deg); }
+.export-advanced > summary small { grid-column: 2; color: var(--text-muted); font-weight: 400; font-size: var(--fs-xs); }
+.export-advanced[open] > summary { border-bottom: 1px solid var(--border); }
+.export-advanced > .export-section { border: 0; margin: 0; box-shadow: none; }
+
+/* ---- Raport (zakładka): skrót do raportu PDF ---- */
+.vps-pdf-shortcut { display: flex; margin: 2px 0 8px; }
+.vps-pdf-shortcut > .ui-button { flex: 1; justify-content: center; }
+@media (prefers-reduced-motion: reduce) { .export-advanced > summary::before { transition: none; } }
+
+/* ---- Rysuj / Mierz: podpowiedź raz, przy mapie ---- */
+/* Pasek przy mapie (MapToolHint) pokazuje następny krok; karta powtarzała to samo zdanie. Treść zostaje pod ikoną „i”. */
+.app-shell:has(.map-tool-hint) .workspace-card .context-next-step { display: none; }
+
+/* ---- Profil terenu: czytelne etykiety, niższy panel na niskich ekranach ---- */
+.terrain-profile-chart { position: relative; }
+.terrain-ylabel { position: absolute; left: 6px; padding: 0 4px; border-radius: 4px; background: color-mix(in srgb, var(--surface-solid) 85%, transparent); color: var(--text-muted); font-size: var(--fs-xs); font-variant-numeric: tabular-nums; pointer-events: none; }
+.terrain-ylabel--max { top: 0; }
+.terrain-ylabel--min { bottom: 6px; }
+.terrain-profile-xaxis { display: flex; justify-content: space-between; color: var(--text-muted); font-size: var(--fs-xs); margin-top: 2px; }
+.terrain-hover-dot { position: absolute; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: var(--chart-line); border: 2px solid var(--surface-solid); pointer-events: none; }
+.terrain-hover-tip { position: absolute; transform: translate(8px, -130%); padding: 2px 6px; border-radius: 5px; background: var(--surface-solid); border: 1px solid var(--border); font-size: var(--fs-xs); font-weight: 600; white-space: nowrap; pointer-events: none; box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,.12)); }
+.terrain-hover-tip.is-left { transform: translate(calc(-100% - 8px), -130%); }
+@media (max-height: 860px) {
+  .terrain-profile-chart { height: 128px; }
+  .terrain-profile-stats span { padding: 3px 7px; }
+  .terrain-profile-body { padding-block: 6px 5px; }
+}
+
+/* ---- telefon: nagłówek arkusza już podaje numer, gminę i powierzchnię — w szczegółach tylko identyfikator ---- */
+.m-card-details .identify-headline-title, .m-card-details .identify-headline-sub { display: none; }

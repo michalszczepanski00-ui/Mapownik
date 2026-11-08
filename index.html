@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#f2f4f8" />
+  <title>msportal</title>
+  <link rel="icon" type="image/png" href="./assets/mapownik-logo-icon.png?v=19.41.4" />
+  <link rel="stylesheet" href="./vendor/static/openlayers.css?v=10.10.0" />
+  <!-- Arkusz podzielony na warstwy kaskady. Kolejność <link> ma znaczenie:
+       00-layers.css deklaruje kolejność warstw i musi być pierwszy. Pliki
+       21–27 to dawny 20-legacy.css rozdzielony tematycznie (patrz nagłówek
+       każdego pliku) — wszystkie nadal deklarują warstwę „legacy", więc ich
+       kolejność względem 30-shell.css/90-utilities.css się nie zmieniła;
+       kolejność MIĘDZY nimi (21..27) też nie jest przypadkowa, bo część
+       reguł powtarza ten sam selektor w dwóch plikach (np. odstępy paska
+       narzędzi poprawione później) — zamieniona kolejność linków zmieniłaby,
+       która deklaracja wygrywa. -->
+  <link rel="stylesheet" href="./assets/css/00-layers.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/10-tokens.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/21-legacy-shell.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/22-legacy-panels.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/23-legacy-catalog.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/24-legacy-tools.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/25-legacy-export.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/26-legacy-identify.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/27-legacy-analysis.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/30-shell.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/31-ux.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/32-vps.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/33-compact-layout.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/34-v2.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/35-workspace-1c.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/36-latwa-obsluga.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/37-raport-pdf.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/38-ergonomia.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/39-teren-3d.css?v=19.41.4" />
+  <link rel="stylesheet" href="./assets/css/90-utilities.css?v=19.41.4" />
+  <script>
+    window.__MAPOWNIK_DEPLOY_VERSION__ = '19.41.4';
+    window.__MAPOWNIK_BOOTED__ = false;
+  </script>
+  <!-- 17.8.11: lucide, zod i proj4 ładowane z vendor/opt (podzbiór ikon
+       i wersje zminifikowane — te same biblioteki, patrz vendor/opt/README.txt).
+       Import map musi być zdefiniowany przed modułami aplikacji. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "./vendor/static/react.js?v=19.2.8",
+      "react/jsx-runtime": "./vendor/static/react-jsx-runtime.js?v=19.2.8",
+      "react-dom": "./vendor/static/react-dom.js?v=19.2.8",
+      "react-dom/client": "./vendor/static/react-dom-client.js?v=19.2.8",
+      "@radix-ui/react-dropdown-menu": "./vendor/static/radix-dropdown.js?v=2.1.16",
+      "@radix-ui/react-tooltip": "./vendor/static/radix-tooltip.js?v=1.2.8",
+      "proj4": "./vendor/opt/proj4.min.js?v=2.22.0-m1",
+      "zod": "./vendor/opt/zod.min.js?v=4.6.5-m1",
+      "lucide-react": "./vendor/opt/lucide-subset.js?v=1.47.0-18.18.0c",
+      "ol": "./vendor/ol-esm-2/index.js",
+    "ol-mapbox-style": "./vendor/opt/ol-mapbox-style.js?v=13.5.1",
+    "maplibre-contour": "./vendor/opt/maplibre-contour.js?v=0.1.0",
+    "three": "./vendor/opt/three.module.min.js?v=0.170.0",
+    "three-orbit-controls": "./vendor/opt/three-orbit-controls.js?v=0.170.0",
+    "ol/": "./vendor/ol-esm-2/"
+    }
+  }
+  </script>
+  <!-- 17.8.11: OpenLayers (1 MB) zaczyna się pobierać od razu, równolegle
+       z modułami aplikacji, zamiast czekać na vendor_status.php. -->
+  <link rel="preload" as="script" href="./vendor/static/openlayers.js?v=10.10.0" />
+  <!-- 19.5.0: celowo bez setek preloadów JS: ograniczamy liczbę jednoczesnych
+       żądań i obciążenie pamięci. Moduły ESM wczytują się przy potrzebie. -->
+  <!-- MODULEPRELOAD:START -->
+  <!-- MODULEPRELOAD:END -->
+  <style>
+    .boot-screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font:14px/1.4 Inter,"Segoe UI",Arial,sans-serif;color:#33413a;background:#eef2ee}
+    .boot-screen strong{font-size:18px;color:#1f3a2b}
+    .boot-screen span{color:#5b6b62}
+    .boot-screen img{animation:boot-pulse 1.4s ease-in-out infinite}
+    @keyframes boot-pulse{50%{opacity:.45}}
+    @media (prefers-reduced-motion:reduce){.boot-screen img{animation:none}}
+    @media (prefers-color-scheme:dark){.boot-screen{background:#151a17;color:#d6ded9}.boot-screen strong{color:#e8efe9}.boot-screen span{color:#9fb0a6}}
+    .skip-link{position:absolute;left:8px;top:-60px;z-index:10000;padding:8px 12px;border-radius:8px;background:#1f5135;color:#fff;font:600 13px Inter,"Segoe UI",Arial,sans-serif;text-decoration:none}
+    .skip-link:focus{top:8px}
+  </style>
+</head>
+<body>
+  <!-- 19.28.0: pierwszy element dla klawiatury — od razu do wyszukiwarki (przyciski mapy są w kodzie strony wcześniej). -->
+  <a class="skip-link" href="#map-search-input" onclick="var i=document.getElementById('map-search-input');if(i){event.preventDefault();i.focus();}">Przejdź do wyszukiwarki</a>
+  <!-- 19.28.0: ekran wczytywania zamiast pustej białej strony; React zastępuje go przy pierwszym renderze. -->
+  <div id="root"><div class="boot-screen" role="status" aria-live="polite"><img src="./assets/mapownik-logo-icon.png?v=19.41.4" alt="" width="44" height="44" /><strong>msportal</strong><span>Wczytywanie mapy…</span></div></div>
+  <script type="module">
+    const root = document.getElementById('root');
+    function showError(title, detail, options = {}) {
+      if (!root) return;
+      const box = document.createElement('div');
+      box.style.cssText = 'font-family:Segoe UI,Arial,sans-serif;max-width:820px;margin:48px auto;padding:24px;border:1px solid #f3b4b4;border-radius:12px;background:#fff;color:#18202c';
+      const heading = document.createElement('h2'); heading.style.marginTop = '0'; heading.textContent = String(title ?? 'Błąd'); box.appendChild(heading);
+      const detailNode = document.createElement(options.preformatted ? 'pre' : 'p'); detailNode.textContent = String(detail ?? '');
+      if (options.preformatted) detailNode.style.cssText = 'white-space:pre-wrap;background:#f7f7f8;padding:12px;border-radius:8px';
+      box.appendChild(detailNode);
+      if (options.actionHref && options.actionLabel) {
+        const actionP = document.createElement('p'); const action = document.createElement('a');
+        action.href = options.actionHref; action.textContent = options.actionLabel;
+        action.style.cssText = 'display:inline-block;padding:10px 14px;border-radius:8px;background:#2563eb;color:#fff;text-decoration:none';
+        actionP.appendChild(action); box.appendChild(actionP);
+      }
+      const diagP = document.createElement('p'); const diag = document.createElement('a'); diag.href = './diagnostyka.html'; diag.textContent = 'Otwórz diagnostykę'; diagP.appendChild(diag); box.appendChild(diagP);
+      const version = document.createElement('p'); version.style.cssText = 'color:#667085;font-size:13px'; version.textContent = 'Wersja: 19.41.4'; box.appendChild(version);
+      root.replaceChildren(box);
+    }
+    async function fetchVendorStatus(timeoutMs) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetch('./api/vendor_status.php?v=19.41.4', { cache: 'no-store', signal: controller.signal });
+        if (!response.ok) throw new Error(`vendor_status: HTTP ${response.status}`);
+        return await response.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+    // 17.8.11: vendor_status.php nie blokuje już każdego startu. Liczył SHA-256
+    // ~5 MB bibliotek przy każdym otwarciu aplikacji, a start czekał na jego
+    // odpowiedź, zanim zaczął pobierać OpenLayers. Teraz aplikacja startuje od
+    // razu; o stan bibliotek pytamy dopiero wtedy, gdy start się nie powiódł —
+    // tylko po to, żeby przy braku bibliotek przejść do setup-vendors.php.
+    async function vendorsKnownMissing() {
+      try {
+        const status = await fetchVendorStatus(5000);
+        return status && status.ready === false;
+      } catch (error) {
+        console.warn('msportal: vendor_status.php nie odpowiedział.', error);
+        return false;
+      }
+    }
+    function loadOpenLayers() {
+      return new Promise((resolve, reject) => {
+        if (window.ol?.Map) { resolve(); return; }
+        const script = document.createElement('script');
+        script.src = './vendor/static/openlayers.js?v=10.10.0';
+        script.async = false;
+        script.onload = () => (window.ol?.Map ? resolve() : reject(new Error('Lokalny OpenLayers nie udostępnił window.ol.Map.')));
+        script.onerror = () => reject(new Error('Nie udało się załadować lokalnego OpenLayers.'));
+        document.head.appendChild(script);
+      });
+    }
+    try {
+      // OpenLayers i graf modułów równolegle; vendor/ol-esm-2/_ol.js sam czeka
+      // na window.ol (top-level await), więc kolejność wykonania jest ta sama.
+      await Promise.all([loadOpenLayers(), import('./app-19.41.4/main.js?v=19.41.4')]);
+    } catch (error) {
+      console.error('msportal bootstrap failed', error);
+      // 19.26.0: niepełne wgranie — nowy index.html, ale stary .htaccess blokuje nowy katalog
+      // aplikacji (HTTP 410) albo katalogu nie ma (404). Komunikat mówi, co wgrać ponownie.
+      let appStatus = 0;
+      try { appStatus = (await fetch('./app-19.41.4/main.js?v=19.41.4', { method: 'HEAD', cache: 'no-store' })).status; } catch { appStatus = 0; }
+      if (appStatus === 410 || appStatus === 404) {
+        showError('Niepełna aktualizacja na serwerze',
+          (appStatus === 410
+            ? 'Serwer blokuje katalog app-19.41.4 (HTTP 410): wgrany jest nowy index.html, ale stary plik .htaccess.'
+            : 'Na serwerze brakuje katalogu app-19.41.4 (HTTP 404).')
+          + '\n\nWgraj ponownie całą paczkę tej wersji z opcją „nadpisz zawsze”: .htaccess (plik ukryty), VERSION.txt, katalog api/ oraz app-19.41.4/.'
+          + ' Następnie otwórz verify-deployment.php — powinno być "deployment_consistent": true.',
+          { preformatted: true, actionHref: './verify-deployment.php', actionLabel: 'Sprawdź wdrożenie (verify-deployment.php)' });
+      } else if (await vendorsKnownMissing()) {
+        window.location.replace('./setup-vendors.php?auto=1');
+      } else {
+        showError('msportal nie wystartował', String(error), {
+          preformatted: true,
+          actionHref: './setup-vendors.php?auto=1',
+          actionLabel: 'Przygotuj biblioteki lokalne',
+        });
+      }
+    }
+  </script>
+</body>
+</html>

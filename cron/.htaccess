@@ -1,0 +1,7 @@
+# 19.35.0: skrypty crona — tylko z wiersza poleceń (OVH Zaplanowane zadania), nigdy z przeglądarki.
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Deny from all
+</IfModule>

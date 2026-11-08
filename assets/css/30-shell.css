@@ -1,0 +1,2554 @@
+/* Układ powłoki: paski górne, doki, szyna ikon i zachowanie paneli w doku.
+   Warstwa wygrywa z legacy niezależnie od specyficzności, więc reguły mogą
+   być pisane wprost, bez sztucznego wydłużania selektorów. */
+@layer shell {
+
+/* Selektory są celowo krótkie: warstwa shell wygrywa z legacy niezależnie od
+   specyficzności, więc nie trzeba ich sztucznie wydłużać (`.is-docked` obok
+   `.compact-panel`, zawężanie do `.layers-panel`) tylko po to, żeby przebić
+   historyczną regułę. */
+
+/* Przypisanie pasm z-index elementom powłoki (Faza 0). */
+.map-statusbar { z-index: var(--z-map-statusbar); }
+.map-view-controls { z-index: var(--z-map-controls); }
+.floating-tools { z-index: var(--z-tools); }
+.layers-panel { z-index: var(--z-dock); }
+.objects-panel { z-index: var(--z-dock-raised); }
+.identify-panel { z-index: var(--z-dock-overlay); }
+.export-panel { z-index: var(--z-dock-top); }
+.top-property-bar { z-index: var(--z-appbar); }
+.map-search-dropdown { z-index: var(--z-search-dropdown); }
+.dropdown-content { z-index: var(--z-menu); }
+.tooltip-content { z-index: var(--z-tooltip); }
+
+/* Ustawianie elementów wewnątrz paska aplikacji i paska zaznaczenia. */
+/* 16.5.0 symulowała drugi rząd paska zawijaniem flexa i pseudoelementem
+   `::after { flex: 0 0 100% }`, z żonglerką `order`, bo wszystko siedziało
+   w jednym kontenerze. Faza 2 dzieli pasek na dwa realne komponenty
+   (AppBar + SelectionBar), więc ta symulacja jest zbędna — zostają tylko
+   reguły ustawiania elementów wewnątrz paska aplikacji. */
+.app-bar > .brand,
+.app-bar > .map-search,
+.app-bar > .topbar-primary-action,
+.app-bar > .compact-basemap-button { align-self: center; }
+.app-bar > .top-spacer { flex: 1 1 auto; }
+.selection-bar > .property-section,
+.selection-bar > .topbar-context-action,
+.selection-bar > .toolbar-divider { min-height: 32px; }
+
+/* Odstępy pasków, także zależne od szerokości ekranu. Muszą leżeć w tej
+   samej warstwie co reguły bazowe pasków — inaczej by z nimi przegrywały. */
+.app-bar { gap: 5px; padding: 5px 8px; }
+@media (max-width: 1366px) and (max-height: 820px) {
+  .app-bar { padding-block: 4px; }
+}
+@media (max-width: 620px) {
+  .app-bar { gap: 3px; padding-inline: 6px; }
+  .selection-bar { gap: 3px; padding-inline: 6px; }
+}
+
+/* ==========================================================================
+   Faza 1 — dok i szyna ikon
+
+   Mapa zajmuje całą przestrzeń do szyny. Karta narzędzia nakłada się na mapę,
+   więc nad i pod nią nadal widać mapę. Okna odpięte z doku dalej pływają nad
+   mapą i korzystają z reguł sprzed przebudowy.
+   ========================================================================== */
+
+.workspace {
+  --activity-bar-width: 56px;
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+/* Układ odniesienia dla mapy, narzędzi i okien odpiętych. */
+.map-area {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--map-bg);
+}
+
+/* ------------------------------------------------------------------- dok */
+
+/* Dok: reguły wspólne dla obu krawędzi są niżej, w sekcji Fazy 2. */
+
+/* ------------------------------------------------------------ szyna ikon */
+
+.activity-bar {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  z-index: var(--z-dock-raised);
+  width: var(--activity-bar-width);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 0;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+.activity-bar-heading {
+  display: block;
+  width: 100%;
+  padding: 2px 0 5px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+}
+.activity-bar-slot { position: relative; }
+.activity-bar-button {
+  width: 34px;
+  height: 34px;
+}
+/* 19.8.5: ikona z krótkim podpisem (audyt UX A1). */
+.activity-bar-button.has-label {
+  width: 52px;
+  height: 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 2px 0;
+}
+.activity-bar-label {
+  display: block;
+  max-width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+/* Otwarty panel ma obrys zamiast wypełnienia używanego przez aktywne
+   narzędzia mapy (.icon-button.is-active). */
+.activity-bar-button.is-open {
+  color: var(--accent);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.activity-bar-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--surface-solid);
+  font-size: 9px;
+  font-weight: var(--fw-semibold);
+  line-height: 14px;
+  text-align: center;
+  pointer-events: none;
+}
+.activity-bar-dot {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid var(--surface-raised);
+  background: var(--accent);
+  pointer-events: none;
+}
+
+/* Panel Warstwy ma overflow:hidden, więc połowa uchwytu wystająca poza jego
+   krawędź była przycinana i nie dawała się złapać — zostawała chwytliwa
+   dosłownie kilkupikselowa resztka. Uchwyt wjeżdża w całości do środka. */
+.panel-resizer--right { right: 0; }
+
+/* Uchwyty okien pływających też muszą leżeć nad treścią panelu. Bez tego
+   chwytliwy był tylko ten skrawek paska, który wystawał poza panel — reszta
+   trafiała w wiersze listy. */
+.panel-resizer,
+.panel-height-resizer {
+  z-index: var(--z-dock-handle);
+}
+
+/* Tryb zaznaczania prostokąta eksportu chowa dok razem z resztą powłoki. */
+.app-shell.is-export-selection .workspace { display: block; }
+
+/* 18.9.11: do 860 px przyciski szyny mają 40 px (wcześniej 30 px — najmniejsze
+   akurat na tabletach). Szyna rośnie do 44 px, żeby je pomieścić. */
+@media (max-width: 860px) {
+  .workspace { --activity-bar-width: 54px; }
+  .activity-bar-button { width: 40px; height: 40px; }
+  .activity-bar-button.has-label { width: 50px; height: 46px; }
+}
+
+/* ==========================================================================
+   Faza 2 — dwurzędowy pasek górny i dolny dok
+
+   Pasek górny rozpada się na stały pasek aplikacji i pasek właściwości
+   zaznaczenia, który pojawia się tylko wtedy, gdy jest co opisywać. Obszar
+   roboczy zyskuje drugą oś: kolumna mapy oddaje wysokość dolnemu dokowi tak
+   samo, jak cały obszar oddaje szerokość dokowi prawemu.
+   ========================================================================== */
+
+/* Pasek górny przestaje być jednym rzędem o stałej wysokości: rośnie o rząd
+   kontekstowy i pozwala mu się zawijać, nie ruszając paska aplikacji. */
+.top-property-bar {
+  height: auto;
+  min-height: var(--topbar-height);
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+}
+.app-bar {
+  min-height: var(--topbar-height);
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+}
+.selection-bar {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 5px 9px;
+  border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--surface-raised) 60%, transparent);
+  animation: selection-bar-in 120ms ease-out;
+}
+@keyframes selection-bar-in {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .selection-bar { animation: none; }
+}
+/* Odstęp po lewej wyrównuje pasek właściwości do treści, a nie do logo. */
+
+/* ------------------------------------------------------------ kolumna mapy */
+
+.map-column {
+  width: calc(100% - var(--activity-bar-width));
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.map-area { flex: 1 1 auto; }
+
+/* --------------------------------------------------------- dok jako rodzina */
+
+.dock {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-solid);
+}
+.dock--right {
+  z-index: var(--z-dock);
+  border-left: 1px solid var(--border);
+}
+.dock--bottom {
+  z-index: var(--z-dock);
+  flex: 0 0 auto;
+  border-top: 1px solid var(--border);
+}
+
+/* Panel w doku oddaje ramkę, cień i pozycjonowanie kontenerowi. */
+.dock .compact-panel {
+  position: static;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  max-width: none;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.dock-resizer {
+  position: absolute;
+  z-index: var(--z-dock-handle);
+  touch-action: none;
+  background: transparent;
+}
+.dock--right > .dock-resizer {
+  top: 0;
+  bottom: 0;
+  left: -3px;
+  width: 7px;
+  cursor: ew-resize;
+}
+.dock--bottom > .dock-resizer {
+  left: 0;
+  right: 0;
+  top: -3px;
+  height: 7px;
+  cursor: ns-resize;
+}
+.dock-resizer:hover,
+.dock-resizer:focus-visible {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+/* ------------------------------------------- profil terenu w dolnym doku */
+
+/* Wykres jest szeroki i niski, więc w doku dostaje całą szerokość mapy
+   zamiast wisieć nad nią jako okno o stałych marginesach. */
+.dock--bottom .terrain-profile-panel {
+  left: auto;
+  right: auto;
+  bottom: auto;
+  min-width: 0;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+}
+.dock--bottom .terrain-profile-panel .terrain-profile-body,
+.dock--bottom .terrain-profile-panel .terrain-area-body {
+  min-height: 0;
+  overflow: auto;
+}
+@media (max-width: 860px) {
+  .selection-bar { padding: 4px 7px; }
+}
+
+/* Paleta narzędzi nie może przerastać obszaru mapy — po otwarciu dolnego doku
+   mapa bywa niska, a paleta ma stałą liczbę pozycji i zasłaniała statusbar.
+   17.8.13: odstęp liczony od paska stanu (12 px góra + 28 px pasek + 8 px);
+   wcześniej przy 1280×720 paleta zawsze wchodziła 14 px na pasek stanu. */
+.floating-tools {
+  max-height: calc(100% - var(--statusbar-height) - 20px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.floating-tools-heading {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  gap: 2px;
+  color: var(--text-muted);
+  background: var(--surface);
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  line-height: 1.1;
+}
+.floating-tools-collapse {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.floating-tools-collapse:hover { background: var(--surface-hover); color: var(--text); }
+.floating-tools-collapse:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+.floating-tools.is-collapsed { overflow: visible; }
+.floating-tools.is-collapsed .floating-tools-collapse svg { transform: rotate(-90deg); }
+
+/* Profil terenu używa własnych nazw przycisków, które nigdy nie dostały stylu
+   — w oknie pływającym o stałej szerokości rzucało się to mniej w oczy niż
+   teraz, na całą szerokość doku. Przejmują wygląd przycisków paneli. */
+
+/* Nagłówek modułu w doku wyrównany z nagłówkami pozostałych paneli. */
+.dock .terrain-profile-header { padding: 7px 8px 7px 12px; min-height: 43px; }
+.dock .terrain-profile-header strong { font-size: var(--fs-md); }
+.dock .terrain-profile-header small { font-size: var(--fs-sm); }
+
+/* Nazwa zaznaczonego obiektu była chowana poniżej 1500 px, bo w jednym rzędzie
+   konkurowała z wyszukiwarką i przełącznikami paneli. We własnym rzędzie
+   miejsca starcza, więc wraca — znika dopiero na wąskich ekranach. */
+
+.selection-bar .toolbar-divider { display: none; }
+
+/* --------------------------------------- tabela wyników analizy (dolny dok) */
+
+.analysis-results-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.analysis-results-panel .panel-header { gap: 10px; }
+.results-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-inline-start: auto;
+}
+
+.results-export {
+  width: auto;
+  min-height: 28px;
+  margin-top: 0;
+  padding-inline: 10px;
+}
+
+.results-table-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-md);
+  white-space: nowrap;
+}
+/* Nagłówek zostaje widoczny przy przewijaniu długiej listy trafień. */
+.results-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0;
+  text-align: left;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+}
+.results-table thead th button {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  cursor: pointer;
+}
+.results-table thead th button svg { opacity: .35; }
+.results-table thead th.is-sorted button { color: var(--text); }
+.results-table thead th.is-sorted button svg { opacity: .9; color: var(--accent); }
+.results-table thead th.is-numeric button { justify-content: flex-end; }
+
+.results-table tbody td {
+  padding: 6px 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  color: var(--text);
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.results-table tbody td.is-numeric { text-align: right; font-variant-numeric: tabular-nums; }
+.results-table tbody tr { cursor: pointer; }
+.results-table tbody tr:hover { background: var(--surface-hover); }
+.results-table tbody tr.is-selected { background: var(--accent-soft); }
+.results-table tbody tr.is-selected td { color: var(--text); font-weight: 600; }
+.results-table tbody tr:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.results-col-flag { width: 62px; text-align: center; color: var(--accent); }
+/* Nagłówek kolumny znacznika nie ma przycisku sortowania, więc potrzebuje
+   własnych odstępów — reguła `thead th { padding: 0 }` jest pod przycisk. */
+.results-table thead th.results-col-flag {
+  padding: 7px 8px;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  text-align: center;
+}
+.results-table tbody tr.is-in-radius td.results-col-flag { color: var(--accent); }
+
+/* Zakładki doku — tylko dla modułów kontekstowych, które nie mają pozycji
+   w szynie ikon. */
+.dock-tabs {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 2px;
+  padding: 4px 6px 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+.dock-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  cursor: pointer;
+}
+.dock-tab:hover { color: var(--text); background: var(--surface-hover); }
+.dock-tab.is-active {
+  color: var(--text);
+  border-color: var(--border);
+  background: var(--surface-solid);
+}
+.dock-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/* ---------------------------------------------------------------------------
+   Okna dialogowe (DialogHost)
+
+   Zastępują window.confirm/window.prompt. Renderowane portalem do <body>, więc
+   korzystają z tokenów zdublowanych na :root, a nie ze zmiennych .app-shell.
+   --------------------------------------------------------------------------- */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-dialog);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--backdrop);
+  backdrop-filter: blur(2px);
+  animation: dialog-fade 120ms ease-out;
+}
+:root[data-theme="dark"] .dialog-backdrop { background: var(--backdrop); }
+
+.dialog-window {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--panel-radius);
+  background: var(--surface-solid);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  animation: dialog-rise 140ms cubic-bezier(.2, .8, .3, 1);
+}
+
+.dialog-head { display: flex; align-items: center; gap: 10px; }
+.dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.dialog-window--danger .dialog-icon { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
+:root[data-theme="dark"] .dialog-window--danger .dialog-icon { color: var(--danger); }
+
+.dialog-title { margin: 0; font-size: var(--fs-xl); font-weight: 650; letter-spacing: -.01em; }
+.dialog-message { margin: 0; font-size: var(--fs-lg); line-height: 1.5; color: var(--text-muted); }
+.dialog-hint { margin: 0; font-size: var(--fs-md); line-height: 1.45; color: var(--text-faint); }
+
+.dialog-field { display: flex; flex-direction: column; gap: 5px; }
+.dialog-field > span { font-size: var(--fs-md); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; color: var(--text-faint); }
+.dialog-field > input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--control-radius);
+  background: var(--surface-raised);
+  color: var(--text);
+  font-size: var(--fs-lg);
+}
+.dialog-field > input:focus-visible { outline: none; border-color: var(--accent); box-shadow: var(--focus-ring); }
+
+.dialog-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 2px; }
+.dialog-button {
+  padding: 7px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--control-radius);
+  background: var(--surface-raised);
+  color: var(--text);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  cursor: pointer;
+}
+.dialog-button:hover { background: var(--surface-hover); }
+.dialog-button:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.dialog-button--primary { border-color: transparent; background: var(--accent); color: var(--on-accent); }
+.dialog-button--primary:hover { filter: brightness(1.07); }
+.dialog-window--danger .dialog-button--primary { background: var(--danger-solid); }
+
+@keyframes dialog-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dialog-rise { from { opacity: 0; transform: translateY(6px) scale(.985); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog-backdrop, .dialog-window { animation: none; }
+}
+
+/* Pozycja menu z ikoną i etykietą. Bazowa `.dropdown-item` w warstwie legacy
+   nie ma odstępu — menu podkładów robi go własnymi elementami wewnętrznymi,
+   więc dokładanie `gap` tam przesunęłoby tamten układ. */
+.dropdown-item--with-icon { gap: 9px; }
+.dropdown-item--with-icon > svg { flex: 0 0 auto; color: var(--text-muted); }
+.dropdown-item--with-icon[data-highlighted] > svg { color: var(--text); }
+
+/* ---------------------------------------------------------------------------
+   Panel Warstwy: skala widoczności i legenda WMS
+   --------------------------------------------------------------------------- */
+
+/* Warstwa włączona, ale poza swoim zakresem skali. Wyciszenie tytułu mówi
+   „jest włączona, tylko jej teraz nie widać" — wyłączenie oka kłamałoby. */
+.layer-row--out-of-scale .layer-row-copy strong { color: var(--text-faint); }
+
+.layer-scale-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0 1px 30px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--warning) 12%, transparent);
+  color: var(--warning);
+  font-size: var(--fs-md);
+  line-height: 1.35;
+}
+:root[data-theme="dark"] .layer-scale-row,
+.app-shell[data-theme="dark"] .layer-scale-row { background: color-mix(in srgb, var(--warning) 14%, transparent); color: var(--warning); }
+.layer-scale-row > span { flex: 1 1 auto; min-width: 0; }
+
+.layer-legend {
+  margin: 4px 0 2px 30px;
+  padding: 7px 8px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-raised);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.layer-legend--loading,
+.layer-legend--empty {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-faint);
+  font-size: var(--fs-md);
+}
+/* Legendy WMS przychodzą z serwera jako obrazki na białym lub przezroczystym
+   tle. Jasna podkładka pod samym obrazkiem sprawia, że czarne podpisy
+   pozostają czytelne również w ciemnym motywie. */
+.layer-legend-image {
+  max-width: 100%;
+  align-self: flex-start;
+  border-radius: 4px;
+  background: var(--legend-bg);
+  padding: 3px;
+}
+.layer-legend-more { margin: 2px 0 0; font-size: var(--fs-md); color: var(--text-faint); }
+.zone-legend-panel .layer-legend { margin: 0; }
+
+/* 18.0: pięć kolumn — uchwyt, widoczność (pole wyboru), nazwa, informacje,
+   menu ⋯ (ulubione, „tylko ta”). Przyciski mają pełne 28 px. */
+.layer-row--compact .layer-row-main { grid-template-columns: 16px var(--icon-button) minmax(0, 1fr) var(--icon-button) var(--icon-button); column-gap: 2px; }
+
+.kowr-popup {
+  position: relative;
+  width: min(300px, calc(100vw - 38px));
+  max-height: min(340px, 65vh);
+  overflow-y: auto;
+  padding: 13px 34px 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-solid);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font: var(--fs-md)/1.4 system-ui, sans-serif;
+}
+.kowr-popup-heading { display: block; margin-bottom: 8px; font-size: var(--fs-lg); }
+.kowr-popup p { margin: 5px 0; }
+.kowr-popup details { padding: 5px 0; border-top: 1px solid var(--border); }
+.kowr-popup summary { cursor: pointer; }
+.kowr-popup a { display: inline-block; margin-top: 7px; color: var(--accent); }
+.kowr-popup-close { position: absolute; right: 8px; top: 4px; border: 0; background: transparent; color: var(--text-muted); font-size: var(--fs-2xl); cursor: pointer; }
+
+/* 17.8.11 — pasek stanu: elementy diagnostyczne nie kurczą się i nie nachodzą
+   na siebie; skraca się (wielokropkiem) wyłącznie lista atrybucji źródeł.
+   Pełna lista jest w podpowiedzi kontenera. */
+.map-statusbar > .status-item,
+.map-statusbar > .status-separator,
+.map-statusbar > button { flex-shrink: 0; }
+.status-attributions {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.status-attributions .map-attribution + .map-attribution::before {
+  content: ' · ';
+  color: var(--text-faint);
+}
+
+/* 17.8.11 — atrybucje zostają widoczne także na laptopach 1366 px: kontener
+   skraca je bezpiecznie, a licencja OSM wymaga widocznego podpisu. */
+.status-attributions .map-attribution { display: inline; }
+
+/* 17.8.11 — panel Analizy: siatka sekcji nie rozciąga wierszy na całą
+   wysokość doku. Wcześniej opis, pole promienia i przycisk dostawały po
+   ~170 px, a przycisk „Uruchom screening" zajmował pół panelu. */
+.analysis-panel-body,
+.analysis-section { align-content: start; }
+
+/* Prawy dok pokazuje pojedynczy panel; szyna ikon pozostaje obok niego. */
+.dock--right-panel {
+  --dock-panel-width: 340px;
+  --mobile-sheet-height: 54vh;
+  position: absolute;
+  /* 18.10: górna krawędź zawsze przy szynie (wcześniej panel był wyśrodkowany
+     w pionie i „skakał" przy każdej zmianie modułu; przesunięcia ułamkowe
+     rozmywały też tekst). */
+  top: 8px;
+  right: var(--activity-bar-width);
+  transform: none;
+  width: var(--dock-panel-width);
+  max-width: calc(100% - var(--activity-bar-width) - 12px);
+  min-height: 0;
+  height: auto;
+  max-height: min(78vh, 760px, calc(100% - 16px));
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+/* 18.10: panel leży na mapie — przyciski widoku ustępują mu miejsca. Wartości
+   ustawia RightPanelDock (--dock-inset-right / --dock-inset-bottom). */
+.map-view-controls {
+  right: calc(14px + var(--dock-inset-right));
+  bottom: calc(43px + var(--dock-inset-bottom));
+  transition: right 120ms ease-out, bottom 120ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-view-controls { transition: none; }
+}
+.activity-bar-result {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--surface-raised);
+  background: var(--success, var(--accent));
+  pointer-events: none;
+}
+.dock--right-panel > .compact-panel {
+  height: auto;
+  max-height: 100%;
+  flex: 0 1 auto;
+  overflow: hidden;
+}
+.dock--right-panel .layers-list,
+.dock--right-panel .objects-list { flex: 0 1 auto; }
+.dock--right-panel > .dock-resizer { left: 0; }
+.mobile-sheet-grip { display: none; }
+
+@media (max-height: 620px) {
+  .dock--right-panel { max-height: calc(100% - 16px); }
+}
+
+@media (max-width: 760px), (pointer: coarse) and (max-height: 500px) {
+  .workspace { --activity-bar-width: 44px; }
+  .activity-bar { overflow-y: auto; padding-block: 5px; }
+  .activity-bar-button,
+  .activity-bar-button.has-label { width: 40px; height: 40px; }
+  /* Telefon: szyna zostaje wąska, podpis zastępuje podpowiedź i etykieta dostępności. */
+  .activity-bar-label { display: none; }
+  .dock--right-panel {
+    top: auto;
+    left: 0;
+    right: var(--activity-bar-width);
+    bottom: var(--statusbar-height);
+    transform: none;
+    width: calc(100% - var(--activity-bar-width));
+    max-width: none;
+    height: min(var(--mobile-sheet-height), calc(100% - var(--statusbar-height) - 24px));
+    max-height: calc(100% - var(--statusbar-height) - 24px);
+    border-radius: 12px 12px 0 0;
+  }
+  .mobile-sheet-grip {
+    flex: 0 0 36px;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 36px;
+    background: var(--surface-solid);
+    cursor: ns-resize;
+    touch-action: none;
+  }
+  .mobile-sheet-grip::after {
+    content: "";
+    width: 44px;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--border-strong);
+  }
+  .mobile-sheet-grip:hover::after,
+  .mobile-sheet-grip:focus-visible::after { background: var(--accent); }
+  .mobile-sheet-grip:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .dock--right-panel > .compact-panel { flex: 1 1 auto; height: auto; min-height: 0; max-height: none; }
+  .dock--right-panel .layers-list,
+  .dock--right-panel .objects-list { flex: 1 1 auto; min-height: 0; }
+  .dock--right-panel > .dock-resizer { display: none; }
+
+  .dock--right-panel .layers-panel--v2 .layer-group-title { min-height: 44px; }
+  /* `.dock input[type="checkbox"]` (0,2,1) wygrywał z regułą grupy i zgniatał pole do 36×16. */
+  .dock--right-panel .layers-panel--v2 input.layer-group-checkbox { width: 22px; height: 22px; flex-basis: 22px; margin: 7px; }
+  .dock--right-panel .layers-panel--v2 .layer-row-main { min-height: 44px; }
+  .layers-panel--v2 .layer-visibility { width: 40px; height: 40px; }
+  .layers-panel--v2 .layer-row-main .icon-button { width: 40px; height: 40px; flex-basis: 40px; }
+  .layers-panel--v2 .layer-row-main { grid-template-columns: 16px 40px minmax(0, 1fr) 40px 40px; }
+  .layers-panel--v2 .layer-group-checkbox { flex-basis: 22px; width: 22px; height: 22px; }
+  .layers-panel--v2 .layer-group-checkbox:checked::after,
+  .layers-panel--v2 .layer-group-checkbox:indeterminate::after { line-height: 20px; }
+  .layers-panel--v2 .layers-filter { min-height: 40px; }
+  .layers-panel--v2 .layers-toolbar .icon-button { width: 40px; height: 40px; flex-basis: 40px; }
+  .layers-panel--v2 .layers-search input { min-height: 40px; }
+  .dock--right-panel .panel-header--compact .panel-actions .icon-button { width: 40px; height: 40px; flex-basis: 40px; }
+  .dock--right-panel .objects-panel--compact .object-row { min-height: 44px; grid-template-columns: 15px 36px 24px minmax(0, 1fr) 40px 40px; }
+  .dock--right-panel .objects-panel--compact .object-check { width: 36px; height: 36px; }
+  .dock--right-panel .object-row-action { width: 40px; height: 40px; }
+  .dock--right-panel .objects-controls input,
+  .dock--right-panel .objects-controls select { min-height: 40px; }
+  .floating-tools--grouped .icon-button { min-height: 44px; }
+  .floating-tools-collapse { width: 28px; height: 36px; flex-basis: 28px; }
+}
+
+.app-shell.is-export-selection .map-column { width: 100%; }
+.app-shell.is-map-only { grid-template-rows: minmax(0, 1fr); }
+.app-shell.is-map-only .workspace { grid-row: 1; }
+.app-shell.is-map-only .map-column { width: 100%; }
+.app-shell.is-map-only .map-view-controls { display: none; }
+.app-shell.is-map-only .map-statusbar {
+  left: auto;
+  right: 10px;
+  bottom: 8px;
+  width: auto;
+  height: auto;
+  max-width: calc(100% - 20px);
+  padding: 3px 7px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface);
+}
+.app-shell.is-map-only .map-statusbar > :not(.status-attributions) { display: none; }
+.app-shell.is-map-only .map-attribution { display: inline; }
+.map-only-exit {
+  position: absolute;
+  z-index: var(--z-map-controls);
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+}
+.map-only-exit:hover { background: var(--surface-hover); }
+.map-only-exit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ==========================================================================
+   17.8.12 — przełącznik podkładów jako miniatury w rogu mapy
+   18.4: bliżej lewej krawędzi, tuż obok palety narzędzi (12 px + szerokość
+   + 4 px), a nie o 12 px dalej jak wcześniej.
+   ========================================================================== */
+.basemap-switcher {
+  position: absolute;
+  z-index: var(--z-map-controls);
+  left: 88px;
+  bottom: 40px;
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
+}
+.basemap-option {
+  position: relative;
+  width: 66px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  cursor: pointer;
+}
+.basemap-option:disabled { cursor: default; opacity: .6; }
+.basemap-option:focus-visible { outline: none; }
+.basemap-thumb {
+  position: relative;
+  display: block;
+  width: 66px;
+  height: 46px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  background: var(--thumb-base);
+}
+.basemap-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Tło zastępcze, gdy miniatura nie przyszła (usługa niedostępna, tryb offline). */
+.basemap-thumb--osm { background: var(--thumb-osm); }
+.basemap-thumb--topography { background: var(--thumb-topo); }
+.basemap-thumb--orthophoto { background: var(--thumb-ortho); }
+.basemap-thumb--nmt-shaded { background: var(--thumb-nmt); }
+.basemap-option:hover .basemap-thumb { border-color: var(--text-faint); }
+/* 17.8.13: wyraźny pierścień fokusu (poprzedni: 2 px akcentu w 42% krycia). */
+.basemap-option:focus-visible .basemap-thumb { box-shadow: 0 0 0 2px var(--surface-solid), 0 0 0 4px var(--accent); }
+.basemap-option.is-active { color: var(--text); }
+.basemap-option.is-active .basemap-thumb { border: 2px solid var(--accent); }
+.basemap-option.is-pending .basemap-thumb { border: 2px dashed var(--accent); }
+.basemap-option.is-error .basemap-thumb { border-color: var(--danger); }
+.basemap-option-label {
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.basemap-option-state {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 66px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  background: var(--thumb-overlay);
+  color: var(--thumb-overlay-text);
+}
+.basemap-option-state--error { background: var(--thumb-overlay-error); color: var(--thumb-overlay-error-text); }
+.basemap-option-check {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+.basemap-switcher-toggle {
+  align-self: center;
+  width: 20px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-faint);
+  cursor: pointer;
+}
+.basemap-switcher-toggle:hover { color: var(--text); background: var(--surface-hover); }
+.basemap-switcher-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* Niska mapa (dolny dok, laptop): paleta narzędzi sięga dołu — przełącznik
+   stoi obok niej, więc nie nachodzi na narzędzia. */
+@media (max-height: 820px) {
+  .basemap-switcher { bottom: 36px; padding: 5px; }
+}
+
+
+/* ===================================================================
+   18.0 — czytelność: role tekstu i rozmiary kontrolek (audyt ergonomii).
+   Wszystkie wartości z tokenów w 10-tokens.css; ten blok nadpisuje
+   rozproszone rozmiary ze starszych plików, bez zmiany ich struktury.
+   =================================================================== */
+
+/* Warstwy — nagłówki grup: półgruba, zwykła pisownia, jeden stopień niżej
+   niż nazwy warstw; nazwy warstw zwykłą grubością (pogrubienie tylko dla
+   włączonych), żeby lista miała hierarchię. */
+.layer-group-title {
+  height: auto;
+  min-height: var(--row-h);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  text-transform: none;
+  letter-spacing: .01em;
+  color: var(--text-muted);
+}
+.layer-group-toggle > small { font-size: var(--fs-xs); font-weight: var(--fw-medium); }
+.layer-group-checkbox {
+  flex-basis: var(--checkbox);
+  width: var(--checkbox);
+  height: var(--checkbox);
+}
+.layer-group-checkbox:checked::after,
+.layer-group-checkbox:indeterminate::after { line-height: 14px; }
+.layer-row { min-height: var(--row-h); }
+.layer-row-titleline strong,
+.layer-row--compact .layer-row-titleline strong { font-size: var(--fs-md); font-weight: var(--fw-regular); }
+.layer-row.is-visible .layer-row-titleline strong,
+.layer-row--visible .layer-row-titleline strong { font-weight: var(--fw-semibold); }
+.layer-visibility,
+.layer-row--compact .layer-visibility { width: var(--icon-button); height: var(--icon-button); }
+.layer-row-main { grid-template-columns: var(--icon-button) minmax(0, 1fr) auto; }
+
+/* Obiekty */
+.object-check,
+.objects-panel--compact .object-check { width: var(--checkbox); height: var(--checkbox); }
+.object-row,
+.objects-panel--compact .object-row { min-height: var(--row-h); }
+.object-row-copy strong,
+.objects-panel--compact .object-row-copy strong { font-size: var(--fs-md); font-weight: var(--fw-regular); }
+.object-row.is-selected .object-row-copy strong { font-weight: var(--fw-semibold); }
+
+/* Nagłówki paneli i akcje doku */
+.panel-actions .icon-button,
+.panel-header--compact .panel-actions .icon-button { width: var(--icon-button); height: var(--icon-button); flex-basis: var(--icon-button); }
+
+/* Pasek stanu — 26 px, tekst 12 px, elementy na pełną wysokość (cel ≥ 24 px). */
+.map-statusbar { height: var(--statusbar-height); font-size: var(--fs-sm); }
+.status-item { font-size: var(--fs-sm); }
+.status-source-button { align-self: stretch; height: auto; min-height: var(--control-h-sm); }
+.map-attribution { display: inline-flex; align-items: center; min-height: var(--control-h-sm); }
+
+/* Menu kontekstowe mapy — ta sama skala co reszta menu. */
+.map-context-menu button { font-size: var(--fs-md); min-height: var(--control-h); }
+
+/* Profil terenu — komunikat błędu w skali treści. */
+.terrain-profile-error { font-size: var(--fs-md); }
+
+/* Pola wyboru w panelach — jednolity rozmiar 16 px. */
+.compact-panel input[type="checkbox"],
+.dock input[type="checkbox"] { width: var(--checkbox); height: var(--checkbox); }
+
+/* ==========================================================================
+   18.0 — komponenty nowej powłoki
+
+   Pasek kontekstu, kontrolki .ui-*, paleta poleceń, skróty, powiadomienia,
+   paleta narzędzi z podpisami, stałe zakładki doku, menu ustawień, gęstość
+   „kompaktowa”. Wyłącznie tokeny — żadnych literałów kolorów.
+   ========================================================================== */
+
+/* ------------------------------------------------------------ pasek kontekstu */
+.context-bar {
+  height: var(--context-bar-height);
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 10px;
+  border-top: 1px solid var(--border-soft);
+  background: var(--surface-raised);
+  overflow: hidden;
+  font-size: var(--fs-md);
+}
+.context-zone {
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+/* Priorytet miejsca: pola zaznaczonego obiektu > nazwa narzędzia > instrukcja.
+   Instrukcja skraca się pierwsza (do zera), strefa obiektu nie kurczy się,
+   a gdy i tak się nie mieści — jej pola przewijają się w poziomie. */
+.context-zone--tool { flex: 1 1 auto; }
+.context-zone--object {
+  flex: 0 0 auto;
+  max-width: calc(100% - 220px);
+  /* 18.6: strefa zaznaczonego obiektu to osobny „kafelek” — jaśniejsze
+     (w ciemnym motywie ciemniejsze) tło i akcentowy pasek z lewej zamiast
+     cienkiej kreski, która ginęła na tle paska. margin-left:auto trzyma ją
+     przy prawej krawędzi także wtedy, gdy instrukcja narzędzia jest krótka. */
+  margin-left: auto;
+  padding: 0 var(--space-3);
+  background: var(--surface-solid);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+}
+.context-zone--object .context-fields {
+  flex: 0 1 auto;
+  min-width: 0;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+.context-tool-icon {
+  flex: 0 0 auto;
+  width: var(--icon-button);
+  height: var(--icon-button);
+  display: inline-grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.context-tool-name {
+  flex: 0 0 auto;
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}
+.context-tool-help { flex: 0 0 auto; width: 23px; height: 23px; color: var(--text-muted); }
+.context-tool-help:hover,
+.context-tool-help:focus-visible { color: var(--accent); }
+.context-fields {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.context-readouts {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-2);
+  border-left: 1px solid var(--border-soft);
+}
+.context-object-label {
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+}
+.context-object-name {
+  flex: 0 0 auto;
+  max-width: 180px;
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ----------------------------------------------------------------- kontrolki */
+/* Podpowiedź w polach: kolor tokenu zamiast domyślnej szarości przeglądarki
+   (#757575 na --surface-raised dawało 4,4:1). */
+.app-shell input::placeholder,
+.app-shell textarea::placeholder { color: var(--text-faint); opacity: 1; }
+.ui-field {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ui-field-label {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  white-space: nowrap;
+}
+.ui-control {
+  box-sizing: border-box;
+  height: var(--control-h);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-solid);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-md);
+}
+.ui-control:hover:not(:disabled):not(.is-disabled) { border-color: var(--border-strong); }
+.ui-control:focus-visible,
+.ui-number:focus-within { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ui-number {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 7px 0 0;
+}
+.ui-number input {
+  width: 58px;
+  height: 100%;
+  padding: 0 4px 0 8px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+.ui-number.is-disabled { opacity: .55; }
+.ui-unit { color: var(--text-muted); font-size: var(--fs-sm); }
+.ui-select { padding: 0 24px 0 8px; cursor: pointer; }
+.ui-text { width: 160px; padding: 0 8px; }
+.ui-swatch-trigger {
+  width: var(--control-h);
+  padding: 4px;
+  display: inline-grid;
+  place-items: stretch;
+  cursor: pointer;
+}
+.ui-swatch {
+  display: block;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+.ui-color-input {
+  box-sizing: border-box;
+  width: var(--control-h);
+  height: var(--control-h);
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-solid);
+  cursor: pointer;
+}
+.ui-color-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.ui-button {
+  box-sizing: border-box;
+  height: var(--control-h);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.ui-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ui-button:disabled { opacity: .5; cursor: not-allowed; }
+.ui-button--sm { height: var(--control-h-sm); padding: 0 8px; font-size: var(--fs-sm); }
+.ui-button--primary { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+.ui-button--primary:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 86%, var(--text)); }
+.ui-button--secondary { color: var(--text); background: var(--surface-solid); border-color: var(--border); }
+.ui-button--secondary:hover:not(:disabled) { background: var(--surface-hover); }
+.ui-button--ghost { color: var(--text-muted); background: transparent; }
+.ui-button--ghost:hover:not(:disabled) { color: var(--text); background: var(--surface-hover); }
+.ui-button--danger { color: var(--on-danger); background: var(--danger-solid); border-color: var(--danger-solid); }
+.ui-button--danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger-solid) 86%, var(--text)); }
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  color: var(--text-muted);
+  background: var(--surface-hover);
+}
+.ui-badge--accent { color: var(--accent); background: var(--accent-soft); }
+.ui-badge--success { color: var(--success); background: color-mix(in srgb, var(--success) 12%, transparent); }
+.ui-badge--warning { color: var(--warning); background: color-mix(in srgb, var(--warning) 14%, transparent); }
+.ui-badge--danger { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent); }
+
+.ui-kbd {
+  box-sizing: border-box;
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  font: var(--fw-semibold) var(--fs-xs)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  white-space: nowrap;
+}
+.ui-readout {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+}
+.ui-readout strong {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  font-variant-numeric: tabular-nums;
+}
+.ui-readout--live strong { color: var(--text); }
+
+/* -------------------------------------------------------------- okna (modal) */
+.ui-modal-backdrop { align-items: flex-start; padding-top: 12vh; }
+.ui-modal {
+  width: min(560px, 100%);
+  max-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-solid);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  animation: menu-in 110ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) { .ui-modal { animation: none; } }
+
+.command-palette-search {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.command-palette-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-lg);
+  outline: none;
+}
+.command-palette-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 6px;
+}
+.command-palette-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-md);
+  cursor: pointer;
+}
+.command-palette-item.is-active { background: var(--surface-hover); }
+.command-palette-item.is-disabled { color: var(--text-faint); cursor: default; }
+.command-palette-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.command-palette-group { color: var(--text-muted); font-size: var(--fs-sm); white-space: nowrap; }
+.command-palette-empty { padding: 18px; color: var(--text-muted); text-align: center; }
+.command-palette-hint {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+}
+
+.shortcuts-dialog { width: min(780px, 100%); padding: 16px 18px 18px; overflow-y: auto; }
+.shortcuts-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.shortcuts-head .dialog-title { margin: 0; font-size: var(--fs-xl); }
+.shortcuts-intro { margin: 6px 0 14px; color: var(--text-muted); font-size: var(--fs-md); }
+.shortcuts-grid { columns: 3 220px; column-gap: 24px; }
+.shortcuts-group { break-inside: avoid; margin-bottom: 16px; }
+.shortcuts-group h3 {
+  margin: 0 0 6px;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+}
+.shortcuts-group dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px 10px;
+}
+.shortcuts-group dt { justify-self: start; }
+.shortcuts-group dd { margin: 0; font-size: var(--fs-md); }
+
+/* ----------------------------------------------------------- powiadomienia */
+.toast-host {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--statusbar-height) + 18px);
+  z-index: var(--z-toast);
+  transform: translateX(-50%);
+  display: grid;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  min-width: 260px;
+  max-width: min(520px, calc(100vw - 32px));
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 14px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--surface-solid);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  font-size: var(--fs-md);
+  pointer-events: auto;
+  animation: menu-in 120ms ease-out;
+}
+.toast--success { border-left-color: var(--success); }
+.toast--warning { border-left-color: var(--warning); }
+.toast--danger { border-left-color: var(--danger); }
+.toast-message { flex: 1 1 auto; min-width: 0; }
+.toast-action { color: var(--accent); }
+.toast-close {
+  flex: 0 0 auto;
+  width: var(--control-h-sm);
+  height: var(--control-h-sm);
+  display: inline-grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.toast-close:hover { color: var(--text); background: var(--surface-hover); }
+.toast-close:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+
+/* -------------------------------------------------------------- pasek stanu */
+.status-label { color: var(--text-faint); }
+.status-slot-item { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+
+/* ------------------------------------------------------------ menu ustawień */
+.settings-menu { min-width: 250px; }
+.dropdown-check {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  display: inline-grid;
+  place-items: center;
+  color: var(--accent);
+}
+.dropdown-kbd { margin-left: auto; }
+.settings-menu .dropdown-label,
+.layer-row-menu .dropdown-label { text-transform: none; letter-spacing: 0; font-size: var(--fs-sm); }
+
+/* ---------------------------------------------------------- panel Obiekty */
+.objects-measurements {
+  margin-top: 6px;
+  border-top: 1px solid var(--border-soft);
+}
+.objects-measurements-head {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px 2px 6px;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--radius-sm);
+}
+.objects-measurements-head::-webkit-details-marker { display: none; }
+.objects-measurements-head::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin: 0 2px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 120ms ease;
+}
+.objects-measurements[open] > .objects-measurements-head::before { transform: rotate(45deg); }
+.objects-measurements-head:hover { color: var(--text); background: var(--surface-hover); }
+.objects-measurements-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.objects-measurements-clear { margin-left: auto; }
+
+/* ---------------------------------------------------------- panel Warstwy */
+.layer-visibility,
+.layer-visibility.is-visible { color: var(--text-muted); background: transparent; }
+.layer-visibility:hover { background: var(--surface-hover); }
+.layer-visibility-box {
+  box-sizing: border-box;
+  width: var(--checkbox);
+  height: var(--checkbox);
+  display: inline-grid;
+  place-items: center;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 4px;
+  background: var(--surface-solid);
+  color: var(--on-accent);
+}
+.layer-visibility.is-visible .layer-visibility-box { border-color: var(--accent); background: var(--accent); }
+.layer-row-more { width: var(--icon-button); height: var(--icon-button); flex-basis: var(--icon-button); border-radius: var(--radius-sm); }
+.layer-row-titleline { gap: 5px; }
+.layer-row--compact .layer-row-copy { cursor: pointer; }
+.layer-active-strip {
+  padding: 6px 9px 7px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.layer-active-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: calc(var(--control-h-sm) * 3 + 8px); /* trzy pełne rzędy, dalej przewijanie */
+  overflow-y: auto;
+  margin-top: 4px;
+}
+.layer-active-chip {
+  max-width: 100%;
+  height: var(--control-h-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px 0 8px;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+.layer-active-chip > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.layer-active-chip > svg { flex: 0 0 auto; color: var(--text-muted); }
+.layer-active-chip:hover > svg { color: var(--danger); }
+.layer-active-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.layer-favorite-mark { flex: 0 0 auto; color: var(--warning); fill: currentColor; }
+.zone-legend-panel.layer-inline-legend {
+  max-height: 180px;
+  margin: 0 8px 6px 46px;
+  padding: 4px 0 4px 8px;
+  overflow: auto;
+  border-bottom: 0;
+  border-left: 2px solid var(--border);
+}
+
+/* ---------------------------------------------------------- profil terenu */
+/* Akcje nagłówka w rzędzie (legacy układało każdy div nagłówka w kolumnę),
+   podpis bez przezroczystości — kolor tekstu drugorzędnego zamiast opacity. */
+.terrain-profile-header > .panel-actions { flex-direction: row; align-items: center; gap: 2px; }
+.terrain-profile-header small { opacity: 1; color: var(--text-muted); }
+/* Tekst drugorzędny modułu terenu: kolor --text-muted (kontrast ≥ 4,5:1 w obu
+   motywach) zamiast opacity .58–.78, która na jasnym tle dawała ~3:1. */
+.terrain-profile-stats small,
+.terrain-profile-note,
+.terrain-area-intro,
+.terrain-parcel-row small,
+.terrain-area-empty,
+.terrain-hypsometry small,
+.terrain-accuracy-control > span,
+.terrain-rectangle-info span { opacity: 1; color: var(--text-muted); }
+.terrain-chart-label { opacity: 1; fill: var(--text-muted); }
+.terrain-profile-error { align-items: flex-start; gap: 10px; }
+.terrain-profile-error-body { flex: 1 1 auto; min-width: 0; display: grid; gap: 4px; }
+.terrain-profile-error-details summary { color: var(--text-muted); font-size: var(--fs-sm); cursor: pointer; }
+.terrain-profile-error-details code {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: var(--fs-xs);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ==========================================================================
+   18.1 — kontrolki paneli (PanelShell, Section, Message, Tabs, pola)
+
+   Analizy, Eksport, Profil terenu, Działka, Wyniki i Stan źródeł używają tych
+   samych kontrolek co pasek kontekstu. Starsze klasy paneli (export-field,
+   analysis-run-button…) zostają jako haczyki układu, ale wygląd kontrolek
+   pochodzi stąd — warstwa shell wygrywa z legacy niezależnie od specyficzności.
+   ========================================================================== */
+.ui-section {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 12px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+}
+.ui-section + .ui-section { margin-top: 8px; }
+.ui-section-head { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
+.ui-section-icon { flex: 0 0 auto; display: inline-grid; place-items: center; color: var(--accent); padding-top: 1px; }
+.ui-section-titles { flex: 1 1 auto; min-width: 0; display: grid; gap: 2px; }
+.ui-section-title { font-size: var(--fs-md); font-weight: var(--fw-semibold); color: var(--text); }
+.ui-section-subtitle { color: var(--text-muted); font-size: var(--fs-sm); line-height: var(--lh-normal); }
+
+.ui-message {
+  display: grid;
+  gap: 3px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-solid);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-normal);
+}
+/* Tylko bezpośrednie dzieci — przyciski w komunikacie zachowują swój kolor tekstu. */
+.ui-message > strong { font-size: var(--fs-md); }
+.ui-message > small, .ui-message > span { color: var(--text-muted); }
+.ui-message--info { border-left-color: var(--info); }
+.ui-message--success { border-left-color: var(--success); background: color-mix(in srgb, var(--success) 7%, var(--surface-solid)); }
+.ui-message--warning { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning) 8%, var(--surface-solid)); }
+.ui-message--warning > small { color: var(--warning); }
+.ui-message--danger { border-left-color: var(--danger); background: color-mix(in srgb, var(--danger) 7%, var(--surface-solid)); }
+.ui-message--danger > span:first-child, .ui-message--danger { color: var(--text); }
+
+.ui-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+}
+.ui-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  height: var(--control-h);
+  padding: 0 10px;
+  border: 0;
+  border-radius: calc(var(--radius-sm) - 2px);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.ui-tab:hover:not(:disabled) { color: var(--text); background: var(--surface-hover); }
+.ui-tab.is-active { color: var(--text); background: var(--surface-solid); box-shadow: 0 0 0 1px var(--border); font-weight: var(--fw-semibold); }
+.ui-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.ui-tab:disabled { opacity: .5; cursor: not-allowed; }
+.ui-tabs--sm .ui-tab { height: var(--control-h-sm); font-size: var(--fs-sm); padding: 0 8px; }
+
+.ui-check {
+  min-height: var(--control-h-sm);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: var(--text);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+.ui-check input { flex: 0 0 auto; width: var(--checkbox); height: var(--checkbox); margin: 0; accent-color: var(--accent); }
+.ui-check-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ui-check-hint { margin-left: auto; color: var(--text-muted); font-size: var(--fs-xs); }
+.ui-check.is-disabled { color: var(--text-muted); cursor: default; }
+
+.ui-field--range { display: grid; grid-template-columns: minmax(84px, 38%) minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.ui-range { width: 100%; min-height: var(--control-h-sm); accent-color: var(--accent); }
+.ui-range-value { min-width: 40px; text-align: right; font-size: var(--fs-sm); font-variant-numeric: tabular-nums; color: var(--text); }
+.ui-file-button { display: contents; }
+
+.ui-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  gap: 6px;
+}
+.ui-stat {
+  display: grid;
+  gap: 1px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-solid);
+  opacity: 1;
+}
+.ui-stat strong { font-size: var(--fs-md); font-weight: var(--fw-semibold); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ui-stat small { color: var(--text-muted); font-size: var(--fs-xs); opacity: 1; }
+
+.ui-kv {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 0;
+  font-size: var(--fs-sm);
+}
+.ui-kv dt { color: var(--text-muted); }
+.ui-kv dd { margin: 0; min-width: 0; font-weight: var(--fw-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Pola w panelach: etykieta po lewej, kontrolka na całą resztę szerokości. */
+.ui-panel .ui-field {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(84px, 38%) minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.ui-panel .ui-field:not(:has(> .ui-field-label)) { grid-template-columns: minmax(0, 1fr); }
+.ui-panel .ui-field .ui-control { width: 100%; }
+.ui-panel .ui-field-label { white-space: normal; line-height: var(--lh-tight); }
+.ui-panel .ui-number input { flex: 1 1 auto; width: auto; min-width: 0; }
+.ui-panel .ui-field--range { grid-template-columns: minmax(84px, 38%) minmax(0, 1fr) auto; }
+.ui-panel .ui-tabs { margin: 8px 10px 0; }
+.ui-panel .ui-button { max-width: 100%; }
+.ui-panel .ui-button .ui-button-label { overflow: hidden; text-overflow: ellipsis; }
+
+/* Eksport */
+.export-panel-body { display: grid; gap: 8px; align-content: start; }
+.export-panel .ui-section + .ui-section { margin-top: 0; }
+.export-actions, .export-action-group { display: grid; gap: 6px; }
+.export-action-group + .export-action-group, .export-action-group + .export-actions, .export-actions + .export-action-group { margin-top: 4px; }
+.export-actions .ui-button, .export-section .ui-button { width: 100%; justify-content: flex-start; }
+.export-checks { display: grid; grid-template-columns: 1fr; gap: 2px; margin: 0; }
+.ui-panel .export-grid--2 { display: grid; grid-template-columns: 1fr; gap: 8px; }
+.export-more > summary { color: var(--accent); font-size: var(--fs-sm); font-weight: var(--fw-semibold); cursor: pointer; }
+.export-more-body { display: grid; gap: 8px; padding-top: 8px; }
+.export-plan { margin: 0; }
+.export-incomplete, .export-message { margin: 0 10px 8px; }
+.export-incomplete ul { margin: 2px 0 0; padding-left: 18px; color: var(--text-muted); }
+.export-incomplete-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+
+/* Analizy */
+.analysis-panel-body { display: grid; gap: 8px; align-content: start; }
+.analysis-manual { display: grid; gap: 8px; }
+.analysis-panel .ui-section + .ui-section { margin-top: 0; }
+.analysis-run-row { display: flex; gap: 6px; }
+.analysis-run-row .analysis-run-button { flex: 1 1 auto; }
+.analysis-preview-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.analysis-focus-button { width: 100%; }
+.analysis-result .ui-message { margin: 0; }
+.analysis-target-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: var(--fs-sm); color: var(--text-muted); }
+.analysis-target-row .is-warning { color: var(--warning); }
+.analysis-hint { margin: 0; color: var(--text-muted); font-size: var(--fs-sm); line-height: var(--lh-normal); }
+.analysis-hint.is-warning { color: var(--warning); }
+.analysis-source-meta { color: var(--text-muted); font-size: var(--fs-xs); }
+
+/* Profil terenu i analiza wysokości */
+.terrain-area-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.terrain-area-controls .ui-tabs { margin: 0; flex: 0 0 auto; }
+.terrain-area-controls .terrain-accuracy { flex: 1 1 260px; max-width: 360px; }
+.terrain-parcel-list { display: grid; gap: 2px; max-height: 180px; overflow: auto; }
+.terrain-area-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.terrain-profile-error { display: flex; align-items: flex-start; gap: 10px; margin: 8px 12px; }
+.terrain-profile-stats.ui-stats { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+@media (max-width: 900px) { .terrain-profile-stats.ui-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* Wyniki analizy */
+.results-toolbar { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.results-toolbar .ui-field { width: auto; display: inline-flex; }
+.results-toolbar .ui-text { width: 180px; }
+
+/* Stan źródeł */
+.source-health-summary { display: flex; flex-wrap: wrap; gap: 4px; }
+.source-health-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.source-health-actions .ui-tabs { margin: 0; }
+.source-health-retry { flex: 0 0 auto; }
+
+/* Szczegóły działki */
+.parcelplus-more-toggle { justify-self: start; }
+.identify-panel .ui-message { margin: 8px 0 0; }
+.terrain-area-selection { min-width: 0; }
+
+/* ===================================================================
+   18.2 — Warstwy i Obiekty na wspólnych kontrolkach (SearchField,
+   EmptyState, Button, IconButton, RangeField). Wiersze list zostają
+   w arkuszach 22/23 — tu tylko ramy, paski narzędzi i nowe kontrolki.
+   =================================================================== */
+.ui-search {
+  box-sizing: border-box;
+  min-width: 0;
+  height: var(--control-h);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 2px 0 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-solid);
+  color: var(--text-muted);
+}
+.ui-search:hover { border-color: var(--border-strong); }
+.ui-search:focus-within { border-color: var(--accent); box-shadow: var(--focus-ring); }
+.ui-search > svg { flex: 0 0 auto; }
+.ui-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-md);
+}
+/* Własny przycisk czyszczenia zamiast systemowego „×” (inny w każdej przeglądarce). */
+.ui-search input::-webkit-search-cancel-button { display: none; }
+.ui-search-clear {
+  flex: 0 0 auto;
+  width: var(--control-h-sm);
+  height: var(--control-h-sm);
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.ui-search-clear:hover { color: var(--text); background: var(--surface-hover); }
+.ui-search-clear:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.ui-search.is-disabled { opacity: .55; }
+
+.ui-empty {
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-muted);
+}
+.ui-empty-icon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 10px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-md);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.ui-empty strong { color: var(--text); font-size: var(--fs-lg); }
+.ui-empty p { max-width: 240px; margin: 6px 0 0; font-size: var(--fs-md); line-height: var(--lh-normal); }
+
+.objects-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px;
+  padding: 6px;
+  border-bottom: 1px solid var(--border-soft);
+}
+/* Lista typów ma szerokość najdłuższej opcji („Wszystkie typy”), bez ucinania. */
+.ui-panel .objects-controls .objects-type .ui-control { width: auto; max-width: 160px; }
+.objects-toolbar {
+  min-height: var(--row-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 6px 0 10px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-muted);
+  background: var(--surface-raised);
+  font-size: var(--fs-sm);
+}
+.objects-toolbar .ui-check { font-size: var(--fs-sm); }
+.objects-bulk-actions { display: flex; align-items: center; gap: 2px; }
+.objects-panel .panel-footer > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.layers-toolbar { display: flex; align-items: center; gap: 6px; padding: 6px; border-bottom: 1px solid var(--border-soft); }
+.layers-toolbar .layers-search { flex: 1 1 auto; min-width: 0; }
+.layers-toolbar .layers-off-button { flex: 0 0 var(--control-h); width: var(--control-h); height: var(--control-h); }
+.layers-filter-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 4px 6px; border-bottom: 1px solid var(--border-soft); }
+.layers-filter {
+  min-width: 0; min-height: 27px; display: flex; align-items: center; justify-content: center; gap: 5px;
+  padding: 2px 5px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--text-muted);
+  font: inherit; font-size: var(--fs-xs); white-space: nowrap; cursor: pointer;
+}
+.layers-filter:hover { background: var(--surface-hover); color: var(--text); }
+.layers-filter.is-active { border-color: color-mix(in srgb, var(--accent) 34%, var(--border)); background: var(--accent-soft); color: var(--accent); font-weight: var(--fw-semibold); }
+.layers-filter small { min-width: 16px; padding: 1px 4px; border-radius: 99px; background: color-mix(in srgb, currentColor 10%, transparent); font-size: 10px; line-height: 1.2; text-align: center; }
+.layers-panel--v2 .layer-group + .layer-group { border-top: 1px solid var(--border-soft); }
+.layers-panel--v2 .layer-group-title { min-height: 31px; padding-block: 2px; }
+.layers-panel--v2 .layer-row--compact { padding-block: 1px; }
+.layers-panel--v2 .layer-row-main { min-height: 29px; }
+.layers-catalog-warning { margin: 6px 6px 0; }
+.layer-expanded-info .layer-opacity { margin: 4px 0 2px; }
+/* Krótki podpis „Krycie” — suwak zajmuje resztę szerokości (jak w 18.1). */
+.ui-panel .layer-expanded-info .layer-opacity { grid-template-columns: auto minmax(0, 1fr) auto; }
+.layer-error-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 2px 0 30px;
+  color: var(--danger);
+  font-size: var(--fs-sm);
+}
+.layer-error-row > span { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.layer-error-row .icon-button { width: var(--control-h-sm); height: var(--control-h-sm); flex-basis: var(--control-h-sm); }
+.layer-scale-row .layer-scale-action { flex: 0 0 auto; color: inherit; border: 1px solid currentColor; font-weight: var(--fw-semibold); }
+
+/* Parametry operacji analizy (z deklaracji operacji, 18.2). */
+.analysis-operation-params {
+  display: grid;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent-soft) 24%, transparent);
+}
+.analysis-param { display: grid; gap: 4px; }
+
+/* Błąd jednego panelu zostaje w panelu (18.1). */
+.panel-load-error { padding: var(--space-3); }
+.panel-load-error p { margin: 2px 0 0; color: var(--text-muted); font-size: var(--fs-sm); line-height: var(--lh-normal); }
+.panel-load-error-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+.panel-load-error details { margin-top: var(--space-2); font-size: var(--fs-sm); color: var(--text-muted); }
+.panel-load-error code { display: block; margin-top: 4px; white-space: pre-wrap; word-break: break-word; font-size: var(--fs-xs); }
+
+/* ------------------------------------------------------ cele kliknięcia ≥ 24 px
+   (WCAG 2.2, 2.5.8). Pola tekstowe wypełniają całą wysokość swojej ramki,
+   małe przyciski dostają pełne 24 px. Linki atrybucji w pasku stanu są
+   tekstem ciągłym — wyjątek „inline” w tej samej normie. */
+.layer-group-toggle { align-self: stretch; min-height: var(--control-h-sm); }
+.basemap-switcher-toggle { width: var(--control-h-sm); }
+.map-search-chip-clear { flex: 0 0 auto; width: var(--control-h-sm); height: var(--control-h-sm); margin: -3px -5px -3px -2px; }
+.identify-fact-value > button { min-width: var(--control-h-sm); min-height: var(--control-h-sm); }
+.ui-search input,
+.command-palette-search input,
+.map-search-place input,
+.map-search-parcel input { align-self: stretch; min-height: var(--control-h-sm); }
+.terrain-profile-error-details > summary,
+.app-shell details > summary { min-height: var(--control-h-sm); padding-block: 4px; box-sizing: border-box; }
+
+/* ------------------------------------------------------ gęstość kompaktowa */
+.app-shell[data-density="compact"] {
+  --row-h: 28px;
+  --control-h: 26px;
+  --control-h-sm: 22px;
+  --icon-button: 26px;
+  --context-bar-height: 36px;
+}
+.app-shell[data-density="compact"] .floating-tools--grouped .icon-button { height: 28px; flex-basis: 28px; }
+
+.layer-coverage-note { margin: 4px 6px; font-size: 12px; line-height: 1.4; color: var(--text-muted); }
+/* Zanikanie u dołu: element o zerowej wysokości przyklejony do dolnej krawędzi
+   palety (18.10.4: bez przycisku podpisów); wewnętrzna warstwa rysuje gradient. */
+.floating-tools-more {
+  position: sticky;
+  bottom: 0;
+  height: 0;
+  margin: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease-out;
+}
+.floating-tools-more.is-visible { opacity: 1; }
+.floating-tools-more > svg {
+  position: absolute;
+  left: 50%;
+  bottom: 1px;
+  transform: translateX(-50%);
+  color: var(--text-muted);
+  z-index: 1;
+}
+.floating-tools-more::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 26px;
+  background: linear-gradient(to bottom, transparent, var(--surface));
+}
+@media (prefers-reduced-motion: reduce) { .floating-tools-more { transition: none; } }
+
+/* Stały układ nagłówka i pełna szerokość wykresu w doku i odpiętym oknie. */
+.terrain-profile-chart svg,
+.dock--bottom .terrain-profile-panel .terrain-profile-chart svg { display: block; width: 100%; height: 100%; }
+.list-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px; font-size: 12px; }
+.list-pagination > span { flex: 1; text-align: center; }
+
+/* 18.10.4: paleta ma same ikony — nazwy i skróty pokazuje podpowiedź po najechaniu. */
+.floating-tools--grouped { padding-bottom: 3px; }
+}
+
+/* 18.9.6 — compact elevation progress and cached raster controls. */
+.terrain-fetch-progress { display: grid; gap: 4px; margin: 8px 12px; font-size: var(--fs-sm); }
+.terrain-fetch-status { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.terrain-fetch-progress progress { width: 100%; height: 5px; accent-color: var(--accent); }
+.terrain-fetch-progress small, .terrain-fetch-details, .terrain-surface-note { color: var(--text-muted); }
+.terrain-fetch-details { max-height: 140px; overflow: auto; }
+.terrain-fetch-details summary { cursor: pointer; }
+.terrain-surface-controls { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-bottom: 8px; }
+.terrain-surface-controls .ui-field { flex: 1 1 200px; }
+.terrain-surface-controls .ui-field--range { max-width: 320px; }
+.terrain-surface-readout { font-size: var(--fs-sm); min-height: 20px; margin: 4px 0; }
+.terrain-surface-note { display: block; font-size: var(--fs-sm); }
+.terrain-surface-status { font-size: var(--fs-sm); color: var(--text-muted); }
+.terrain-hypsometry-bar { background: var(--hypsometry); }
+
+/* 18.9.7 — optional slope and contours, local analysis export. */
+.terrain-slope-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: var(--fs-sm); margin: 8px 0; }
+.terrain-slope-legend > span { display: inline-flex; align-items: center; gap: 5px; }
+.terrain-slope-legend > small { flex-basis: 100%; color: var(--text-muted); }
+.terrain-slope-swatch { display: inline-block; width: 14px; height: 10px; border-radius: 2px; }
+.terrain-slope-swatch--0 { background: var(--terrain-slope-0); }
+.terrain-slope-swatch--1 { background: var(--terrain-slope-1); }
+.terrain-slope-swatch--2 { background: var(--terrain-slope-2); }
+.terrain-slope-swatch--3 { background: var(--terrain-slope-3); }
+.terrain-slope-swatch--4 { background: var(--terrain-slope-4); }
+.terrain-report-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0; }
+.terrain-report-actions small { flex-basis: 100%; color: var(--text-muted); font-size: var(--fs-sm); }
+
+/* 18.9.8: niewielka karta ortofotomap, w istniejącym doku i trybie pływającym. */
+@layer shell {
+    .ortho-controls, .ortho-point { display: grid; gap: var(--space-2, 8px); }
+    .ortho-date-fields { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2, 8px); }
+    .ortho-controls .ui-field, .ortho-controls select { min-width: 0; width: 100%; }
+    .ortho-status, .ortho-point small { display: block; color: var(--text-muted); }
+    .ortho-point { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+    .ortho-records { list-style: none; margin: 0; padding: 0; max-height: 180px; overflow-y: auto; }
+    .ortho-records li { display: flex; flex-direction: column; gap: 2px; padding: 5px 0; font-size: 12px; border-bottom: 1px solid var(--border); }
+    .ortho-records span { color: var(--text-muted); }
+    .ortho-details { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+    .ortho-details summary { cursor: pointer; }
+    .ortho-details p { margin: 6px 0; line-height: 1.5; }
+    .layers-ortho-shortcut { align-self: flex-start; margin: 6px 8px 0; min-height: 28px; }
+    @media (max-width: 760px), (pointer: coarse) and (max-height: 500px) { .layers-ortho-shortcut { min-height: 40px; } }
+    /* 18.9.11: treść panelu Ortofotomap ma własny margines (pola dotykały ramki). */
+    .ortho-body { min-height: 0; overflow: auto; padding: 10px 12px 12px; display: grid; gap: 10px; align-content: start; }
+    .ortho-body .ortho-point { margin-top: 2px; }
+    .ortho-body .ortho-details { margin-top: 2px; }
+    /* Powód wyłączenia przycisku — widoczny tuż pod nim. */
+    .disabled-reason { display: block; margin-top: 6px; color: var(--text-muted); font-size: var(--fs-sm, 11px); line-height: 1.4; }
+}
+
+
+/* ==========================================================================
+   18.10.1 — drobne poprawki układu z audytu prawej belki
+   ========================================================================== */
+@layer shell {
+    /* Eksport: lista wyboru dostaje całą szerokość wiersza, etykieta nad nią —
+       „PUWG 1992 / EPSG:2180” i opis układu mapy nie są już ucinane. */
+    .export-panel-body .ui-field:has(select),
+    .ortho-controls > .ui-field:has(select) { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+
+    /* Pusty panel Informacji: przycisk pod opisem, wyśrodkowany jak reszta. */
+    .identify-panel--empty .identify-panel-body { display: grid; justify-items: center; align-content: start; gap: 10px; padding-bottom: 12px; }
+
+    /* Odpięte okno Warstw kończy się nad przełącznikiem podkładów (88 px od lewej,
+       ok. 120 px od dołu), zamiast go przykrywać. */
+    .layers-panel.compact-panel:not(.is-docked) { bottom: 128px; }
+}
+
+/* 18.11.0: gdy kod narzędzia jeszcze się wczytuje, mapa nie przyjmuje kliknięć
+   (inaczej trafiały do nawigacji: dwuklik przybliżał, obiekt nie powstawał). */
+.app-shell:has(.floating-tools .tool-loading-icon) .map-host { cursor: progress; }
+.app-shell:has(.floating-tools .tool-loading-icon) .map-host .ol-viewport { pointer-events: none; }
+
+/* 18.11.0: prawy panel nie zachodzi na dolny dok (Profil terenu, Analiza wysokości). */
+@media (min-width: 761px) {
+  .workspace .dock--right-panel { max-height: calc(100% - var(--map-bottom-gap) - 16px); }
+}
+
+/* 18.11.0: odczyt szkicu i Zakończ/Anuluj — na komputerze w linii paska,
+   na telefonie pływająca karta nad mapą (zawsze widoczna, duże cele). */
+.context-sketch { display: contents; }
+@media (max-width: 760px), (pointer: coarse) and (max-height: 500px) {
+  .context-sketch {
+    position: fixed;
+    z-index: var(--z-tools);
+    top: var(--sketch-top);
+    left: 68px;
+    right: 52px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 8px;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-solid);
+    box-shadow: var(--shadow-soft);
+  }
+  .context-sketch .context-readouts { flex: 1 1 100%; justify-content: center; flex-wrap: wrap; }
+  .context-sketch .ui-button, .context-sketch button { min-height: 40px; flex: 1 1 0; }
+}
+@media (max-width: 760px), (pointer: coarse) and (max-height: 500px) {
+  .context-sketch .context-readouts { min-width: 0; gap: 2px 10px; }
+  .context-sketch .ui-readout { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+}
+
+/* 18.11.1: kursor mówi, w jakim trybie jest mapa. */
+.map-host[data-active-tool="core.pan"] { cursor: grab; }
+.map-host[data-active-tool="core.pan"]:active { cursor: grabbing; }
+.map-host[data-active-tool^="core.draw."],
+.map-host[data-active-tool^="core.measure."],
+.map-host[data-active-tool^="core.terrain."],
+.map-host[data-active-tool="core.buffer"] { cursor: crosshair; }
+
+/* 18.11.2: kontrolka nie wychodzi poza swoje pole (lista „Linia ciągła”
+   wchodziła na etykietę „Grubość” przy 1280 px). */
+.context-fields > .ui-field { min-width: max-content; }
+/* Do 1366 px obrót ma same przyciski (krok 15°, podany w podpowiedzi) — pasek
+   obiektu mieści się bez przewijania także przy 1280 px. */
+@media (max-width: 1366px) {
+  .context-zone--object .ui-field--rotate .ui-field--number { display: none; }
+}
+
+/* 18.11.2: pole tekstu przy wskazanym miejscu (Tekst na mapie, Etykieta). */
+.map-inline-text {
+  position: absolute;
+  z-index: var(--z-tools);
+  transform: translate(-12px, 10px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  gap: 4px;
+  width: 240px;
+  padding: 6px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-soft);
+}
+.map-inline-text-input {
+  min-width: 0;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.map-inline-text-input:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+.map-inline-text-ok {
+  height: 32px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+}
+.map-inline-text-hint { grid-column: 1 / -1; color: var(--text-muted); font-size: var(--fs-xs); }
+
+/* 18.12.2: podsumowanie wyniku — najważniejsze odpowiedzi na górze panelu. */
+.identify-verdict,
+.screening-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin: 8px 0;
+}
+.identify-verdict-item,
+.screening-summary-item {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-left-width: 3px;
+  border-radius: 8px;
+  background: var(--surface-raised);
+}
+.identify-verdict-item > span,
+.screening-summary-item > span { color: var(--text-muted); font-size: var(--fs-xs); }
+.identify-verdict-item > strong,
+.screening-summary-item > strong { font-size: var(--fs-md); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.identify-verdict-item--info { border-left-color: var(--info); }
+.identify-verdict-item--warning, .screening-summary-item--warning { border-left-color: var(--warning); }
+.identify-verdict-item--warning > strong, .screening-summary-item--warning > strong { color: var(--warning); }
+.identify-verdict-item--ok, .screening-summary-item--ok { border-left-color: var(--success); }
+.identify-verdict-item--danger, .screening-summary-item--danger { border-left-color: var(--danger); }
+.identify-verdict-item--danger > strong, .screening-summary-item--danger > strong { color: var(--danger); }
+.identify-verdict-item--neutral { border-left-color: var(--border-strong); }
+.identify-verdict-item--muted > strong, .identify-verdict-item--loading > strong { color: var(--text-faint); font-weight: var(--fw-medium); }
+.identify-verdict-item--loading { border-left-color: var(--border); }
+
+/* Baner „źródła nie odpowiadają” — tekst i przycisk w jednej kolumnie. */
+.identify-sources-down, .screening-sources-down { display: grid; gap: 6px; }
+.identify-error { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* 18.12.2: Analiza źródła w trzech krokach; ustawienia rzadziej zmieniane schowane. */
+.analysis-step > .ui-section-title, .analysis-step h3 { font-weight: var(--fw-semibold); }
+.analysis-advanced { margin-top: 6px; }
+.analysis-advanced > summary { cursor: pointer; color: var(--text-muted); font-size: var(--fs-sm); padding: 4px 0; }
+.analysis-advanced[open] > summary { margin-bottom: 6px; }
+.analysis-advanced .ui-field + .ui-field { margin-top: 6px; }
+
+/* 18.12.2: dolny panel terenu bez wyniku (pusty, w trakcie, błąd) ma wysokość
+   treści — mapa nie traci ~1/3 wysokości na jedną linijkę tekstu. */
+.dock--bottom:has(> .terrain-profile-panel.is-compact),
+.dock--bottom:has(.terrain-profile-panel.is-compact) { height: auto !important; max-height: 50%; }
+.dock--bottom .terrain-profile-panel.is-compact { height: auto; }
+
+/* 18.12.3: jak wskazać działkę do screeningu; akcja „Screening tej działki”. */
+.screening-target-help { display: grid; gap: 6px; margin: 6px 0 4px; }
+.screening-target-help small { color: var(--text-muted); font-size: var(--fs-xs); line-height: 1.35; }
+.identify-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
+.identify-actions .ui-button, .identify-actions button { flex: 1 1 auto; min-width: 0; }
+/* 19.8.5: główna akcja w osobnym, pełnym wierszu — w 340 px ucinała się („Screenin…”). */
+.identify-actions .ui-button--primary { order: -1; flex-basis: 100%; }
+.identify-more-facts { margin: 2px 0 6px; font-size: 12px; }
+.identify-more-facts > summary { cursor: pointer; color: var(--text-muted); padding: 3px 0; }
+.identify-more-facts > summary:hover { color: var(--text); }
+.identify-more-facts > .identify-summary-grid { margin-top: 4px; }
+
+/* =====================================================================
+   18.14.0 — powłoka mobilna „MSPortal w terenie” (wzór: Mapy Google).
+   Aktywna, gdy aplikacja ma klasę .is-mobile (useIsMobile: ≤ 760 px).
+   ===================================================================== */
+.app-shell.is-mobile { grid-template-rows: 0 minmax(0, 1fr); }
+.app-shell.is-mobile .workspace { --activity-bar-width: 0px; }
+/* Pasek kontekstu zostaje zamontowany (karta szkicu: Zakończ/Anuluj), ale niewidoczny. */
+.app-shell.is-mobile .top-property-bar.m-context-host { visibility: hidden; height: 0; min-height: 0; overflow: visible; border: 0; padding: 0; }
+.app-shell.is-mobile .context-sketch { visibility: visible; top: calc(env(safe-area-inset-top, 0px) + 168px) !important; left: 12px; right: 12px; }
+.app-shell.is-mobile .activity-bar,
+.app-shell.is-mobile .map-view-controls,
+.app-shell.is-mobile .map-statusbar { display: none !important; }
+
+.m-shell { position: absolute; inset: 0; z-index: var(--z-tools); pointer-events: none; }
+.m-shell > * { pointer-events: auto; }
+
+/* Wyszukiwarka — pływająca „pigułka” u góry. */
+.m-top { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 10px); left: 10px; right: 10px; display: grid; gap: 8px; pointer-events: none; }
+.m-top > * { pointer-events: auto; }
+.m-search {
+  border-radius: 26px;
+  background: var(--surface-solid);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  padding: 0 6px 0 4px;
+}
+.m-search .map-search { flex: 1 1 auto; min-width: 0; width: 100%; max-width: none; }
+.m-search .map-search-fields { display: flex; gap: 6px; width: 100%; }
+.m-search .map-search-place { flex: 1 1 auto; min-width: 0; }
+.m-search .map-search-parcel { flex: 0 0 96px; }
+.m-search input { font-size: 16px; min-height: 44px; border: 0; background: transparent; }
+.m-search .map-search-dropdown { position: fixed; left: 10px; right: 10px; top: calc(env(safe-area-inset-top, 0px) + 66px); max-height: 60vh; border-radius: 16px; }
+
+/* Przełączniki warstw — przewijany rząd jak kategorie w Mapach Google. */
+.m-chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 1px 2px 4px; -webkit-overflow-scrolling: touch; }
+.m-chips::-webkit-scrollbar { display: none; }
+.m-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--surface-solid);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--fs-md);
+  font-weight: var(--fw-medium);
+  box-shadow: var(--shadow-soft);
+  white-space: nowrap;
+}
+.m-chip.is-on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+.m-tool-pill {
+  justify-self: center;
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 40px; padding: 0 6px 0 14px;
+  border-radius: 20px; background: var(--accent); color: var(--on-accent);
+  box-shadow: var(--shadow); font-weight: var(--fw-semibold);
+}
+.m-tool-pill button { width: 34px; height: 34px; border: 0; border-radius: 17px; background: transparent; color: inherit; display: grid; place-items: center; }
+
+/* Przyciski pływające (Warstwy, Moja lokalizacja). */
+.m-fabs { position: absolute; right: 12px; top: calc(env(safe-area-inset-top, 0px) + 122px); display: grid; gap: 10px; }
+.m-fab {
+  width: 50px; height: 50px; border-radius: 25px;
+  display: grid; place-items: center;
+  border: 1px solid var(--border);
+  background: var(--surface-solid); color: var(--text);
+  box-shadow: var(--shadow);
+}
+.m-fab--locate { position: absolute; right: 12px; bottom: calc(var(--m-nav-h) + env(safe-area-inset-bottom, 0px) + 16px); transition: bottom .2s ease; }
+.m-fab--locate.is-on, .m-fab--locate.is-searching { color: var(--accent); }
+.m-fab--locate.is-follow { background: var(--accent); color: var(--on-accent); }
+.m-shell.has-card .m-fab--locate { bottom: calc(var(--m-peek-h) + 14px); }
+.m-toast { position: absolute; left: 16px; right: 16px; bottom: calc(var(--m-nav-h) + 80px); padding: 12px 14px; border-radius: 12px; background: var(--surface-solid); box-shadow: var(--shadow); color: var(--text); }
+
+/* Dolny pasek nawigacji. */
+.m-nav {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: calc(var(--m-nav-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  background: var(--surface-solid);
+  border-top: 1px solid var(--border);
+  z-index: 3;
+}
+.m-nav button { display: grid; place-items: center; align-content: center; gap: 2px; border: 0; background: transparent; color: var(--text-muted); font: inherit; font-size: var(--fs-sm); font-weight: var(--fw-medium); }
+.m-nav button.is-active { color: var(--accent); }
+.m-nav button.is-active svg { background: var(--accent-soft); border-radius: 14px; padding: 3px 14px; box-sizing: content-box; }
+.m-shell.has-card .m-nav { display: none; }
+
+/* Dolne arkusze (karta działki, Warstwy, Narzędzia, Więcej). */
+.m-sheet {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  z-index: 4;
+  display: flex; flex-direction: column;
+  border-radius: 18px 18px 0 0;
+  background: var(--surface-solid);
+  box-shadow: var(--shadow);
+  transition: height .22s ease;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.m-sheet.is-dragging { transition: none; }
+.m-shell:not(.has-card) .m-sheet:not(.m-parcel-card) { bottom: 0; }
+.m-sheet-head { flex: 0 0 auto; padding: 6px 14px 8px; touch-action: none; cursor: grab; }
+.m-sheet-grip { display: block; width: 44px; height: 18px; margin: 0 auto 4px; border: 0; background: transparent; position: relative; }
+.m-sheet-grip::after { content: ''; position: absolute; left: 4px; right: 4px; top: 7px; height: 4px; border-radius: 2px; background: var(--border-strong); }
+.m-sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 14px 16px; }
+.m-card-head { display: flex; align-items: flex-start; gap: 10px; }
+.m-card-title { flex: 1 1 auto; min-width: 0; display: grid; gap: 2px; }
+.m-card-title strong { font-size: 19px; line-height: 1.25; }
+.m-card-title span { color: var(--text-muted); font-size: var(--fs-md); }
+.m-icon-button { width: 40px; height: 40px; flex: 0 0 40px; border: 0; border-radius: 20px; background: var(--surface-hover); color: var(--text); display: grid; place-items: center; }
+
+.m-card-verdict .identify-verdict { display: flex; overflow-x: auto; scrollbar-width: none; gap: 6px; margin: 2px 0 10px; }
+.m-card-verdict .identify-verdict-item { flex: 0 0 auto; min-width: 104px; }
+.m-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 4px 0 12px; }
+.m-action { display: grid; justify-items: center; gap: 6px; border: 0; background: transparent; color: var(--accent); font: inherit; font-size: var(--fs-sm); font-weight: var(--fw-medium); padding: 0; }
+.m-action-icon { width: 48px; height: 48px; border-radius: 24px; border: 1px solid var(--border); display: grid; place-items: center; background: var(--surface-raised); }
+.m-action.is-primary .m-action-icon { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.m-action:disabled { opacity: .45; }
+.m-action-label { color: var(--text); }
+
+.m-screening { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; background: var(--surface-raised); }
+.m-screening-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
+.m-screening-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.m-screening-row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--border); font-size: var(--fs-md); }
+.m-screening-row:first-child { border-top: 0; }
+.m-screening-row.is-danger strong { color: var(--danger); }
+.m-screening-row.is-warning strong { color: var(--warning); }
+.m-screening-row.is-ok strong { color: var(--success); }
+.m-screening-row.is-muted strong { color: var(--text-faint); font-weight: var(--fw-medium); }
+.m-inline-warning { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 0; color: var(--warning); font-size: var(--fs-sm); }
+.m-inline-warning button { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 0 10px; border: 1px solid var(--border); border-radius: 18px; background: transparent; color: var(--text); }
+.m-note { color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.4; }
+
+/* Pełne dane działki w karcie — bez drugiego nagłówka i powtórzonego podsumowania. */
+.m-card-details .panel-header,
+.m-card-details .identify-verdict,
+.m-card-details .identify-actions,
+.m-card-details .ui-panel-foot,
+.m-card-details .panel-footer { display: none !important; }
+.m-card-details .identify-panel { position: static; width: 100%; max-width: none; max-height: none; border: 0; box-shadow: none; background: transparent; }
+.m-sheet--peek .m-actions,
+.m-sheet--peek .m-screening,
+.m-sheet--peek .m-card-details { visibility: hidden; }
+.m-sheet--half .m-card-details { opacity: .9; }
+
+.m-section-title { margin: 6px 0 8px; font-size: var(--fs-sm); color: var(--text-muted); font-weight: var(--fw-semibold); text-transform: uppercase; letter-spacing: .04em; }
+.m-layers-sheet .basemap-switcher { position: static; display: flex; flex-wrap: wrap; box-shadow: none; border: 0; background: transparent; padding: 0; }
+.m-layers-sheet .basemap-switcher-toggle { display: none; }
+.m-layers-sheet .m-chips { flex-wrap: wrap; overflow: visible; }
+.m-list-button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 0 6px; border: 0; border-bottom: 1px solid var(--border); background: transparent; color: var(--text); font: inherit; font-size: var(--fs-md); text-align: left; }
+.m-tool-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 6px; padding: 4px 0 8px; }
+.m-tool { display: grid; justify-items: center; gap: 6px; border: 0; background: transparent; color: var(--text); font: inherit; font-size: 12px; text-align: center; line-height: 1.2; }
+.m-tool-icon { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: var(--surface-raised); border: 1px solid var(--border); color: var(--accent); }
+.m-tool.is-active .m-tool-icon { background: var(--accent); color: var(--on-accent); }
+
+/* Panele z prawego doku (Projekt, Analizy, Eksport…) jako arkusz nad dolnym paskiem. */
+.app-shell.is-mobile .dock--right-panel {
+  left: 0 !important; right: 0 !important; width: 100% !important;
+  bottom: calc(var(--m-nav-h) + env(safe-area-inset-bottom, 0px)) !important;
+  border-radius: 18px 18px 0 0;
+  z-index: calc(var(--z-tools) + 1);
+}
+
+/* 18.14.1: pomiar z celownikiem i menu przytrzymania. */
+.m-crosshair-layer { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+.m-crosshair-layer > * { pointer-events: auto; }
+.m-crosshair {
+  position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; margin: -22px 0 0 -22px;
+  pointer-events: none !important;
+  border: 2px solid var(--accent); border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--surface-solid);
+}
+.m-crosshair::before, .m-crosshair::after { content: ''; position: absolute; background: var(--accent); }
+.m-crosshair::before { left: 50%; top: -12px; bottom: -12px; width: 2px; margin-left: -1px; }
+.m-crosshair::after { top: 50%; left: -12px; right: -12px; height: 2px; margin-top: -1px; }
+.m-measure-bar {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 12px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+  border-radius: 18px 18px 0 0; background: var(--surface-solid); box-shadow: var(--shadow);
+  display: grid; gap: 12px;
+}
+.m-measure-head { display: flex; align-items: flex-start; gap: 10px; }
+.m-measure-values { flex: 1 1 auto; display: grid; gap: 2px; min-width: 0; }
+.m-measure-values > span { color: var(--text-muted); font-size: var(--fs-sm); }
+.m-measure-values > strong { font-size: 24px; line-height: 1.2; }
+.m-measure-values > small { color: var(--text-muted); font-size: var(--fs-sm); }
+.m-measure-actions { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; }
+.m-measure-add { width: 68px; height: 68px; border-radius: 34px; border: 0; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; box-shadow: var(--shadow); }
+.m-measure-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; border: 1px solid var(--border); border-radius: 24px; background: transparent; color: var(--text); font: inherit; font-weight: var(--fw-medium); }
+.m-measure-secondary.is-done { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.m-measure-secondary:disabled { opacity: .4; }
+.m-shell.is-measuring .m-nav,
+.m-shell.is-measuring .m-top,
+.m-shell.is-measuring .m-fabs,
+.m-shell.is-measuring .m-parcel-card { display: none; }
+.m-shell.is-measuring .m-fab--locate { bottom: 196px; }
+.m-shell.has-point-menu .m-nav { display: none; }
+.m-list-icon { width: 36px; height: 36px; border-radius: 18px; display: grid; place-items: center; background: var(--surface-raised); color: var(--accent); flex: 0 0 36px; }
+.m-list-copy { display: grid; gap: 1px; min-width: 0; }
+.m-list-copy small { color: var(--text-muted); font-size: var(--fs-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 18.14.2: przesuwanie mapy palcem.
+   Domyślny styl OpenLayers (`.ol-viewport { touch-action: pan-x pan-y }`) jest
+   pomyślany dla mapy osadzonej w przewijanej stronie: przeglądarka sama
+   rozstrzyga, czy przeciągnięcie palcem przewija stronę, czy przesuwa mapę,
+   i w połowie gestu potrafi go przejąć (pointercancel) — mapa raz się
+   przesuwała, raz nie. MSPortal zajmuje cały ekran, więc wszystkie gesty na
+   mapie należą do mapy. Do tego bez „przeciągnij, by odświeżyć” i bez
+   odbijania całej strony. */
+.ol-viewport, .map-host { touch-action: none; }
+html, body { overscroll-behavior: none; }
+.app-shell.is-mobile, .app-shell.is-mobile .map-area { overscroll-behavior: none; }
+
+/* 18.14.3: poprawki wersji mobilnej. */
+/* Przycisk „Moja lokalizacja” stoi nad każdym arkuszem (wysokość z MobileSheet),
+   a przy arkuszu na pełny ekran znika — wcześniej chował się pod kartą. */
+.m-shell:has(.m-sheet) .m-fab--locate { bottom: calc(var(--m-sheet-h, var(--m-peek-h)) + 14px); }
+.m-shell:has(.m-sheet.is-dragging) .m-fab--locate { transition: none; }
+.m-shell:has(.m-sheet--full) .m-fab--locate { display: none; }
+.m-shell.is-measuring .m-fab--locate { bottom: 196px; }
+/* Komunikat o lokalizacji u góry, pod przełącznikami warstw — nie ginie pod arkuszem. */
+.m-toast { top: calc(env(safe-area-inset-top, 0px) + 118px); bottom: auto; right: 74px; z-index: 6; }
+/* Jeden arkusz naraz: Warstwy / Więcej / Narzędzia / menu punktu przykrywają kartę działki
+   zamiast nakładać się na nią; karta wraca po zamknięciu arkusza. */
+.m-shell:has(.m-layers-sheet, .m-more-sheet, .m-tools-sheet, .m-point-menu) .m-parcel-card { display: none; }
+/* Pole „Nr działki”: na telefonie było schowane (szerokość 0). Pokazuje się jako
+   druga linia wyszukiwarki, gdy wybrano miejscowość (wcześniej i tak jest nieaktywne). */
+.m-search .map-search-fields { flex-wrap: wrap; row-gap: 0; }
+.m-search .map-search-place { border: 0; background: transparent; box-shadow: none; height: 44px; }
+.m-search .map-search-parcel { display: none; }
+.m-search .map-search-parcel:not(.is-disabled) {
+  display: flex; flex: 1 0 100%; height: 44px;
+  border: 0; border-top: 1px solid var(--border); border-radius: 0; background: transparent; box-shadow: none;
+}
+.m-search { padding-top: 2px; padding-bottom: 2px; }
+.m-search:has(.map-search-parcel:not(.is-disabled)) { border-radius: 20px; }
+/* Druga linia wyszukiwarki przesuwa w dół listę podpowiedzi, przycisk Warstwy i komunikat. */
+.m-search:has(.map-search-parcel:not(.is-disabled)) .map-search-dropdown { top: calc(env(safe-area-inset-top, 0px) + 110px); }
+.m-shell:has(.map-search-parcel:not(.is-disabled)) .m-fabs { top: calc(env(safe-area-inset-top, 0px) + 166px); }
+.m-shell:has(.map-search-parcel:not(.is-disabled)) .m-toast { top: calc(env(safe-area-inset-top, 0px) + 162px); }
+
+/* =====================================================================
+   18.15.0 — telefon trzymany poziomo (wysokość ≤ 500 px). Wcześniej dostawał
+   wersję komputerową. Teraz: wyszukiwarka, arkusze, panele i dolny pasek
+   w lewej kolumnie, mapa po prawej na całej wysokości (wzór: Mapy Google).
+   ===================================================================== */
+@media (orientation: landscape) and (max-height: 500px) {
+  .app-shell.is-mobile {
+    --m-side-w: min(400px, 52vw);
+    --m-nav-h: 52px;
+    --m-side-left: env(safe-area-inset-left, 0px);
+  }
+  .app-shell.is-mobile .m-top { left: calc(var(--m-side-left) + 8px); right: auto; width: calc(var(--m-side-w) - 16px); top: calc(env(safe-area-inset-top, 0px) + 8px); gap: 6px; }
+  .app-shell.is-mobile .m-search { min-height: 44px; }
+  .app-shell.is-mobile .m-search .map-search-dropdown { left: calc(var(--m-side-left) + 8px); right: auto; width: calc(var(--m-side-w) - 16px); top: calc(env(safe-area-inset-top, 0px) + 58px); max-height: calc(100dvh - 80px); }
+  .app-shell.is-mobile .m-search:has(.map-search-parcel:not(.is-disabled)) .map-search-dropdown { top: calc(env(safe-area-inset-top, 0px) + 102px); }
+  .app-shell.is-mobile .m-tool-pill { justify-self: start; }
+  .app-shell.is-mobile .m-fabs,
+  .app-shell.is-mobile .m-shell:has(.map-search-parcel:not(.is-disabled)) .m-fabs { top: calc(env(safe-area-inset-top, 0px) + 8px); right: calc(env(safe-area-inset-right, 0px) + 12px); }
+  /* Arkusze są po lewej, więc przycisk lokalizacji zostaje w prawym dolnym rogu. */
+  .app-shell.is-mobile .m-fab--locate,
+  .app-shell.is-mobile .m-shell:has(.m-sheet) .m-fab--locate,
+  .app-shell.is-mobile .m-shell.is-measuring .m-fab--locate { display: grid; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); right: calc(env(safe-area-inset-right, 0px) + 12px); }
+  .app-shell.is-mobile .m-toast,
+  .app-shell.is-mobile .m-shell:has(.map-search-parcel:not(.is-disabled)) .m-toast { top: calc(env(safe-area-inset-top, 0px) + 8px); left: auto; right: calc(env(safe-area-inset-right, 0px) + 74px); width: min(320px, 38vw); }
+  .app-shell.is-mobile .m-nav { right: auto; width: var(--m-side-w); left: var(--m-side-left); border-right: 1px solid var(--border); border-radius: 0 14px 0 0; }
+  .app-shell.is-mobile .m-nav button { grid-auto-flow: column; justify-content: center; gap: 6px; }
+  .app-shell.is-mobile .m-nav button.is-active svg { padding: 3px 8px; }
+  .app-shell.is-mobile .m-sheet,
+  .app-shell.is-mobile .m-measure-bar { right: auto; left: var(--m-side-left); width: var(--m-side-w); border-radius: 0 18px 0 0; }
+  .app-shell.is-mobile .m-measure-bar { gap: 8px; padding-top: 8px; }
+  .app-shell.is-mobile .m-measure-add { width: 56px; height: 56px; }
+  .app-shell.is-mobile .dock--right-panel { right: auto !important; left: var(--m-side-left) !important; width: var(--m-side-w) !important; border-radius: 0 18px 0 0; }
+}
+
+/* 18.15.0: rysowanie na telefonie — pasek u dołu (Cofnij · Zakończ · Anuluj)
+   zamiast karty szkicu u góry; dolny pasek i przełączniki warstw chowają się. */
+.app-shell.is-mobile .context-sketch { display: none !important; }
+.m-sketch-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.m-sketch-actions .m-measure-secondary { min-height: 52px; }
+.m-shell.is-sketching .m-nav,
+.m-shell.is-sketching .m-top .m-chips,
+.m-shell.is-sketching .m-top .m-search,
+.m-shell.is-sketching .m-parcel-card { display: none; }
+.m-shell.is-sketching .m-fab--locate { bottom: 176px; }
+.m-sketch-bar { z-index: 5; }
+/* 18.15.0: przełączniki warstw — obszar dotyku 44 px przy tym samym wyglądzie (36 px). */
+.m-chip { position: relative; }
+.m-chip::after { content: ''; position: absolute; left: 0; right: 0; top: -4px; bottom: -4px; }
+.m-top .m-chips { padding-top: 4px; padding-bottom: 5px; margin: -3px 0 -4px; }
+/* 18.15.0: minimalna wysokość 460 px (dla wersji komputerowej) na telefonie
+   trzymanym poziomo (390–430 px) przewijała całą stronę — dolny pasek
+   i przycisk lokalizacji były poza ekranem. Powłoka mobilna zawsze mieści się w ekranie. */
+.app-shell.is-mobile { min-height: 0; }
+html:has(.app-shell.is-mobile), body:has(.app-shell.is-mobile) { overflow: hidden; }
+
+/* 18.18.0: spadki terenu (udział klas) oraz wykopy i nasypy w analizie wysokości. */
+.terrain-slope-summary, .terrain-earthworks { display: grid; gap: 8px; margin: 12px 0 4px; padding-top: 10px; border-top: 1px solid var(--border); }
+.terrain-section-title { font-size: var(--fs-md); font-weight: var(--fw-semibold); }
+.terrain-slope-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--surface-hover); }
+.terrain-slope-bar > span { display: block; min-width: 2px; }
+.terrain-slope-table { display: grid; gap: 2px; font-size: var(--fs-sm); }
+.terrain-slope-row { display: grid; grid-template-columns: minmax(0, 1fr) auto 56px; gap: 10px; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--border); }
+.terrain-slope-row:last-child { border-bottom: 0; }
+.terrain-slope-row > span:first-child { display: inline-flex; align-items: center; gap: 6px; }
+.terrain-slope-row > span:nth-child(2) { color: var(--text-muted); text-align: right; font-variant-numeric: tabular-nums; }
+.terrain-slope-row > strong { text-align: right; font-variant-numeric: tabular-nums; }
+.terrain-earthworks-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; align-items: end; }
+.terrain-slope-summary, .terrain-earthworks { max-width: 680px; }

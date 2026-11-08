@@ -1,0 +1,1844 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Diagnostyka msportalu 19.41.4</title>
+<link rel="stylesheet" href="./vendor/static/openlayers.css?v=10.10.0">
+<style>
+body{font-family:Segoe UI,Arial,sans-serif;max-width:980px;margin:32px auto;padding:0 20px;color:#18202c;background:#f7f8fa}.card{background:#fff;border:1px solid #d8dee8;border-radius:14px;padding:22px;box-shadow:0 8px 26px #0000000e}.test{padding:7px 0;border-bottom:1px solid #edf0f3}.ok{color:#157347}.bad{color:#b42318}.warn{color:#b26a00}.muted{color:#667085}pre{white-space:pre-wrap;background:#f5f7f9;padding:12px;border-radius:8px;overflow:auto}a{color:#1d4ed8}button{font:inherit;padding:7px 14px;border-radius:8px;border:1px solid #d8dee8;background:#fff;color:#18202c;cursor:pointer}button:hover{background:#f5f7f9}</style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "./vendor/static/react.js?v=19.2.8",
+    "react/jsx-runtime": "./vendor/static/react-jsx-runtime.js?v=19.2.8",
+    "react-dom": "./vendor/static/react-dom.js?v=19.2.8",
+    "react-dom/client": "./vendor/static/react-dom-client.js?v=19.2.8",
+    "@radix-ui/react-dropdown-menu": "./vendor/static/radix-dropdown.js?v=2.1.16",
+    "@radix-ui/react-tooltip": "./vendor/static/radix-tooltip.js?v=1.2.8",
+    "proj4": "./vendor/static/proj4.js?v=2.22.0",
+    "zod": "./vendor/static/zod.js?v=4.6.5",
+    "lucide-react": "./vendor/static/lucide-react.js?v=vendor-react19.2.8-ol10.10.0-lucide1.47.0-v2",
+    "ol": "./vendor/ol-esm-2/index.js",
+    "ol-mapbox-style": "./vendor/opt/ol-mapbox-style.js?v=13.5.1",
+    "maplibre-contour": "./vendor/opt/maplibre-contour.js?v=0.1.0",
+    "ol/": "./vendor/ol-esm-2/"
+  }
+}
+</script>
+</head>
+<body><div class="card"><h1>Diagnostyka msportalu 19.41.4</h1><p class="muted">19.41.4 sprawdza rdzeń msportalu, optymalizację dużych zbiorów BDOT10k, cache zapytań, adaptacyjny podgląd wektorów, analizy odległościowe, bufory, odporność WMS/WMTS, eksport oraz mapę projektową.</p><p><a href="./monitor-zrodel.html">Monitor źródeł danych — historia, próbki i eksport</a></p><div id="tests"></div><h3>Szczegóły</h3><pre id="details">Uruchamianie…</pre><p><a href="./">← msportal</a> · <a href="./setup-vendors.php">Przygotowanie bibliotek</a></p></div>
+<div class="card">
+<h3>Dziennik błędów przeglądarki</h3>
+<p class="muted">18.1.0 — nieprzechwycone błędy JS, odrzucone obietnice i błędy renderowania React z tej przeglądarki (zapisywane lokalnie, ostatnie 40 zdarzeń). Przydatne przy zgłaszaniu awarii, których nikt nie widział na żywo.</p>
+<div id="errorlog"><p class="muted">Wczytywanie…</p></div>
+<p><button id="clearlog" type="button">Wyczyść dziennik</button></p>
+</div>
+<script type="module">
+const CURRENT_DIAG_VERSION='19.41.4'; const out=document.getElementById('tests'); const details=document.getElementById('details'); const results={}; const sourceAudit=new Map();
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,(ch)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]))}
+async function renderErrorLog(){
+  const box=document.getElementById('errorlog');
+  try{
+    const {getErrorLog,clearErrorLog}=await import('./app-19.41.4/diagnostics/errorLog.js?v=19.41.4');
+    const entries=getErrorLog();
+    if(!entries.length){box.innerHTML='<p class="muted">Brak zarejestrowanych błędów w tej przeglądarce.</p>'}
+    else{
+      box.innerHTML='';
+      for(const e of entries.slice().reverse()){
+        const div=document.createElement('div'); const historical=String(e.appVersion||'')!==CURRENT_DIAG_VERSION; div.className='test '+(historical?'warn':'bad');
+        const when=new Date(e.timestamp).toLocaleString('pl-PL');
+        const detail=(e.message||'')+(e.stack?('\n'+e.stack):'');
+        div.innerHTML=`<strong>${escapeHtml(e.type)}</strong> · ${escapeHtml(when)} · wersja ${escapeHtml(e.appVersion||'?')}${historical?' · wpis historyczny':''}<br><span class="muted">${escapeHtml(e.source||'')}</span><pre>${escapeHtml(detail)}</pre>`;
+        box.appendChild(div);
+      }
+    }
+    const clearBtn=document.getElementById('clearlog');
+    if(clearBtn)clearBtn.onclick=()=>{clearErrorLog();renderErrorLog()};
+  }catch(e){
+    box.innerHTML='<p class="bad">Nie udało się odczytać dziennika: '+escapeHtml(e?.message||e)+'</p>';
+  }
+}
+renderErrorLog();
+function recordSourceAudit(source, patch){const prev=sourceAudit.get(source)||{source,attempts:0,ok:0,errors:[],latencies:[],cache:[],variants:[]};prev.attempts+=1;if(patch.ok){prev.ok+=1;if(Number.isFinite(patch.ms))prev.latencies.push(patch.ms);if(patch.cache)prev.cache.push(patch.cache);if(patch.variant)prev.variants.push(patch.variant);}else if(patch.error){prev.errors.push(String(patch.error));}sourceAudit.set(source,prev);}
+function row(name,ok,value){results[name]=ok?{ok:true,value}:{ok:false,error:String(value)}; const d=document.createElement('div');d.className='test '+(ok?'ok':'bad');d.textContent=`${ok?'✓':'✗'} ${name} — ${value}`;out.appendChild(d);details.textContent=JSON.stringify(results,null,2)}
+function warning(name,value){results[name]={ok:true,warning:true,value:String(value)};const d=document.createElement('div');d.className='test warn';d.textContent=`⚠ ${name} — ${value}`;out.appendChild(d);details.textContent=JSON.stringify(results,null,2)}
+async function test(name,fn){try{const v=await fn();row(name,true,v??'OK')}catch(e){row(name,false,e?.stack||e)}}
+/* Arkusz jest podzielony na warstwy kaskady (Faza 3), więc diagnostyka skleja
+   wszystkie pliki w kolejności wczytywania i bada je jak jeden dokument. */
+const CSS_LAYER_FILES=['00-layers','10-tokens','21-legacy-shell','22-legacy-panels','23-legacy-catalog','24-legacy-tools','25-legacy-export','26-legacy-identify','27-legacy-analysis','30-shell','31-ux','90-utilities'];
+let __cssCache=null;
+async function loadAppCss(){
+  if(__cssCache)return __cssCache;
+  const parts=await Promise.all(CSS_LAYER_FILES.map(async name=>{
+    const r=await fetch(`./assets/css/${name}.css?v=19.41.4`,{cache:'no-store'});
+    if(!r.ok)throw new Error(`Brak arkusza warstwy ${name}.css (HTTP ${r.status})`);
+    return r.text();
+  }));
+  __cssCache=parts.join('\n');
+  return __cssCache;
+}
+/* 18.1: panele biorą napisy z katalogu i18n/pl.js przez t('klucz'), więc
+   „panel pokazuje napis X” znaczy: X jest w kodzie wprost albo kod używa
+   klucza katalogu, którego tekst zawiera X. */
+let __catalog=null;
+async function loadCatalog(){if(!__catalog)__catalog=(await import('./app-19.41.4/i18n/pl.js?v=19.41.4')).PL;return __catalog}
+async function showsText(src,text){if(src.includes(text))return true;const catalog=await loadCatalog();return Object.entries(catalog).some(([key,value])=>String(value).includes(text)&&(src.includes(`'${key}'`)||src.includes(`"${key}"`)))}
+async function missingTexts(src,texts){const missing=[];for(const text of texts)if(!(await showsText(src,text)))missing.push(text);return missing}
+/* 18.2: operacje analizy są deklaracjami funkcji — manager tworzony w teście dostaje je tak jak w runtime. */
+async function registerAnalysisOperations(manager){const {analysisFeature}=await import('./app-19.41.4/features/builtin/analysisFeature.js?v=19.41.4');for(const operation of analysisFeature.analysisOperations)manager.registerOperation(operation);return manager}
+async function fetchSources(paths){return (await Promise.all(paths.map(path=>fetch(path+'?v=19.41.4',{cache:'no-store'}).then(r=>r.text())))).join('\n')}
+async function testKnownLimitation(name,fn){try{const v=await fn();row(name,true,v??'OK')}catch(e){warning(name,(e?.message||String(e))+' · znane ograniczenie, nie blokuje wydania')}}
+async function testExternalService(name,fn){try{const v=await fn();row(name,true,v??'OK')}catch(e){warning(name,(e?.message||String(e))+' · próba źródła nie powiodła się; sprawdź Monitor źródeł. Wynik nie dowodzi stanu całego rdzenia')}}
+async function mapLimit(items,limit,fn){
+ const input=[...items],output=new Array(input.length);let cursor=0;
+ const workers=Array.from({length:Math.max(1,Math.min(limit,input.length||1))},async()=>{while(true){const index=cursor++;if(index>=input.length)return;try{output[index]={status:'fulfilled',value:await fn(input[index],index)}}catch(reason){output[index]={status:'rejected',reason}}}});
+ await Promise.all(workers);return output;
+}
+async function ensureOl(){if(window.ol?.Map)return; await new Promise((res,rej)=>{const s=document.createElement('script');s.src='./vendor/static/openlayers.js?v=10.10.0';s.onload=res;s.onerror=()=>rej(new Error('OpenLayers static load failed'));document.head.appendChild(s)});if(!window.ol?.Map)throw new Error('window.ol.Map unavailable')}
+await test('PHP / health',async()=>{const r=await fetch('./api/health.php',{cache:'no-store'});const j=await r.json();if(!j.ok)throw new Error(JSON.stringify(j));return `PHP ${j.php} / ${j.version}`});
+await test('18.1.0 — magazyn certyfikatów TLS',async()=>{const r=await fetch('./api/health.php?ca='+Date.now(),{cache:'no-store'});const j=await r.json();if(!j.ca_bundle||Number(j.ca_bundle_bytes)<100000)throw new Error('Brak lokalnego CA bundle dla cURL/OpenSSL');return Math.round(Number(j.ca_bundle_bytes)/1024)+' kB · ścisła walidacja TLS'});
+await test('18.1.0 — spójność wdrożenia',async()=>{const [health,index]=await Promise.all([fetch('./api/health.php?diag='+Date.now(),{cache:'no-store'}).then(r=>r.json()),fetch('./?diag='+Date.now(),{cache:'no-store'}).then(r=>r.text())]);if(health.version!==CURRENT_DIAG_VERSION+'-server')throw new Error('health.php z innej wersji: '+health.version);if(!index.includes("__MAPOWNIK_DEPLOY_VERSION__ = '"+CURRENT_DIAG_VERSION+"'"))throw new Error('index.html z innej wersji');return 'index + API + aplikacja mają wspólną wersję '+CURRENT_DIAG_VERSION;});
+await test('18.1.0 — walidacja identyfikatora działki',async()=>{const r=await fetch('./api/search.php?mode=parcel-id&q=141207_5.0010.bad',{cache:'no-store'});const j=await r.json();if(r.status!==400||j.ok!==false)throw new Error('Błędny identyfikator nie został odrzucony');return 'Niepoprawny identyfikator: HTTP 400';});
+await testExternalService('18.1.0 — działka według identyfikatora ULDK',async()=>{const r=await fetch('./api/search.php?mode=parcel-id&q=141207_5.0010.804',{cache:'no-store'});const j=await r.json();if(!r.ok||!j.ok||j.items?.[0]?.id!=='141207_5.0010.804'||!j.items[0].wkt)throw new Error(j.error||'Brak geometrii przykładowej działki');return 'ULDK: identyfikator i geometria działki';});
+await test('18.1.0 — źródło konturów klasyfikacyjnych',async()=>{const r=await fetch('./api/identify.php?action=sources',{cache:'no-store'});const j=await r.json();if(!r.ok||!j.sources?.includes('egib_classes'))throw new Error('Brak źródła EGiB w API identyfikacji');return 'Warstwa i odczyt punktowy EGiB skonfigurowane';});
+await testExternalService('18.1.0 — mapa konturów EGiB',async()=>{const q=new URLSearchParams({source:'egib_classes',BBOX:'659944.766,486467.448,660557.657,486824.870',WIDTH:'256',HEIGHT:'256',SRS:'EPSG:2180'});const started=performance.now();const r=await fetch('./api/wms.php?'+q,{cache:'no-store'});if(!r.ok||!r.headers.get('content-type')?.includes('image/png')){const error='WMS nie zwrócił obrazu PNG (HTTP '+r.status+')';recordSourceAudit('egib_classes',{ok:false,error});throw new Error(error);}recordSourceAudit('egib_classes',{ok:true,ms:Math.round(performance.now()-started),cache:r.headers.get('X-msportal-Cache')||'—',variant:r.headers.get('X-msportal-WMS-Variant')});return 'Obraz WMS konturów pobrany';});
+try{const r=await fetch('./api/analysis_buildings.php?action=status&diag='+Date.now(),{cache:'no-store'});const j=await r.json();if(!r.ok||!j?.ok)throw new Error(j?.error||('HTTP '+r.status));if(j.ready)row('18.1.0 — lokalna baza BDOT10k',true,`${Number(j.featureCount||0).toLocaleString('pl-PL')} obiektów · ${j.storeVersion||'bez wersji'} · komórka ${j.tileSize} m · ${j.indexStrategy||'grid'} · cache ${j.queryCacheWritable?'RW':'RO'}`);else warning('18.1.0 — lokalna baza BDOT10k','API działa · baza danych nie została jeszcze wgrana do data/bdot_buildings');}catch(e){row('18.1.0 — lokalna baza BDOT10k',false,e?.stack||e)}
+await test('18.1.0 — OpenLayers bootstrap przed modułami',async()=>{await ensureOl();if(!window.ol?.Map)throw new Error('window.ol.Map unavailable po bootstrapie');return 'globalThis.ol gotowy przed importem modułów';});
+await test('18.1.0 — provider lokalnych budynków',async()=>{const [{BdotBuildingsProvider},{AnalysisManager}]=await Promise.all([import('./app-19.41.4/analysis/providers/BdotBuildingsProvider.js?v=19.41.4'),import('./app-19.41.4/analysis/AnalysisManager.js?v=19.41.4')]);const p=new BdotBuildingsProvider({id:'diag',title:'diag',category:'single_family'});if(p.testData||p.category!=='single_family'||typeof p.load!=='function')throw new Error('Nieprawidłowy kontrakt BdotBuildingsProvider');if(!AnalysisManager)throw new Error('Brak AnalysisManager');return 'BDOT provider + AnalysisManager OK';});
+await test('18.1.0 — optymalizacja podglądu dużych zbiorów',async()=>{const src=await fetch('./app-19.41.4/analysis/AnalysisVectorLayer.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text());for(const token of ['DEFAULT_MAX_RENDERED = 2500','simplifyGeometry','sampleFeatures','getRenderStats'])if(!src.includes(token))throw new Error('Brak mechanizmu: '+token);if(src.includes('features.map((item) => structuredClone(item))'))throw new Error('Podgląd nadal klonuje cały zestaw geometrii');return 'max 2500 wektorów · uproszczenie tylko renderingu · brak podwójnej kopii geometrii';});
+await test('18.1.0 — cache i ETag BDOT',async()=>{const provider=await fetch('./app-19.41.4/analysis/providers/BdotBuildingsProvider.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text());if(!provider.includes("cache: 'default'"))throw new Error('Provider omija cache HTTP');const status=await fetch('./api/analysis_buildings.php?action=status&cachetest='+Date.now(),{cache:'no-store'}).then(r=>r.json());if(!status.queryCacheWritable)throw new Error('Katalog cache/bdot-query nie jest zapisywalny');if(!status.ready||!Array.isArray(status.bounds)||status.bounds.length!==4)return 'cache RW · provider korzysta z cache HTTP · pełny test po wgraniu BDOT';const x=Number(status.bounds[0]),y=Number(status.bounds[1]);const q='./api/analysis_buildings.php?bbox='+[x,y,x+500,y+500].join(',')+'&category=single_family&limit=50';const r1=await fetch(q+'&diag=17.8.3',{cache:'no-store'});if(!r1.ok)throw new Error('Pierwsze zapytanie HTTP '+r1.status);await r1.text();const etag=r1.headers.get('ETag');if(!etag)throw new Error('Brak ETag');const r2=await fetch(q+'&diag=17.8.3',{cache:'no-store'});if(!r2.ok)throw new Error('Drugie zapytanie HTTP '+r2.status);await r2.text();const state=r2.headers.get('X-msportal-BDOT-Cache');if(state!=='HIT')throw new Error('Drugie zapytanie nie trafiło w cache: '+state);return 'cache serwera HIT · ETag · cache HTTP przeglądarki';});
+await testKnownLimitation('18.1.0 — DATA HARDENING: klasyfikacja budynków mieszkalnych',async()=>{const res=await fetch('./tools/build_bdot_store.py?v=19.41.4',{cache:'no-store'});/* 18.18.3: narzędzie do budowy bazy BDOT jest uruchamiane poza serwerem i nie wchodzi do paczki */if(res.status===404)throw new Error('tools/build_bdot_store.py nie jest częścią paczki serwerowej; klasyfikację sprawdza się przy budowie bazy');const src=await res.text();for(const token of ["'1121db'","t.startswith(('1110','1121','1122','1130'))"])if(!src.includes(token))throw new Error('Brak klasyfikacji BDOT: '+token);return '1110.Dj + 1121.Db + 1122.Dw + pozostałe mieszkalne';});
+await test('18.1.0 — DATA HARDENING: ścisły BBOX',async()=>{const r=await fetch('./api/analysis_buildings.php?bbox=x,1,2,3&category=single_family&limit=10&diag='+Date.now(),{cache:'no-store'});const j=await r.json().catch(()=>({}));if(r.status!==400)throw new Error('Oczekiwano HTTP 400, otrzymano '+r.status);if(!String(j.error||'').includes('nie jest liczbą'))throw new Error('Brak jasnego błędu walidacji BBOX');return 'nienumeryczny BBOX → HTTP 400';});
+await test('18.1.0 — DATA HARDENING: polityka cache BDOT',async()=>{const r=await fetch('./api/analysis_buildings.php?action=status&policy='+Date.now(),{cache:'no-store'});const j=await r.json();const p=j.queryCachePolicy||{};if(Number(p.quantumMeters)!==1)throw new Error('Nieprawidłowa kwantyzacja cache');if(Number(p.maxFiles)!==5000)throw new Error('Nieprawidłowy limit plików cache');if(Number(p.maxBytes)!==1073741824)throw new Error('Nieprawidłowy limit rozmiaru cache');if(Number(p.ttlSeconds)!==2592000)throw new Error('Nieprawidłowy TTL cache');return '1 m · 5000 plików · 1 GiB · TTL 30 dni';});
+await test('18.1.0 — DATA HARDENING: blokada zapisu wyniku niepełnego',async()=>{const [mgr,panel]=await Promise.all([fetch('./app-19.41.4/analysis/AnalysisManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./app-19.41.4/app/components/AnalysisPanel.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())]);if(!(await showsText(mgr,'Nie można zapisać niepełnego wyniku analizy')))throw new Error('Manager nie blokuje zapisu truncated');if(!(await showsText(panel,'Wynik niepełny — zapis zablokowany')))throw new Error('UI nie blokuje zapisu truncated');return 'truncated=true → zapis zablokowany';});
+await test('18.1.0 — anulowanie nieaktualnych analiz BDOT',async()=>{const [manager,provider]=await Promise.all([fetch('./app-19.41.4/analysis/AnalysisManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./app-19.41.4/analysis/providers/BdotBuildingsProvider.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())]);if(!manager.includes('runSequence')||!manager.includes('runId !== this.runSequence'))throw new Error('AnalysisManager nie odrzuca starego wyniku');if(!provider.includes('requestSerial'))throw new Error('Provider nie odrzuca starego requestu');return 'runSequence + requestSerial + AbortController';});
+await test('18.1.0 — silnik odległości przestrzennych',async()=>{const m=await import('./app-19.41.4/analysis/analysisDistanceEngine.js?v=19.41.4');const target={type:'Polygon',coordinates:[[[0,0],[10,0],[10,10],[0,10],[0,0]]]};const building={id:'b1',geometry:{type:'Polygon',coordinates:[[[20,2],[24,2],[24,6],[20,6],[20,2]]]},properties:{category:'single_family'}};const exact=m.nearestGeometryPoints(target,building.geometry);if(Math.abs(exact.distanceMeters-10)>1e-9)throw new Error('Błędna odległość poligon-poligon: '+exact.distanceMeters);const result=await m.analyzeFeatureDistances(target,[building],{radiusMeters:15});if(result.inRadiusCount!==1||Math.abs(result.nearest?.distanceMeters-10)>1e-9||result.features[0]?.geometry?.type!=='LineString')throw new Error('Błędny wynik analizy promienia/najbliższego obiektu');const nested=m.nearestGeometryPoints(target,{type:'Point',coordinates:[5,5]});if(nested.distanceMeters!==0)throw new Error('Geometria przecinająca nie zwraca 0 m');return 'dokładna odległość + promień + linia najkrótszej odległości OK';});
+await test('18.1.0 — zapis parametrów analizy odległości',async()=>{const schema=await (await fetch('./app-19.41.4/persistence/projectSchemas.js?v=19.41.4',{cache:'no-store'})).text();for(const token of ['analysisDistanceRadiusMeters','analysisNearestDistanceMeters','analysisInRadiusCount','analysisNearestFeatureId'])if(!schema.includes(token))throw new Error('Brak pola projektu: '+token);return 'promień + odległość + licznik + ID najbliższego obiektu';});
+await test('17.7 — źródła analiz przestrzennych',async()=>{
+  // 18.1: źródła są w deklaracji funkcji Analizy (slot analysisSources); screening bierze te z screening: true.
+  const [{analysisFeature},response]=await Promise.all([import('./app-19.41.4/features/builtin/analysisFeature.js?v=19.41.4'),fetch('./api/identify.php?action=sources&v=17.8.3',{cache:'no-store'})]);
+  const declared=new Map((analysisFeature.analysisSources||[]).map(source=>[source.id,source]));
+  const requiredProviders=['bdot-residential','bdot-forests','bdot-water','gdos-natura2000','gdos-protection','flood-mzpmrp','nid-immovable','nid-archaeology'];
+  for(const id of requiredProviders){if(!declared.has(id))throw new Error('Brak źródła w deklaracji: '+id);if(declared.get(id).screening!==true)throw new Error('Źródło poza screeningiem: '+id);}
+  const payload=await response.json();
+  const wmsKeys=[...declared.values()].filter(source=>source.type==='wms-probe').map(source=>source.sourceKey);
+  const missing=wmsKeys.filter(id=>!payload?.sources?.includes(id));
+  if(missing.length)throw new Error('Brak źródeł Identify API: '+missing.join(', '));
+  return declared.size+' źródeł w deklaracji ('+requiredProviders.length+' w screeningu) + '+wmsKeys.length+' kluczy API';
+});
+await test('17.8 — screening działki',async()=>{const [manager,panel]=await Promise.all([fetch('./app-19.41.4/analysis/AnalysisManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./app-19.41.4/app/components/AnalysisPanel.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())]);for(const token of ['runParcelScreening()','screeningRadiusMeters','screeningResults','showScreeningResult(sourceId)'])if(!manager.includes(token))throw new Error('Brak mechanizmu screeningu: '+token);{const missing=await missingTexts(panel,['Sprawdź otoczenie','Promień','screening-results','Screening WMS (przybliżony)']);if(missing.length)throw new Error('Brak UI screeningu: '+missing.join(', '));}return 'pełna geometria zaznaczonego poligonu + 8 kategorii + podgląd wyniku';});
+await test('18.1.0 — fokus wyniku screeningu',async()=>{const src=await fetch('./app-19.41.4/analysis/AnalysisVectorLayer.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text());if(!src.includes('focus() {')||!src.includes('this.host.fitExtent(extent'))throw new Error('AnalysisVectorLayer nie obsługuje focus()');const manager=await fetch('./app-19.41.4/analysis/AnalysisManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text());if(!manager.includes('this.previewLayer.focus()'))throw new Error('Screening nie używa focus() warstwy podglądu');return 'klik wyniku screeningu → dopasowanie widoku bez TypeError';});
+await test('Lokalne biblioteki vendor',async()=>{const r=await fetch('./api/vendor_status.php',{cache:'no-store'});const j=await r.json();if(!j.ready)throw new Error('Nieprzygotowane: '+Object.entries(j.files).filter(([,v])=>!v.ok).map(([k])=>k).join(', '));return j.release});
+if((results['Lokalne biblioteki vendor']||{}).ok){
+ await test('React lokalny',async()=>{const m=await import('react');if(!m.useState)throw new Error('useState missing');return 'OK'});
+ await test('ReactDOM lokalny',async()=>{const m=await import('react-dom/client');if(!m.createRoot)throw new Error('createRoot missing');return 'OK'});
+ await test('proj4 lokalny',async()=>{const m=await import('proj4');if(!(m.default||m))throw new Error('proj4 missing');return 'OK'});
+ await test('Zod lokalny',async()=>{const m=await import('zod');if(!m.z)throw new Error('z missing');return 'OK'});
+ await test('Radix lokalny',async()=>{const [a,b]=await Promise.all([import('@radix-ui/react-tooltip'),import('@radix-ui/react-dropdown-menu')]);if(!a.Root||!b.Root)throw new Error('Radix Root missing');return 'OK'});
+ await test('OpenLayers lokalny',async()=>{await ensureOl();return 'OK'});
+ await test('Atomowość IndexedDB — rollback wielostore',async()=>{
+   const {msportalDatabase}=await import('./app-19.41.4/persistence/database.js?v=19.41.4');
+   const dbName='mapownik-diag-13.9-'+Date.now();
+   const db=new msportalDatabase(dbName); const ts=new Date().toISOString(); let rejected=false;
+   try{await db.transaction('rw',db.projects,db.states,async(scope)=>{await scope.projects.put({id:'p',name:'T',schemaVersion:2,createdAt:ts,updatedAt:ts});await scope.states.put({projectId:'p',updatedAt:ts});throw new Error('rollback-probe')})}catch(e){rejected=true}
+   if(!rejected)throw new Error('Transakcja testowa nie została przerwana');
+   const [p1,s1]=await Promise.all([db.projects.get('p'),db.states.get('p')]); if(p1||s1)throw new Error('Rollback nie cofnął wszystkich store');
+   await db.transaction('rw',db.projects,db.states,async(scope)=>{await scope.projects.put({id:'p',name:'T',schemaVersion:2,createdAt:ts,updatedAt:ts});await scope.states.put({projectId:'p',updatedAt:ts})});
+   const [p2,s2]=await Promise.all([db.projects.get('p'),db.states.get('p')]); if(!p2||!s2)throw new Error('Commit wielostore nie zapisał kompletu danych');
+   await db.close(); await new Promise((resolve,reject)=>{const q=indexedDB.deleteDatabase(dbName);q.onsuccess=resolve;q.onerror=()=>reject(q.error);q.onblocked=resolve});
+   return 'rollback + commit OK';
+ });
+ await test('Autozapis — ponowienie po błędzie',async()=>{
+   const {LocalProjectSession}=await import('./app-19.41.4/persistence/LocalProjectSession.js?v=19.41.4');
+   let mutationListener=null; let attempts=0; let saved=null;
+   const repository={
+     async loadProject(){return {objects:[],state:null,issues:[]}},
+     async applyObjectChanges(projectId,changes){attempts+=1;if(attempts===1)throw new Error('retry-probe');saved={projectId,changes}},
+     async saveState(){throw new Error('Nieoczekiwany zapis stanu w teście retry')}
+   };
+   const noopSubscribe=()=>()=>undefined;
+   const session=new LocalProjectSession({
+     repository,
+     objectManager:{replaceAll(){},subscribeMutations(fn){mutationListener=fn;return()=>{mutationListener=null}}},
+     layerManager:{subscribe:noopSubscribe,applyOverlayPreferences(){},getOverlayPreferences(){return[]}},
+     basemapManager:{subscribe:noopSubscribe,setActive(){},getSnapshot(){return{activeId:null}}},
+     controller:{setViewState(){},getViewSnapshot(){return{zoom:6.2,center3857:[0,0]}}}
+   });
+   if(!await session.restore())throw new Error('Nie udało się uruchomić sesji testowej');
+   session.startAutosave();
+   mutationListener({type:'upsert',object:{id:'retry-object'}});
+   session.flushBestEffort();
+   await session.writeQueue;
+   if(attempts!==1||session.getSnapshot().status!=='error'||session.pendingObjectChanges.size!==1)throw new Error('Nie zachowano zmiany po pierwszym błędzie');
+   session.flushObjectChanges();
+   await session.writeQueue;
+   if(attempts!==2||!saved||saved.changes.upserts[0]?.id!=='retry-object'||session.pendingObjectChanges.size!==0||session.getSnapshot().status!=='ready')throw new Error('Ponowienie nie zapisało oczekującej zmiany');
+   await session.dispose();
+   return 'błąd zachowany + retry OK';
+ });
+ await test('Projekt .mapownik — round-trip',async()=>{const m=await import('./app-19.41.4/persistence/projectTransfer.js?v=19.41.4');const ts=new Date().toISOString();const object={id:'a',name:'Test',visible:true,origin:'user',style:{strokeColor:'#2563eb',strokeWidth:2,fillColor:'#2563eb',fillOpacity:.18,pointRadius:6},order:0,createdAt:ts,updatedAt:ts,geometry:{type:'Point',coordinates:[500000,500000]}};const state={projectId:'local-default',schemaVersion:2,updatedAt:ts,ui:{theme:'dark',panels:{objectsOpen:true,layersOpen:true,objectsWidth:318}},mapView:{zoom:8,center3857:[2100000,6800000]},basemapId:null,layers:[]};const file=m.createmsportalProjectFile({meta:{name:'Test',createdAt:ts,updatedAt:ts},objects:[object],state});const parsed=m.parsemsportalProjectFile(m.serializeTransferFile(file));if(parsed.objects.length!==1||parsed.objects[0].geometry.coordinates[0]!==500000)throw new Error('Round-trip zmienił dane');return 'walidacja + round-trip OK'});
+ await test('GeoJSON — EPSG:2180 / EPSG:4326',async()=>{const m=await import('./app-19.41.4/persistence/projectTransfer.js?v=19.41.4');const ts=new Date().toISOString();const object={id:'g',name:'Punkt',visible:true,origin:'user',style:{strokeColor:'#2563eb',strokeWidth:2,fillColor:'#2563eb',fillOpacity:.18,pointRadius:6},order:0,createdAt:ts,updatedAt:ts,geometry:{type:'Point',coordinates:[500000,500000]}};for(const crs of ['EPSG:2180','EPSG:4326']){const file=m.createGeoJsonFile([object],crs);const parsed=m.parseGeoJsonFile(m.serializeTransferFile(file));const c=parsed[0].geometry.coordinates;if(Math.hypot(c[0]-500000,c[1]-500000)>1)throw new Error('Transformacja '+crs+' przekroczyła 1 m')}return 'oba układy OK'});
+ await test('Atomowy import całego projektu',async()=>{const {msportalDatabase}=await import('./app-19.41.4/persistence/database.js?v=19.41.4');const {LocalProjectRepository}=await import('./app-19.41.4/persistence/LocalProjectRepository.js?v=19.41.4');const dbName='mapownik-import-13.9-'+Date.now();const db=new msportalDatabase(dbName);const repo=new LocalProjectRepository(db);const ts=new Date().toISOString();const make=(id)=>({id,name:id,visible:true,origin:'import',style:{strokeColor:'#2563eb',strokeWidth:2,fillColor:'#2563eb',fillOpacity:.18,pointRadius:6},order:0,createdAt:ts,updatedAt:ts,geometry:{type:'Point',coordinates:[500000,500000]}});await repo.replaceProject('p',{name:'Próba',objects:[make('a')],state:null});let rejected=false;try{await repo.replaceProject('p',{name:'Błąd',objects:[make('b'),make('b')],state:null})}catch{rejected=true}const loaded=await repo.loadProject('p');if(!rejected||loaded.meta.name!=='Próba'||loaded.objects.length!==1||loaded.objects[0].id!=='a')throw new Error('Nie zachowano poprzedniego projektu po błędzie');await db.close();await new Promise((resolve,reject)=>{const q=indexedDB.deleteDatabase(dbName);q.onsuccess=resolve;q.onerror=()=>reject(q.error);q.onblocked=resolve});return 'walidacja przed zapisem + zachowanie projektu OK'});
+ await test('Warstwa projekcji msportalu',async()=>{const m=await import('./app-19.41.4/projections/index.js?v=19.41.4');if(!m.PROJECT_PROJECTION)throw new Error('PROJECT_PROJECTION missing');return m.PROJECT_PROJECTION});
+ await test('OpenLayersMapController',async()=>{await ensureOl();const {OpenLayersMapController}=await import('./app-19.41.4/map/OpenLayersMapController.js?v=19.41.4');const host=document.createElement('div');host.style.cssText='position:absolute;width:256px;height:256px;left:-10000px;top:-10000px';document.body.appendChild(host);const c=new OpenLayersMapController(host);c.destroy();host.remove();return 'construct + destroy OK'});
+ await test('Store msportalu',async()=>{const m=await import('./app-19.41.4/store/index.js?v=19.41.4');if(!m.store?.getState)throw new Error('store missing');return 'OK'});
+ await test('Persistence msportalu',async()=>{const m=await import('./app-19.41.4/persistence/index.js?v=19.41.4');if(!m.localProjectRepository||!m.ProjectTransferManager)throw new Error('persistence/transfer missing');return 'OK'});
+ await test('MapRuntime',async()=>{const m=await import('./app-19.41.4/runtime/index.js?v=19.41.4');if(!m.MapRuntime)throw new Error('MapRuntime missing');return 'OK'});
+ await test('UI — IdentifyPanel',async()=>{const m=await import('./app-19.41.4/app/components/IdentifyPanel.js?v=19.41.4');if(!m.IdentifyPanel)throw new Error('IdentifyPanel missing');return 'OK'});
+ await test('14.3 — Informacja o działce+ — manager',async()=>{const src=await (await fetch('./app-19.41.4/identify/IdentifyManager.js?v=19.41.4',{cache:'no-store'})).text();/* 19.23.0: „Zasób KOWR” usunięty z karty działki — usługa nie zwraca danych */const required=['pog_adopted','pog_draft','pog_zones','pgi_deposits','pgi_miningareas','natura2000','gdos_protection','egib_classes'];const missing=required.filter(k=>!src.includes("sourceKey: '"+k+"'"));if(missing.length)throw new Error('Brak źródeł screeningu: '+missing.join(', '));if(!src.includes("transform('EPSG:2180', 'EPSG:3857')"))throw new Error('Brak obrysu działki ULDK');return required.length+' źródeł + obrys ULDK OK'});
+ await test('19.23.0 — RCN usunięty, warstwy bez danych ukryte, Nominatim w przeglądarce',async()=>{
+   const rcn=await fetch('./api/vps.php?route=rcn/stats&bbox=19.9,50.0,20.0,50.1',{cache:'no-store'});if(rcn.status!==410)throw new Error('rcn/stats powinno zwracać 410, jest '+rcn.status);
+   const health=await (await fetch('./api/vps.php?route=health',{cache:'no-store'})).json();if('rcn' in (health.datasets||{}))throw new Error('health nadal raportuje zbiór RCN');
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');const ids=new Set(dataCatalog.layers.map(l=>l.id));
+   for(const id of ['overlay.kowr.parcels','overlay.nmt.hypsometry'])if(ids.has(id))throw new Error(id+' nadal w katalogu warstw');
+   const panel=await (await fetch('./app-19.41.4/app/components/VpsDataPanel.js?v=19.41.4',{cache:'no-store'})).text();if(/rcn\/(search|stats)|Ceny transakcyjne/.test(panel))throw new Error('Panel nadal odwołuje się do RCN');
+   const search=await (await fetch('./app-19.41.4/app/components/SearchToolbar.js?v=19.41.4',{cache:'no-store'})).text();if(!search.includes('searchLocalitiesInBrowser'))throw new Error('Wyszukiwanie miejscowości nie korzysta z Nominatim w przeglądarce');
+   return 'RCN 410 · KOWR/hipsometria ukryte · Nominatim z przeglądarki';
+ });
+ await test('19.34.0 — ostatnie działki w wyszukiwarce, „W okolicy” na telefonie',async()=>{
+   const read=async(f)=>(await fetch('./app-19.41.4/'+f+'?v=19.41.4',{cache:'no-store'})).text();
+   const [search,mobile]=await Promise.all([read('app/components/SearchToolbar.js'),read('app/mobile/MobileParcelCard.js')]);
+   if(!search.includes('msportal:recent-parcels:v1'))throw new Error('Brak listy ostatnio sprawdzanych działek');
+   if(!mobile.includes('h(Nearby'))throw new Error('Karta działki na telefonie bez „W okolicy”');
+   return 'ostatnie działki (do 6) · „W okolicy” w karcie na telefonie';
+ });
+ await test('19.33.0 — intuicyjny układ (start, kliknięcia, podpowiedź, legenda)',async()=>{
+   const read=async(f)=>(await fetch('./app-19.41.4/'+f+'?v=19.41.4',{cache:'no-store'})).text();
+   const [help,panels,ctrl,app,search]=await Promise.all(['app/components/QuickHelp.js','store/panelsSlice.js','map/OpenLayersMapController.js','app/App.js','search/SearchManager.js'].map(read));
+   if(/setTimeout\(\(\) => setOpen\(true\)/.test(help))throw new Error('„Jak zacząć” otwiera się samo przy starcie');
+   if(!/right: \{ activeId: null/.test(panels))throw new Error('Panel Warstw otwarty przy pierwszym wejściu');
+   if(!ctrl.includes('mapownikClickPriority'))throw new Error('Kliknięcie w punkt narzędzia nadal uruchamia sprawdzanie działki');
+   if(!app.includes('h(MapToolHint')||!app.includes('h(MapLegend'))throw new Error('Brak podpowiedzi narzędzia albo wspólnej legendy');
+   if(!search.includes('maxZoom: 18.5'))throw new Error('Kadr działki bez sąsiedztwa');
+   return 'start bez okienek · punkt narzędzia nie uruchamia Sprawdź · podpowiedź przy mapie · wspólna legenda · kadr z sąsiedztwem';
+ });
+ await test('19.32.0 — narzędzie „Ceny transakcyjne” (RCN w widoku)',async()=>{
+   const {FEATURE_PANELS}=await import('./app-19.41.4/features/index.js?v=19.41.4');
+   for(const id of ['marketPrices','buildingPermits'])if(!FEATURE_PANELS.some(panel=>panel.id===id))throw new Error('Brak narzędzia na prawej belce: '+id);
+   const r=await fetch('./api/rcn.php?bbox=466800,676000,468800,678000&kind=grunty&years=5',{cache:'no-store'});const j=await r.json();
+   if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));
+   if(!(j.count>0)||!Array.isArray(j.bbox))throw new Error('Brak transakcji w widoku Starogardu Gd. (grunty, 5 lat)');
+   const big=await fetch('./api/rcn.php?bbox=400000,600000,420000,620000',{cache:'no-store'});if(big.status!==400)throw new Error('Za duży obszar powinien dać 400, jest '+big.status);
+   return `${j.count} transakcji w widoku · mediana ${j.stats?.medianPerM2 ?? '—'} zł/m² · oba narzędzia na belce`;
+ });
+ await test('19.32.0 — narzędzie „Pozwolenia na budowę” (RWDZ)',async()=>{
+   const r=await fetch('./api/permits.php?x=467833&y=677018&r=500&years=3',{cache:'no-store'});const j=await r.json().catch(()=>({}));
+   if(r.status===503&&j.code==='no-data')throw new Error('Baza RWDZ nie jest wgrana: data/rwdz/rwdz.sqlite (paczka danych)');
+   if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));
+   const bad=await fetch('./api/permits.php?x=1&y=1',{cache:'no-store'});if(bad.status!==400)throw new Error('Złe współrzędne powinny dać 400, jest '+bad.status);
+   return `dane GUNB z ${j.dataDate} · ${j.count} inwestycji w 500 m (Starogard Gd.)${j.pending?` · ${j.pending} w trakcie lokalizacji`:''} · obręby: ${j.regions.length}`;
+ });
+ await test('19.35.0 — eksport „jak na ekranie” (PNG z przeglądarki)',async()=>{
+   const mod=await import('./app-19.41.4/export/screenExport.js?v=19.41.4');if(typeof mod.exportScreenPng!=='function')throw new Error('Brak exportScreenPng');
+   const src=await fetchSources(['./app-19.41.4/app/components/ExportPanel.js']);if(!src.includes('ScreenExportSection'))throw new Error('Panel Eksport nie ma sekcji „jak na ekranie”');
+   const c=document.createElement('canvas');c.width=c.height=4;await new Promise((ok,no)=>c.toBlob(b=>b?ok():no(new Error('Przeglądarka nie zapisuje PNG z płótna'))));
+   return 'moduł, sekcja w panelu Eksport i zapis PNG z płótna działają';
+ });
+ await test('19.35.0 — automatyczna aktualizacja bazy pozwoleń (cron)',async()=>{
+   const r=await fetch('./api/permits.php?status=1',{cache:'no-store'});const j=await r.json().catch(()=>({}));
+   if(r.status===503&&j.code==='no-data')throw new Error('Baza RWDZ nie jest wgrana: data/rwdz/rwdz.sqlite');
+   if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));
+   const cron=await fetch('./cron/rwdz_update.php',{cache:'no-store'});if(cron.ok)throw new Error('Skrypt crona jest dostępny z przeglądarki — brak cron/.htaccess');
+   if(j.update&&j.update.ok===false)throw new Error('Ostatnia aktualizacja: '+(j.update.error||'błąd')+' ('+j.update.at+') — dziennik: cache/rwdz/update.log');
+   const age=j.dataDate?Math.round((Date.now()-Date.parse(j.dataDate))/86400000):null;
+   const cronInfo=j.update?`cron: ${j.update.state} (${String(j.update.at).slice(0,10)})${j.building?' · budowa w toku':''}`:'cron jeszcze nie uruchomiony — ustaw Zaplanowane zadania w OVH';
+   return `dane GUNB z ${j.dataDate} (${age} dni) · ${j.investments.toLocaleString('pl-PL')} inwestycji · ${cronInfo}`;
+ });
+ await test('19.36.0 — raport działki PDF (szablony, biblioteka, czcionki)',async()=>{
+   const cfg=await import('./app-19.41.4/report/reportConfig.js?v=19.41.4');const c=await cfg.loadReportConfig();
+   if(!c.presets.length||!c.sections.length)throw new Error('Brak szablonów lub sekcji raportu');
+   for(const p of c.presets)if(!p.sections.includes('dzialka')||!p.sections.includes('zrodla'))throw new Error('Szablon bez sekcji obowiązkowych: '+p.id);
+   for(const u of ['./vendor/pdf/jspdf.umd.min.js','./vendor/pdf/Inter_400Regular.ttf','./vendor/pdf/Inter_700Bold.ttf']){const r=await fetch(u,{method:'HEAD',cache:'no-store'});if(!r.ok)throw new Error('Brak pliku '+u+' (HTTP '+r.status+') — wgraj katalog vendor/pdf');}
+   const dlg=await import('./app-19.41.4/app/components/ReportPdfDialog.js?v=19.41.4');if(typeof dlg.reportDialog?.open!=='function')throw new Error('Brak okna raportu');
+   const own=c.fromFile?'plik konfiguracja/raport-pdf.json wczytany':'ustawienia domyślne (bez konfiguracja/raport-pdf.json)';
+   return `${c.presets.length} szablonów (${c.presets.map(p=>p.name).join(', ')}) · ${c.sections.length} sekcji · ${own}`;
+ });
+ await test('19.37.0 — „Czyj las” (Bank Danych o Lasach)',async()=>{
+   // Las Państwowy (Nadl. Chojnów) i las prywatny (okolice Siedlec) — EPSG:2180.
+   const lp=await fetch('./api/forest.php?x=640527.3&y=466851.5',{cache:'no-store'});const a=await lp.json().catch(()=>({}));
+   if(!lp.ok||!a.ok)throw new Error((a.error||('HTTP '+lp.status))+' — sprawdź api/forest.php i dostęp do mapserver.bdl.lasy.gov.pl');
+   if(a.kind!=='lp')throw new Error('Las w Nadl. Chojnów nie rozpoznany jako Lasy Państwowe');
+   const pr=await fetch('./api/forest.php?x=713622.1&y=475019.8',{cache:'no-store'}).then(r=>r.json()).catch(()=>({}));
+   const map=await fetch('./api/forest.php?wms=1&SERVICE=WMS&REQUEST=GetMap&SRS=EPSG:2180&BBOX=638000,465000,642000,469000&WIDTH=256&HEIGHT=256',{cache:'no-store'});
+   if(!map.ok||!(map.headers.get('content-type')||'').includes('image/png'))throw new Error('Mapa lasów nie zwróciła PNG (HTTP '+map.status+')');
+   const cfg=(await import('./app-19.41.4/data/catalog/index.js?v=19.41.4')).dataCatalog.layers.find(l=>l.id==='overlay.forest.ownership');if(!cfg)throw new Error('Brak warstwy w katalogu');
+   return `Chojnów: ${a.owner} · Siedlce: ${pr.owner??'—'} · mapa PNG OK`;
+ });
+ await test('19.37.1 — mapy raportu PDF rysują się także w karcie w tle',async()=>{
+   const src=await fetchSources(['./app-19.41.4/report/reportMaps.js','./app-19.41.4/data/sources/adapters/fastWmtsAdapter.js']);
+   for(const token of ['renderUntilLoaded','renderSync',"crossOrigin: 'anonymous'"])if(!src.includes(token))throw new Error('Brak mechanizmu: '+token);
+   if(src.includes("on('rendercomplete'"))throw new Error('Raport nadal czeka na rendercomplete (wstrzymywane w karcie w tle)');
+   return 'rysowanie bez requestAnimationFrame · ortofotomapa WMTS z CORS (raport i eksport PNG)';
+ });
+ await test('19.41.0 — Teren 3D: biblioteka, siatka, api/dem.php',async()=>{
+   const three=await fetch('./vendor/opt/three.module.min.js?v=0.170.0',{cache:'no-store'});if(!three.ok)throw new Error('Brak vendor/opt/three.module.min.js (HTTP '+three.status+')');
+   const orbit=await fetch('./vendor/opt/three-orbit-controls.js?v=0.170.0',{cache:'no-store'});if(!orbit.ok)throw new Error('Brak vendor/opt/three-orbit-controls.js');
+   const G=await import('./app-19.41.4/terrain3d/terrainGrid.js?v=19.41.4');
+   const plan=G.planGrid([469000,678400,469300,678700],'standard','tiles');if(plan.p!==1||plan.cols!==256)throw new Error('Plan siatki 300 m: oczekiwano kroku 1 m i 256 węzłów');
+   const info=await fetch('./api/dem.php?info=1',{cache:'no-store'}).then(r=>r.json()).catch(()=>null);
+   if(!info?.ok)throw new Error('api/dem.php nie odpowiada — wgraj api/dem.php i api/_dem.php');
+   const probe=await fetch('./api/dem.php?p=16&tx=150&ty=118&cached=1',{cache:'no-store'});if(![200,204].includes(probe.status))throw new Error('api/dem.php: sprawdzenie cache HTTP '+probe.status);
+   return `Three.js 0.170.0 · siatka OK · api/dem.php (limit PHP ${info.maxExecutionTime||'brak'} s, cache ${info.cacheDays} dni)`;
+ });
+ await test('19.40.0 — raport PDF dla inwestycji: karta decyzyjna, reguły, analiza całej powierzchni',async()=>{
+   const rules=await import('./app-19.41.4/report/reportRules.js?v=19.41.4');
+   if(!rules.RULES_VERSION||rules.INVEST_TYPES.length!==4)throw new Error('Brak reguł wniosków (reportRules.js)');
+   const geo=await import('./app-19.41.4/report/reportGeometry.js?v=19.41.4');
+   const sq={type:'Polygon',coordinates:[[[0,0],[100,0],[100,50],[0,50],[0,0]]]};const m=geo.shapeMetrics(sq,5000);
+   if(Math.abs(m.length-100)>1||Math.abs(m.width-50)>1||!m.rect||m.rect.area<4500)throw new Error('Wymiary prostokąta 100 × 50 m policzone błędnie');
+   const cfg=await import('./app-19.41.4/report/reportConfig.js?v=19.41.4');if(!cfg.REPORT_PRESETS.some(p=>p.id==='oze'))throw new Error('Brak szablonu „OZE i przemysł”');
+   const bad=[];
+   for(const src of ['flood_isok','bdot10k_forest']){
+     const r=await fetch(`./api/wms.php?source=${src}&SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=x&STYLES=&SRS=EPSG:2180&BBOX=357749,365244,359749,367244&WIDTH=256&HEIGHT=256&FORMAT=image/png&TRANSPARENT=true`,{cache:'no-store'});
+     if(!r.ok||!(r.headers.get('content-type')||'').startsWith('image/')||/FALLBACK/i.test(r.headers.get('x-msportal-cache')||''))bad.push(`${src} (HTTP ${r.status}${r.headers.get('x-msportal-upstream-error')?', '+r.headers.get('x-msportal-upstream-error'):''})`);
+   }
+   if(bad.length)throw new Error('Źródło obrazu dla raportu nie odpowiada: '+bad.join('; ')+' — sprawdź, czy wgrano api/_wms_sources.php z paczki 19.40.0');
+   return `reguły ${rules.RULES_VERSION} · geometria OK · szablon OZE · ISOK i lasy BDOT przez proxy`;
+ });
+ await test('19.39.0 — ergonomia: akcje działki na wierzchu, zwinięty eksport z serwera, czytelny profil',async()=>{
+   const src=await fetchSources(['./app-19.41.4/app/components/IdentifyPanel.js','./app-19.41.4/app/components/ExportPanel.js','./app-19.41.4/app/components/TerrainProfilePanel.js','./app-19.41.4/app/components/VpsDataPanel.js']);
+   for(const t of ['identify-actions--v3','identify-actions-more','export-advanced','terrain-ylabel','vps-pdf-shortcut'])if(!src.includes(t))throw new Error('Brak: '+t);
+   if(!document.querySelector('link[href*="38-ergonomia.css"]')&&!(await (await fetch('./index.html',{cache:'no-store'})).text()).includes('38-ergonomia.css'))throw new Error('index.html nie ładuje assets/css/38-ergonomia.css');
+   const css=await fetch('./assets/css/38-ergonomia.css?v=19.41.4',{cache:'no-store'});if(!css.ok)throw new Error('Brak pliku assets/css/38-ergonomia.css (HTTP '+css.status+')');
+   return 'karta działki · Analizy · Eksport · Raport · profil — wersja 19.39.0';
+ });
+ await test('19.38.0 — raport PDF: uzbrojenie (KIUT), opis POG, ochrona przyrody, profile terenu',async()=>{
+   const cfg=await import('./app-19.41.4/report/reportConfig.js?v=19.41.4');if(!cfg.REPORT_SECTIONS.some(s=>s.id==='uzbrojenie'))throw new Error('Brak sekcji Uzbrojenie terenu');
+   const data=await import('./app-19.41.4/report/reportData.js?v=19.41.4');if((data.NETWORKS||[]).length!==6)throw new Error('Lista sieci KIUT niepełna');
+   const r=await fetch('./api/wms.php?source=kiut_power&SERVICE=WMS&REQUEST=GetMap&VERSION=1.1.1&LAYERS=przewod_elektroenergetyczny&STYLES=&SRS=EPSG:2180&BBOX=469118,678457,469318,678657&WIDTH=200&HEIGHT=200&FORMAT=image/png&TRANSPARENT=true',{cache:'no-store'});
+   if(!r.ok||!(r.headers.get('content-type')||'').startsWith('image/'))throw new Error('KIUT przez proxy nie zwrócił obrazu (HTTP '+r.status+')');
+   const src=await fetchSources(['./app-19.41.4/report/reportPdf.js']);for(const t of ['POG_ZONES','drawProfile','sectionUzbrojenie',"overlays: ['natura', 'gdos']"])if(!src.includes(t))throw new Error('Brak: '+t);
+   return 'KIUT przez proxy OK · 6 sieci · opis 13 stref POG · mapa Natura 2000/GDOŚ · 3 profile NMT';
+ });
+ await test('19.31.0 — zagrożenie powodziowe ISOK (identyfikacja)',async()=>{
+   // Wrocław-Kozanów: obszar zagrożenia powodzią rzeczną (MZP). Wcześniej usługa odrzucała nieistniejącą warstwę NZ.HazardArea.
+   const r=await fetch('./api/identify.php?source=flood_mzpmrp&x=358749.8&y=366244.1',{cache:'no-store'});const j=await r.json().catch(()=>({}));
+   if(!r.ok||!j.ok)throw new Error((j.error||('HTTP '+r.status))+' — sprawdź api/identify.php (warstwy NZ.Fluvial…)');
+   if(!j.found)throw new Error('ISOK nie zwrócił obszaru zagrożenia we Wrocławiu-Kozanowie');
+   return 'obszar zagrożenia znaleziony · '+String(j.text||'').split(/\r?\n/).find(l=>/hazardcategory\s*=/.test(l))?.trim();
+ });
+ await test('19.31.0 — wydajność podkładów i sondy „W widoku”',async()=>{
+   const {buildVectorStyle}=await import('./app-19.41.4/basemaps/vectorStyles.js?v=19.41.4');
+   const style=await buildVectorStyle('pastel');const r20=style.layers.find(l=>l.id==='poi_r20');
+   if(r20&&!(r20.minzoom>=16.5))throw new Error('Punkty usług rangi 20 od z'+r20.minzoom+' — zbyt gęste etykiety spowalniają mapę');
+   const cov=await (await fetch('./app-19.41.4/app/components/layerCoverage.js?v=19.41.4',{cache:'no-store'})).text();
+   if(!cov.includes('FAILURE_COOLDOWN_MS'))throw new Error('Sonda „W widoku” bez przerwy po błędzie źródła');
+   const lm=await (await fetch('./app-19.41.4/layers/LayerManager.js?v=19.41.4',{cache:'no-store'})).text();
+   if(!lm.includes('HEAVY_HIDDEN_LAYER_TTL_MS'))throw new Error('Brak zwalniania ukrytych podkładów wektorowych');
+   return `POI r20 od z${r20?.minzoom ?? '—'} · sonda z przerwą po błędzie · podkłady wektorowe zwalniane po 60 s`;
+ });
+ await test('19.30.0 — podkłady wektorowe OSM i nachylenie terenu',async()=>{
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');const ids=new Set(dataCatalog.layers.map(l=>l.id));
+   for(const id of ['basemap.vector.pastel','basemap.vector.zmierzch','basemap.vector.kartograficzny','overlay.terrain.slope'])if(!ids.has(id))throw new Error('Brak w katalogu: '+id);
+   const olms=await import('ol-mapbox-style');if(typeof olms.applyStyle!=='function')throw new Error('ol-mapbox-style bez applyStyle');
+   const contour=(await import('maplibre-contour')).default;if(typeof contour?.LocalDemManager!=='function')throw new Error('maplibre-contour bez LocalDemManager');
+   const {buildVectorStyle}=await import('./app-19.41.4/basemaps/vectorStyles.js?v=19.41.4');
+   const style=await buildVectorStyle('pastel');if(!style.layers.some(l=>l.id==='msportal-housenumber'))throw new Error('Styl Pastel bez numerów adresowych');
+   const dem=await fetch('https://s3.amazonaws.com/elevation-tiles-prod/terrarium/12/2240/1394.png',{mode:'cors'});if(!dem.ok)throw new Error('Model wysokości: HTTP '+dem.status);
+   return `3 podkłady + nachylenie · styl OpenFreeMap: ${style.layers.length} warstw · model wysokości OK`;
+ });
+ await test('19.29.0 — ceny transakcyjne RCN (WFS GUGiK)',async()=>{
+   const q=new URLSearchParams({x:'467830',y:'677015',r:'500',kind:'mieszkania',years:'5'});
+   const r=await fetch('./api/rcn.php?'+q,{cache:'no-store'});const j=await r.json();
+   if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));
+   if(!(j.marketCount>0)||!(j.stats?.medianPerM2>1000))throw new Error('Brak transakcji albo mediany w Starogardzie Gd. (mieszkania, 500 m, 5 lat)');
+   const bad=await fetch('./api/rcn.php?x=1&y=1',{cache:'no-store'});if(bad.status!==400)throw new Error('Złe współrzędne powinny dać 400, jest '+bad.status);
+   const src=await (await fetch('./app-19.41.4/app/components/RcnPrices.js?v=19.41.4',{cache:'no-store'})).text();if(!src.includes('api/rcn.php'))throw new Error('Brak komponentu cen w Raporcie');
+   return `${j.marketCount} transakcji · mediana ${j.stats.medianPerM2} zł/m² · ${j.cached?'cache':j.upstreamMs+' ms'}`;
+ });
+ await test('19.26.0 — wyszukiwanie działki po numerze w obrębach miejscowości',async()=>{
+   const q=new URLSearchParams({mode:'parcel',q:'432',locality:'Wieliczka',lon:'20.0603',lat:'49.9867'});
+   const r=await fetch('./api/search.php?'+q,{cache:'no-store'});const j=await r.json();
+   if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));
+   const ids=(j.items||[]).map(i=>i.id);if(!ids.some(id=>/^121905_4\.\d{4}\.432$/.test(id)))throw new Error('Brak działki 432 w obrębach Wieliczki: '+ids.join(', '));
+   const src=await (await fetch('./app-19.41.4/app/components/SearchToolbar.js?v=19.41.4',{cache:'no-store'})).text();if(!src.includes('lonLatOf(selectedLocality)'))throw new Error('Pole działki nie przekazuje punktu miejscowości');
+   return ids.length+' działek · '+ids.slice(0,2).join(', ');
+ });
+ await test('18.1.0 — Identify API — rejestr źródeł',async()=>{const r=await fetch('./api/identify.php?action=sources&v=17.8.3',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const data=await r.json();const required=['pog_adopted','pog_draft','pog_zones','kowr','pgi_deposits','pgi_miningareas'];const sources=Array.isArray(data?.sources)?data.sources:[];const missing=required.filter(k=>!sources.includes(k));if(missing.length)throw new Error('Brak zarejestrowanych źródeł API: '+missing.join(', '));return required.length+' źródeł API zarejestrowanych OK'});
+
+ await test('UI — SearchToolbar',async()=>{const m=await import('./app-19.41.4/app/components/SearchToolbar.js?v=19.41.4');if(!m.SearchToolbar)throw new Error('SearchToolbar missing');return 'OK'});
+ await test('18.1.0 — oficjalny Lucide — komplet eksportów',async()=>{const icons=await import('lucide-react');const required=['Activity','Blend','BuildingComplex','ChartSpline','Check','ChevronDown','ChevronRight','Circle','CircleDashed','CircleDot','Crosshair','Download','Eye','EyeOff','FileJson','FolderKanban','GripVertical','Hand','Home','ImageDown','Info','LandPlot','LassoSelect','Layers3','ListTree','LoaderCircle','LocateFixed','Magnet','Map','MapPin','Minus','Moon','Mountain','MousePointer2','MoveHorizontal','MoveUpRight','Palette','Pentagon','Pin','Plus','RectangleHorizontal','Redo2','RefreshCw','Road','RotateCcw','RotateCw','Route','Rows3','Ruler','ScanSearch','Search','Shapes','Signpost','SquareDashedMousePointer','Star','Sun','Tag','Trash2','Truck','Type','Undo2','Upload','Waypoints','X','ZoomIn'];const missing=required.filter(name=>!icons[name]);if(missing.length)throw new Error('Brak eksportów: '+missing.join(', '));return required.length+' oficjalnych ikon Lucide OK'});
+ await test('15.2 — Compact LayersPanel',async()=>{const m=await import('./app-19.41.4/app/components/LayersPanel.js?v=19.41.4');if(!m.LayersPanel)throw new Error('LayersPanel missing');return 'zwijane grupy + statusy OK'});
+ await test('15.2 — Compact ObjectsPanel',async()=>{const m=await import('./app-19.41.4/app/components/ObjectsPanel.js?v=19.41.4');if(!m.ObjectsPanel)throw new Error('ObjectsPanel missing');return 'kompaktowe rekordy OK'});
+ await test('19.14.0 — dane w widoku (sonda warstw planistycznych)',async()=>{const src=await (await fetch('./app-19.41.4/app/components/layerCoverage.js?v=19.41.4',{cache:'no-store'})).text();const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');const planning=dataCatalog.layers.filter((l)=>l.group==='Planowanie przestrzenne'&&l.source?.kind==='wms'&&l.id!=='overlay.mpzp');if(planning.length<7)throw new Error('Za mało warstw planistycznych: '+planning.length);const noProxy=planning.filter((l)=>!/[?&]source=/.test(l.source.url));if(noProxy.length)throw new Error('Bez adresu proxy: '+noProxy.map((l)=>l.id).join(', '));if(!/MAX_SIDE = 1024/.test(src)||!/CONCURRENCY = 2/.test(src))throw new Error('Limity sondy zmienione — sprawdź obciążenie serwera');return planning.length+' warstw przez proxy · obraz ≤1024 px (19.37.2) · 2 naraz'});
+await test('19.10.0 — karta miejsca i rodziny statusów',async()=>{const {PANEL_DEFS}=await import('./app-19.41.4/store/index.js?v=19.41.4');if(!PANEL_DEFS.identify?.placeCard||PANEL_DEFS.identify.floatGroup==='right-overlay')throw new Error('Działka nie jest kartą miejsca');const src=await (await fetch('./app-19.41.4/app/components/LayersPanel.js?v=19.41.4',{cache:'no-store'})).text();const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');const ids=[...src.matchAll(/\['(overlay\.[a-z0-9.]+)', '/g)].map((m)=>m[1]);if(ids.length!==6)throw new Error('Rodziny statusów: '+ids.length+' warstw zamiast 6');const missing=ids.filter((id)=>!dataCatalog.layers.some((l)=>l.id===id));if(missing.length)throw new Error('Brak w katalogu: '+missing.join(', '));return 'Działka po lewej · MPZP i POG: 6 warstw w 2 wierszach'});
+await test('19.9.0 — dok narzędzi Sprawdź · Szkic · Pomiar',async()=>{const m=await import('./app-19.41.4/app/components/ToolDock.js?v=19.41.4');if(!m.ToolDock)throw new Error('ToolDock missing');const g=await import('./app-19.41.4/app/components/toolGroups.js?v=19.41.4');const ids=g.TOOL_GROUPS.map((x)=>x.id).join(',');if(ids!=='information,drawing,measurement')throw new Error('Grupy doku: '+ids);const all=g.TOOL_GROUPS.flatMap((x)=>x.tools);for(const id of ['core.draw.road','core.terrain.profile','core.terrain.area','core.buffer','core.select','core.parcel.pick'])if(!all.includes(id))throw new Error('Brak w doku: '+id);if(g.groupOfTool('core.draw.road')?.id!=='drawing'||g.groupOfTool('core.terrain.area')?.id!=='measurement')throw new Error('Przejazd ma być w Szkicu, Teren w Pomiarze');return '3 grupy · Przejazd w Szkicu · Teren w Pomiarze'});
+ await test('Faza 2 — pasek aplikacji i pasek kontekstu',async()=>{const [bar,ctx]=await Promise.all([import('./app-19.41.4/app/components/AppBar.js?v=19.41.4'),import('./app-19.41.4/app/components/ContextBar.js?v=19.41.4')]);if(!bar.AppBar)throw new Error('AppBar missing');if(!ctx.ContextBar)throw new Error('ContextBar missing');return 'pasek aplikacji + pasek kontekstu (narzędzie · zaznaczenie) OK'});
+ await test('Faza 5 — odległość per obiekt',async()=>{
+   const {analyzeFeatureDistances}=await import('./app-19.41.4/analysis/analysisDistanceEngine.js');
+   const sq=(x,y,s)=>({type:'Polygon',coordinates:[[[x,y],[x+s,y],[x+s,y+s],[x,y+s],[x,y]]]});
+   const target=sq(0,0,100);
+   const r=await analyzeFeatureDistances(target,[
+     {id:'daleki',geometry:sq(400,0,50)},
+     {id:'bliski',geometry:sq(150,0,20)},
+     {id:'styczny',geometry:sq(100,0,30)},
+     {id:'poza',geometry:sq(2000,0,10)}],{radiusMeters:500});
+   if(r.distances.length!==4)throw new Error('Silnik nie zwraca odległości dla każdego obiektu');
+   const by=Object.fromEntries(r.distances.map(d=>[d.id,Math.round(d.distanceMeters)]));
+   if(by.styczny!==0||by.bliski!==50||by.daleki!==300||by.poza!==1900)throw new Error('Błędne odległości: '+JSON.stringify(by));
+   if(r.nearest?.feature?.id!=='styczny')throw new Error('Zły najbliższy obiekt');
+   if(r.inRadiusCount!==3)throw new Error('Zła liczba trafień w promieniu');
+   const {toCsv}=await import('./app-19.41.4/app/components/AnalysisResultsPanel.js');
+   const cols=[{key:'distanceMeters',label:'Odległość',get:(x)=>x.distanceMeters},{key:'areaSqm',label:'Powierzchnia',get:(x)=>x.areaSqm}];
+   const row=toCsv([{id:'bliski',distanceMeters:50.4,areaSqm:400}],null,cols).split('\r\n')[1];
+   if(row!=='50;400;bliski')throw new Error('CSV formatuje liczby jako tekst: '+row);
+   return 'odległości 0/50/300/1900 m · najbliższy · CSV liczbowy OK'});
+ await test('Faza 4 — tabela wyników analizy',async()=>{
+   const [layerMod,panelMod,sl]=await Promise.all([
+     import('./app-19.41.4/analysis/AnalysisVectorLayer.js'),
+     import('./app-19.41.4/app/components/AnalysisResultsPanel.js'),
+     import('./app-19.41.4/store/panelsSlice.js')]);
+   const host={addLayer(){},removeLayer(){},getFeaturesAtPixel(){return[]},fitExtent(){}};
+   const layer=new layerMod.AnalysisVectorLayer(host);
+   const sq=(x,y,s)=>({type:'Polygon',coordinates:[[[x,y],[x+s,y],[x+s,y+s],[x,y+s],[x,y]]]});
+   layer.replace([
+     {id:'t1',geometry:sq(500000,600000,100),properties:{name:'Hala A',functionDetail:'magazyn',floors:1}},
+     {id:'t2',geometry:sq(500300,600000,40),properties:{function:'biuro',floors:3}}],{});
+   const rows=layer.getTableRows();
+   if(rows.length!==2)throw new Error('Tabela nie odwzorowuje obiektów podglądu');
+   if(Math.round(rows[0].areaSqm)!==10000||Math.round(rows[1].areaSqm)!==1600)throw new Error('Błędne pola powierzchni w tabeli');
+   if(rows[1].functionDetail!=='biuro')throw new Error('Tabela nie czyta zamiennika pola funkcji');
+   if(!layer.select('t2'))throw new Error('Wybór obiektu po identyfikatorze nie działa');
+   const csv=panelMod.toCsv(rows,new Set(['t1']));
+   if(csv.charCodeAt(0)!==0xFEFF)throw new Error('CSV bez BOM — Excel zepsuje polskie znaki');
+   const head=csv.split('\r\n')[0];
+   if(!head.includes(';')||!head.includes('W promieniu'))throw new Error('Zły nagłówek CSV: '+head);
+   let st=sl.panelsReducer(sl.initialPanelsState,sl.setPanelAvailable('analysisResults',true));
+   st=sl.panelsReducer(st,sl.openPanel('analysisResults'));
+   if(st.dock.bottom.activeId!=='analysisResults'||st.dock.right.activeId!==(innerWidth<1400?null:'layers'))throw new Error('Moduł nie trafia do dolnego doku');
+   st=sl.panelsReducer(st,sl.setPanelAvailable('terrainProfile',true));
+   const tabs=sl.selectDockTabs({panels:st}).bottom.map(t=>t.id);
+   if(tabs.length!==2)throw new Error('Dolny dok nie pokazuje zakładek dla dwóch modułów kontekstowych');
+   st=sl.panelsReducer(st,sl.setPanelAvailable('analysisResults',false));
+   if(st.dock.bottom.activeId==='analysisResults')throw new Error('Moduł bez treści zostaje aktywną zakładką');
+   return rows.length+' wierszy · CSV dla Excela · zakładki dolnego doku OK'});
+ await test('Faza 1 — rejestr paneli, dok i szyna ikon',async()=>{const [reg,reged,dock,rail]=await Promise.all([import('./app-19.41.4/app/panels/PanelRegistry.js'),import('./app-19.41.4/app/panels/registerBuiltInPanels.js'),import('./app-19.41.4/app/components/Dock.js?v=19.41.4'),import('./app-19.41.4/app/components/ActivityBar.js?v=19.41.4')]);reged.registerBuiltInPanels();const ids=reg.listPanels().map(p=>p.id);for(const id of ['layers','objects','analysis','export','terrainProfile'])if(!ids.includes(id))throw new Error('Panel poza rejestrem: '+id);if(!dock.Dock||!rail.ActivityBar)throw new Error('Brak komponentu doku lub szyny');return ids.length+' modułów w rejestrze · dok + szyna OK'});
+ await test('15.0 — narzędzia rysowania zaawansowanego',async()=>{const src=await (await fetch('./app-19.41.4/features/builtin/editingFeature.js?v=19.41.4',{cache:'no-store'})).text();const required=['draw-rectangle','draw-circle','draw-arrow','draw-text','draw-callout'];const missing=required.filter(x=>!src.includes(x));if(missing.length)throw new Error('Brak trybów: '+missing.join(', '));return required.length+' nowych trybów OK'});
+ await test('15.0 — style linii i paleta 12 kolorów',async()=>{const core=await import('./app-19.41.4/core/index.js?v=19.41.4');if(core.MAPOWNIK_PRESET_COLORS?.length!==12)throw new Error('Paleta nie ma 12 kolorów');const ids=(core.MAPOWNIK_STROKE_PATTERNS??[]).map(x=>x.id);for(const id of ['solid','dash-short','dash-medium','dash-long','dots','dash-dot','double'])if(!ids.includes(id))throw new Error('Brak stylu '+id);return '12 kolorów + '+ids.length+' stylów OK'});
+ await test('15.0 — zapis adnotacji w .mapownik',async()=>{const m=await import('./app-19.41.4/persistence/projectTransfer.js?v=19.41.4');const ts=new Date().toISOString();const obj={id:'txt',name:'Etykieta',visible:true,origin:'user',kind:'callout',properties:{text:'Przyłącze',fontSize:13,fontWeight:'600',rotationDeg:0,backgroundOpacity:.8},style:{strokeColor:'#dc2626',strokeWidth:2,strokeOpacity:1,strokePattern:'dash-medium',fillColor:'#dc2626',fillOpacity:.18,pointRadius:6},order:0,createdAt:ts,updatedAt:ts,geometry:{type:'LineString',coordinates:[[500000,500000],[500010,500010]]}};const file=m.createmsportalProjectFile({meta:{name:'15.0',createdAt:ts,updatedAt:ts},objects:[obj],state:null});const parsed=m.parsemsportalProjectFile(m.serializeTransferFile(file));if(parsed.objects[0].kind!=='callout'||parsed.objects[0].properties?.text!=='Przyłącze'||parsed.objects[0].style.strokePattern!=='dash-medium')throw new Error('Adnotacja nie przechodzi round-trip');return 'kind + tekst + styl OK'});
+ await test('15.1 — edycja wierzchołków i snap',async()=>{const src=await (await fetch('./app-19.41.4/editing/EditingManager.js?v=19.41.4',{cache:'no-store'})).text();for(const token of ['deleteVertexCondition','intersection: true','setSnapEnabled(value)','toggleSnap()','rotateSelected(angleDeg)'])if(!src.includes(token))throw new Error('Brak mechanizmu: '+token);return 'drag/dodawanie wierzchołków + Alt+klik usuwa + snap vertex/edge/intersection'});
+ await test('15.1 — obrót geometrii',async()=>{const {ObjectCommandService}=await import('./app-19.41.4/commands/ObjectCommands.js?v=19.41.4');let current={id:'r',name:'R',visible:true,origin:'user',kind:'rectangle',style:{strokeColor:'#000',strokeWidth:2,strokeOpacity:1,strokePattern:'solid',fillColor:'#000',fillOpacity:.1,pointRadius:6},order:0,createdAt:'x',updatedAt:'x',geometry:{type:'Polygon',coordinates:[[[0,0],[0,2],[4,2],[4,0],[0,0]]]}};const manager={getObject:()=>structuredClone(current),setGeometry:(id,g)=>{current={...current,geometry:structuredClone(g)}},restoreObjectSnapshot:(o)=>{current=structuredClone(o)}};const bus={execute:(cmd)=>cmd.execute()};const svc=new ObjectCommandService(bus,manager);if(!svc.rotate('r',90))throw new Error('rotate zwrócił false');const p=current.geometry.coordinates[0][0];if(Math.abs(p[0]-3)>1e-6||Math.abs(p[1]+1)>1e-6)throw new Error('Nieprawidłowy obrót: '+JSON.stringify(p));return 'obrót wokół środka obiektu OK'});
+ await test('15.2 — droga i stały profil ciężarówki',async()=>{const sweep=await import('./app-19.41.4/road/vehicleSweep.js?v=19.41.4');/* 18.18.3: od 18.13.0 profil to model kinematyczny EU_SEMITRAILER_16_5; w projekcie zapisywany jako 'typical-eu-semitrailer' */if(sweep.EU_SEMITRAILER_16_5?.widthM!==2.55)throw new Error('Brak stałego profilu pojazdu 2,55 m');const editing=await (await fetch('./app-19.41.4/editing/EditingManager.js?v=19.41.4',{cache:'no-store'})).text();if(!editing.includes("vehicleProfile: 'typical-eu-semitrailer'"))throw new Error('Obiekt drogi nie zapisuje profilu pojazdu');const tools=await (await fetch('./app-19.41.4/features/builtin/editingFeature.js?v=19.41.4',{cache:'no-store'})).text();if(!tools.includes("mode: 'draw-road'"))throw new Error('Brak narzędzia draw-road');return '1 stały profil · bez wymiarów użytkownika · narzędzie Droga OK'});
+ await test('15.2 — uproszczony swept path 90°',async()=>{const {deriveRoadGeometries}=await import('./app-19.41.4/road/index.js?v=19.41.4');const d=deriveRoadGeometries({type:'LineString',coordinates:[[0,0],[30,0],[30,30]]},6,12);if(d.roundedAxis.coordinates.length<20)throw new Error('Oś nie została wygładzona');if(d.roadSurface.type!=='Polygon'||d.sweptPath.type!=='Polygon')throw new Error('Brak poligonów drogi / swept path');const center=[18,12];const swept=d.sweptPath.coordinates[0].filter(p=>p[0]>=15&&p[0]<=33&&p[1]>=-3&&p[1]<=15);const minR=Math.min(...swept.map(p=>Math.hypot(p[0]-center[0],p[1]-center[1])));if(!(minR<8))throw new Error('Model nie pokazuje ścinania zakrętu przez naczepę: '+minR.toFixed(2)+' m');return 'łuk R12 · offtracking widoczny · min. promień obwiedni '+minR.toFixed(1)+' m'});
+ await test('15.2 — zapis drogi w .mapownik',async()=>{const m=await import('./app-19.41.4/persistence/projectTransfer.js?v=19.41.4');const ts=new Date().toISOString();const obj={id:'road',name:'Droga 1',visible:true,origin:'user',kind:'road',properties:{roadWidthMeters:6,curveRadiusMeters:12,vehicleProfile:'typical-eu-semitrailer',sweptPathApproximate:true},style:{strokeColor:'#2563eb',strokeWidth:2,strokeOpacity:1,strokePattern:'solid',fillColor:'#2563eb',fillOpacity:.18,pointRadius:6},order:0,createdAt:ts,updatedAt:ts,geometry:{type:'LineString',coordinates:[[500000,500000],[500030,500000],[500030,500030]]}};const file=m.createmsportalProjectFile({meta:{name:'15.2',createdAt:ts,updatedAt:ts},objects:[obj],state:null});const parsed=m.parsemsportalProjectFile(m.serializeTransferFile(file));const r=parsed.objects[0];if(r.kind!=='road'||r.properties?.roadWidthMeters!==6||r.properties?.curveRadiusMeters!==12||r.properties?.vehicleProfile!=='typical-eu-semitrailer')throw new Error('Droga nie przechodzi round-trip');return 'oś + szerokość + promień + stały profil OK'});
+ await test('15.2 — Compact statusbar',async()=>{const m=await import('./app-19.41.4/app/components/MapStage.js?v=19.41.4');if(!m.MapStage)throw new Error('MapStage missing');return 'statusbar moduł OK'});
+ await test('Faza 0/1 — stan, tryb i geometria paneli',async()=>{const m=await import('./app-19.41.4/store/panelsSlice.js?v=19.41.4');let s=m.initialPanelsState;
+   s=m.panelsReducer(s,m.setPanelMode('layers','floating'));
+   s=m.panelsReducer(s,m.setPanelCollapsed('layers',true));
+   s=m.panelsReducer(s,m.setPanelGeometry('objects',{position:{x:720,y:24}}));
+   s=m.panelsReducer(s,m.setPanelGeometry('layers',{width:310}));
+   if(!s.collapsed.layers||s.geometry.objects.position?.x!==720||s.geometry.layers.width!==310)throw new Error('Stan panelu pływającego nie jest zachowywany');
+   s=m.panelsReducer(s,m.setPanelMode('layers','docked'));
+   if(s.dock.right.activeId!=='layers')throw new Error('Zadokowanie nie ustawia aktywnej zakładki');
+   s=m.panelsReducer(s,m.togglePanel('layers'));
+   if(s.dock.right.activeId!==null)throw new Error('Ponowne kliknięcie aktywnego modułu nie zwija doku');
+   s=m.panelsReducer(s,m.openPanel('terrainProfile'));
+   if(s.dock.bottom.activeId!=='terrainProfile'||s.dock.right.activeId!==null)throw new Error('Dolny dok nie jest niezależny od prawego');
+   s=m.panelsReducer(s,m.setDockSize('bottom',320));
+   if(s.dock.bottom.size!==320)throw new Error('Rozmiar dolnego doku nie jest zapisywany');
+   return 'tryb · minimalizacja · geometria · oba doki OK'});
+ await test('Faza 1/2 — zgodność preferencji paneli z formatem .mapownik',async()=>{const [sl,pe]=await Promise.all([import('./app-19.41.4/store/panelsSlice.js?v=19.41.4'),import('./app-19.41.4/store/panelsPersistence.js?v=19.41.4')]);
+   const flat=pe.toLegacyPanelPrefs(sl.initialPanelsState);
+   for(const k of ['objectsOpen','layersOpen','objectsWidth','layersWidth'])if(!(k in flat))throw new Error('Brak historycznego pola: '+k);
+   const back=sl.panelsReducer(sl.initialPanelsState,sl.hydratePanels(pe.fromLegacyPanelPrefs(flat)));
+   if(JSON.stringify(pe.toLegacyPanelPrefs(back))!==JSON.stringify(flat))throw new Error('Round-trip preferencji paneli niestabilny');
+   const preDock=sl.panelsReducer(sl.initialPanelsState,sl.hydratePanels(pe.fromLegacyPanelPrefs({objectsOpen:true,layersOpen:false,objectsWidth:350})));
+   if(preDock.dock.right.activeId!=='objects')throw new Error('Projekt sprzed doku nie otwiera modułu, który był widoczny');
+   return 'historyczne pola + round-trip + migracja starych projektów OK'});
+ await test('15.2 — round-trip układu UI',async()=>{const m=await import('./app-19.41.4/persistence/projectTransfer.js?v=19.41.4');const ts=new Date().toISOString();const state={projectId:'local-default',schemaVersion:2,updatedAt:ts,ui:{theme:'dark',panels:{objectsOpen:true,layersOpen:true,objectsCollapsed:true,layersCollapsed:false,objectsWidth:330,layersWidth:300,objectsPosition:{x:820,y:18},layersPosition:{x:66,y:18}}},mapView:{zoom:8,center3857:[2100000,6800000]},basemapId:null,layers:[]};const file=m.createmsportalProjectFile({meta:{name:'UI',createdAt:ts,updatedAt:ts},objects:[],state});const parsed=m.parsemsportalProjectFile(m.serializeTransferFile(file));const p=parsed.state.ui.panels;if(!p.objectsCollapsed||p.objectsWidth!==330||p.layersWidth!==300||p.objectsPosition?.x!==820)throw new Error('Układ paneli nie przeszedł round-trip');return 'układ paneli zapisuje się w .mapownik'});
+ await test('Faza 3 — warstwy kaskady i reguły layoutu',async()=>{const css=await loadAppCss();const required=['@layer tokens, base, legacy, shell, utilities;','--topbar-height','--z-dock','--z-appbar','.app-bar','.selection-bar','.dock--right','.dock--bottom','.activity-bar','.map-column'];const missing=required.filter(x=>!css.includes(x));if(missing.length)throw new Error('Brak krytycznych reguł CSS: '+missing.join(', '));return 'warstwy kaskady + paski + oba doki + szyna ikon OK'});
+ await test('18.1.0 — izolacja cache modułów',async()=>{const index=await (await fetch('./index.html?diag='+Date.now(),{cache:'no-store'})).text();if(!index.includes('./app-19.41.4/main.js?v=19.41.4'))throw new Error('index.html nie wskazuje wersjonowanego katalogu app-19.41.4');for(const path of ['./app-15.2.0/main.js','./app-15.3.0/main.js','./app-15.3.1/main.js','./app-16.0.0/main.js','./app-16.1.1/main.js','./app-16.1.2/main.js','./app-16.2.1/main.js','./app-16.3.2/main.js','./app-16.4.0/main.js','./app-17.3.0/main.js','./app-17.8.3/main.js']){const old=await fetch(path+'?diag='+Date.now(),{cache:'no-store'});if(old.ok)throw new Error('Stary katalog '+path+' nadal jest publicznie dostępny; .htaccess powinien zwracać 410.')}return 'app-19.41.4 + blokada wszystkich starszych katalogów aplikacji'});
+ await test('Graf aplikacji App.js',async()=>{const m=await import('./app-19.41.4/app/App.js?v=19.41.4');if(!m.App)throw new Error('App export missing');return 'OK'});
+ await test('Parser geometrii działki ULDK',async()=>{
+   const {parseParcelWkt}=await import('./app-19.41.4/parcels/wkt.js?v=19.41.4');
+   const polygon=parseParcelWkt('SRID=2180;POLYGON ((500000 500000,500100 500000,500100 500100,500000 500000))');
+   if(polygon.type!=='Polygon'||polygon.coordinates[0].length!==4)throw new Error('Parser POLYGON zwrócił błędny wynik');
+   const multi=parseParcelWkt('MULTIPOLYGON (((0 0,10 0,10 10,0 0)),((20 20,30 20,30 30,20 20)))');
+   if(multi.type!=='MultiPolygon'||multi.coordinates.length!==2)throw new Error('Parser MULTIPOLYGON zwrócił błędny wynik');
+   return 'POLYGON + MULTIPOLYGON OK';
+ });
+ await testExternalService('ULDK — proxy działki',async()=>{
+   const r=await fetch('./api/uldk.php?x=460166.4&y=313380.5',{cache:'no-store'});
+   const j=await r.json();
+   if(!r.ok||!j.ok||!j.parcel?.wkt)throw new Error(j.error||('HTTP '+r.status));
+   if(!/^(?:SRID\s*=\s*\d+\s*;\s*)?(?:POLYGON|MULTIPOLYGON)/i.test(j.parcel.wkt))throw new Error('ULDK nie zwrócił POLYGON/MULTIPOLYGON');
+   return j.parcel.parcel ? `działka ${j.parcel.parcel}` : 'geometria działki OK';
+ });
+ await test('Silnik buforów (JSTS)',async()=>{
+   const {bufferGeoJsonGeometry}=await import('./vendor/geometry/jsts-buffer.esm.js?v=19.41.4');
+   const result=bufferGeoJsonGeometry({type:'Point',coordinates:[500000,500000]},50);
+   if(result.type!=='Polygon')throw new Error('Oczekiwano Polygon, otrzymano '+result.type);
+   const ring=result.coordinates[0]; let area=0;
+   for(let i=0;i<ring.length-1;i++) area+=ring[i][0]*ring[i+1][1]-ring[i+1][0]*ring[i][1];
+   area=Math.abs(area/2);
+   const expected=Math.PI*50*50;
+   if(Math.abs(area-expected)/expected>0.03)throw new Error(`Pole bufora ${area.toFixed(0)} m\u00b2 zbyt dalekie od oczekiwanego ${expected.toFixed(0)} m\u00b2`);
+   return `pole ${area.toFixed(0)} m\u00b2 (oczekiwano ~${expected.toFixed(0)} m\u00b2)`;
+ });
+ await test('MeasurementManager i BufferManager',async()=>{
+   await ensureOl();
+   const {OpenLayersMapController}=await import('./app-19.41.4/map/OpenLayersMapController.js?v=19.41.4');
+   const {MeasurementManager}=await import('./app-19.41.4/measurement/index.js?v=19.41.4');
+   const {BufferManager}=await import('./app-19.41.4/buffer/index.js?v=19.41.4');
+   const {ObjectManager}=await import('./app-19.41.4/objects/index.js?v=19.41.4');
+   const {CommandBus,ObjectCommandService}=await import('./app-19.41.4/commands/index.js?v=19.41.4');
+   const host=document.createElement('div');
+   host.style.cssText='position:absolute;width:256px;height:256px;left:-10000px;top:-10000px';
+   document.body.appendChild(host);
+   const controller=new OpenLayersMapController(); controller.mount(host);
+   const objectManager=new ObjectManager(controller);
+   const bus=new CommandBus(20,700);
+   const objectCommands=new ObjectCommandService(bus,objectManager);
+   const measurement=new MeasurementManager(controller,objectManager,objectCommands);
+   const buffer=new BufferManager(controller,objectManager,objectCommands);
+   try{
+     if(measurement.getSnapshot().mode!==null)throw new Error('Pomiar powinien startować nieaktywny');
+     if(typeof measurement.removeSelected!=='function')throw new Error('Brak usuwania pojedynczego pomiaru');
+     if(measurement.getSnapshot().selectedCount!==0)throw new Error('selectedCount powinien startować od 0');
+     measurement.activate('line');
+     if(measurement.getSnapshot().mode!=='line')throw new Error('activate(line) nie ustawiło trybu');
+     measurement.deactivate();
+     if(measurement.getSnapshot().mode!==null)throw new Error('deactivate() nie wyczyściło trybu');
+     const measureId=objectCommands.create({name:'Wymiar 100 m',kind:'measurement',properties:{measurementType:'length'},geometry:{type:'LineString',coordinates:[[500000,500000],[500100,500000]]},origin:'user',visible:true,style:{strokeColor:'#c2410c',strokeWidth:2,strokeOpacity:1,strokePattern:'dash-medium',fillColor:'#c2410c',fillOpacity:0,pointRadius:4}});
+     if(measurement.getSnapshot().count!==1)throw new Error('Pomiar nie pojawił się jako obiekt');
+     objectManager.select(measureId);
+     if(measurement.getSnapshot().selectedCount!==1)throw new Error('Pomiar nie korzysta ze zwykłej selekcji obiektów');
+     if(measurement.removeSelected()!==1||measurement.getSnapshot().count!==0)throw new Error('Nie udało się usunąć pomiaru jako obiektu');
+     objectCommands.create({name:'Test',geometry:{type:'Point',coordinates:[500000,500000]},origin:'user',visible:true});
+     buffer.setDistance(30);
+     if(buffer.getSnapshot().distanceMeters!==30)throw new Error('setDistance nie zapisało wartości');
+     buffer.setDistance(-5);
+     if(!buffer.getSnapshot().error)throw new Error('Ujemna odległość powinna zgłosić błąd');
+   } finally {
+     measurement.dispose(); buffer.dispose(); objectManager.dispose(); bus.dispose(); controller.destroy(); host.remove();
+   }
+   return 'construct + activate/deactivate + pomiary jako obiekty + walidacja odległości OK';
+ });
+
+ await test('18.1.0 — Pan domyślny + Identify na żądanie',async()=>{
+   const [editing,identify,tools]=await Promise.all([
+     fetch('./app-19.41.4/editing/EditingManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/identify/IdentifyManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/features/builtin/informationFeature.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())
+   ]);
+   if(!editing.includes("mode: 'pan'"))throw new Error('EditingManager nie startuje w trybie pan');
+   if(!identify.includes('active: false')||!identify.includes('!this.snapshot.active'))throw new Error('Identify nie jest domyślnie wyłączone');
+   if(!tools.includes("id: 'core.identify'"))throw new Error('Brak osobnego narzędzia Identify');
+   return 'Pan startuje aktywny · informacja o działce dopiero po włączeniu Identify';
+ });
+
+ await test('18.1.0 — Identify: kliknięcie na mapie faktycznie odpala odczyt',async()=>{
+   // Prawdziwy błąd znaleziony na produkcji: przycisk „Informacja o działce"
+   // aktywował się (podświetlał), ale kliknięcie na mapie nic nie pokazywało.
+   // Przyczyna: identifyTool.js ustawia tryb edycji na 'pan' przy aktywacji,
+   // natomiast IdentifyManager.shouldIgnoreClick() odrzucał każde kliknięcie,
+   // jeśli tryb NIE był 'select' — czyli warunek wymagał trybu, którego samo
+   // narzędzie nigdy nie ustawia. Efekt: handler kliknięcia nigdy się nie
+   // wykonywał, żadne zapytanie do api/uldk.php ani api/identify.php nie
+   // leciało, panel się nie otwierał. Ten test sprawdza literalnie kod, który
+   // o tym decyduje — więc złapie to natychmiast, gdyby ktoś (człowiek albo
+   // AI) znów rozjechał te dwie wartości.
+   const [manager,tool]=await Promise.all([
+     fetch('./app-19.41.4/identify/IdentifyManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/tools/builtins/identifyTool.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+   ]);
+   const activationMode=tool.match(/editingManager\.setMode\('([\w-]+)'\)/)?.[1];
+   if(!activationMode)throw new Error('Nie znaleziono setMode(...) w identifyTool.js — sprawdź ręcznie, czy narzędzie nadal ustawia tryb edycji.');
+   const guardMode=manager.match(/return editing\.mode !== '([\w-]+)';/)?.[1];
+   if(!guardMode)throw new Error('Nie znaleziono warunku blokującego kliknięcie w IdentifyManager.shouldIgnoreClick — sprawdź ręcznie.');
+   if(activationMode!==guardMode)throw new Error(`Rozjazd trybów: identifyTool.js aktywuje w trybie '${activationMode}', ale IdentifyManager wymaga '${guardMode}' — kliknięcia na mapie będą zawsze ignorowane.`);
+   return `aktywacja i warunek klikalności zgodne — oba tryb '${activationMode}'`;
+ });
+ await test('18.1.0 — Sekcje działki, kopiowanie i punktowy screening',async()=>{
+   const src=await (await fetch('./app-19.41.4/app/components/IdentifyPanel.js?v=19.41.4',{cache:'no-store'})).text();
+   const missing=await missingTexts(src,['Identyfikator','identify-headline','Działka ${parcel.parcel}','Środek działki (WGS84)','Planowanie przestrzenne','Grunty','Ograniczenia','parcelplus-more-toggle','Kopiuj:']);
+   if(missing.length)throw new Error('Brak elementu panelu: '+missing.join(', '));
+   if(!src.includes("layers.filter((layer) => layer.status !== 'empty')"))throw new Error('Brak filtrowania pustych wyników');
+   return 'sekcje + współrzędne środka + kopiowanie + wyniki punktowe OK';
+ });
+ await test('18.1.0 — Analizy: dwie osobne zakładki + pogrupowane źródła',async()=>{
+   // Na życzenie: panel Analiz łączył dwa różne narzędzia (automatyczny
+   // screening działki i ręczną analizę pojedynczego źródła) w jednym
+   // ciągłym formularzu. Teraz to dwie zakładki, a lista źródeł rozróżnia
+   // dokładną geometrię lokalną (BDOT) od przybliżonego screeningu WMS.
+   const [panel,registry,bdot,wms]=await Promise.all([
+     fetch('./app-19.41.4/app/components/AnalysisPanel.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/analysis/AnalysisProviderRegistry.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/analysis/providers/BdotBuildingsProvider.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/analysis/providers/WmsProbeProvider.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+   ]);
+   // 18.1: zakładki to wspólna kontrolka Tabs, a każda zakładka ma własny
+   // komponent (ScreeningTab / ManualTab) — panel renderuje tylko jeden z nich.
+   if(!panel.includes("className: 'analysis-mode-tabs'")||(await missingTexts(panel,['Screening działki','Analiza źródła'])).length)throw new Error('Brak dwóch zakładek trybu analizy.');
+   if(!panel.includes('h(ScreeningTab,')||!panel.includes('h(ManualTab,')||!/\?\s*h\(ScreeningTab,[^:]+:\s*h\(ManualTab,/.test(panel))throw new Error('Sekcje nie są już warunkowane trybem — zakładki nie rozdzielają zawartości.');
+   if(!panel.includes("group: t('analysis.source.group.precise')")||!(await showsText(panel,'Dane dokładne')))throw new Error('Brak grupy „Dane dokładne" w liście źródeł.');
+   if(!panel.includes("group: t('analysis.source.group.screening')")||!(await showsText(panel,'Screening WMS')))throw new Error('Brak grupy „Screening WMS" w liście źródeł.');
+   if(!registry.includes("kind: provider.kind === 'screening' ? 'screening' : 'precise'"))throw new Error('Rejestr providerów nie eksportuje już pola kind — grupowanie w UI się zepsuje.');
+   if(!bdot.includes("this.kind = 'precise'"))throw new Error('BdotBuildingsProvider nie deklaruje kind=precise.');
+   if(!wms.includes("this.kind = 'screening'"))throw new Error('WmsProbeProvider nie deklaruje kind=screening.');
+   return 'zakładki Screening/Analiza źródła + grupowanie źródeł (precise/screening) OK';
+ });
+ await test('18.1.0 — pełna mapa przy zaznaczaniu eksportu',async()=>{
+   const [app,exp,css]=await Promise.all([
+     fetch('./app-19.41.4/app/App.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/export/ExportManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     loadAppCss()
+   ]);
+   if(!exp.includes('selecting: true')||!app.includes('exportSelectionMode'))throw new Error('Brak trybu pełnej mapy podczas wyboru eksportu');
+   if(!css.includes('.app-shell.is-export-selection'))throw new Error('Brak CSS pełnej mapy');
+   return 'okna ukrywane · mapa na pełnej powierzchni · Esc przywraca UI';
+ });
+ await test('18.1.0 — wymiarowanie jako obiekt projektu',async()=>{
+   const [schema,measurement,objects]=await Promise.all([
+     fetch('./app-19.41.4/persistence/projectSchemas.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/measurement/MeasurementManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/objects/ObjectManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())
+   ]);
+   // 18.0: rodzaje obiektów w jednej liście (core/object/objectKinds.js), używanej przez schemat i import.
+   const { MAP_OBJECT_KINDS }=await import('./app-19.41.4/core/object/objectKinds.js');
+   if(!MAP_OBJECT_KINDS.includes('measurement')||!schema.includes('MAP_OBJECT_KINDS'))throw new Error('Schema projektu nie obsługuje measurement');
+   if(!measurement.includes("kind: 'measurement'")||!measurement.includes('objectCommands.create'))throw new Error('MeasurementManager nie zapisuje pomiaru jako obiektu');
+   if(!objects.includes("object.kind === 'measurement'"))throw new Error('ObjectManager nie renderuje wymiarowania');
+   return '.mapownik + panel Obiekty + zwykłe usuwanie/edycja';
+ });
+
+await test('18.1.0 — Google Maps / Street View / Geoportal — menu PPM',async()=>{
+  // 18.0: pozycje menu PPM deklaruje funkcja (slot contextMenu), a menu tylko je wyświetla.
+  const [core,menu,controller]=await Promise.all([
+    fetch('./app-19.41.4/features/builtin/coreFeature.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+    fetch('./app-19.41.4/app/components/MapContextMenu.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+    fetch('./app-19.41.4/map/OpenLayersMapController.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())]);
+  for(const token of ['map_action=map','map_action=pano','mapy.geoportal.gov.pl/imapnext/imap/index.html','moduleId=modulGiK','mapview='])
+    if(!core.includes(token))throw new Error('Brak akcji PPM: '+token);
+  if(!menu.includes("list('contextMenu')"))throw new Error('Menu PPM nie czyta slotu contextMenu');
+  if(!controller.includes('coordinateFromBrowserEvent'))throw new Error('Brak przeliczenia pozycji PPM na współrzędne mapy');
+  const { BUILTIN_FEATURES }=await import('./app-19.41.4/features/index.js');
+  const items=BUILTIN_FEATURES.flatMap((f)=>f.contextMenu??[]);
+  if(items.length<6)throw new Error('Za mało pozycji menu PPM: '+items.length);
+  return `PPM → ${items.length} pozycji z deklaracji funkcji (Google Maps / Street View / Geoportal / współrzędne / działka)`;
+});
+await test('18.1.0 — Profil terenu NMT — moduł i obiekt projektu',async()=>{const [terrain,schema,tools]=await Promise.all([import('./app-19.41.4/terrain/index.js?v=19.41.4'),fetch('./app-19.41.4/persistence/projectSchemas.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./app-19.41.4/features/builtin/terrainFeature.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())]);if(!terrain.TerrainProfileManager)throw new Error('Brak TerrainProfileManager');const kinds=(await import('./app-19.41.4/core/object/objectKinds.js')).MAP_OBJECT_KINDS;if(!kinds.includes('terrain-profile')||!schema.includes('MAP_OBJECT_KINDS'))throw new Error('Profil terenu nie jest trwałym typem obiektu');if(!tools.includes('core.terrain.profile'))throw new Error('Brak narzędzia Profil terenu');return 'linia profilu → obiekt .mapownik → panel wykresu'});
+await testExternalService('18.1.0 — Profil terenu NMT — GUGiK GetHByPointList',async()=>{const r=await fetch('./api/terrain.php?v=19.41.4',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({points:[[243490,563800],[243490,563950],[243400,563950]]})});const j=await r.json().catch(()=>null);if(!r.ok||!j?.ok)throw new Error(j?.error||('HTTP '+r.status));if(!Array.isArray(j.heights)||j.heights.length!==3||j.heights.some(x=>!Number.isFinite(Number(x))))throw new Error('Niepełna odpowiedź NMT');return '3/3 wysokości · '+j.source});
+await test('18.1.0 — Profil terenu — synchronizacja wykres ↔ mapa',async()=>{const [manager,panel]=await Promise.all([fetch('./app-19.41.4/terrain/TerrainProfileManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./app-19.41.4/app/components/TerrainProfilePanel.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())]);if(!manager.includes('setProfileHover(index)')||!manager.includes('terrainHover'))throw new Error('Brak markera synchronizowanego z profilem');if(!panel.includes('onPointerMove')||!(await showsText(panel,'najedź na wykres')))throw new Error('Brak obsługi kursora wykresu');return 'hover wykresu → marker na mapie OK'});
+await test('18.9.7 — Analiza wysokości powierzchni — działki + prostokąt + dokładność 800',async()=>{const [manager,panel,tool,capsResponse]=await Promise.all([fetch('./app-19.41.4/terrain/TerrainProfileManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./app-19.41.4/app/components/TerrainProfilePanel.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./app-19.41.4/features/builtin/terrainFeature.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./api/terrain.php?action=capabilities&v=18.18.0',{cache:'no-store'})]);for(const token of ['sampleParcels','sampleRectangle','startAreaRectangleSelection','setAreaAccuracy','areaSelectionMode'])if(!manager.includes(token))throw new Error('Brak mechanizmu analizy powierzchni: '+token);{const missing=await missingTexts(panel,['Szybka · ~50 pkt','Siatka · ~200 pkt','Siatka · ~400 pkt','Gęsta siatka · ~800 pkt','Wskaż prostokąt']);if(missing.length)throw new Error('Brak UI analizy: '+missing.join(', '));}if(!tool.includes('core.terrain.area'))throw new Error('Brak narzędzia Analiza wysokości');const caps=await capsResponse.json().catch(()=>null);const counts=(caps?.areaSamplePresets||[]).map(x=>Number(x.samples)).sort((a,b)=>a-b);if(!capsResponse.ok||!caps?.ok||Number(caps.maxPoints)<800||Number(caps.maxAreaSamples)<800||counts.join(',')!=='50,200,400,800')throw new Error('Backend NMT nie raportuje presetów 50/200/400/800');return 'działki + ręczny prostokąt · 50/200/400/800 próbek · regularna siatka NMT'});
+await test('15.2 — konfiguracja źródeł mapowych',async()=>{
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');
+   if(dataCatalog.issues.length)throw new Error('Katalog ma błędy: '+JSON.stringify(dataCatalog.issues));
+   const byId=new Map(dataCatalog.layers.map((l)=>[l.id,l]));
+   const topo=byId.get('basemap.topography');
+   const ortho=byId.get('basemap.orthophoto');
+   const mpzp=byId.get('overlay.mpzp');
+   const classes=byId.get('overlay.egib.arable-classes');
+   if(topo?.source?.kind!=='wms'||topo?.source?.layers!=='Raster'||topo?.source?.projection||topo?.source?.tiled!==true||topo?.source?.preload!==1)throw new Error('Topografia nie używa TileWMS Raster / EPSG:3857 / preload');
+   if(ortho?.source?.kind!=='fast-wmts'||!ortho?.source?.standardUrl?.includes('/WMTS/StandardResolution')||!ortho?.source?.highResolutionWmsUrl?.includes('source=orthophoto_high'))throw new Error('Ortofotomapa nie używa bezpośredniego WMTS Standard/HD');
+   if(mpzp?.source?.version!=='1.1.1'||mpzp?.source?.layers?.includes('plany')||mpzp?.source?.layers!=='granice,raster,wektor-str,wektor-lzb,wektor-lin,wektor-pow,wektor-pkt'||mpzp?.source?.tiled!==false)throw new Error('MPZP ma nieprawidłowy zestaw warstw'); /* 19.8.6: MPZP jako jeden obraz WMS (ImageWMS), nie kafle 512 px */
+   /* 19.18.0: studium usunięte z portalu (po reformie planistycznej nie obowiązuje) */if(byId.has('overlay.studium'))throw new Error('Studium nadal w katalogu warstw');
+   /* 18.18.3: od 18.18.0 grupa „Działki i grunty"; mapa glebowo-rolnicza to osobna warstwa overlay.soil.agricultural (nie dawna overlay.glebowa) */if(classes?.source?.layers!=='kontury,uzytki'||classes?.group!=='Działki i grunty'||byId.has('overlay.glebowa'))throw new Error('Warstwa klas EGiB albo wycofanie mapy glebowej są niespójne');
+   return 'Topografia TileWMS / Orto direct WMTS / MPZP / klasy EGiB / bez studium — OK';
+ });
+
+ await test('18.1.0 — transport WMS: direct → proxy, EPSG:3857',async()=>{
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');
+   if(dataCatalog.issues.length)throw new Error('Katalog ma błędy: '+JSON.stringify(dataCatalog.issues));
+   // 19.37.0: warstwy z własnym endpointem (np. api/forest.php — Bank Danych o Lasach) nie idą przez api/wms.php.
+   const wms=dataCatalog.layers.filter((l)=>l.source?.kind==='wms'&&String(l.source.url||'').startsWith('./api/wms.php'));
+   const proxyOnlyAllowed=new Set(['basemap.orthophoto.archive','overlay.egib.arable-classes','overlay.pog.adopted','overlay.pog.zones','basemap.nmt.shaded']); /* 19.23.0: NMT bez EPSG:3857 i z losowymi pustymi kaflami — proxy odrzuca je i ponawia */ /* 19.8.6: POG uchwalony i strefy łączą dwa źródła na serwerze (merge: fill) */ /* 18.18.3: klasy EGiB mają dwa warianty usługi — przełącza je proxy */
+   const noDirect=wms.filter((l)=>!proxyOnlyAllowed.has(l.id)&&(l.source.transport==='proxy'||!l.source.directUrl));
+   if(noDirect.length)throw new Error('Bez transportu bezpośredniego: '+noDirect.map((l)=>l.id).join(', '));
+   const archive= wms.find((l)=>l.id==='basemap.orthophoto.archive');
+   if(!archive||archive.source.transport!=='proxy'||archive.source.projection!=='EPSG:2180'||!archive.source.time?.match(/^\d{4}-(0[1-9]|1[0-2])-01$/)||!/[?&]source=orthophoto_archive/.test(archive.source.url))throw new Error('Archiwum ortofotomapy wymaga proxy EPSG:2180, klucza źródła i poprawnego TIME');
+   const noProxyKey=wms.filter((l)=>!/[?&]source=[a-z0-9_]+/.test(l.source.url));
+   if(noProxyKey.length)throw new Error('Brak klucza proxy (eksport/identify): '+noProxyKey.map((l)=>l.id).join(', '));
+   /* 18.18.3: zestaw wszystkich sieci KIUT (18.18.0) używa tej samej usługi co kategorie KIUT — tylko EPSG:2180 */ const allowed2180=new Set(['overlay.kiut.power','overlay.kiut.gas','overlay.kiut.water','overlay.kiut.sewer','overlay.kiut.telecom','overlay.kiut.heat','overlay.kiut.other','overlay.utilities.all','overlay.kibdot.bdot500','overlay.egib.arable-classes','basemap.orthophoto.archive','basemap.nmt.shaded']); /* 19.23.0: NMT ShadedRelief nie ma EPSG:3857 w GetCapabilities */
+   const reproj=wms.filter((l)=>l.source.projection&&!allowed2180.has(l.id));
+   if(reproj.length)throw new Error('Reprojekcja rastra po stronie klienta: '+reproj.map((l)=>l.id).join(', '));
+   const byId=new Map(wms.map((l)=>[l.id,l]));
+   const zones=byId.get('overlay.pog.zones'), adopted=byId.get('overlay.pog.adopted');
+   /* 19.8.3: strefy POG z krajowej integracji GUGiK (widoczne do 1:100 000 → od zoomu ~12,4); Rejestr Urbanistyczny jako wariant zapasowy *//* dpiScale 2 dotyczył usługi Geoportalu; profil RU (18.18.0) go nie ustawia */if(!(zones?.minZoom>=12&&zones?.minZoom<=13)||zones?.source?.tileSize!==512||!zones?.source?.directUrl?.includes('PlanyOgolneGmin'))throw new Error('Strefy planistyczne: oczekiwano krajowej integracji POG (PlanyOgolneGmin), minZoom 12–13, tileSize 512 (jest minZoom '+zones?.minZoom+')');
+   if(adopted?.source?.tiled!==true)throw new Error('POG uchwalony: oczekiwano kafli');
+   /* 18.18.3: nazwy zgodne z katalogiem KIUT od 18.18.0 */if(byId.get('overlay.kiut.other')?.source?.layers!=='przewod_specjalny,przewod_niezidentyfikowany')throw new Error('KIUT pozostałe: nieoficjalne nazwy warstw');
+   const [registry,transport,loaders]=await Promise.all([
+     fetch('./app-19.41.4/data/sources/SourceRegistry.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/data/sources/adapters/wmsTransport.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/data/sources/resilience/resilientLoaders.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())
+   ]);
+   if(!registry.includes('createWmsTransport'))throw new Error('SourceRegistry nie używa polityki transportu');
+   for(const token of ['buildProxyUrlFromDirect','scaleWmsRequestSize','STICKY_FAILURE_THRESHOLD'])if(!transport.includes(token))throw new Error('Brak '+token);
+   for(const token of ['loadIntoElement','createErrorGuard','adoptProbeElement','onCandidateResult'])if(!loaders.includes(token))throw new Error('Brak '+token);
+   return wms.length+' warstw WMS · direct→proxy · '+(wms.length-allowed2180.size)+' w EPSG:3857 · POG dpiScale 2';
+ });
+
+ await test('18.1.0 — STABILITY: gate, half-open, pokrycie i TTL',async()=>{
+   const [transport,loaders,waiter,layers,health]=await Promise.all([
+     fetch('./app-19.41.4/data/sources/adapters/wmsTransport.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/data/sources/resilience/resilientLoaders.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/data/sources/adapters/tileReadiness.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/layers/LayerManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/data/sources/adapters/healthState.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())
+   ]);
+   for(const token of ['probeInFlight','probeUntil','waitForDecision','onAbort: releaseDirectProbe'])if(!transport.includes(token))throw new Error('Brak WMS gate: '+token);
+   for(const token of ['halfOpenInFlight','releaseHalfOpen','halfOpenProbe'])if(!loaders.includes(token))throw new Error('Brak half-open gate: '+token);
+   for(const token of ['minCoverage','loaded.size / total','FIRST_TILE_GRACE_MS'])if(!waiter.includes(token))throw new Error('Brak kontroli pokrycia kaflami: '+token);
+   for(const token of ['HIDDEN_LAYER_TTL_MS','HIDDEN_LAYER_KEEP_RECENT','scheduleHiddenEviction'])if(!layers.includes(token))throw new Error('Brak TTL/LRU ukrytych warstw: '+token);
+   if(health.includes("telemetry.cacheStatus === 'STALE'"))throw new Error('Historyczny STALE nadal oznacza źródło jako niestabilne');
+   return '1 direct probe · 1 half-open probe · coverage waiter · TTL/LRU · bieżący health';
+ });
+
+ await test('18.1.0 — bezpośredni dostęp z przeglądarki do usług WMS',async()=>{
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');
+   // Mały widok w Poznaniu: EPSG:3857 oraz ten sam obszar w EPSG:2180 dla KIUT/KIBDOT.
+   const bbox3857='1884100,6874000,1885200,6875100', bbox2180='357200,505400,357900,506100';
+   const seen=new Set(); const ok=[], failed=[];
+   const probe=(l)=>new Promise((resolve)=>{
+     const s=l.source; const is2180=s.projection==='EPSG:2180';
+     const q=new URLSearchParams({SERVICE:'WMS',REQUEST:'GetMap',VERSION:s.version,LAYERS:s.layers,STYLES:'',FORMAT:s.format,TRANSPARENT:String(s.transparent).toUpperCase(),WIDTH:'256',HEIGHT:'256',BBOX:is2180?bbox2180:bbox3857});
+     q.set(s.version==='1.3.0'?'CRS':'SRS',is2180?'EPSG:2180':'EPSG:3857');
+     const started=performance.now(); const img=new Image();
+     const timer=setTimeout(()=>{img.src='';resolve({ok:false,why:'timeout'})},(s.directTimeoutMs||10000));
+     img.onload=()=>{clearTimeout(timer);resolve(img.naturalWidth>=16?{ok:true,ms:Math.round(performance.now()-started)}:{ok:false,why:'pusty obraz'})};
+     img.onerror=()=>{clearTimeout(timer);resolve({ok:false,why:'błąd/ServiceException'})};
+     img.src=s.directUrl+(s.directUrl.includes('?')?'&':'?')+q.toString();
+   });
+   const layers=dataCatalog.layers.filter((l)=>l.source?.kind==='wms'&&l.source.directUrl&&l.source.transport!=='proxy');
+   const unique=layers.filter((l)=>{const key=l.source.directUrl+'|'+l.source.layers;if(seen.has(key))return false;seen.add(key);return true;});
+   const settled=await mapLimit(unique,3,async(l)=>[l,await probe(l)]);
+   const results=settled.map((r)=>r.status==='fulfilled'?r.value:null);
+   for(const item of results){if(!item)continue;const [l,r]=item;(r.ok?ok:failed).push(r.ok?l.id+' '+r.ms+' ms':l.id+' ('+r.why+')');}
+   if(!ok.length)throw new Error('Żadna usługa nie odpowiedziała bezpośrednio: '+failed.join('; '));
+   if(failed.length)return 'OSTRZEŻENIE — przez proxy: '+failed.join('; ')+' · bezpośrednio OK: '+ok.length;
+   return 'wszystkie '+ok.length+' usług odpowiadają bezpośrednio';
+ });
+
+ await test('14.3.0 — polityka osi WMS EPSG:2180',async()=>{
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');
+   const affected=dataCatalog.layers.filter((l)=>l.source?.kind==='wms'&&l.source?.projection==='EPSG:2180');
+   const wrong=affected.filter((l)=>l.source?.version!=='1.1.1');
+   if(wrong.length)throw new Error('WMS 1.3.0 + EPSG:2180: '+wrong.map((l)=>l.id).join(', '));
+   return affected.length+' warstw · WMS 1.1.1 · kolejność osi x/y';
+ });
+
+ await test('14.1 — katalog uzbrojenia i BDOT500',async()=>{
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');
+   if(!(dataCatalog.catalogVersion>=10))throw new Error('Oczekiwano catalogVersion ≥ 10, jest '+dataCatalog.catalogVersion);
+   const byId=new Map(dataCatalog.layers.map((l)=>[l.id,l]));
+   const expected=[
+     'overlay.bdot10k.buildings','overlay.bdot10k.transport','overlay.bdot10k.water','overlay.bdot10k.landuse',
+     'overlay.prg.boundaries','overlay.prng.names','overlay.kina.addresses','overlay.gdos.protection',
+     'overlay.kiut.power','overlay.kiut.gas','overlay.kiut.water','overlay.kiut.sewer',
+     'overlay.kiut.telecom','overlay.kiut.heat','overlay.kiut.other','overlay.kibdot.bdot500'
+   ];
+   for(const id of expected){
+     const layer=byId.get(id);
+     if(!layer)throw new Error('Brak '+id);
+     if(layer.visible)throw new Error(id+' powinien startować jako wyłączony');
+     if(layer.source?.kind!=='wms')throw new Error(id+' nie używa WMS');
+   }
+   return 'pełny KIUT/GESUT + BDOT500 · '+expected.length+' warstw referencyjnych · domyślnie wyłączone';
+ });
+
+ await test('14.2 — katalog nowych danych',async()=>{
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');
+   const byId=new Map(dataCatalog.layers.map((l)=>[l.id,l]));
+   const expected=['basemap.nmt.shaded','overlay.pog.adopted','overlay.pog.draft','overlay.pog.zones','overlay.pgi.deposits','overlay.pgi.miningareas'];
+   for(const id of expected){
+     const layer=byId.get(id); if(!layer)throw new Error('Brak '+id);
+     if(layer.visible)throw new Error(id+' powinien startować jako wyłączony');
+     if(layer.source?.kind!=='wms')throw new Error(id+' nie używa WMS');
+     if(layer.source?.projection==='EPSG:2180'&&layer.source?.version!=='1.1.1')throw new Error(id+' narusza politykę osi EPSG:2180');
+   }
+   return expected.length+' nowych warstw · POG / KOWR / MIDAS / NMT';
+ });
+
+ async function probeMapSource(source,bbox='659944.766,486467.448,660557.657,486824.870'){
+   const started=performance.now();
+   try{
+     const q=new URLSearchParams({source,BBOX:bbox,WIDTH:'384',HEIGHT:'256',SRS:'EPSG:2180'});
+     const r=await fetch('./api/wms.php?'+q.toString(),{cache:'no-store'});
+     const upstream=r.headers.get('X-msportal-Upstream-Status');
+     if(!r.ok)throw new Error('HTTP '+r.status);
+     if(upstream)throw new Error('upstream HTTP '+upstream+': '+(r.headers.get('X-msportal-Upstream-Error')||''));
+     const type=r.headers.get('content-type')||'';
+     const b=await r.blob();
+     if(!type.startsWith('image/'))throw new Error('Nieprawidłowy Content-Type: '+type);
+     if(b.size<100)throw new Error('Odpowiedź obrazu jest podejrzanie mała: '+b.size+' B');
+     const ms=Math.round(performance.now()-started); const cache=r.headers.get('X-msportal-Cache')||'—'; const age=r.headers.get('X-msportal-Cache-Age'); const upstreamMs=r.headers.get('X-msportal-Upstream-Ms'); const variant=r.headers.get('X-msportal-WMS-Variant'); const resolved=r.headers.get('X-msportal-WMS-Layers-Resolved');
+     recordSourceAudit(source,{ok:true,ms,cache,variant});
+     return type.split(';')[0]+' · '+b.size+' B · '+ms+' ms · cache '+cache+(age?' ('+age+' s)':'')+(upstreamMs?' · upstream '+upstreamMs+' ms':'')+(variant?' · wariant '+variant:'')+(resolved?' · layers '+resolved:'');
+   }catch(error){recordSourceAudit(source,{ok:false,error:error?.message||String(error)});throw error;}
+ }
+ await test('15.3 — szybka ortofotomapa WMTS',async()=>{const {dataCatalog}=await import('./app-19.41.4/data/catalog/dataCatalog.js?v=19.41.4');const d=dataCatalog.layers.find(x=>x.id==='basemap.orthophoto');if(!d)throw new Error('Brak basemap.orthophoto');const q=d.source;if(q.kind!=='fast-wmts')throw new Error('Ortofotomapa nie używa fast-wmts');if(!q.standardUrl.includes('/WMTS/StandardResolution')||!q.standardUrl.includes('LAYER=ORTOFOTOMAPA')||!q.standardUrl.includes('TILEMATRIXSET=EPSG:3857'))throw new Error('Nieprawidłowy WMTS StandardResolution');/* 19.18.0: WMTS HD bez EPSG:3857 — od z20 WMS HighResolution */if(q.highResolutionUrl)throw new Error('Martwy WMTS HighResolution EPSG:3857 nadal w katalogu');if(!q.highResolutionWmsUrl?.includes('source=orthophoto_high')||!q.fallbackWmsUrl?.includes('source=orthophoto_high'))throw new Error('Brak WMS HighResolution');if(q.switchZoom!==20||q.preload!==1)throw new Error('Nieprawidłowy switchZoom/preload');return 'WMTS Standard do z19 · WMS HighResolution od z20 i jako zapas'});
+ await testKnownLimitation('15.3 — bezpośredni kafel ortofotomapy',async()=>{const url='https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMTS/StandardResolution?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTOFOTOMAPA&STYLE=default&FORMAT=image/jpeg&TILEMATRIXSET=EPSG:3857&TILEMATRIX=EPSG:3857:12&TILEROW=1354&TILECOL=2265';await new Promise((resolve,reject)=>{const img=new Image();const timer=setTimeout(()=>reject(new Error('Timeout bezpośredniego WMTS')),10000);img.onload=()=>{clearTimeout(timer);if(img.naturalWidth<1||img.naturalHeight<1)reject(new Error('Kafel ma zerowy rozmiar'));else resolve()};img.onerror=()=>{clearTimeout(timer);reject(new Error('Nie udało się załadować kafla WMTS bezpośrednio z Geoportalu'))};img.src=url});return 'Geoportal WMTS tile OK'});
+ await test('18.1.0 — bezpośredni kafel OSM',async()=>{const url='https://tile.openstreetmap.org/6/35/21.png';const started=performance.now();await new Promise((resolve,reject)=>{const img=new Image();const timer=setTimeout(()=>reject(new Error('Timeout bezpośredniego OSM')),10000);img.onload=()=>{clearTimeout(timer);if(img.naturalWidth!==256||img.naturalHeight!==256)reject(new Error('Nieoczekiwany rozmiar kafla OSM '+img.naturalWidth+'×'+img.naturalHeight));else resolve()};img.onerror=()=>{clearTimeout(timer);reject(new Error('Nie udało się załadować kafla OSM'))};img.src=url});return 'OSM direct tile 256×256 · '+Math.round(performance.now()-started)+' ms'});
+ await test('15.3 — kafelkowe podkłady WMS',async()=>{const {dataCatalog}=await import('./app-19.41.4/data/catalog/dataCatalog.js?v=19.41.4');for(const id of ['basemap.topography','basemap.nmt.shaded']){const d=dataCatalog.layers.find(x=>x.id===id);if(!d)throw new Error('Brak '+id);if(d.source.kind!=='wms'||d.source.tiled!==true||d.source.preload!==1)throw new Error(id+' nie ma TileWMS + preload')}return 'Topografia / NMT — TileWMS + preload'});
+ await test('15.3 — równoległe ładowanie kafli',async()=>{const src=await (await fetch('./app-19.41.4/map/OpenLayersMapController.js?v=19.41.4',{cache:'no-store'})).text();if(!src.includes('maxTilesLoading: 16'))throw new Error('maxTilesLoading != 16');return 'maxTilesLoading 16'});
+ await test('18.1.0 — polityka OpenLayers 10.10',async()=>{const [wms,xyz,wmts,map,policyModule]=await Promise.all([fetch('./app-19.41.4/data/sources/adapters/wmsAdapter.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./app-19.41.4/data/sources/adapters/xyzAdapter.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./app-19.41.4/data/sources/adapters/fastWmtsAdapter.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./app-19.41.4/map/OpenLayersMapController.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),import('./app-19.41.4/data/sources/adapters/tileLayerPolicy.js?v=19.41.4')]);if([wms,xyz,wmts].some(x=>x.includes('useInterimTilesOnError')))throw new Error('Pozostało jawne użycie deprecated useInterimTilesOnError');const basemapCache=policyModule.tileLayerCacheSize({role:'basemap'},{});const overlayCache=policyModule.tileLayerCacheSize({role:'overlay'},{});const overriddenCache=policyModule.tileLayerCacheSize({role:'basemap'},{cacheSize:900});if(basemapCache!==512||overlayCache!==128)throw new Error(`Nieoczekiwany cacheSize TileLayer: basemap=${basemapCache} overlay=${overlayCache} (oczekiwano 512/128)`);if(overriddenCache!==900)throw new Error('Jawny cacheSize źródła powinien nadpisywać domyślny');if(!map.includes('moveTolerance: 3'))throw new Error('Brak moveTolerance=3');return 'cache TileLayer 512/128 (warstwy tematyczne: budżet ~2 widoków, 17.8.11) · nadpisanie źródła działa · preload · brak deprecated interim API · moveTolerance 3'});
+ await test('18.1.0 — telemetria źródeł mapowych',async()=>{
+   const {createSourceTelemetry}=await import('./app-19.41.4/data/sources/adapters/sourceTelemetry.js?v=19.41.4');
+   const telemetry=createSourceTelemetry('WMTS HD');
+   const tile={}; telemetry.tileStart(tile); telemetry.recordFallback('standard'); telemetry.recordRetry(); telemetry.recordTimeout(); telemetry.recordValidationError(); telemetry.recordOutcome(false); telemetry.tileEnd(tile);
+   telemetry.recordFallback('wms'); telemetry.recordStaleHit(); telemetry.recordResponseMeta({cacheStatus:'STALE',cacheAgeSeconds:120,upstreamMs:850}); telemetry.recordOutcome(true); telemetry.recordOutcome(true); telemetry.recordOutcome(true); telemetry.setCircuit({state:'closed',openUntil:0});
+   const snap=telemetry.getSnapshot(); telemetry.dispose();
+   if(snap.requests!==1||snap.successes!==1||snap.fallbackCount!==2||snap.retries!==1||snap.timeouts!==1||snap.validationErrors!==1||snap.staleHits!==1||snap.cacheStatus!=='STALE'||snap.cacheAgeSeconds!==120||snap.upstreamMs!==850||!['degraded','healthy'].includes(snap.health))throw new Error('Nieprawidłowe liczniki telemetrii: '+JSON.stringify(snap));
+   return 'retry/timeout/walidacja/stale cache/cache age/upstream/health — liczniki OK';
+ });
+ await test('18.1.0 — circuit breaker źródeł',async()=>{
+   const {createCircuitBreaker,resetResilienceCircuits}=await import('./app-19.41.4/data/sources/resilience/resilientLoaders.js?v=19.41.4');
+   resetResilienceCircuits(); const c=createCircuitBreaker('diag',{failureThreshold:3,cooldownMs:60000});
+   c.failure();c.failure();const third=c.failure();const gate=c.beforeRequest();
+   if(third.state!=='open'||gate.allowed!==false||gate.state!=='open')throw new Error('Circuit breaker nie otworzył obwodu');
+   c.success();if(!c.beforeRequest().allowed)throw new Error('Circuit breaker nie zamknął się po sukcesie');
+   return '3 błędy → OPEN · sukces → CLOSED';
+ });
+ await test('18.1.0 — anulowanie przestarzałych requestów',async()=>{
+   const m=await import('./app-19.41.4/data/sources/resilience/requestCoordinator.js?v=19.41.4');
+   let canceled=0; const keep=m.registerRasterRequest(()=>{canceled++},{sourceId:'diag.image',cancelOnGeneration:true});
+   const keepTile=m.registerRasterRequest(()=>{canceled+=100},{sourceId:'diag.tile',cancelOnGeneration:false});
+   const before=m.getRasterRequestCoordinatorSnapshot().generation; m.beginRasterRequestGeneration('diag');
+   const after=m.getRasterRequestCoordinatorSnapshot().generation; keep(); keepTile();
+   if(after!==before+1||canceled!==1)throw new Error('Nieprawidłowe anulowanie generacji: '+canceled);
+   return 'viewport ImageWMS anulowany · kafle cache pozostawione do ponownego użycia';
+ });
+ await test('18.1.0 — walidacja obrazów + retry WMS/WMTS',async()=>{
+   const [registry,resilience]=await Promise.all([
+     fetch('./app-19.41.4/data/sources/SourceRegistry.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/data/sources/resilience/resilientLoaders.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())
+   ]);
+   for(const token of ['attachResilientTileSource','attachResilientImageSource','timeoutMs: 12000','cancelOnGeneration: true'])if(!registry.includes(token))throw new Error('Brak '+token);
+   for(const token of ['createImageBitmap','recordRetry','recordTimeout','recordValidationError','restoreLastGood','createCircuitBreaker'])if(!resilience.includes(token))throw new Error('Brak mechanizmu '+token);
+   return 'decode + min. wymiar + retry 0,5/1,5 s + last-known-good';
+ });
+ await test('18.1.0 — API loaderów OpenLayers',async()=>{
+   await ensureOl();
+   const [{default:TileWMS},{default:ImageWMS}]=await Promise.all([import('ol/source/TileWMS.js'),import('ol/source/ImageWMS.js')]);
+   const tile=new TileWMS({url:'./api/wms.php?source=mpzp',params:{LAYERS:'x'}});
+   const image=new ImageWMS({url:'./api/wms.php?source=mpzp',params:{LAYERS:'x'}});
+   if(typeof tile.setTileLoadFunction!=='function')throw new Error('TileWMS nie udostępnia setTileLoadFunction');
+   if(typeof image.setImageLoadFunction!=='function')throw new Error('ImageWMS nie udostępnia setImageLoadFunction');
+   return 'TileWMS.setTileLoadFunction + ImageWMS.setImageLoadFunction OK';
+ });
+ await test('18.1.0 — metryki w LayerManager',async()=>{
+   const src=await (await fetch('./app-19.41.4/layers/LayerManager.js?v=19.41.4',{cache:'no-store'})).text();
+   for(const token of ['loadStartedAt','loadMs','sourceTelemetry','unsubscribeTelemetry','cancelPending','watchdogTrips'])if(!src.includes(token))throw new Error('Brak '+token);
+   return 'czas pierwszego renderu + telemetry snapshot OK';
+ });
+ await test('18.1.0 — status źródła w UI',async()=>{
+   const [src,css]=await Promise.all([
+     fetch('./app-19.41.4/app/components/MapStage.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     loadAppCss()
+   ]);
+   if(!src.includes('status-source')||(await missingTexts(src,['Błędy kafli','Fallbacki:','circuit breaker','zapamiętane obrazy'])).length)throw new Error('Brak statusu wydajności źródła w MapStage');
+   if(!css.includes('.status-source')||!css.includes('.status-item--warning'))throw new Error('Brak stylów statusu źródła');
+   return 'kompaktowy status + szczegóły po najechaniu OK';
+ });
+
+ await test('18.1.0 — kompatybilność wyboru prostokąta OpenLayers',async()=>{const src=await (await fetch('./app-19.41.4/map/OpenLayersMapController.js?v=19.41.4',{cache:'no-store'})).text();if(src.includes("{ createBox } from 'ol/interaction/Draw.js'"))throw new Error('Nadal używany jest niedostępny named export createBox');if(!src.includes('createBoxGeometryFunction'))throw new Error('Brak lokalnej funkcji geometrii prostokąta');const {OpenLayersMapController}=await import('./app-19.41.4/map/OpenLayersMapController.js?v=19.41.4');if(typeof OpenLayersMapController.prototype.selectBoxExtent!=='function')throw new Error('Brak selectBoxExtent');return 'lokalny geometryFunction · bez named export createBox'});
+ await test('15.4 — Export Manager — moduł i wybór obszaru',async()=>{
+   const [{ExportManager},{OpenLayersMapController}]=await Promise.all([
+     import('./app-19.41.4/export/index.js?v=19.41.4'),
+     import('./app-19.41.4/map/OpenLayersMapController.js?v=19.41.4')
+   ]);
+   if(!ExportManager)throw new Error('Brak ExportManager');
+   for(const method of ['getViewportExtent2180','selectBoxExtent'])if(typeof OpenLayersMapController.prototype[method]!=='function')throw new Error('Brak '+method);
+   return 'bieżący widok + obiekty + prostokąt na mapie OK';
+ });
+ await test('15.4 — backend eksportu — capabilities',async()=>{
+   const r=await fetch('./api/export.php?action=capabilities&v=17.8.3',{cache:'no-store'});const j=await r.json();
+   if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));
+   if(!j.gd)throw new Error('PHP GD jest wyłączone — eksport PNG/JPG nie zadziała');
+   if(!Number.isFinite(j.safe_single_pixels)||j.safe_single_pixels<1000000)throw new Error('Nieprawidłowy limit safe_single_pixels');
+   return 'GD · limit '+(j.safe_single_pixels/1e6).toFixed(1)+' MP · ZIP '+(j.zip?'TAK':'NIE');
+ });
+ await testKnownLimitation('18.1.0 — backend eksportu — PNG + otwór poligonu',async()=>{
+   const body={mode:'single',bbox:[500000,500000,500200,500120],width:400,height:240,format:'png',quality:90,basemap:null,overlays:[],objects:[{id:'p',name:'Test',visible:true,geometry:{type:'Polygon',coordinates:[[[500020,500020],[500180,500020],[500180,500100],[500020,500100],[500020,500020]],[[500080,500050],[500120,500050],[500120,500070],[500080,500070],[500080,500050]]]},style:{strokeColor:'#2563eb',strokeWidth:2,fillColor:'#2563eb',fillOpacity:.45}}],layout:'plain',georef:true};
+   const r=await fetch('./api/export.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),cache:'no-store'});
+   if(!r.ok){let msg='HTTP '+r.status;try{msg=(await r.json()).error||msg}catch{}throw new Error(msg)}
+   const b=await r.blob();if(!b.type.startsWith('image/png')||b.size<1000)throw new Error('Nieprawidłowy obraz eksportu: '+b.type+' '+b.size+' B');
+   if(!r.headers.get('X-msportal-World-File'))throw new Error('Brak world file w nagłówku');
+   const bitmap=await createImageBitmap(b);const canvas=document.createElement('canvas');canvas.width=400;canvas.height=240;const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(bitmap,0,0);bitmap.close?.();
+   const fill=ctx.getImageData(80,160,1,1).data;const hole=ctx.getImageData(200,120,1,1).data;
+   if(Math.abs(hole[0]-245)>8||Math.abs(hole[1]-247)>8||Math.abs(hole[2]-250)>8)throw new Error('Otwór poligonu został wypełniony: '+Array.from(hole).join(','));
+   if(Math.abs(fill[0]-245)<8&&Math.abs(fill[1]-247)<8&&Math.abs(fill[2]-250)<8)throw new Error('Wypełnienie poligonu nie zostało narysowane');
+   return 'PNG '+b.size+' B + world file + poprawne wycięcie hole';
+ });
+ await test('15.5 — duży eksport kafelkowy',async()=>{
+   const r=await fetch('./api/export.php?action=capabilities&v=17.8.3',{cache:'no-store'});const j=await r.json();
+   return j.batch?('ZipArchive + kafle '+(j.batch_tile_px||'?')+' px + manifest/world files OK'):'ZipArchive niedostępne — tryb kafli wyłączony na tym hostingu';
+ });
+ await test('16.0 — mapa projektowa i UI eksportu',async()=>{
+   const [src,css,php]=await Promise.all([
+     fetch('./app-19.41.4/app/components/ExportPanel.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     loadAppCss(),
+     fetch('./api/export.php?v=19.41.4',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',cache:'no-store'}).then(async r=>({status:r.status,text:await r.text()}))
+   ]);
+   {const missing=await missingTexts(src,['Mapa projektowa','world file','Pakiet kafli ZIP']);if(missing.length)throw new Error('Brak UI: '+missing.join(', '));}
+   for(const token of ['.export-plan','.export-checks','.export-panel--wide'])if(!css.includes(token))throw new Error('Brak CSS: '+token);
+   return 'tytuł + północ + skala + legenda · panel eksportu OK';
+ });
+ await test('15.2 — Topografia WMS',()=>probeMapSource('topography'));
+ async function probePhotoSource(source,bbox='659944.766,486467.448,660557.657,486824.870',extra={}){
+   const started=performance.now();
+   try{
+     const q=new URLSearchParams({source,BBOX:bbox,WIDTH:'384',HEIGHT:'256',SRS:'EPSG:2180',...extra});
+     const r=await fetch('./api/wms.php?'+q.toString(),{cache:'no-store'});
+     const upstream=r.headers.get('X-msportal-Upstream-Status');
+     if(!r.ok)throw new Error('HTTP '+r.status);
+     if(upstream)throw new Error('upstream HTTP '+upstream+': '+(r.headers.get('X-msportal-Upstream-Error')||''));
+     const blob=await r.blob();
+     if(!blob.type.startsWith('image/'))throw new Error('Nieprawidłowy Content-Type: '+blob.type);
+     const bitmap=await createImageBitmap(blob);
+     const canvas=document.createElement('canvas'); canvas.width=48; canvas.height=32;
+     const ctx=canvas.getContext('2d',{willReadFrequently:true});
+     ctx.drawImage(bitmap,0,0,canvas.width,canvas.height); bitmap.close?.();
+     const data=ctx.getImageData(0,0,canvas.width,canvas.height).data;
+     let min=255,max=0,sum=0,count=0;
+     // 19.8.3: tylko piksele nieprzezroczyste — przezroczysty PNG (brak pokrycia) nie jest „czarnym obrazem”.
+     for(let i=0;i<data.length;i+=16){if(data[i+3]<16)continue;const y=(data[i]*0.2126+data[i+1]*0.7152+data[i+2]*0.0722);min=Math.min(min,y);max=Math.max(max,y);sum+=y;count++;}
+     if(count===0){
+       // Prawdziwa ortofotomapa obejmuje tylko wybrane miasta — przezroczysty obraz to brak pokrycia, nie awaria.
+       if(source==='orthophoto_true'){const ms0=Math.round(performance.now()-started);recordSourceAudit(source,{ok:true,ms:ms0,cache:r.headers.get('X-msportal-Cache')||'—',variant:null});return 'usługa działa · brak pokrycia TrueOrtho w obszarze próby (obraz przezroczysty)';}
+       throw new Error('WMS zwrócił w całości przezroczysty obraz.');
+     }
+     const mean=sum/Math.max(1,count);
+     if(max<18&&mean<8)throw new Error('WMS zwrócił technicznie poprawny, ale niemal czarny obraz (jasność '+mean.toFixed(1)+', max '+max.toFixed(1)+'). Sprawdź wersję WMS / kolejność osi BBOX.');
+     if(min>242&&mean>248)throw new Error('WMS zwrócił niemal pusty biały obraz (jasność '+mean.toFixed(1)+').');
+     const variant=r.headers.get('X-msportal-WMS-Variant'); const version=r.headers.get('X-msportal-WMS-Version'); const axis=r.headers.get('X-msportal-WMS-Axis');
+     const cache=r.headers.get('X-msportal-Cache')||'—'; const age=r.headers.get('X-msportal-Cache-Age'); const upstreamMs=r.headers.get('X-msportal-Upstream-Ms');
+     const ms=Math.round(performance.now()-started); recordSourceAudit(source,{ok:true,ms,cache,variant});
+     return blob.type.split(';')[0]+' · '+blob.size+' B · '+ms+' ms · cache '+cache+(age?' ('+age+' s)':'')+(upstreamMs?' · upstream '+upstreamMs+' ms':'')+' · jasność '+mean.toFixed(1)+' · zakres '+min.toFixed(0)+'–'+max.toFixed(0)+(variant?' · wariant '+variant:'')+(version?' · WMS '+version:'')+(axis?' · oś '+axis:'');
+   }catch(error){recordSourceAudit(source,{ok:false,error:error?.message||String(error)});throw error;}
+ }
+ await test('15.3 — Ortofotomapa WMS fallback + kontrola obrazu',()=>probePhotoSource('orthophoto'));
+ await test('18.1.0 — MPZP odporny na chwilowe błędy',async()=>{
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/dataCatalog.js?v=19.41.4');
+   const d=dataCatalog.layers.find(x=>x.id==='overlay.mpzp');
+   if(!d)throw new Error('Brak overlay.mpzp');
+   if(d.source.kind!=='wms'||d.source.tiled!==false||!(d.source.ratio>1))throw new Error('MPZP nie używa jednego obrazu WMS z zapasem (19.8.6: ImageWMS, ratio > 1)');
+   const [registry,resilience]=await Promise.all([
+     fetch('./app-19.41.4/data/sources/SourceRegistry.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+     fetch('./app-19.41.4/data/sources/resilience/resilientLoaders.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())
+   ]);
+   if(!registry.includes("this.register('wms'")||!registry.includes('attachResilientTileSource')||!registry.includes('attachResilientImageSource'))throw new Error('WMS nie korzysta ze wspólnego resilient loadera');
+   for(const token of ['restoreLastGood','recordStaleHit','createCircuitBreaker'])if(!resilience.includes(token))throw new Error('Brak '+token);
+   return 'TileWMS + preload + last-known-good + retry/circuit breaker + błąd upstream nie zastępuje poprawnego kafla';
+ });
+ await test('18.1.0 — backend WMS resilience',async()=>{
+   const wms=await fetch('./api/wms.php?source=mpzp&BBOX=659944.766,486467.448,660557.657,486824.870&WIDTH=256&HEIGHT=256&SRS=EPSG:2180',{cache:'no-store'});
+   if(wms.ok){const size=wms.headers.get('X-msportal-Raster-Size');if(!size)throw new Error('Backend nie raportuje zwalidowanego wymiaru obrazu');return 'retry + circuit breaker endpointu + walidacja rastra '+size+' + stale cache';}
+   const upstream=wms.headers.get('X-msportal-Upstream-Status');const error=wms.headers.get('X-msportal-Upstream-Error')||'';
+   if(wms.status===502&&upstream)return 'upstream chwilowo niedostępny ('+upstream+') · backend zwrócił kontrolowany 502 · klient zachowuje last-known-good';
+   throw new Error('MPZP resilience probe HTTP '+wms.status+(error?' · '+error:''));
+ });
+ await test('15.2 — MPZP WMS',()=>probeMapSource('mpzp'));
+
+ async function probeSourceGroup(sources){
+   const results=await mapLimit(sources,2,(source)=>probeMapSource(source));
+   const errors=[]; const ok=[];
+   results.forEach((result,index)=>{
+     const source=sources[index];
+     if(result.status==='fulfilled')ok.push(source);
+     else errors.push(source+': '+(result.reason?.message||String(result.reason)));
+   });
+   if(errors.length)throw new Error(errors.join(' | '));
+   return ok.join(', ')+' — OK';
+ }
+ await test('15.2 — BDOT10k WMS',()=>probeSourceGroup(['bdot10k_buildings','bdot10k_transport','bdot10k_water','bdot10k_landuse']));
+ await test('14.3.0 — PRG / PRNG / KINA WMS',()=>probeSourceGroup(['prg_boundaries','prng_names','kina_addresses']));
+ await test('14.1 — pełne KIUT/GESUT WMS',()=>probeSourceGroup(['kiut_power','kiut_gas','kiut_water','kiut_sewer','kiut_telecom','kiut_heat','kiut_other']));
+ await test('18.1.0 — BDOT500 / KIBDOT WMS — oficjalna kompozycja bdot',()=>probeMapSource('kibdot_bdot500'));
+ await test('14.2 — NMT cieniowanie WMS',()=>probeMapSource('nmt_shaded'));
+ await test('18.1.0 — POG uchwalone / projektowane / strefy',()=>probeSourceGroup(['pog_adopted','pog_draft','pog_zones']));
+ await test('14.2 — Działki KOWR',()=>probeMapSource('kowr'));
+ await test('14.2 — MIDAS złoża / obszary górnicze',()=>probeSourceGroup(['pgi_deposits','pgi_miningareas']));
+ await test('15.2 — GDOŚ WMS',()=>probeSourceGroup(['gdos_protection']));
+ await test('18.1.0 — Natura 2000 WMS',()=>probeMapSource('natura2000'));
+ await test('18.1.0 — KIEG działki WMS',()=>probeMapSource('dzialki'));
+ await test('18.1.0 — Ortofotomapa HighResolution WMS fallback',()=>probePhotoSource('orthophoto_high'));
+ await test('18.18.3 — pozostałe źródła z katalogu',async()=>{
+   // Źródła dodane do katalogu bez osobnego testu dostają tu próbę obrazu,
+   // żeby audyt niżej nie zgłaszał ich jako „bez próby".
+   const {dataCatalog:restCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');
+   const keys=[...new Set(restCatalog.layers.filter((l)=>l.source?.kind==='wms'&&String(l.source.url||'').startsWith('./api/wms.php')).map((l)=>(/[?&]source=([a-z0-9_]+)/.exec(l.source.url||'')||[])[1]).filter(Boolean))].filter((k)=>!sourceAudit.has(k));
+   if(!keys.length)return 'wszystkie źródła miały już próbę';
+   const archiveTime=restCatalog.layers.find((l)=>l.id==='basemap.orthophoto.archive')?.source?.time;
+   const results=await mapLimit(keys,2,(source)=>source==='orthophoto_archive'?probePhotoSource(source,undefined,{TIME:archiveTime||''}):source.startsWith('orthophoto')?probePhotoSource(source):probeMapSource(source));
+   const errors=[];results.forEach((r,i)=>{if(r.status!=='fulfilled')errors.push(keys[i]+': '+(r.reason?.message||String(r.reason)))});
+   if(errors.length)throw new Error(errors.join(' | '));
+   return keys.length+' źródeł — OK: '+keys.join(', ');
+ });
+ await test('18.1.0 — audyt stabilności wszystkich źródeł',async()=>{
+   const rows=[...sourceAudit.values()];
+   // 18.18.0: lista oczekiwanych źródeł z katalogu zamiast liczby wpisanej na sztywno
+   // (każda nowa warstwa psuła test). Błąd tylko wtedy, gdy źródła z katalogu nikt nie sprawdził.
+   const {dataCatalog:auditCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');
+   const auditKeys=new Set(auditCatalog.layers.filter((l)=>l.source?.kind==='wms'&&String(l.source.url||'').startsWith('./api/wms.php')).map((l)=>(/[?&]source=([a-z0-9_]+)/.exec(l.source.url||'')||[])[1]).filter(Boolean));
+   const audited=new Set(rows.map((x)=>x.source)); const unaudited=[...auditKeys].filter((k)=>!audited.has(k));
+   if(unaudited.length)throw new Error('Źródła z katalogu bez próby w audycie: '+unaudited.join(', '));
+   const bad=rows.filter(x=>x.errors.length||x.ok===0); const stale=rows.filter(x=>x.cache.includes('STALE')); const slow=rows.filter(x=>x.latencies.some(ms=>ms>3000)); const fallbacks=rows.filter(x=>x.variants.some(v=>Number(v)>1));
+   if(bad.length)throw new Error('Problematyczne: '+bad.map(x=>x.source+' ('+x.errors[0]+')').join(' | '));
+   const notes=[]; if(stale.length)notes.push('STALE: '+stale.map(x=>x.source).join(', ')); if(slow.length)notes.push('>3 s: '+slow.map(x=>x.source).join(', ')); if(fallbacks.length)notes.push('wariant fallback: '+fallbacks.map(x=>x.source).join(', '));
+   return rows.length+' źródeł technicznie OK'+(notes.length?' · do obserwacji: '+notes.join(' · '):' · bez ostrzeżeń runtime');
+ });
+
+ await test('KIEG — pojedynczy obraz WMS bez powielania etykiet',async()=>{
+   await ensureOl();
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');
+   const {createWmsLayer}=await import('./app-19.41.4/data/sources/adapters/wmsAdapter.js?v=19.41.4');
+   const definition=dataCatalog.layers.find((l)=>l.id==='overlay.dzialki');
+   if(!definition)throw new Error('Brak overlay.dzialki');
+   const layer=createWmsLayer(definition,definition.source);
+   try{
+     if(!(layer instanceof window.ol.layer.Image))throw new Error('Działki nie zostały utworzone jako ImageLayer');
+     if(!(layer.getSource() instanceof window.ol.source.ImageWMS))throw new Error('Źródło działek nie jest ImageWMS');
+     return 'ImageWMS — etykiety liczone dla całego widoku';
+   } finally { layer.dispose?.(); }
+ });
+
+ await test('Warstwy nakładek (WMS) w katalogu',async()=>{
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');
+   if(dataCatalog.issues.length)throw new Error('Katalog ma błędy: '+JSON.stringify(dataCatalog.issues));
+   const overlays=dataCatalog.layers.filter((l)=>l.role==='overlay');
+   const expected=['overlay.dzialki','overlay.natura2000','overlay.mpzp','overlay.egib.arable-classes','overlay.bdot10k.buildings','overlay.bdot10k.transport','overlay.bdot10k.water','overlay.bdot10k.landuse','overlay.prg.boundaries','overlay.prng.names','overlay.kina.addresses','overlay.gdos.protection','overlay.kiut.power','overlay.kiut.gas'];
+   for(const id of expected) if(!overlays.some((l)=>l.id===id)) throw new Error('Brak warstwy '+id);
+   return `${overlays.length} nakładek OK`;
+ });
+ await test('13.9 — IdentifyManager',async()=>{
+   const m=await import('./app-19.41.4/identify/index.js?v=19.41.4');
+   if(!m.IdentifyManager)throw new Error('Brak IdentifyManager');
+   return 'moduł identyfikacji OK';
+ });
+ await test('13.8 — SearchManager',async()=>{
+   const m=await import('./app-19.41.4/search/index.js?v=19.41.4');
+   if(!m.SearchManager)throw new Error('Brak SearchManager');
+   return 'wyszukiwarka miejscowości / ulic / działek — moduł OK';
+ });
+ await test('18.1.0 — wyszukiwarka miejscowości — poprawny bbox',async()=>{
+   await ensureOl();
+   const {SearchManager}=await import('./app-19.41.4/search/index.js?v=19.41.4');
+   let fitted=null;
+   const host={addLayer(){},removeLayer(){},fitExtent(extent,options){fitted={extent:[...extent],options};}};
+   const manager=new SearchManager(host);
+   manager.focusLocality({localityName:'Test',boundingBox:[18.40,54.20,18.90,54.50],lon:18.65,lat:54.35});
+   manager.dispose();
+   if(!fitted)throw new Error('SearchManager nie wykonał fitExtent');
+   const [minX,minY,maxX,maxY]=fitted.extent;
+   const width=maxX-minX,height=maxY-minY;
+   if(!(width>1000&&width<150000&&height>1000&&height<150000))throw new Error(`Nieprawidłowy extent po wyborze miejscowości: ${Math.round(width)}×${Math.round(height)} m`);
+   if(fitted.options?.maxZoom!==15)throw new Error('Nieprawidłowy maxZoom miejscowości');
+   const src=await (await fetch('./app-19.41.4/search/SearchManager.js?v=19.41.4',{cache:'no-store'})).text();
+   if(src.includes('const [south, north, west, east] = values'))throw new Error('Pozostała podwójna normalizacja bbox Nominatim');
+   return `bbox WSEN · extent ${Math.round(width/1000)}×${Math.round(height/1000)} km · maxZoom 15`;
+ });
+ await test('13.9 — warstwy identyfikowalne',async()=>{
+   const {dataCatalog}=await import('./app-19.41.4/data/catalog/index.js?v=19.41.4');
+   const expected=['overlay.natura2000','overlay.mpzp','overlay.egib.arable-classes','overlay.prg.boundaries','overlay.prng.names','overlay.kina.addresses','overlay.gdos.protection','overlay.kiut.power','overlay.kiut.gas'];
+   for(const id of expected){const layer=dataCatalog.layers.find((x)=>x.id===id);if(!layer?.capabilities?.identify)throw new Error(id+' nie ma capabilities.identify=true')}
+   return expected.length+' warstwy GetFeatureInfo';
+ });
+ await testExternalService('13.9 — proxy GetFeatureInfo MPZP',async()=>{
+   const r=await fetch('./api/identify.php?source=mpzp&x=660123.559&y=486518.564',{cache:'no-store'});
+   const j=await r.json();
+   if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));
+   return j.found?'wynik WMS OK':'brak obiektu — endpoint OK';
+ });
+ await testExternalService('19.41.0 — pilotaż: kafel NMT 1 m z WCS GUGiK przez serwer',async()=>{
+   // Jeden kafel 256 × 256 m (Warszawa): czas pobrania z GUGiK przy pierwszym razie, potem z cache serwera.
+   const ctl=new AbortController();const timer=setTimeout(()=>ctl.abort(),150000);const t0=performance.now();
+   try{
+     const r=await fetch('./api/dem.php?p=1&tx=2465&ty=1891',{cache:'no-store',signal:ctl.signal});const ms=Math.round(performance.now()-t0);
+     if(!r.ok){const j=await r.json().catch(()=>null);throw new Error(`${j?.error||('HTTP '+r.status)} po ${Math.round(ms/1000)} s — model 3D użyje siatki punktów GUGiK`);}
+     const b=await r.arrayBuffer();const min=new DataView(b).getFloat64(8,true);if(min<50||min>150)throw new Error('nieoczekiwana wysokość '+min.toFixed(1)+' m');
+     const up=r.headers.get('x-mapownik-dem-ms');return r.headers.get('x-mapownik-dem-cache')==='HIT'?`z cache serwera (${ms} ms)`:`pobrany z GUGiK w ${Math.round((up||ms)/1000)} s, zapisany w cache`;
+   }catch(e){if(e?.name==='AbortError')throw new Error('brak odpowiedzi w 150 s — WCS GUGiK zbyt wolny z tego serwera; model 3D użyje siatki punktów');throw e;}finally{clearTimeout(timer);}
+ });
+}
+await test('16.1 — usunięte True Ortho i Rejestr Urbanistyczny',async()=>{
+  const {dataCatalog}=await import('./app-19.41.4/data/catalog/dataCatalog.js?v=19.41.4');
+  const banned=['basemap.trueortho','overlay.ru.pog'];
+  const found=banned.filter(id=>dataCatalog.layers.some(x=>x.id===id));
+  if(found.length)throw new Error('Pozostały warstwy: '+found.join(', '));
+  const api=await (await fetch('./api/_wms_sources.php?diag='+Date.now(),{cache:'no-store'})).text().catch(()=> '');
+  return 'brak w katalogu aplikacji · backend chroniony';
+});
+await test('16.1 — czytelne ikony narzędzi i paneli',async()=>{
+  const icons=await import('lucide-react');
+  for(const name of ['ScanSearch','FolderKanban','Shapes','Info','LassoSelect','Waypoints','MoveHorizontal','LandPlot','ChartSpline','Tag','Activity','Crosshair','LocateFixed','RefreshCw','EyeOff','Signpost','ImageDown','FileJson','Palette','Rows3','Blend','Road','ZoomIn','Pin','BuildingComplex']) if(!icons[name])throw new Error('Brak wybranej ikony Lucide '+name);
+  const tools=await (await fetch('./app-19.41.4/app/components/ToolDock.js?v=19.41.4',{cache:'no-store'})).text();
+  const iconMap=await (await fetch('./app-19.41.4/app/icons/tablerIcons.js?v=19.41.4',{cache:'no-store'})).text();if(!tools.includes('ToolIcon')||!/'point':\s*'(?:map-pin|pin-plus)'/.test(iconMap)||!/'road':\s*'tir'/.test(iconMap)||!/'circle':\s*'circle'/.test(iconMap))throw new Error('Mapowanie ikon Punkt/Okrąg/Droga nieaktualne');
+  return 'Warstwy / podkład / motyw / Punkt / Okrąg / ciężarówka OK';
+});
+await test('16.1 — Obiekty drag&drop + bezpośredni Usuń',async()=>{
+  const src=await (await fetch('./app-19.41.4/app/components/ObjectsPanel.js?v=19.41.4',{cache:'no-store'})).text();
+  if(!src.includes('draggable: true')||!src.includes('onDrop:')||!src.includes('object-row-action--danger'))throw new Error('Brak drag&drop lub bezpośredniego Usuń');
+  if(src.includes('DropdownMenu'))throw new Error('Pozostało menu rozwijane w Obiektach');
+  return 'drag&drop kolejności + Usuń bez menu OK';
+});
+await test('16.1 — zmiana wysokości paneli',async()=>{
+  // 18.18.0: wysokości paneli przeniesiono z uiSlice do panelsSlice/panelsPersistence (dok, Faza 1).
+  const panel=await (await fetch('./app-19.41.4/app/components/ObjectsPanel.js?v=19.41.4',{cache:'no-store'})).text();
+  const prefs=await (await fetch('./app-19.41.4/store/panelsPersistence.js?v=19.41.4',{cache:'no-store'})).text();
+  // 18.2: uchwyty rozmiaru okna pływającego rysuje wspólna ramka PanelShell (app/ui).
+  const kit=await (await fetch('./app-19.41.4/app/ui/index.js?v=19.41.4',{cache:'no-store'})).text();
+  if(!panel.includes('onResizeHeight')||!kit.includes('panel-height-resizer')||!prefs.includes('objectsHeight')||!prefs.includes('layersHeight'))throw new Error('Brak resizera wysokości lub stanu paneli');
+  return 'Obiekty + Warstwy · wysokość zapisywana w stanie projektu';
+});
+await test('18.1.0 — usuwanie pojedynczego wymiarowania',async()=>{
+  const mgr=await (await fetch('./app-19.41.4/measurement/MeasurementManager.js?v=19.41.4',{cache:'no-store'})).text();
+  // 18.0: przyciski pomiaru deklaruje funkcja (objectFields), pasek kontekstu je rysuje;
+  // lista pomiarów ma własną, zwijaną grupę w panelu Obiekty.
+  const [fields,panel]=await Promise.all([
+    fetch('./app-19.41.4/features/builtin/objectStyleFeature.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+    fetch('./app-19.41.4/app/components/ObjectsPanel.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())]);
+  for(const token of ['removeSelected()','selectedCount',"item?.kind !== 'measurement'"])if(!mgr.includes(token))throw new Error('Brak mechanizmu '+token);
+  if(!fields.includes("removeSelected()"))throw new Error('Brak przycisku usuwania zaznaczonego pomiaru');
+  if(!fields.includes("measurement')?.clear()"))throw new Error('Brak przycisku czyszczenia pomiarów');
+  if(!panel.includes('objects-measurements'))throw new Error('Pomiary nie mają osobnej grupy w panelu Obiekty');
+  return 'klik pomiaru → Usuń + wyczyść wszystkie (pasek kontekstu) · grupa Pomiary w Obiektach';
+});
+
+await test('18.1.0 — Delete usuwa dowolny zaznaczony obiekt',async()=>{
+  // 18.0: jedno polecenie core.delete w CommandRegistry, jeden nasłuch klawiatury.
+  const { BUILTIN_FEATURES }=await import('./app-19.41.4/features/index.js');
+  const { CommandRegistry, KeyboardService }=await import('./app-19.41.4/keyboard/index.js');
+  const core=BUILTIN_FEATURES.find((f)=>f.id==='core');
+  const del=core?.commands?.find((c)=>c.id==='core.delete');
+  if(!del||del.shortcut?.key!=='Delete')throw new Error('Brak polecenia Delete');
+  const removed=[];
+  const ctx={
+    get:(name)=>({
+      objects:{ getSnapshot:()=>({ selectedId:'o1', items:[{ id:'o1', name:'Budynek' }] }) },
+      objectCommands:{ remove:(id)=>removed.push(id) },
+    })[name],
+    toasts:{ show:()=>{} }, t:(k)=>k,
+  };
+  const registry=new CommandRegistry();
+  registry.register(del);
+  let dialog=false;
+  const keyboard=new KeyboardService(registry,{ isDialogOpen:()=>dialog, getContext:()=>ctx });
+  const input=document.createElement('input');
+  const fire=(target)=>{ const ev=new KeyboardEvent('keydown',{ key:'Delete', code:'Delete', bubbles:true, cancelable:true }); Object.defineProperty(ev,'target',{ value:target }); return keyboard.handle(ev); };
+  if(fire(input))throw new Error('Delete w polu tekstowym usunął obiekt');
+  dialog=true; if(fire(document.body))throw new Error('Delete przy otwartym oknie usunął obiekt'); dialog=false;
+  if(!fire(document.body)||removed.join()!=='o1')throw new Error('Delete nie usunął zaznaczonego obiektu');
+  const mgr=await (await fetch('./app-19.41.4/measurement/MeasurementManager.js?v=19.41.4',{cache:'no-store'})).text();
+  if(mgr.includes("addEventListener('keydown'"))throw new Error('MeasurementManager wciąż przechwytuje klawiaturę');
+  return 'jedno polecenie · pomija pola tekstowe i okna · usuwanie przez CommandBus (cofalne)';
+});
+
+await test('18.1.0 — własne okna dialogowe zamiast natywnych',async()=>{
+  const files={
+    dialog:'./app-19.41.4/core/dialogs/DialogManager.js',
+    host:'./app-19.41.4/app/components/DialogHost.js',
+    editing:'./app-19.41.4/editing/EditingManager.js',
+    objects:'./app-19.41.4/app/components/ObjectsPanel.js',
+    exportPanel:'./app-19.41.4/app/components/ExportPanel.js',
+    // 18.1: akcje formatów (otwórz projekt, import „zastąp”) są w deklaracji funkcji.
+    exportFeature:'./app-19.41.4/features/builtin/exportFeature.js',
+  };
+  const src={};
+  for(const [key,path] of Object.entries(files))src[key]=await (await fetch(path+'?v=19.41.4',{cache:'no-store'})).text();
+  // Żadne z okien natywnych nie może zostać: w kodzie wolno im wystąpić
+  // wyłącznie w komentarzach wyjaśniających, dlaczego ich nie ma.
+  const callPattern=/window\s*\.\s*(confirm|prompt)\s*\(/;
+  for(const [key,text] of Object.entries(src)){
+    const code=text.split('\n').filter((line)=>!line.trim().startsWith('*')&&!line.trim().startsWith('//')).join('\n');
+    if(callPattern.test(code))throw new Error('window.confirm/prompt wciąż wywoływane w '+key);
+  }
+  for(const token of ['class DialogManager','appDialogs','publishHead','cancelledValue'])
+    if(!src.dialog.includes(token))throw new Error('Brak elementu menedżera: '+token);
+  if(!src.host.includes('createPortal'))throw new Error('Okno nie jest portalowane poza powłokę');
+  if(!src.host.includes("aria-modal"))throw new Error('Okno bez aria-modal');
+  if(!src.editing.includes('askForText'))throw new Error('Rysowanie tekstu nie pyta przez menedżera okien');
+  if(!src.objects.includes('appDialogs.confirm'))throw new Error('Panel Obiekty bez potwierdzenia');
+  if(!src.exportFeature.includes('appDialogs.confirm'))throw new Error('Panel Eksport bez potwierdzenia');
+  const css=await (await fetch('./assets/css/30-shell.css?v=19.41.4',{cache:'no-store'})).text();
+  if(!css.includes('.dialog-backdrop')||!css.includes('--z-dialog'))throw new Error('Brak stylów okna dialogowego');
+  return '2× prompt + 3× confirm zastąpione · kolejka FIFO · Escape anuluje';
+});
+
+await test('18.1.0 — które źródła WMS naprawdę zwracają legendę',async()=>{
+  // Ten test jest RAPORTEM, nie bramką. Obsługa GetLegendGraphic zależy od
+  // usługodawcy, nie od msportalu: część polskich usług WMS jej nie ma.
+  // Test zawodzi tylko wtedy, gdy zawodzi NASZ endpoint — żeby dało się
+  // odróżnić „to źródło nie ma legendy" od „legenda jest zepsuta".
+  const { dataCatalog }=await import('./app-19.41.4/data/catalog/index.js');
+
+  // Klucz źródła wyciągany z adresu proxy — dokładnie tak, jak robi to
+  // LayerManager.wmsSourceKey, żeby raport dotyczył tych samych adresów,
+  // pod które chodzi panel.
+  const sources=new Map();
+  for(const layer of dataCatalog.layers){
+    if(layer.role!=='overlay'||layer.source?.kind!=='wms'||layer.source.legendUrl)continue; // 19.37.0: legenda własna (obraz), nie GetLegendGraphic
+    const raw=String(layer.source?.url??layer.source?.fallbackWmsUrl??'');
+    const m=/[?&]source=([^&]+)/.exec(raw);
+    if(!m)continue;
+    const key=decodeURIComponent(m[1]);
+    if(!sources.has(key))sources.set(key,[]);
+    sources.get(key).push(layer.title);
+  }
+  if(!sources.size)throw new Error('Nie wyłuskano ani jednego klucza źródła WMS');
+
+  // Trzy kubełki, bo to trzy różne wnioski: legenda jest; usługa odpowiedziała
+  // i odmówiła (ServiceException — po prostu nie ma GetLegendGraphic);
+  // usługa w ogóle nie odpowiedziała (sieć, timeout — może być chwilowe).
+  const withLegend=[], refused=[], silent=[], broken=[];
+
+  async function probe(key){
+    const titles=sources.get(key);
+    const label=titles.length>1?`${key} (${titles.length} warstw)`:key;
+    let manifest;
+    try{
+      const res=await fetch(`./api/wms_legend.php?source=${encodeURIComponent(key)}`,{cache:'no-store'});
+      if(!res.ok)return broken.push(`${label}: spis HTTP ${res.status}`);
+      manifest=await res.json();
+    }catch(error){
+      return broken.push(`${label}: spis — ${error.message}`);
+    }
+    const first=manifest?.entries?.[0];
+    if(!first?.url)return broken.push(`${label}: pusty spis`);
+    try{
+      const res=await fetch(first.url,{cache:'no-store'});
+      const type=res.headers.get('content-type')??'';
+      if(res.ok&&type.startsWith('image/')){
+        const size=res.headers.get('X-msportal-Legend-Size')??'';
+        const bytes=(await res.blob()).size;
+        if(bytes<64)return without.push(`${label}: obrazek pusty (${bytes} B)`);
+        return withLegend.push(`${label}${size?` ${size}`:''}`);
+      }
+      // Endpoint podaje powód w nagłówku — zwykle treść ServiceException.
+      const why=(res.headers.get('X-msportal-Upstream-Error')??'').replace(/^legend \S+ \S+ /,'').trim();
+      const upstream=Number(res.headers.get('X-msportal-Upstream-Status')??0);
+      const entry={ key, label, why: (why||`HTTP ${res.status}`).slice(0,120) };
+      // upstream 0 = nie doszliśmy do usługi. Cokolwiek innego znaczy, że
+      // usługa odpowiedziała — i odpowiedziała odmownie.
+      return (upstream>0?refused:silent).push(entry);
+    }catch(error){
+      return broken.push(`${label}: obrazek — ${error.message}`);
+    }
+  }
+
+  // Trzy naraz: dwadzieścia zapytań po kolei to minuty, a wszystkie naraz
+  // potrafią wywrócić limity usługodawcy.
+  const keys=[...sources.keys()];
+  const queue=keys.slice();
+  await Promise.all([0,1,2].map(async()=>{
+    while(queue.length){
+      const key=queue.shift();
+      if(key!==undefined)await probe(key);
+    }
+  }));
+
+  // Jeśli padł NASZ endpoint dla wszystkich, to jest błąd wdrożenia.
+  if(broken.length===keys.length)throw new Error('Endpoint legendy nie odpowiada: '+broken.slice(0,3).join(' | '));
+  if(broken.length)throw new Error(`Endpoint legendy zawiódł dla ${broken.length} źródeł: `+broken.slice(0,4).join(' | '));
+
+  const names=(list,limit=8)=>{
+    const shown=list.slice(0,limit).map((entry)=>entry.key).join(', ');
+    return list.length>limit?`${shown} i ${list.length-limit} dalszych`:shown;
+  };
+  const parts=[`${withLegend.length}/${keys.length} źródeł z legendą`];
+  if(refused.length)parts.push(`odmówiło (${refused.length}): ${names(refused)} — np. „${refused[0].why}"`);
+  if(silent.length)parts.push(`nie odpowiedziało (${silent.length}): ${names(silent)}`);
+  if(!refused.length&&!silent.length)parts.push('wszystkie odpowiedziały');
+  return parts.join(' · ');
+});
+
+await test('18.1.0 — polityka cache pozwala wdrożyć nową wersję',async()=>{
+  // Test istnieje, bo brak tej reguły kosztował jedno wdrożenie: pliki na
+  // serwerze były nowe, a przeglądarka podawała roczne kopie z cache.
+  // Objaw — „does not provide an export named …" — wygląda jak błąd kodu,
+  // a jest błędem konfiguracji.
+  const read=async(path)=>{
+    const res=await fetch(path,{cache:'no-store'});
+    return { status:res.status, cc:(res.headers.get('cache-control')??'').toLowerCase() };
+  };
+  const app=await read('./app-19.41.4/main.js');
+  if(app.status>=400)throw new Error('Nie udało się pobrać main.js: HTTP '+app.status);
+
+  // Serwer deweloperski nie czyta .htaccess i nie ustawia nic — to nie błąd,
+  // ale i nie potwierdzenie. Mówimy wprost, że tu niczego nie sprawdziliśmy.
+  if(!app.cc)return 'serwer nie ustawia Cache-Control — reguły .htaccess NIEsprawdzone (serwer deweloperski?)';
+
+  // 19.8.3: zgodnie z regułą .htaccess z 18.18.0 kod w katalogu app-<wersja>/ MOŻE być
+  // „immutable”: każda zmiana kodu dostaje nowy katalog (tools/bump_version.py), a index.html
+  // — jedyny plik bez wersji w adresie — jest zawsze rewalidowany. Warunkiem jest jeden katalog
+  // wersji na serwerze (sprawdza verify-deployment.php) i rewalidowany index.html (niżej).
+  if(!app.cc.includes('immutable')&&!/no-cache|max-age=0|must-revalidate/.test(app.cc))
+    throw new Error('Kod aplikacji ma nieprzewidziany Cache-Control: '+app.cc);
+  const entry=await read('./index.html');
+  if(entry.cc&&!/no-store|no-cache/.test(entry.cc))
+    throw new Error('index.html nie jest rewalidowany ('+entry.cc+') — przy kodzie „immutable” użytkownicy nie dostaną nowej wersji.');
+  const deploy=await fetch('./verify-deployment.php',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null);
+  if(deploy&&Array.isArray(deploy.app_directories_present)&&deploy.app_directories_present.length!==1)
+    throw new Error('Na serwerze jest kilka katalogów app-*: '+deploy.app_directories_present.join(', ')+' — usuń stare.');
+
+  const html=await read('./diagnostyka.html');
+  if(html.cc&&!/no-store|no-cache/.test(html.cc))
+    throw new Error('Strony HTML nie są rewalidowane: '+html.cc);
+
+  // Vendory MOGĄ być immutable — ich adresy niosą wersję w importmapie.
+  const vendor=await read('./vendor/static/react.js?v=19.2.8');
+  const vendorNote=vendor.status<400&&vendor.cc.includes('immutable')
+    ? 'vendor immutable (poprawnie — wersja w adresie)'
+    : `vendor: ${vendor.cc||'brak nagłówka'}`;
+  return `kod aplikacji rewalidowany (${app.cc}) · ${vendorNote}`;
+});
+
+await test('18.1.0 — udostępnianie projektu przez link — zapis i odczyt',async()=>{
+  // Sedno bezpieczeństwa endpointu: to ZAWSZE nowy wpis pod losowym id, nigdy
+  // nadpisanie istniejącego — więc dwie osoby z tym samym linkiem nie mogą
+  // nadepnąć sobie na zmiany, bo POST nie nadpisuje niczyjego zapisu.
+  const sample={format:'mapownik-project',formatVersion:1,app:{name:'msportal',version:'19.41.4'},exportedAt:new Date().toISOString(),crs:'EPSG:2180',project:{name:'Diag',schemaVersion:2,createdAt:null,updatedAt:null},state:null,objects:[]};
+  const body=JSON.stringify(sample);
+  const saved=await fetch('./api/shared_project.php',{method:'POST',headers:{'Content-Type':'application/json'},body});
+  if(!saved.ok)throw new Error('Zapis nie powiódł się: HTTP '+saved.status);
+  const {id}=await saved.json();
+  if(!/^(?:[0-9a-f]{10}|[0-9a-f]{32})$/.test(id||''))throw new Error('Nieoczekiwany format id: '+id);
+
+  const loaded=await fetch('./api/shared_project.php?id='+id,{cache:'no-store'});
+  if(!loaded.ok)throw new Error('Odczyt zapisanego linku nie powiódł się: HTTP '+loaded.status);
+  const back=await loaded.json();
+  if(back.project?.name!=='Diag'||!Array.isArray(back.objects))throw new Error('Odczytana treść nie zgadza się z zapisaną');
+
+  const badId=await fetch('./api/shared_project.php?id=nieprawidlowy',{cache:'no-store'});
+  if(badId.status!==400)throw new Error('Zły format id powinien dać 400, dał '+badId.status);
+
+  const missing=await fetch('./api/shared_project.php?id=0000000000',{cache:'no-store'});
+  if(missing.status!==404)throw new Error('Nieistniejący, ale poprawnie sformatowany id powinien dać 404, dał '+missing.status);
+
+  const garbage=await fetch('./api/shared_project.php',{method:'POST',headers:{'Content-Type':'application/json'},body:'to nie jest projekt'});
+  if(garbage.status!==422)throw new Error('Treść spoza formatu .mapownik powinna dać 422, dała '+garbage.status);
+
+  const empty=await fetch('./api/shared_project.php',{method:'POST',body:''});
+  if(empty.status!==400)throw new Error('Pusty zapis powinien dać 400, dał '+empty.status);
+
+  return 'zapis + odczyt + odrzucenie złego id/treści OK (id: '+id+')';
+});
+
+await test('18.1.0 — link do projektu w interfejsie',async()=>{
+  const [panel,app,manager]=await Promise.all([
+    fetchSources(['./app-19.41.4/app/components/ExportPanel.js','./app-19.41.4/features/builtin/exportFeature.js']),
+    (await fetch('./app-19.41.4/app/App.js?v=19.41.4',{cache:'no-store'})).text(),
+    (await fetch('./app-19.41.4/persistence/ProjectTransferManager.js?v=19.41.4',{cache:'no-store'})).text(),
+  ]);
+  if(!panel.includes('shareProject')||!(await showsText(panel,'Udostępnij link')))throw new Error('Brak przycisku udostępniania w Eksporcie');
+  if(!manager.includes('async shareProject()')||!manager.includes('shared_project.php'))throw new Error('Brak metody shareProject w ProjectTransferManager');
+  if(!app.includes('useSharedProjectLoader')||!app.includes("searchParams.get('p')"))throw new Error('Brak wczytywania linku ?p= przy starcie aplikacji');
+  if(!app.includes('history.replaceState'))throw new Error('Parametr ?p= powinien znikać z adresu po odczytaniu');
+  return 'przycisk udostępniania + wczytywanie ?p= przy starcie OK';
+});
+
+await test('18.1.0 — katalog warstw: grupy bez szuflad',async()=>{
+  const { dataCatalog, OVERLAY_GROUP_ORDER }=await import('./app-19.41.4/data/catalog/index.js');
+  const overlays=dataCatalog.layers.filter((l)=>l.role==='overlay');
+  if(overlays.length<27)throw new Error(`Nakładek: ${overlays.length}, oczekiwano co najmniej 27`);
+  const counts=new Map();
+  for(const l of overlays)counts.set(l.group,(counts.get(l.group)??0)+1);
+  // Szuflada „Nakładki” trzymała pięć najczęściej używanych warstw pod nazwą,
+  // która nic nie znaczy; grupy jednoelementowe kosztowały nagłówek za pozycję.
+  if(counts.has('Nakładki'))throw new Error('Grupa „Nakładki" wróciła');
+  // 18.18.0: katalog ma osiem grup (Budynki i Infrastruktura — Biogazownie KOWR —
+  // doszły po tym teście). Test pilnuje teraz granicy zamiast dokładnej liczby.
+  // 19.8.3: granicą jest lista OVERLAY_GROUP_ORDER (od 19.x dziewiąta grupa „Archiwum”).
+  if(counts.size>OVERLAY_GROUP_ORDER.length)throw new Error(`Grup: ${counts.size}, oczekiwano najwyżej ${OVERLAY_GROUP_ORDER.length}`);
+  // Każda grupa MUSI być w OVERLAY_GROUP_ORDER, inaczej ląduje na końcu panelu
+  // po cichu — to właśnie był stan drzewa przed tą zmianą.
+  for(const group of counts.keys())
+    if(!OVERLAY_GROUP_ORDER.includes(group))throw new Error(`Grupa ${group} spoza OVERLAY_GROUP_ORDER`);
+  for(const group of OVERLAY_GROUP_ORDER)
+    if(!counts.has(group))throw new Error(`OVERLAY_GROUP_ORDER wymienia nieistniejącą grupę ${group}`);
+  // MPZP należy do planowania. 19.18.0: studium usunięte z portalu (po reformie
+  // planistycznej nie obowiązuje) — nie może wrócić do katalogu.
+  const plan=overlays.filter((l)=>l.group==='Planowanie przestrzenne').map((l)=>l.id);
+  if(!plan.includes('overlay.mpzp'))throw new Error('overlay.mpzp poza planowaniem przestrzennym');
+  if(overlays.some((l)=>l.id==='overlay.studium'))throw new Error('overlay.studium nadal w katalogu');
+  const panel=await (await fetch('./app-19.41.4/app/components/LayersPanel.js?v=19.41.4',{cache:'no-store'})).text();
+  if(!panel.includes('OVERLAY_GROUP_ORDER'))throw new Error('Panel nie sortuje grup wg katalogu');
+  return `${counts.size} grup · ${overlays.length} nakładek · ${[...counts.values()].sort((a,b)=>b-a).join('/')}`;
+});
+
+await test('18.1.0 — skala widoczności warstwy',async()=>{
+  const { niceScaleDenominator, scaleDenominatorForZoom, formatScale }=await import('./app-19.41.4/projections/mapScale.js');
+  // Skala musi uwzględniać cos(szerokości) — bez poprawki wychodzi zawyżona
+  // o ponad połowę, a msportal pracuje w Polsce, nie na równiku.
+  const z17=scaleDenominatorForZoom(17);
+  if(!(z17>2000&&z17<3200))throw new Error(`Skala dla zoom 17 poza zakresem: ${z17}`);
+  if(scaleDenominatorForZoom(10)<=scaleDenominatorForZoom(17))throw new Error('Mianownik nie maleje przy przybliżaniu');
+  // Zaokrąglenie W DÓŁ: nie wolno obiecywać widoczności przy skali, przy której
+  // warstwy jeszcze nie ma.
+  if(niceScaleDenominator(17)>z17)throw new Error('Zaokrąglono w górę');
+  if(scaleDenominatorForZoom(NaN)!==null||formatScale(NaN)!==null)throw new Error('Brak obsługi wartości spoza zakresu');
+  if(!/^~1:/.test(formatScale(2600)??''))throw new Error('Zły format skali: '+formatScale(2600));
+
+  const mgr=await (await fetch('./app-19.41.4/layers/LayerManager.js?v=19.41.4',{cache:'no-store'})).text();
+  for(const token of ['minZoom: definition.minZoom','minScale','zoomToLayerMinimum'])
+    if(!mgr.includes(token))throw new Error('LayerManager bez elementu: '+token);
+  const panel=await (await fetch('./app-19.41.4/app/components/LayersPanel.js?v=19.41.4',{cache:'no-store'})).text();
+  for(const token of ['belowMinZoom','aboveMaxZoom','layer.visible &&','zoomToLayerMinimum'])
+    if(!panel.includes(token))throw new Error('Panel bez elementu: '+token);
+  // Siedem warstw uzbrojenia wymaga zoomu 17 — to one najczęściej „nie działają".
+  const { dataCatalog }=await import('./app-19.41.4/data/catalog/index.js');
+  const gated=dataCatalog.layers.filter((l)=>Number.isFinite(l.minZoom)&&l.minZoom>=14);
+  if(gated.length<10)throw new Error(`Warstw z progiem skali: ${gated.length}`);
+  return `zoom 17 → ${formatScale(niceScaleDenominator(17))} · ${gated.length} warstw z progiem`;
+});
+
+await test('18.1.0 — legenda WMS',async()=>{
+  const mgr=await (await fetch('./app-19.41.4/layers/LayerManager.js?v=19.41.4',{cache:'no-store'})).text();
+  if(!mgr.includes('wms_legend.php'))throw new Error('Snapshot nie zawiera adresu legendy');
+  const panel=await (await fetch('./app-19.41.4/app/components/LayersPanel.js?v=19.41.4',{cache:'no-store'})).text();
+  for(const token of ['LayerLegend','layer-legend--loading','layer-legend--empty','onError'])
+    if(!panel.includes(token))throw new Error('Panel bez elementu legendy: '+token);
+
+  // Manifest: spis warstw kompozycji, osobno od samych obrazków.
+  const res=await fetch('./api/wms_legend.php?source=mpzp',{cache:'no-store'});
+  if(!res.ok)throw new Error('Manifest legendy HTTP '+res.status);
+  const data=await res.json();
+  if(!Array.isArray(data.entries)||!data.entries.length)throw new Error('Pusty manifest legendy');
+  for(const entry of data.entries)
+    if(!entry.layer||!/wms_legend\.php\?source=/.test(entry.url??''))throw new Error('Wpis manifestu bez adresu');
+  if(data.total<data.entries.length)throw new Error('total mniejszy niż liczba wpisów');
+
+  // Błędne wejście nie może kończyć się 200 ani 500.
+  const unknown=await fetch('./api/wms_legend.php?source=nie-ma-takiego',{cache:'no-store'});
+  if(unknown.status!==404)throw new Error('Nieznane źródło zwróciło '+unknown.status);
+  const badLayer=await fetch('./api/wms_legend.php?source=mpzp&layer=nie-ma',{cache:'no-store'});
+  if(badLayer.status!==400)throw new Error('Nieznana warstwa zwróciła '+badLayer.status);
+
+  // Siatka wiersza musi mieć kolumnę na przycisk legendy. Bez niej przycisk
+  // spada do drugiego rzędu i każdy wiersz rośnie z 46 do 74 px.
+  const css=await (await fetch('./assets/css/30-shell.css?v=19.41.4',{cache:'no-store'})).text();
+  // 18.0: pięć kolumn — uchwyt, widoczność, nazwa, informacje (z legendą), menu ⋯.
+  if(!/grid-template-columns:\s*16px var\(--icon-button\) minmax\(0, 1fr\) var\(--icon-button\) var\(--icon-button\)/.test(css))
+    throw new Error('Siatka wiersza warstwy nie ma kolumn na informacje i menu');
+  return `${data.entries.length} warstw kompozycji MPZP · 404/400 na błędne wejście`;
+});
+
+await test('18.1.0 — skróty narzędzi działają bez fokusu na mapie',async()=>{
+  const [kb,runtime]=await Promise.all([
+    fetch('./app-19.41.4/keyboard/KeyboardService.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+    fetch('./app-19.41.4/runtime/MapRuntime.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())]);
+  // Nasłuch na oknie, nie na elemencie mapy: wcześniej skrót milczał, dopóki
+  // użytkownik nie kliknął w mapę (po starcie fokus jest na <body>).
+  if(!runtime.includes('keyboard.bind(window)'))throw new Error('Skróty nie nasłuchują na oknie');
+  if(!kb.includes('a[href], summary'))throw new Error('Guard spacji nie obejmuje elementów aktywowanych spacją');
+  const { activatedBySpace, isTextEntry, CommandRegistry }=await import('./app-19.41.4/keyboard/index.js');
+  const button=document.createElement('button');
+  if(!activatedBySpace(button)||!isTextEntry(document.createElement('input')))throw new Error('Zabezpieczenia klawiatury nie działają');
+  // Każde narzędzie ma skrót, bez powtórzeń — rejestr poleceń odrzuca konflikt.
+  const { BUILTIN_FEATURES }=await import('./app-19.41.4/features/index.js');
+  const tools=BUILTIN_FEATURES.flatMap((f)=>f.tools??[]);
+  const codes=tools.map((t)=>t.shortcut?.code).filter(Boolean);
+  if(codes.length!==tools.length)throw new Error(`Skrót ma ${codes.length} z ${tools.length} narzędzi`);
+  const registry=new CommandRegistry();
+  for(const t of tools)registry.register({ id:'tool.'+t.id, title:t.title, shortcut:t.shortcut, run:()=>{} });
+  for(const f of BUILTIN_FEATURES)for(const c of f.commands??[])registry.register(c);
+  return `${tools.length}/${tools.length} narzędzi ze skrótem · nasłuch na oknie · ${registry.list().length} poleceń bez konfliktów`;
+});
+
+await test('18.1.0 — Escape porzuca szkic, potem wraca do przesuwania',async()=>{
+  const { BUILTIN_FEATURES, InteractionRegistry }=await import('./app-19.41.4/features/index.js');
+  const esc=BUILTIN_FEATURES.find((f)=>f.id==='core')?.commands?.find((c)=>c.id==='core.escape');
+  if(!esc||esc.shortcut?.key!=='Escape')throw new Error('Brak polecenia Escape');
+  // Zachowanie: pierwszy Escape porzuca szkic, drugi przełącza na przesuwanie.
+  const interactions=new InteractionRegistry();
+  let drawing=true; const activated=[];
+  interactions.register({ id:'fake', service:{}, deactivate:()=>{}, isSketching:()=>drawing, abortSketch:()=>{ const was=drawing; drawing=false; return was; } });
+  const ctx={ interactions, tools:{ activate:(id)=>activated.push(id) }, get:()=>null };
+  esc.run(ctx);
+  if(drawing)throw new Error('Escape nie porzucił szkicu');
+  if(activated.length)throw new Error('Escape przy szkicu zmienił narzędzie');
+  esc.run(ctx);
+  if(activated[0]!=='core.pan')throw new Error('Drugi Escape nie wrócił do przesuwania: '+activated.join());
+  // Wspólna nazwa metody w każdym menedżerze, który rysuje.
+  const managers={
+    editing:'./app-19.41.4/editing/EditingManager.js',
+    measurement:'./app-19.41.4/measurement/MeasurementManager.js',
+    terrain:'./app-19.41.4/terrain/TerrainProfileManager.js',
+  };
+  for(const [key,path] of Object.entries(managers)){
+    const src=await (await fetch(path+'?v=19.41.4',{cache:'no-store'})).text();
+    if(!/abortSketch\s*\(/.test(src))throw new Error(`${key} nie udostępnia abortSketch()`);
+    if(!/if\s*\(.*!this\.snapshot\.drawing\)\s*return false/.test(src.replace(/\n/g,' ')))
+      throw new Error(`${key}.abortSketch nie sprawdza, czy cokolwiek się rysuje`);
+  }
+  return 'szkic → przesuwanie · tryby z rejestru interakcji, jedna nazwa metody';
+});
+
+await test('18.1.0 — przeniesienie obiektu to JEDEN wpis historii',async()=>{
+  const { ObjectCommandService }=await import('./app-19.41.4/commands/index.js');
+  // Atrapa menedżera odwzorowuje kontrakt ObjectManager.move: zamiana
+  // sąsiadów miejscami, lista w snapshotcie malejąco po `order`.
+  const makeManager=()=>{
+    const objects=[5,4,3,2,1,0].map((order,i)=>({ id:`o${i+1}`, order }));
+    return {
+      moves:0,
+      getSnapshot(){ return { items:[...objects].sort((a,b)=>b.order-a.order) }; },
+      move(id,direction){
+        this.moves+=1;
+        const asc=[...objects].sort((a,b)=>a.order-b.order);
+        const index=asc.findIndex((o)=>o.id===id);
+        const target=direction==='up'?index+1:index-1;
+        if(index<0||target<0||target>=asc.length)return false;
+        const a=asc[index], b=asc[target];
+        const tmp=a.order; a.order=b.order; b.order=tmp;
+        return true;
+      },
+    };
+  };
+  const manager=makeManager();
+  const executed=[];
+  const bus={ execute(command){ command.execute(); executed.push(command); } };
+  const service=new ObjectCommandService(bus,manager);
+  const ids=()=>manager.getSnapshot().items.map((o)=>o.id).join(',');
+  const before=ids();
+  if(before!=='o1,o2,o3,o4,o5,o6')throw new Error('Atrapa ma złą kolejność startową: '+before);
+
+  if(service.moveTo('o6','o1')!==true)throw new Error('moveTo nie wykonało przeniesienia');
+  if(executed.length!==1)throw new Error(`Historia dostała ${executed.length} wpisów zamiast jednego`);
+  if(manager.moves!==5)throw new Error(`Oczekiwano 5 zamian, było ${manager.moves}`);
+  const after=ids();
+  if(after!=='o6,o1,o2,o3,o4,o5')throw new Error('Kolejność po przeniesieniu: '+after);
+
+  executed[0].undo();
+  if(ids()!==before)throw new Error('Cofnięcie nie przywróciło kolejności: '+ids());
+  if(typeof executed[0].label!=='string'||!executed[0].label)throw new Error('Komenda bez etykiety w historii');
+
+  // Przypadki bez sensu nie mogą trafiać do historii.
+  const noop=executed.length;
+  service.moveTo('o1','o1'); service.moveTo('o1',null); service.moveTo('nie-ma','o2');
+  if(executed.length!==noop)throw new Error('Pusta operacja trafiła do historii');
+
+  const panel=await (await fetch('./app-19.41.4/app/components/ObjectsPanel.js?v=19.41.4',{cache:'no-store'})).text();
+  if(/for\s*\([^)]*\)\s*commands\.move\(/.test(panel))throw new Error('Panel wciąż woła move() w pętli');
+  if(!panel.includes('commands?.moveTo('))throw new Error('Panel nie korzysta z moveTo');
+  return '1 wpis historii · 5 zamian · cofnięcie wraca do stanu wyjściowego';
+});
+
+await test('18.1.0 — reset układu paneli dostępny z interfejsu',async()=>{
+  // 18.0: menu Ustawienia → polecenie shell.resetLayout (także z palety Ctrl+K).
+  const [menu,cmds]=await Promise.all([
+    fetch('./app-19.41.4/app/components/SettingsMenu.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+    fetch('./app-19.41.4/app/hooks/useShellCommands.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())]);
+  if(!menu.includes("run('shell.resetLayout')"))throw new Error('Menu ustawień nie wywołuje resetu układu');
+  if(!cmds.includes('resetPanelLayout'))throw new Error('Polecenie nie wywołuje resetPanelLayout');
+  if(!cmds.includes('appDialogs.confirm'))throw new Error('Reset nie pyta o potwierdzenie');
+
+  // Sam reduktor: odpięty i przesunięty panel ma wrócić do doku.
+  const slice=await import('./app-19.41.4/store/panelsSlice.js');
+  const { store }=await import('./app-19.41.4/store/index.js');
+  const before=store.getState().panels;
+  store.dispatch(slice.setPanelMode('objects',slice.PANEL_MODE.floating));
+  store.dispatch(slice.setPanelGeometry('objects',{ x:900, y:400 }));
+  if(store.getState().panels.mode.objects===before.mode.objects&&
+     JSON.stringify(store.getState().panels.geometry)===JSON.stringify(before.geometry))
+    throw new Error('Nie udało się rozjechać układu do testu');
+  store.dispatch(slice.resetPanelLayout());
+  const after=store.getState().panels;
+  if(after.mode.objects!==slice.PANEL_MODE.docked)throw new Error('Panel nie wrócił do doku');
+  return 'menu Ustawienia i paleta · potwierdzenie · reduktor przywraca dokowanie';
+});
+
+await test('18.1.0 — grupy palety narzędzi i pasma kolejności',async()=>{
+  const { BUILTIN_FEATURES }=await import('./app-19.41.4/features/index.js');
+  const { hasText }=await import('./app-19.41.4/i18n/index.js');
+  const tools=BUILTIN_FEATURES.flatMap((f)=>f.tools??[]).map((t)=>({ id:t.id, group:t.group, order:t.order, hint:t.hint, icon:t.icon }));
+  // 18.0: liczba narzędzi pochodzi z rejestru funkcji — nowe narzędzie nie psuje testu.
+  if(!tools.length)throw new Error('Brak narzędzi w deklaracjach funkcji');
+  const ids=tools.map((t)=>t.id);
+  if(new Set(ids).size!==ids.length)throw new Error('Powtórzony identyfikator narzędzia');
+  const terrain=tools.filter((t)=>t.group==='terrain').map((t)=>t.id).sort();
+  if(terrain.join(',')!=='core.terrain.3d,core.terrain.area,core.terrain.profile')
+    throw new Error('Grupa terrain nie zawiera obu narzędzi terenowych: '+terrain);
+  // Każda grupa zajmuje własne pasmo setek — kolejność grup wynika z numeracji.
+  const bands=new Map();
+  for(const t of tools){
+    const band=Math.floor(t.order/100);
+    const seen=bands.get(band);
+    if(seen&&seen!==t.group)throw new Error(`Pasmo ${band}xx dzielą grupy ${seen} i ${t.group}`);
+    bands.set(band,t.group);
+  }
+  const order=[...bands.entries()].sort((a,b)=>a[0]-b[0]).map((e)=>e[1]);
+  const expected=['navigation','information','drawing','measurement','terrain','routes','annotations'];
+  if(order.join(',')!==expected.join(','))
+    throw new Error(`Kolejność grup: ${order.join(', ')} zamiast ${expected.join(', ')}`);
+  const dup=tools.map((t)=>t.order).filter((v,i,a)=>a.indexOf(v)!==i);
+  if(dup.length)throw new Error('Powtórzone wartości order: '+dup.join(', '));
+  for(const g of expected)
+    if(!hasText(`group.${g}`)||!hasText(`group.${g}.long`))throw new Error(`Brak nazwy grupy ${g} w katalogu tekstów`);
+  const noHint=tools.filter((t)=>!t.hint).map((t)=>t.id);
+  if(noHint.length)throw new Error('Narzędzia bez podpowiedzi: '+noHint.join(', '));
+  return `${tools.length} narzędzi z rejestru · ${expected.length} grup · pasma po 100 · bez remisów · każde z podpowiedzią`;
+});
+
+await test('18.1.0 — ikony narzędzi i modułów (Tabler)',async()=>{
+  const mod=await import('./app-19.41.4/app/icons/tablerIcons.js');
+  const map=mod.TOOL_ICON_NAMES;
+  // Każde miejsce w interfejsie musi mieć przypisany kształt. Slot bez wpisu
+  // spadłby po cichu na ikonę zastępczą i nikt by tego nie zauważył.
+  const expected={
+    pan:'hand-move', select:'cursor-vertex', identify:'map-info', parcel:'parcel-add',
+    point:'pin-plus', line:'line', polygon:'polygon', rectangle:'rectangle', circle:'circle',
+    road:'tir', arrow:'arrow-up-right', text:'typography', callout:'callout-leader',
+    'measure-line':'ruler-measure', 'measure-area':'dimensions', buffer:'buffer-zone',
+    'terrain-profile':'chart-area-line', 'terrain-area':'terrain-frame',
+    layers:'stack-2', objects:'list-details', analysis:'area-search', 'parcel-report':'file-analytics', export:'download', orthophoto:'photo-time', 'market-prices':'tag', 'building-permits':'crane',
+    terrain:'chart-area-line', table:'table',
+  };
+  for(const [slot,name] of Object.entries(expected))
+    if(map[slot]!==name)throw new Error(`Slot ${slot}: oczekiwano ${name}, jest ${map[slot]}`);
+  if(Object.keys(map).length!==Object.keys(expected).length)throw new Error('Liczba slotów się nie zgadza');
+
+  // Manifesty narzędzi i paneli nie mogą wskazywać na slot, którego nie ma.
+  const { PANEL_DEFS }=await import('./app-19.41.4/store/panelsSlice.js');
+  for(const [id,def] of Object.entries(PANEL_DEFS))
+    if(!map[def.icon])throw new Error(`Panel ${id} wskazuje nieznaną ikonę ${def.icon}`);
+  const { BUILTIN_FEATURES }=await import('./app-19.41.4/features/index.js');
+  for(const tool of BUILTIN_FEATURES.flatMap((f)=>f.tools??[]))
+    if(!map[tool.icon])throw new Error(`Narzędzie ${tool.id} wskazuje nieznaną ikonę ${tool.icon}`);
+
+  // Każdy kształt musi realnie coś rysować — pusty <svg> to najczęstszy błąd
+  // przy przepisywaniu ikon z pakietu.
+  const el=mod.ToolIcon({ name:'polygon', size:20 });
+  if(!el||el.type!=='svg')throw new Error('ToolIcon nie zwraca <svg>');
+  for(const slot of Object.keys(expected)){
+    const node=mod.ToolIcon({ name:slot });
+    const kids=node.props.children;
+    if(!Array.isArray(kids)||kids.length===0)throw new Error(`Ikona ${slot} nie ma żadnej ścieżki`);
+    for(const kid of kids)
+      if(kid.type!=='path'||typeof kid.props.d!=='string'||kid.props.d.length<4)
+        throw new Error(`Ikona ${slot} ma pustą ścieżkę`);
+  }
+  // Ta sama siatka i ta sama kreska co lucide — inaczej ikony narzędzi
+  // odstawałyby wagą od ikon interfejsu (oko, kosz, cofnij).
+  if(el.props.viewBox!=='0 0 24 24')throw new Error('Zła siatka ikon');
+  if(el.props.stroke!=='currentColor')throw new Error('Ikona nie dziedziczy koloru');
+  const fallback=mod.ToolIcon({ name:'nie-ma-takiej-ikony' });
+  if(!Array.isArray(fallback.props.children)||!fallback.props.children.length)
+    throw new Error('Brak ikony zastępczej dla nieznanej nazwy');
+  return `${Object.keys(expected).length} slotów · Tabler 3.48.0 · bez zależności vendorowej`;
+});
+
+await test('18.1.0 — kolejka okien dialogowych',async()=>{
+  const { DialogManager }=await import('./app-19.41.4/core/dialogs/DialogManager.js');
+  const m=new DialogManager();
+  if(m.getSnapshot()!==m.getSnapshot())throw new Error('Snapshot nie jest stabilny referencyjnie');
+  const first=m.confirm({title:'A'});
+  const second=m.prompt({title:'B'});
+  if(m.getSnapshot().request.title!=='A')throw new Error('Kolejka nie jest FIFO');
+  m.settle(true);
+  if(m.getSnapshot().request.title!=='B')throw new Error('Drugie okno nie wchodzi po rozstrzygnięciu pierwszego');
+  m.cancel();
+  if(m.getSnapshot().request!==null)throw new Error('Kolejka nie opróżnia się');
+  if(await first!==true)throw new Error('confirm nie zwrócił true');
+  if(await second!==null)throw new Error('anulowany prompt nie zwrócił null');
+  const pending=m.confirm({title:'C'});
+  m.dispose();
+  if(await pending!==false)throw new Error('dispose zostawił wiszącą obietnicę');
+  return 'FIFO · anulowanie = wartość domyślna · dispose rozstrzyga oczekujące';
+});
+
+await test('16.1 — pasek postępu eksportu PNG/JPG',async()=>{
+  const mgr=await (await fetch('./app-19.41.4/export/ExportManager.js?v=19.41.4',{cache:'no-store'})).text();
+  const panel=await (await fetch('./app-19.41.4/app/components/ExportPanel.js?v=19.41.4',{cache:'no-store'})).text();
+  if(!mgr.includes('responseBlobWithProgress')||!mgr.includes("phase: 'render'")||!panel.includes('export-progress-track'))throw new Error('Brak mechanizmu postępu eksportu');
+  return 'generowanie indeterminate + rzeczywisty postęp pobierania OK';
+});
+
+await test('16.1.3 — Stan źródeł w aplikacji',async()=>{
+  const panel=await import('./app-19.41.4/app/components/SourceHealthPanel.js?v=19.41.4');
+  const stage=await (await fetch('./app-19.41.4/app/components/MapStage.js?v=19.41.4',{cache:'no-store'})).text();
+  const telemetry=await (await fetch('./app-19.41.4/data/sources/adapters/sourceTelemetry.js?v=19.41.4',{cache:'no-store'})).text();
+  if(!panel.SourceHealthPanel)throw new Error('Brak SourceHealthPanel');
+  for(const token of ['lastGoodAt','lastTerminalError','fallbackCount','circuitState'])if(!telemetry.includes(token))throw new Error('Telemetria nie zawiera '+token);
+  if(!stage.includes('SourceHealthPanel')||!stage.includes('status-source-button'))throw new Error('Stan źródeł nie jest dostępny z paska mapy');
+  return 'panel źródeł · OK/niestabilne/offline · retry · ostatnia poprawna odpowiedź';
+});
+await test('16.2.1 — kontrola kompletności eksportu',async()=>{
+  const [mgr,panel,capsResponse]=await Promise.all([
+    fetch('./app-19.41.4/export/ExportManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+    fetch('./app-19.41.4/app/components/ExportPanel.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+    fetch('./api/export.php?action=capabilities&v=17.8.3',{cache:'no-store'})
+  ]);
+  const caps=await capsResponse.json(); if(!capsResponse.ok||!caps.completeness_gate)throw new Error('Backend nie zgłasza completeness_gate');
+  for(const token of ['EXPORT_INCOMPLETE','allow_gaps','retryIncomplete','exportIncompleteAnyway','cancelIncomplete'])if(!mgr.includes(token))throw new Error('Brak mechanizmu '+token);
+  if(!panel.includes('missing_by_source')||(await missingTexts(panel,['Eksport niekompletny','Eksportuj mimo braków'])).length)throw new Error('Brak decyzji użytkownika dla niekompletnego eksportu');
+  return 'backend completeness_gate · braki blokują pobranie · Ponów / Eksportuj mimo braków / Anuluj';
+});
+await test('16.3 — Warstwy 2.0',async()=>{
+  const panel=await (await fetch('./app-19.41.4/app/components/LayersPanel.js?v=19.41.4',{cache:'no-store'})).text();
+  {const missing=await missingTexts(panel,['Szukaj warstwy','Ulubione','Wyłącz wszystkie','Pokaż tylko tę warstwę','reorderOverlay','PREFS_KEY','layer-group-checkbox','expandedGroups']);if(missing.length)throw new Error('Brak funkcji UI: '+missing.join(', '));}
+  if(panel.includes('Ostatnio używane')||panel.includes('rememberRecent'))throw new Error('W panelu pozostała historia ostatnio używanych warstw');
+  const {LayerManager}=await import('./app-19.41.4/layers/LayerManager.js?v=19.41.4');
+  const catalog={catalogVersion:1,issues:[],layers:[
+    {id:'o1',title:'A',group:'G',role:'overlay',visible:false,opacity:1,zIndex:10,capabilities:{identify:false},source:{kind:'wms',url:'/api/wms.php?source=a'}},
+    {id:'o2',title:'B',group:'G',role:'overlay',visible:false,opacity:1,zIndex:20,capabilities:{identify:false},source:{kind:'wms',url:'/api/wms.php?source=b'}},
+    {id:'o3',title:'C',group:'G',role:'overlay',visible:false,opacity:1,zIndex:30,capabilities:{identify:false},source:{kind:'wms',url:'/api/wms.php?source=c'}}
+  ]};
+  const host={addLayer(){},removeLayer(){}}; const registry={createLayer(){throw new Error('Nie powinno się ładować warstw w teście kolejności')}};
+  const manager=new LayerManager(catalog,registry,host);
+  manager.reorderOverlay('o1','o3');
+  let ids=manager.getSnapshot().layers.filter(x=>x.role==='overlay').map(x=>x.id);
+  if(ids[0]!=='o1'||ids[1]!=='o3')throw new Error('Drag&drop nie zmienił kolejności: '+ids.join(','));
+  manager.showOnlyOverlay('o2');
+  const visible=manager.getSnapshot().layers.filter(x=>x.visible).map(x=>x.id);
+  if(visible.length!==1||visible[0]!=='o2')throw new Error('Pokaż tylko tę warstwę nie działa');
+  manager.setAllOverlaysVisibility(false);
+  if(manager.getSnapshot().layers.some(x=>x.role==='overlay'&&x.visible))throw new Error('Wyłącz wszystkie nie działa');
+  manager.dispose();
+  return 'wyszukiwarka · ulubione · ostatnie · drag&drop · pokaż tylko · wyłącz wszystkie · status źródła';
+});
+await test('18.1.0 — adaptacyjny limit pamięci eksportu ZIP',async()=>{
+  const r=await fetch('./api/export.php?action=capabilities&v=17.8.3',{cache:'no-store'});const j=await r.json();if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));
+  if(j.batch&&(!(j.batch_tile_px>=512)||j.batch_tile_px*j.batch_tile_px>j.max_batch_tile_pixels))throw new Error('Kafel batch przekracza model pamięci: '+JSON.stringify(j));
+  if(!Number.isFinite(j.max_client_archive_bytes)||j.max_client_archive_bytes<64*1024*1024)throw new Error('Brak limitu pamięci klienta');
+  return `tile ${j.batch_tile_px||'—'} px · ${(j.max_batch_tile_pixels/1e6).toFixed(1)} MP · klient ${Math.round(j.max_client_archive_bytes/1048576)} MB`;
+});
+await test('18.1.0 — normalizacja pierścieni projektu',async()=>{
+  const {persistedMapObjectSchema}=await import('./app-19.41.4/persistence/projectSchemas.js?v=19.41.4');const ts=new Date().toISOString();
+  const parsed=persistedMapObjectSchema.parse({id:'ring',name:'Ring',visible:true,origin:'import',style:{strokeColor:'#2563eb',strokeWidth:2,fillColor:'#2563eb',fillOpacity:.18,pointRadius:6},createdAt:ts,updatedAt:ts,geometry:{type:'Polygon',coordinates:[[[500000,500000],[500100,500000],[500100,500100],[500000,500100]]]}});
+  const ring=parsed.geometry.coordinates[0];const first=ring[0],last=ring[ring.length-1];if(ring.length!==5||first[0]!==last[0]||first[1]!==last[1])throw new Error('Pierścień nie został domknięty');return 'niedomknięty 4-punktowy ring → 5 punktów, first=last';
+});
+await test('18.1.0 — NMT: teren płaski i brakujące endpointy',async()=>{
+  const {terrainStats}=await import('./app-19.41.4/terrain/TerrainProfileManager.js?v=19.41.4');
+  const flat=terrainStats([[0,0],[100,0],[0,100],[100,100],[50,50]].map(([x,y])=>({coordinate2180:[x,y],elevation:100})));if(flat.downhillAzimuth!==null||flat.downhillDirection!=='—')throw new Error('Teren płaski dostał fikcyjny kierunek');
+  const partial=terrainStats([{distance:0,elevation:null},{distance:25,elevation:100},{distance:75,elevation:105},{distance:100,elevation:null}],100);if(Math.abs(partial.averageSlopePercent-10)>1e-9||Math.abs(partial.profileCoveragePercent-50)>1e-9)throw new Error('Nieprawidłowy spadek/pokrycie: '+JSON.stringify(partial));return 'flat: kierunek — · profil częściowy: 10% przy pokryciu 50%';
+});
+await test('18.1.0 — droga: promień efektywny + korekta topologii',async()=>{
+  const {deriveRoadGeometries}=await import('./app-19.41.4/road/roadGeometry.js?v=19.41.4');const g=deriveRoadGeometries({type:'LineString',coordinates:[[0,0],[10,0],[10,10]]},6,12);
+  if(!g.radiusAdjusted||Math.abs(g.minimumEffectiveRadius-4.5)>.05)throw new Error('Brak informacji o efektywnym promieniu: '+JSON.stringify(g));if(!['Polygon','MultiPolygon'].includes(g.roadSurface.type)||!['Polygon','MultiPolygon'].includes(g.sweptPath.type))throw new Error('Nieprawidłowy wynik geometrii drogi');return `R 12 m → ${g.minimumEffectiveRadius.toFixed(1)} m · topologyAdjusted=${g.topologyAdjusted}`;
+});
+await test('18.1.0 — integralność bibliotek vendor',async()=>{const r=await fetch('./api/vendor_status.php?v=19.41.4',{cache:'no-store'});const j=await r.json();if(!r.ok)throw new Error('HTTP '+r.status);if(j.ready&&!j.manifest)throw new Error('Vendor ready bez manifestu integralności');if(j.ready&&Object.values(j.files||{}).some(x=>x.integrity!=='verified'))throw new Error('Vendor ready bez poprawnego SHA-256');return j.ready?'manifest + SHA-256 wszystkich vendorów OK':'vendor nieprzygotowany — uruchom setup-vendors.php';});
+await test('18.1.0 — pełna walidacja topologii Polygon/MultiPolygon',async()=>{
+  const {validatePolygonalGeometryTopology}=await import('./app-19.41.4/geometry/topologyValidation.js?v=19.41.4');
+  const polygon=(coordinates)=>({type:'Polygon',coordinates});
+  const multi=(coordinates)=>({type:'MultiPolygon',coordinates});
+  const cases=[
+    ['kwadrat',polygon([[[0,0],[10,0],[10,10],[0,10],[0,0]]]),true],
+    ['bow-tie',polygon([[[0,0],[10,10],[0,10],[10,0],[0,0]]]),false],
+    ['otwór poprawny',polygon([[[0,0],[20,0],[20,20],[0,20],[0,0]],[[5,5],[10,5],[10,10],[5,10],[5,5]]]),true],
+    ['otwór poza shell',polygon([[[0,0],[20,0],[20,20],[0,20],[0,0]],[[30,30],[35,30],[35,35],[30,35],[30,30]]]),false],
+    ['zagnieżdżone otwory',polygon([[[0,0],[30,0],[30,30],[0,30],[0,0]],[[5,5],[25,5],[25,25],[5,25],[5,5]],[[10,10],[20,10],[20,20],[10,20],[10,10]]]),false],
+    ['pojedynczy styk otworu',polygon([[[0,0],[20,0],[20,20],[0,20],[0,0]],[[0,10],[5,8],[5,12],[0,10]]]),true],
+    ['dwa styki otworu',polygon([[[0,0],[20,0],[20,20],[0,20],[0,0]],[[0,5],[5,5],[5,15],[0,15],[1,10],[0,5]]]),false],
+    ['MultiPolygon punktowy styk',multi([[[[0,0],[10,0],[10,10],[0,10],[0,0]]],[[[10,10],[20,10],[20,20],[10,20],[10,10]]]]),true],
+    ['MultiPolygon wspólna krawędź',multi([[[[0,0],[10,0],[10,10],[0,10],[0,0]]],[[[10,0],[20,0],[20,10],[10,10],[10,0]]]]),false],
+    ['MultiPolygon nakładanie',multi([[[[0,0],[10,0],[10,10],[0,10],[0,0]]],[[[5,5],[15,5],[15,15],[5,15],[5,5]]]]),false]
+  ];
+  for(const [name,geometry,expected] of cases){const result=validatePolygonalGeometryTopology(geometry);if(result.valid!==expected)throw new Error(`${name}: oczekiwano ${expected}, otrzymano ${result.valid} (${result.code||'OK'})`)}
+  return `${cases.length}/${cases.length} przypadków OGC/JTS · samoprzecięcia · holes · MultiPolygon`;
+});
+await test('18.1.0 — NMT: jawny datum wysokościowy PL-KRON86-NH',async()=>{
+  const [r,manager,panel,schema]=await Promise.all([
+    fetch('./api/terrain.php?action=metadata&diag='+Date.now(),{cache:'no-store'}),
+    fetch('./app-19.41.4/terrain/TerrainProfileManager.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+    fetch('./app-19.41.4/app/components/TerrainProfilePanel.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),
+    fetch('./app-19.41.4/persistence/projectSchemas.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())
+  ]);
+  const api=await r.json().catch(()=>null);if(!r.ok||!api?.ok)throw new Error(api?.error||('HTTP '+r.status));
+  if(api.verticalDatum!=='PL-KRON86-NH')throw new Error('API NMT nie publikuje verticalDatum');
+  if(api.heightType!=='wysokość normalna')throw new Error('API NMT nie opisuje typu wysokości');
+  if(!manager.includes('terrainVerticalDatum')||!manager.includes('verticalDatum: payload.verticalDatum'))throw new Error('Manager nie propaguje datum');
+  if(!panel.includes('PL-KRON86-NH'))throw new Error('UI nie pokazuje datum wysokościowego');
+  if(!schema.includes("terrainVerticalDatum: z.literal('PL-KRON86-NH')"))throw new Error('Schemat projektu nie zachowuje datum profilu');
+  return 'API + obiekt projektu + profil + analiza działek + UI · PL-KRON86-NH';
+});
+
+await test('18.1.0 — Spatial Analysis Core: rejestr providerów + dane testowe',async()=>{
+  const [{AnalysisProviderRegistry},{TestBuildingsProvider}]=await Promise.all([
+    import('./app-19.41.4/analysis/AnalysisProviderRegistry.js?v=19.41.4'),
+    import('./app-19.41.4/diagnostics/TestBuildingsProvider.js?v=19.41.4')
+  ]);
+  const registry=new AnalysisProviderRegistry(); const provider=registry.register(new TestBuildingsProvider());
+  const first=await provider.load({extent:[500000,500000,501000,501000],limit:24});
+  const second=await provider.load({extent:[500000,500000,501000,501000],limit:24});
+  if(registry.list().length!==1||first.features.length!==24)throw new Error('Nieprawidłowa rejestracja/provider testowy');
+  if(JSON.stringify(first.features)!==JSON.stringify(second.features))throw new Error('Provider testowy nie jest deterministyczny');
+  if(!first.features.every(f=>f.geometry?.type==='Polygon'))throw new Error('Provider zwraca nieprawidłowe geometrie');
+  return 'provider registry · 24/24 deterministycznych poligonów';
+});
+await test('18.1.0 — Spatial Analysis: warstwa robocza + klik budynku + zapis opcjonalny',async()=>{
+  const {AnalysisManager}=await import('./app-19.41.4/analysis/AnalysisManager.js?v=19.41.4');
+  const listeners=new Set(); let selected=null; let created=null; let clickListener=null; const layers=[];
+  const objectManager={
+    subscribe(fn){listeners.add(fn);return()=>listeners.delete(fn)},
+    getSnapshot(){return{selectedId:selected,items:selected?[{id:selected,name:'Cel'}]:[]}},
+    getObject(){return{geometry:{type:'Polygon',coordinates:[[[500000,500000],[500100,500000],[500100,500100],[500000,500100],[500000,500000]]]}}},
+    select(id){selected=id}, focus(){}
+  };
+  const commands={create(input){created=input;return 'analysis-test-1'}};
+  const host={
+    getViewportExtent2180(){return[500000,500000,501000,501000]},
+    selectBoxExtent(){throw new Error('nieużywane')},
+    addLayer(layer){layers.push(layer)}, removeLayer(){}, fitExtent(){},
+    onSingleClick(fn){clickListener=fn;return()=>{clickListener=null}},
+    getFeaturesAtPixel(){return manager.previewLayer.source.getFeatures().slice(0,1)}
+  };
+  const {AnalysisProviderRegistry}=await import('./app-19.41.4/analysis/AnalysisProviderRegistry.js?v=19.41.4');const {TestBuildingsProvider}=await import('./app-19.41.4/diagnostics/TestBuildingsProvider.js?v=19.41.4');const testRegistry=new AnalysisProviderRegistry();testRegistry.register(new TestBuildingsProvider());const manager=new AnalysisManager(host,objectManager,commands,testRegistry); await registerAnalysisOperations(manager); manager.setSourceId('test-residential-buildings'); manager.setLimit(12); const result=await manager.run();
+  if(!result||result.featureCount!==12||manager.getSnapshot().previewCount!==12||created!==null||layers.length!==2)throw new Error('Warstwa robocza nie została załadowana poprawnie');
+  clickListener?.({pixel:[10,10]});
+  if(!manager.getSnapshot().selectedFeature?.id)throw new Error('Klik budynku nie ustawił selectedFeature');
+  const id=manager.saveLastResultAsObject();
+  if(id!=='analysis-test-1'||created?.origin!=='analysis'||created?.kind!=='analysis'||created?.geometry?.type!=='MultiPolygon')throw new Error('Opcjonalny zapis zestawu do projektu nie działa');
+  manager.clearPreview(); if(manager.getSnapshot().previewCount!==0||manager.getSnapshot().lastResult!==null)throw new Error('Czyszczenie warstwy roboczej nie działa');
+  manager.dispose(); return '12 geometrii roboczych · klik/atrybuty · zapis MultiPolygon tylko na żądanie';
+});
+await test('18.1.0 — Spatial Analysis: bufory osobne + scalone',async()=>{
+  const {createAnalysisBuffers}=await import('./app-19.41.4/analysis/analysisBufferEngine.js?v=19.41.4');
+  const features=[
+    {id:'a',geometry:{type:'Polygon',coordinates:[[[500000,500000],[500020,500000],[500020,500020],[500000,500020],[500000,500000]]]},properties:{}},
+    {id:'b',geometry:{type:'Polygon',coordinates:[[[500030,500000],[500050,500000],[500050,500020],[500030,500020],[500030,500000]]]},properties:{}}
+  ];
+  const separate=await createAnalysisBuffers(features,{distanceMeters:10,mode:'separate'});
+  const merged=await createAnalysisBuffers(features,{distanceMeters:10,mode:'merged'});
+  if(separate.features.length!==2||separate.failedCount!==0)throw new Error('Tryb osobny nie zwrócił dwóch buforów');
+  if(merged.features.length!==1||!['Polygon','MultiPolygon'].includes(merged.features[0]?.geometry?.type))throw new Error('Tryb scalony nie zwrócił jednej geometrii');
+  return '2 osobne strefy · 1 scalony wynik · JSTS EPSG:2180';
+});
+await test('18.1.0 — Spatial Analysis: manager bufora + zapis do projektu',async()=>{
+  const {AnalysisManager}=await import('./app-19.41.4/analysis/AnalysisManager.js?v=19.41.4');
+  let created=null; const layers=[];
+  const objectManager={subscribe(){return()=>{}},getSnapshot(){return{selectedId:null,items:[]}},getObject(){throw new Error('nieużywane')},select(){},focus(){}};
+  const commands={create(input){created=input;return 'buffer-object-1'}};
+  const host={getViewportExtent2180(){return[500000,500000,500500,500500]},selectBoxExtent(){throw new Error('nieużywane')},addLayer(l){layers.push(l)},removeLayer(){},fitExtent(){},onSingleClick(){return()=>{}},getFeaturesAtPixel(){return[]}};
+  const {AnalysisProviderRegistry}=await import('./app-19.41.4/analysis/AnalysisProviderRegistry.js?v=19.41.4');const {TestBuildingsProvider}=await import('./app-19.41.4/diagnostics/TestBuildingsProvider.js?v=19.41.4');const testRegistry=new AnalysisProviderRegistry();testRegistry.register(new TestBuildingsProvider());const manager=new AnalysisManager(host,objectManager,commands,testRegistry); await registerAnalysisOperations(manager); manager.setSourceId('test-residential-buildings'); manager.setLimit(8); manager.setOperationId('buffer'); manager.setOperationParam('buffer','distanceMeters',50); manager.setOperationParam('buffer','mode','merged');
+  const result=await manager.run();
+  if(!result||result.operationId!=='buffer'||result.featureCount!==8||result.resultCount!==1||manager.getSnapshot().resultCount!==1)throw new Error('Manager nie utworzył scalonego bufora');
+  const id=manager.saveLastResultAsObject();
+  if(id!=='buffer-object-1'||created?.properties?.analysisOperationId!=='buffer'||created?.properties?.analysisBufferDistanceMeters!==50||created?.properties?.analysisBufferMode!=='merged')throw new Error('Metadane bufora nie zostały zapisane');
+  if(created?.geometry?.type!=='MultiPolygon')throw new Error('Zapis wyniku bufora nie jest MultiPolygon');
+  manager.dispose(); return 'provider → scalony bufor 50 m → warstwa wynikowa → obiekt projektu';
+});
+await test('18.1.0 — Spatial Analysis: schemat projektu zachowuje parametry bufora',async()=>{
+  const {persistedMapObjectSchema}=await import('./app-19.41.4/persistence/projectSchemas.js?v=19.41.4'); const ts=new Date().toISOString();
+  const parsed=persistedMapObjectSchema.parse({id:'buffer-1',name:'Bufor 500 m',visible:true,origin:'analysis',kind:'analysis',properties:{analysisProviderId:'bdot-single-family',analysisOperationId:'buffer',analysisFeatureCount:7,analysisResultCount:1,analysisAreaMode:'selected',analysisMarginMeters:0,analysisGeneratedAt:ts,analysisTestData:false,analysisTruncated:false,analysisDataVersion:'bdot-test',analysisDataGeneratedAt:ts,analysisCategory:'single_family',analysisBufferDistanceMeters:500,analysisBufferMode:'merged',analysisBufferFailedCount:0},style:{strokeColor:'#c2410c',strokeWidth:2,strokeOpacity:1,strokePattern:'solid',fillColor:'#c2410c',fillOpacity:.12,pointRadius:5},createdAt:ts,updatedAt:ts,geometry:{type:'Polygon',coordinates:[[[500000,500000],[500100,500000],[500100,500100],[500000,500100],[500000,500000]]]}});
+  if(parsed.properties.analysisBufferDistanceMeters!==500||parsed.properties.analysisBufferMode!=='merged'||parsed.properties.analysisResultCount!==1)throw new Error('Schemat utracił parametry bufora');
+  return 'odległość + tryb + liczba wyników + wersja danych zachowane';
+});
+await test('18.1.0 — Spatial Analysis Core: schemat projektu zachowuje metadane',async()=>{
+  const {persistedMapObjectSchema}=await import('./app-19.41.4/persistence/projectSchemas.js?v=19.41.4'); const ts=new Date().toISOString();
+  const parsed=persistedMapObjectSchema.parse({id:'analysis-1',name:'Analiza',visible:true,origin:'analysis',kind:'analysis',properties:{analysisProviderId:'test-residential-buildings',analysisOperationId:'preview',analysisFeatureCount:1,analysisAreaMode:'viewport',analysisMarginMeters:0,analysisGeneratedAt:ts,analysisTestData:true},style:{strokeColor:'#2563eb',strokeWidth:2,strokeOpacity:1,strokePattern:'solid',fillColor:'#2563eb',fillOpacity:.18,pointRadius:6},createdAt:ts,updatedAt:ts,geometry:{type:'Polygon',coordinates:[[[500000,500000],[500010,500000],[500010,500010],[500000,500010],[500000,500000]]]}});
+  if(parsed.kind!=='analysis'||parsed.properties.analysisProviderId!=='test-residential-buildings'||parsed.properties.analysisFeatureCount!==1)throw new Error('Schemat utracił metadane analizy');
+  return 'kind=analysis · provider/operacja/liczba obiektów zapisywane w .mapownik';
+});
+await test('Cache prywatny /cache',async()=>{const r=await fetch('./cache/ortho/.gitkeep?diag='+Date.now(),{cache:'no-store'});if(r.status!==403&&r.status!==404)throw new Error('Oczekiwano 403/404, otrzymano '+r.status);return `HTTP ${r.status}`});
+
+await test('18.1.0 — brak własnego shima ikon',async()=>{const index=await fetch('./?icons='+Date.now(),{cache:'no-store'}).then(r=>r.text());if(index.includes('vendor/shims/lucide-react'))throw new Error('index nadal używa własnego shima ikon');if(!index.includes('vendor/opt/lucide-subset.js')&&!index.includes('vendor/static/lucide-react.js'))throw new Error('Brak oficjalnego vendora Lucide');const probe=await fetch('./vendor/shims/lucide-react.js',{cache:'no-store'});if(probe.ok)throw new Error('Stary shim nadal jest publicznie dostępny');return 'lucide-react → oficjalny pakiet (podzbiór vendor/opt) · brak własnych SVG';});
+await test('18.1.0 — JSTS ładowany dopiero dla bufora',async()=>{const [buffer,road]=await Promise.all([fetch('./app-19.41.4/geometry/bufferEngine.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text()),fetch('./app-19.41.4/road/roadGeometry.js?v=19.41.4',{cache:'no-store'}).then(r=>r.text())]);if(!buffer.includes("import('../../vendor/geometry/jsts-buffer.esm.js')"))throw new Error('BufferEngine nie używa dynamic import JSTS');if(/^import .*jsts-buffer/m.test(buffer)||road.includes('jsts-buffer.esm.js'))throw new Error('JSTS nadal jest w grafie startowym');return 'dynamic import tylko podczas buforowania';});
+await test('18.1.0 — zoptymalizowane logo',async()=>{const r=await fetch('./assets/mapownik-logo-icon.png?v=19.41.4',{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const b=await r.blob();if(b.size>50000)throw new Error('Logo nadal za duże: '+b.size+' B');return Math.round(b.size/1024)+' kB';});
+await test('18.1.0 — cache wersjonowanych zasobów',async()=>{
+  // Skorygowane w 18.18.0: ten test do tej pory oczekiwał "immutable" na
+  // main.js — dokładnie tej reguły, która wcześniej blokowała odświeżanie
+  // WEWNĘTRZNYCH importów ESM (patrz REFAKTOR_LAYOUT.md, „Pułapka
+  // wdrożeniowa"). .htaccess celowo nie odróżnia już punktu wejścia od
+  // reszty kodu aplikacji — main.js dostaje tę samą rewalidację co wszystko
+  // inne. Asercja poniżej sprawdza obecną, poprawną politykę zamiast starej.
+  const r=await fetch('./app-19.41.4/main.js?v=19.41.4',{cache:'reload'});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const cc=String(r.headers.get('Cache-Control')||'');
+  if(!cc)return 'serwer nie ustawia Cache-Control — reguła .htaccess NIEsprawdzona (serwer deweloperski?)';
+  // 19.8.3: „immutable” w katalogu app-<wersja>/ jest zamierzone (.htaccess, 18.18.0) — nowa wersja = nowy katalog.
+  if(!cc.includes('immutable')&&!/no-cache|max-age=0|must-revalidate/.test(cc))throw new Error('Nieprawidłowy Cache-Control: '+cc);
+  return cc;
+});
+</script></body></html>

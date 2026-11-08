@@ -1,0 +1,61 @@
+/* msportal 19.3.1 — panel „Działka i otoczenie” (analiza działki, BDOT10k) na tokenach motywu (jasny i ciemny).
+   19.3.0 stylował klasę .vps-field, a komponent używa .vps-input — pola miały wygląd
+   domyślny przeglądarki; kolory pochodziły z nieistniejących zmiennych, więc w ciemnym
+   motywie kafelki były białe z białym tekstem. */
+@layer utilities {
+.m-basemap-health{position:absolute;bottom:calc(var(--m-nav-h,64px) + env(safe-area-inset-bottom,0px) + 8px);left:8px;right:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:7px 10px;border:1px solid var(--border);border-radius:10px;background:var(--surface-solid);color:var(--text);font-size:12px;pointer-events:auto}
+.m-basemap-health span{flex:1 1 160px}.m-basemap-health button{min-height:44px;border:1px solid var(--border);border-radius:6px;padding:5px 10px;background:var(--surface-raised);color:var(--text)}
+
+.vps-task-inputs{display:flex;flex-direction:column;gap:8px;min-width:0}
+.vps-source-list>summary{cursor:pointer;font-weight:600;padding:5px 0}
+.app-shell.is-mobile .vps-data-panel select,.app-shell.is-mobile .vps-data-panel input,.app-shell.is-mobile .vps-data-panel button{min-height:44px}
+.app-shell.is-mobile .vps-data-panel input[type=checkbox]{min-height:24px}
+
+.vps-data-panel .vps-body{padding:8px 10px 12px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0;box-sizing:border-box;font-size:var(--fs-md);color:var(--text)}
+.vps-data-panel .vps-connection{display:flex;align-items:center;gap:6px;font-size:var(--fs-sm);color:var(--text-muted)}
+.vps-data-panel .vps-indicator{flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--warning)}
+.vps-data-panel .vps-indicator.ok{background:var(--success)}
+.vps-data-panel .vps-input{display:grid;grid-template-columns:minmax(0,1fr);gap:3px;min-width:0;margin:0}
+.vps-data-panel .vps-input>span{font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--text-muted);line-height:var(--lh-tight);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vps-data-panel .vps-input select,
+.vps-data-panel .vps-input input{box-sizing:border-box;width:100%;min-width:0;height:var(--control-h);padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface-solid);color:var(--text);font:inherit;font-size:var(--fs-md)}
+.vps-data-panel .vps-input select{padding-right:22px;cursor:pointer}
+.vps-data-panel .vps-input select:hover,.vps-data-panel .vps-input input:hover{border-color:var(--border-strong)}
+.vps-data-panel .vps-input select:focus-visible,.vps-data-panel .vps-input input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.vps-data-panel .vps-input input::placeholder{color:var(--text-faint)}
+.vps-data-panel .vps-form-group{display:grid;gap:8px;margin:0;min-width:0}
+.vps-data-panel .vps-2col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0}
+.vps-data-panel .vps-hint{margin:0;color:var(--text-muted);font-size:var(--fs-xs);line-height:var(--lh-normal)}
+.vps-data-panel .vps-metric{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--border-soft);border-radius:var(--radius-sm);background:var(--surface-raised);font-size:var(--fs-sm);color:var(--text-muted)}
+.vps-data-panel .vps-metric strong{color:var(--text);font-size:var(--fs-lg);font-variant-numeric:tabular-nums}
+.vps-data-panel .vps-results{border-top:1px solid var(--border-soft);padding-top:8px;display:flex;flex-direction:column;gap:7px}
+.vps-data-panel .vps-section-head{display:flex;justify-content:space-between;gap:10px;font-size:var(--fs-md)}
+.vps-data-panel .vps-stats{display:flex;flex-direction:column;gap:5px;padding:7px 8px;border:1px solid var(--border-soft);border-radius:var(--radius-sm);background:var(--surface-raised);font-size:var(--fs-sm)}
+.vps-data-panel .vps-stat{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+.vps-data-panel .vps-stat>span{color:var(--text-muted)}
+.vps-data-panel .vps-stat>strong{color:var(--text);text-align:right;font-variant-numeric:tabular-nums}
+.vps-data-panel .vps-annual{display:grid;gap:3px;border-top:1px solid var(--border-soft);padding-top:6px}
+.vps-data-panel .vps-year{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:6px;font-size:var(--fs-sm)}
+.vps-data-panel .vps-year strong{text-align:right;font-variant-numeric:tabular-nums}
+.vps-data-panel .vps-year small{color:var(--text-faint)}
+.vps-data-panel .vps-toggle{display:flex;gap:6px;align-items:center;font-size:var(--fs-sm);color:var(--text)}
+.vps-data-panel .vps-toggle input{width:var(--checkbox);height:var(--checkbox);margin:0;accent-color:var(--accent)}
+.vps-data-panel .vps-items{display:flex;flex-direction:column;max-height:220px;overflow-y:auto;gap:0}
+.vps-data-panel .vps-record{display:flex;justify-content:space-between;flex-wrap:wrap;gap:2px 8px;border-bottom:1px solid var(--border-soft);padding:5px 0;font-size:var(--fs-sm)}
+.vps-data-panel .vps-record span{color:var(--text-muted);font-variant-numeric:tabular-nums}
+.vps-data-panel .vps-source-list{display:flex;flex-direction:column;gap:5px;border-top:1px solid var(--border-soft);padding-top:8px;font-size:var(--fs-sm);word-break:break-word;min-width:0}
+.vps-data-panel .vps-source-list>strong{font-size:var(--fs-sm)}
+.vps-data-panel .vps-sync-item{display:flex;flex-direction:column;gap:1px;border-bottom:1px solid var(--border-soft);padding:4px 0}
+.vps-data-panel .vps-sync-item small,.vps-data-panel .vps-source-list small{font-size:var(--fs-xs);color:var(--text-muted)}
+.vps-data-panel .vps-area-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.vps-data-panel .vps-area-row button{height:var(--control-h-sm);padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface-solid);color:var(--text);font:inherit;font-size:var(--fs-sm);cursor:pointer}
+.vps-data-panel .vps-area-row button:disabled{opacity:.5;cursor:default}
+.vps-data-panel .vps-manager{display:grid;gap:8px;margin-top:6px}
+.vps-data-panel .vps-parcel-report{display:flex;flex-direction:column;gap:8px;min-width:0;padding:6px 0}
+.vps-data-panel .vps-parcel-category{display:flex;flex-direction:column;gap:3px;min-width:0;border-top:1px solid var(--border-soft);padding:6px 0}
+.vps-data-panel .vps-parcel-category>strong{font-size:var(--fs-sm)}
+}
+/* 19.8.3: strefy POG z Rejestru Urbanistycznego w raporcie działki */
+.vps-data-panel .vps-parcel-match>span{font-weight:600}
+.vps-data-panel .vps-link{font-size:var(--fs-xs);color:var(--accent,#0b63c5);text-decoration:none;width:max-content}
+.vps-data-panel .vps-link:hover{text-decoration:underline}

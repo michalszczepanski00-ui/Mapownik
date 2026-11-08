@@ -1,0 +1,20 @@
+# Biblioteki zewnętrzne: tutaj „immutable" jest prawdą.
+#
+# Adresy vendorów niosą wersję w importmapie (`react.js?v=19.2.8`,
+# `lucide-react.js?v=vendor-react19.2.8-…`), a ten ciąg zmienia się razem
+# z biblioteką. Inaczej niż kod aplikacji, którego importy wewnętrzne
+# nie mają żadnego parametru — dlatego katalog główny wymusza rewalidację,
+# a ten jej nie potrzebuje.
+#
+# WYJĄTEK: nakładki modułów OpenLayers (`ol/…`) mapuje importmapa jednym
+# prefiksem katalogu, bez ?v=. Wersją jest więc NAZWA KATALOGU
+# (vendor/ol-esm-2/). Zmiana istniejącego pliku nakładki = nowy katalog
+# (ol-esm-3/…) i nowa importmapa w index.html i diagnostyka.html.
+# 19.30.0 zmieniło vendor/ol-esm/proj.js w miejscu — przeglądarki trzymały
+# stary plik i mapa nie startowała („does not provide an export named
+# 'equivalent'”). Pilnuje tego tools/check_release.py (tools/vendor-lock.json).
+<IfModule mod_headers.c>
+  <FilesMatch "\.(css|js|mjs)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>

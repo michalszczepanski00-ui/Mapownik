@@ -1,0 +1,239 @@
+/* msportal: natywne czcionki systemowe, bez pobierania fontów. */
+@layer tokens {
+:root {
+  font-family: "Segoe UI", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  color-scheme: light dark;
+  --surface-solid: #ffffff;
+  --surface-raised: #f8f9fb;
+  --surface-hover: #eef2f7;
+  --border: #d5dae2;
+  --border-strong: #c1c8d3;
+  --control-border: #7b8798;
+  --text: #141b26;
+  --text-muted: #556274;
+  --text-faint: #5f6b7c;
+  --accent: #1d4ed8; /* 18.0: blue-700 — tekst akcentu na --accent-soft ≥ 5:1 (był 4,3:1) */
+  --accent-soft: #e2ebff;
+  --shadow: 0 8px 28px rgba(27, 39, 58, .12);
+  --shadow-soft: 0 3px 14px rgba(27, 39, 58, .09);
+  --success: #166534; /* 18.0: green-800 — „Podkład OK” na półprzezroczystym pasku stanu */
+  --warning: #92400e; /* 18.0: amber-800 — ostrzeżenia na tle ostrzeżenia ≥ 4,5:1 */
+  --danger: #b91c1c;
+  --info: #1d4ed8;
+  --on-accent: #ffffff;
+  --danger-solid: #dc2626;
+  --on-danger: #ffffff;
+  --backdrop: rgba(17, 24, 35, .42);
+  --chart-line: #059669;
+}
+:root[data-theme="dark"] {
+  --surface-solid: #1f252e;
+  --surface-raised: #252c36;
+  --surface-hover: #2d3540;
+  --border: #343d49;
+  --border-strong: #465160;
+  --control-border: #748399;
+  --text: #f3f6fb;
+  --text-muted: #c1cad6;
+  --text-faint: #9aa6b5;
+  --accent: #93c5fd;
+  --accent-soft: #253b5e;
+  --shadow: 0 12px 36px rgba(0, 0, 0, .30);
+  --shadow-soft: 0 4px 18px rgba(0, 0, 0, .26);
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --info: #7cb2ff;
+  --on-accent: #0b1220;
+  --danger-solid: #dc2626;
+  --on-danger: #ffffff;
+  --backdrop: rgba(0, 0, 0, .58);
+  --chart-line: #34d399;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; width: 100%; min-width: 320px; height: 100%; min-height: 100%; }
+body { min-height: 100vh; overflow: hidden; }
+button, input, select { font: inherit; }
+button { -webkit-tap-highlight-color: transparent; }
+
+.app-shell {
+  --bg: #f2f4f8;
+  --surface: rgba(255,255,255,.92);
+  --surface-solid: #ffffff;
+  --surface-raised: #f8f9fb;
+  --surface-hover: #eef2f7;
+  --surface-active: #e5eefc;
+  --map-bg: #e7ebef;
+  --map-grid: rgba(81, 97, 116, .08);
+  --border: #d5dae2;
+  --border-strong: #c1c8d3;
+  --control-border: #7b8798;
+  --text: #141b26;
+  --text-muted: #556274;
+  --text-faint: #5f6b7c;
+  --accent: #1d4ed8; /* 18.0: blue-700 — tekst akcentu na --accent-soft ≥ 5:1 (był 4,3:1) */
+  --accent-soft: #e2ebff;
+  --shadow: 0 8px 28px rgba(27, 39, 58, .12);
+  --shadow-soft: 0 3px 14px rgba(27, 39, 58, .09);
+  --radius: 10px;
+  --topbar-height: 54px;
+  --success: #166534; /* 18.0: green-800 — „Podkład OK” na półprzezroczystym pasku stanu */
+  --warning: #92400e; /* 18.0: amber-800 — ostrzeżenia na tle ostrzeżenia ≥ 4,5:1 */
+  --danger: #b91c1c;
+  --info: #1d4ed8;
+  --on-accent: #ffffff;
+  --danger-solid: #dc2626;
+  --on-danger: #ffffff;
+  --backdrop: rgba(17, 24, 35, .42);
+  --chart-line: #059669;
+
+  height: 100dvh;
+  min-height: 460px;
+  color: var(--text);
+  background: var(--bg);
+  display: grid;
+  grid-template-rows: var(--topbar-height) minmax(0, 1fr);
+  isolation: isolate;
+}
+
+.app-shell[data-theme="dark"] {
+  --bg: #12161c;
+  --surface: rgba(31, 37, 46, .94);
+  --surface-solid: #1f252e;
+  --surface-raised: #252c36;
+  --surface-hover: #2d3540;
+  --surface-active: #263a59;
+  --map-bg: #171c22;
+  --map-grid: rgba(194, 207, 224, .055);
+  --border: #343d49;
+  --border-strong: #465160;
+  --control-border: #748399;
+  --text: #f3f6fb;
+  --text-muted: #c1cad6;
+  --text-faint: #9aa6b5;
+  --accent: #93c5fd;
+  --accent-soft: #253b5e;
+  --shadow: 0 12px 36px rgba(0, 0, 0, .30);
+  --shadow-soft: 0 4px 18px rgba(0, 0, 0, .26);
+  --success: #4ade80;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --info: #7cb2ff;
+  --on-accent: #0b1220;
+  --danger-solid: #dc2626;
+  --on-danger: #ffffff;
+  --backdrop: rgba(0, 0, 0, .58);
+  --chart-line: #34d399;
+}
+
+:root,
+.app-shell {
+  --panel-radius: 10px;
+  --control-radius: 7px;
+  /* 18.18.1 — wspólne wartości z audytu układu */
+  --radius-control: 6px;       /* jeden promień przycisków i pól (było 4/5/6/7 px) */
+  --control-border-soft: color-mix(in srgb, var(--control-border) 48%, var(--border));
+  --dock-top: 10px;            /* górny margines prawego doku = paleta narzędzi */
+  --focus-ring: 0 0 0 2px color-mix(in srgb, var(--accent) 42%, transparent);
+
+  /* 18.0 — skala tekstu. Pięć rozmiarów zamiast dziewiętnastu; minimum 11 px.
+     Rola decyduje o rozmiarze, nie miejsce w kodzie:
+       xs  znaczniki, liczniki, jednostki     sm  etykiety pól, podtytuły, pasek stanu
+       md  treść: nazwy warstw i obiektów,     lg  zakładki, tytuły paneli
+           pola, przyciski                     xl  tytuł okna dialogowego */
+  --fs-xs: 12px; /* 19.0.0: było 11px — połowa napisów interfejsu miała 11px */
+  --fs-sm: 12px;
+  --fs-md: 13px;
+  --fs-lg: 14px;
+  --fs-xl: 16px;
+  --fs-2xl: 18px;
+  --lh-tight: 1.25;
+  --lh-normal: 1.4;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  /* 18.0 — rozmiary kontrolek i odstępy. Cel kliknięcia co najmniej 24 px
+     (WCAG 2.2, 2.5.8); wiersze list 32 px. */
+  --control-h: 28px;
+  --control-h-sm: 24px;
+  --row-h: 32px;
+  --icon-button: 28px;
+  --checkbox: 16px;
+  --statusbar-height: 26px;
+  --context-bar-height: 40px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-pill: 999px;
+
+  /* 18.0 — kolory miniatur podkładów (tło zastępcze, gdy obrazek nie przyjdzie).
+     To ilustracje mapy, nie kolory interfejsu, więc nie zmieniają się z motywem. */
+  --thumb-osm: linear-gradient(135deg, #ebe7df 0 44%, #ffffff 44% 51%, #dfe8d2 51%);
+  --thumb-topo: repeating-linear-gradient(160deg, #efe9d6 0 7px, #d9c9a3 7px 8px);
+  --thumb-ortho: radial-gradient(circle at 30% 40%, #6d7f4e 0 18%, transparent 19%), radial-gradient(circle at 72% 66%, #8a8a6a 0 22%, transparent 23%), #5e6f45;
+  --thumb-base: #e8e4db;
+  --thumb-overlay: rgba(10, 16, 24, .38);
+  --thumb-overlay-text: #ffffff;
+  --thumb-overlay-error: rgba(80, 20, 20, .42);
+  --thumb-overlay-error-text: #ffd2d2;
+  /* Legendy WMS mają ciemny tekst na przezroczystym tle — zawsze białe podłoże. */
+  --legend-bg: #ffffff;
+  /* Skala hipsometryczna profilu terenu (ilustracja danych, nie kolor UI). */
+  --terrain-slope-0: #fff7bc;
+  --terrain-slope-1: #fec44f;
+  --terrain-slope-2: #fe9929;
+  --terrain-slope-3: #ec7014;
+  --terrain-slope-4: #cc4c02;
+  --hypsometry: linear-gradient(90deg, #f7fcf0, #e0f3db, #a8ddb5, #43a2ca, #084081);
+  --thumb-nmt: linear-gradient(120deg, #d7d7d7, #8c8c8c 40%, #e8e8e8 60%, #9a9a9a);
+
+  /* 17.8.13 — nazwy używane przez starsze pliki CSS, a nigdy niezdefiniowane.
+     Ich wartości zastępcze były jasne, więc w ciemnym motywie menu
+     kontekstowe i odpięty panel Analiz miały jasne tło pod jasnym tekstem.
+     Teraz to aliasy właściwych tokenów. */
+  --panel-bg: var(--surface-solid);
+  --panel-border: var(--border);
+  --border-soft: var(--border);
+  --hover-bg: var(--surface-hover);
+  --muted-text: var(--text-muted);
+  --shadow-panel: var(--shadow);
+
+  /* Pasma stosu kontekstowego: mapa < narzędzia < panele < pasek górny <
+     menu < podpowiedzi. Nowy panel wybiera PASMO, a nie kolejną liczbę —
+     wcześniej każdy panel miał wpisaną na sztywno wartość 41…44 i dołożenie
+     piątego wymagało ręcznego przeliczenia sąsiadów.
+     Wartości liczbowe są celowo identyczne jak przed refaktorem; spłaszczenie
+     pasm paneli do jednego następuje razem z dokiem (Faza 1). */
+  --z-map-statusbar: 10;
+  --z-map-controls: 22;
+  /* 18.10: część mapy przykryta panelem; nadpisuje je RightPanelDock na .workspace. */
+  --dock-inset-right: 0px;
+  --dock-inset-bottom: 0px;
+  --map-bottom-gap: 0px;
+  --sketch-top: 96px;
+  --m-nav-h: 64px;
+  --m-peek-h: 192px;
+  --m-sheet-h: 156px; /* 18.14.3: bieżąca wysokość arkusza — MobileSheet nadpisuje ją na .m-shell */
+  --z-tools: 30;
+  --z-dock-handle: 60;  /* uchwyt szerokości doku — nad treścią panelu */
+  --z-dock: 41;         /* panel dokowany (Warstwy) */
+  --z-dock-raised: 42;  /* panel dokowany na wierzchu (Obiekty) */
+  --z-dock-overlay: 43; /* nakładka kontekstowa (Identify) */
+  --z-dock-top: 44;     /* nakładka pierwszoplanowa (Eksport) */
+  --z-appbar: 80;
+  --z-search-dropdown: 120;
+  --z-menu: 140;
+  --z-tooltip: 150;
+  --z-toast: 130;
+  --z-dialog: 200;      /* okno modalne — nad wszystkim, łącznie z podpowiedziami */
+}
+}

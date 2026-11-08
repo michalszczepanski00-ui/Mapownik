@@ -1,0 +1,406 @@
+/* Wspólny szkielet paneli: dok, nagłówki, dropdown, tooltip, obiekty
+   Wydzielone z dawnego 20-legacy.css (17.8.3, 2577 linii) — podział wyłącznie
+   mechaniczny, żadna reguła nie zmieniła treści. Kolejność reguł w tym pliku
+   jest zachowana z oryginału; tam gdzie ten sam selektor pojawiał się w
+   pliku dwukrotnie (np. późniejsza poprawka odstępów), obie deklaracje
+   trafiły do TEGO SAMEGO pliku w tej samej kolejności — kaskada więc działa
+   identycznie jak wcześniej. Ten plik nadal deklaruje warstwę „legacy"
+   (patrz 00-layers.css) — kolejność linków w index.html decyduje o
+   kolejności w warstwie, nie nazwa pliku.
+*/
+@layer legacy {
+.objects-panel {
+  position: absolute;
+  z-index: 25;
+  top: 10px;
+  right: 10px;
+  bottom: 38px;
+  min-width: 248px;
+  max-width: min(460px, 45vw);
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: visible;
+  background: var(--surface-solid);
+  box-shadow: var(--shadow);
+}
+.panel-resizer {
+  position: absolute;
+  z-index: 4;
+  left: -6px;
+  top: 12px;
+  bottom: 12px;
+  width: 12px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.panel-resizer::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 35%;
+  width: 2px;
+  height: 30%;
+  border-radius: 2px;
+  background: transparent;
+  transition: background-color 120ms ease;
+}
+.panel-resizer:hover::after { background: var(--accent); }
+.panel-header {
+  min-height: 49px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px 7px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-title { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.panel-title > svg { color: var(--accent); flex: 0 0 auto; }
+.panel-title div { display: grid; min-width: 0; }
+.panel-title strong { font-size: var(--fs-lg); }
+.panel-title span { margin-top: 2px; font-size: var(--fs-md); color: var(--text-muted); }
+.panel-actions { display: flex; align-items: center; gap: 1px; }
+.panel-actions .icon-button { width: 30px; height: 30px; flex-basis: 30px; }
+.object-check { width: 14px; height: 14px; margin: 0; accent-color: var(--accent); }
+.objects-bulk-actions { display: flex; align-items: center; gap: 1px; }
+.panel-footer {
+  min-height: 31px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text-faint);
+  font-size: var(--fs-sm);
+}
+
+.dropdown-content {
+  min-width: 210px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-solid);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  z-index: 100;
+  animation: menu-in 100ms ease-out;
+}
+.dropdown-label { padding: 6px 8px 5px; color: var(--text-muted); font-size: var(--fs-md); text-transform: uppercase; letter-spacing: .055em; }
+.dropdown-item {
+  min-height: 31px;
+  padding: 6px 8px;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  font-size: var(--fs-lg);
+  outline: none;
+  user-select: none;
+}
+.dropdown-item[data-highlighted] { background: var(--surface-hover); }
+.dropdown-item[data-disabled] { opacity: .45; }
+.dropdown-separator { height: 1px; margin: 4px; background: var(--border); }
+.tooltip-content {
+  z-index: 110;
+  max-width: 260px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  background: var(--surface-solid);
+  box-shadow: var(--shadow-soft);
+  font-size: var(--fs-md);
+  line-height: 1.3;
+  animation: tooltip-in 90ms ease-out;
+}
+.tooltip-arrow { fill: var(--surface-solid); }
+
+@keyframes menu-in { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes tooltip-in { from { opacity: 0; } to { opacity: 1; } }@media (max-width: 860px) {
+  .objects-panel { max-width: min(380px, calc(100vw - 82px)); }
+}@media (max-width: 620px) {
+  .objects-panel { left: 68px; width: auto !important; min-width: 0; max-width: none; }
+  .panel-resizer { display: none; }
+}
+
+.objects-list {
+  min-height: 0;
+  overflow: auto;
+  padding: 5px;
+}
+.object-row {
+  min-height: 45px;
+  display: grid;
+  grid-template-columns: 18px 28px minmax(0, 1fr) 29px 29px;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 4px 4px 7px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: default;
+  user-select: none;
+}
+.object-row + .object-row { margin-top: 2px; }
+.object-row:hover { background: var(--surface-hover); }
+.object-row.is-selected {
+  border-color: color-mix(in srgb, var(--accent) 32%, var(--border));
+  background: var(--accent-soft);
+}
+.object-row.is-checked:not(.is-selected) {
+  border-color: color-mix(in srgb, var(--accent) 20%, var(--border));
+  background: color-mix(in srgb, var(--accent-soft) 55%, var(--surface-solid));
+}
+.object-row.is-hidden .object-row-copy,
+.object-row.is-hidden .object-kind-icon { opacity: .5; }
+.object-kind-icon {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  color: var(--accent);
+  background: var(--surface-raised);
+}
+.object-row-copy { min-width: 0; display: grid; }
+.object-row-copy strong {
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.object-row-copy small {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  text-transform: capitalize;
+}
+.object-row-action {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+.object-row-action:hover { color: var(--text); background: var(--surface-hover); }
+.object-row-action:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+
+.object-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
+.identify-panel-header { min-height: 44px; padding-block: 5px; }
+
+/* 13.9.11 — Compact panels, grouped tools, refined search */
+.compact-panel { border-radius: 10px; }
+.panel-header--compact {
+  min-height: 39px;
+  padding: 4px 6px 4px 10px;
+}
+.panel-title--compact { gap: 7px; }
+.panel-title--compact strong { font-size: var(--fs-lg); }
+.panel-title--compact span { margin-top: 1px; font-size: var(--fs-xs); }
+.panel-header--compact .panel-actions .icon-button {
+  width: 27px;
+  height: 27px;
+  flex-basis: 27px;
+}
+.panel-footer--compact {
+  min-height: 24px;
+  padding: 0 9px;
+  font-size: var(--fs-xs);
+}
+.layers-panel.compact-panel > .panel-header { min-height: 39px; }
+
+/* Obiekty */
+.objects-panel--compact { grid-template-rows: auto auto auto minmax(0, 1fr) auto; }
+.objects-list { padding: 3px 4px; }
+.objects-panel--compact .object-row {
+  min-height: 35px;
+  grid-template-columns: 16px 24px minmax(0, 1fr) 25px 25px;
+  gap: 2px;
+  padding: 2px 2px 2px 5px;
+  border-radius: 7px;
+}
+.objects-panel--compact .object-row + .object-row { margin-top: 1px; }
+.objects-panel--compact .object-kind-icon {
+  width: 23px;
+  height: 23px;
+  border-radius: 5px;
+}
+.objects-panel--compact .object-kind-icon svg { width: 15px; height: 15px; }
+.objects-panel--compact .object-row-copy strong { font-size: var(--fs-md); }
+.objects-panel--compact .object-row-action { width: 24px; height: 24px; border-radius: 5px; }
+.objects-panel--compact .object-check { width: 13px; height: 13px; }
+
+/* Floating panel movement + resize */
+.panel-header--compact {
+  position: relative;
+  user-select: none;
+}
+.panel-drag-handle {
+  width: 10px;
+  height: 24px;
+  flex: 0 0 10px;
+  cursor: grab;
+  touch-action: none;
+  opacity: .55;
+  border-radius: 4px;
+  background-image: radial-gradient(circle, var(--text-faint) 1px, transparent 1.2px);
+  background-size: 4px 4px;
+  background-position: center;
+}
+.panel-drag-handle:hover { opacity: .95; background-color: var(--surface-hover); }
+.panel-drag-handle:active { cursor: grabbing; }
+
+.panel-resizer--right {
+  left: auto;
+  right: -6px;
+}
+.panel-resizer--right::after {
+  left: auto;
+  right: 5px;
+}
+
+/* Minimized panels become one clear icon instead of disappearing. */
+.panel-minimized {
+  width: 42px !important;
+  min-width: 42px !important;
+  max-width: 42px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  bottom: auto !important;
+  display: grid !important;
+  grid-template: 1fr / 1fr !important;
+  overflow: hidden !important;
+  border-radius: 10px !important;
+  animation: panel-mini-in 120ms ease-out;
+}
+.panel-minimized--objects { right: 10px; top: 10px; }
+.panel-minimized--layers { left: 66px; top: 10px; }
+.panel-minimized--identify { left: 58px; bottom: 39px !important; top: auto; }
+.panel-mini-button {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  color: var(--accent);
+  background: var(--surface-solid);
+  cursor: pointer;
+}
+.panel-mini-button:hover { background: var(--surface-hover); }
+.panel-mini-button:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+
+/* Panels share one visual rhythm. */
+.compact-panel,
+.identify-panel--compact,
+.export-panel--compact {
+  border-radius: var(--panel-radius);
+  border-color: color-mix(in srgb, var(--border) 92%, transparent);
+}
+.panel-enter { animation: panel-enter 145ms cubic-bezier(.2,.8,.2,1); }
+
+/* Slightly calmer light theme and clearer dark active states. */
+.app-shell[data-theme="light"] .compact-panel,
+:root:not([data-theme="dark"]) .compact-panel {
+  box-shadow: var(--shadow);
+}
+
+/* Tooltip readability; keyboard shortcuts already included in tool labels. */
+.tooltip-content {
+  padding: 6px 8px;
+  border-radius: 7px;
+  line-height: 1.35;
+  box-shadow: var(--shadow-soft);
+}
+
+@keyframes panel-enter {
+  from { opacity: 0; transform: translateY(-4px) scale(.992); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes panel-mini-in {
+  from { opacity: 0; transform: scale(.92); }
+  to { opacity: 1; transform: scale(1); }
+}@media (max-width: 920px) {
+  .panel-drag-handle { display: none; }
+}@media (max-width: 620px) {
+  .panel-resizer { display: none !important; }
+  .panel-minimized--layers,
+    .panel-minimized--objects {
+      left: auto !important;
+      right: 8px !important;
+      top: 8px !important;
+      bottom: auto !important;
+      width: 42px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-enter,
+    .panel-minimized { animation: none !important; }
+}
+
+/* 16.1 — panel resize + object drag ergonomics */
+.panel-height-resizer {
+  position: absolute;
+  z-index: 5;
+  left: 14px;
+  right: 14px;
+  bottom: 0;
+  height: 10px;
+  cursor: ns-resize;
+  touch-action: none;
+}
+.panel-height-resizer::after {
+  content: '';
+  position: absolute;
+  left: 40%;
+  right: 40%;
+  top: 7px;
+  height: 2px;
+  border-radius: 2px;
+  background: transparent;
+  transition: background-color 120ms ease;
+}
+.panel-height-resizer:hover::after { background: var(--accent); }
+.objects-panel--compact,
+.layers-panel.compact-panel { min-height: 220px; }
+.objects-panel--compact .object-row {
+  grid-template-columns: 15px 16px 24px minmax(0, 1fr) 25px 25px;
+}
+.object-drag-grip {
+  width: 15px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  color: var(--text-faint);
+  cursor: grab;
+}
+.object-row--draggable { cursor: default; }
+.object-row--draggable.is-dragging { opacity: .48; }
+.object-row--draggable.is-drop-target {
+  outline: 2px solid color-mix(in srgb, var(--accent) 75%, transparent);
+  outline-offset: -2px;
+  background: var(--accent-soft);
+}
+.object-row-action--danger:hover {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+}
+@media (max-width: 760px), (pointer: coarse) and (max-height: 500px) {
+  .panel-height-resizer { display: none !important; }
+}
+.panel-minimized--layers { left: 86px; }
+.panel-minimized--identify { left: 82px; }@media (max-width: 760px), (pointer: coarse) and (max-height: 500px) {
+  .panel-minimized--layers { left: 70px; }
+}
+.panel-minimized--analysis { top: 10px; left: auto; width: auto; }@media (max-width: 720px) {
+  .panel-minimized--analysis { left: auto; right: 8px !important; bottom: auto; width: auto; }
+}
+}

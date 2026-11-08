@@ -1,0 +1,109 @@
+DirectoryIndex index.html
+
+<FilesMatch "^aktualizuj-.*[.]php$">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_mime.c>
+  AddType application/javascript .js .mjs
+  AddType application/json .json
+  AddType text/css .css
+  AddType image/webp .webp
+  AddType font/woff2 .woff2
+</IfModule>
+
+# 17.8.11: kompresja tekstu. Bez niej przeglądarka pobiera ~5,3 MB skryptów
+# zamiast ~1,3 MB. Blok działa tylko tam, gdzie hosting ma mod_deflate;
+# jeśli serwer już kompresuje sam, reguły niczego nie psują.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/csv
+  AddOutputFilterByType DEFLATE application/javascript text/javascript application/json application/geo+json image/svg+xml
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  <FilesMatch "\.(html)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+  </FilesMatch>
+  # Kod aplikacji: ZAWSZE do rewalidacji.
+  #
+  # Powód jest konkretny i kosztował jedno wdrożenie. Punkt wejścia ma
+  # w adresie wersję (`main.js?v=17.8.8`), ale importy wewnątrz modułów ESM
+  # jej nie mają — `import { IconButton } from './IconButton.js'`. Przy
+  # „immutable" przeglądarka nie sprawdza takiego pliku przez ROK, więc
+  # nadpisanie go na serwerze nie docierało do nikogo, kto raz otworzył
+  # aplikację. Objawem był `SyntaxError: does not provide an export named …`:
+  # nowy plik importował ze starego, trzymanego w cache.
+  #
+  # `no-cache` nie znaczy „pobieraj za każdym razem", tylko „zapytaj, czy się
+  # zmienił". Niezmieniony plik kończy się odpowiedzią 304 bez treści, więc
+  # koszt to jedno warunkowe zapytanie na plik.
+  <FilesMatch "\.(css|js|mjs)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+    # 18.18.0: wyjątek — pliki, których adres zmienia się z każdą wersją, są
+    # przechowywane na stałe (bez pytania serwera przy każdym wejściu):
+    #  - kod aplikacji w katalogu app-<wersja>/ (nowa wersja = nowy katalog),
+    #  - pliki wczytywane z ?v=… (style, biblioteki).
+    # Zmienną MAPOWNIK_IMMUTABLE ustawia mod_rewrite niżej. Bez mod_rewrite
+    # zmienna nie powstaje i zostaje zwykła rewalidacja — nic się nie psuje.
+    # WAŻNE: każda zmiana kodu wymaga nowego numeru wersji (tools/bump_version.py),
+    # bo pliki w katalogu app-<wersja>/ nie są już sprawdzane na serwerze.
+    #
+    # 19.12.0: stałe przechowywanie TYLKO dla odpowiedzi z właściwym typem.
+    # 28.10.2026 hosting raz oddał arkusz CSS jako text/plain — przeglądarka go
+    # odrzuciła, a z nagłówkiem „immutable” trzymałaby tę zepsutą odpowiedź
+    # przez rok. Warunek expr= wymaga Apache 2.4.10+; starszy serwer (albo brak
+    # mod_version) dostaje dawną regułę bez sprawdzania typu.
+    <IfModule mod_version.c>
+      <IfVersion >= 2.4.10>
+        Header set Cache-Control "public, max-age=31536000, immutable" "expr=reqenv('MAPOWNIK_IMMUTABLE') == '1' && %{CONTENT_TYPE} =~ m#^(text/css|application/javascript|text/javascript)#"
+      </IfVersion>
+      <IfVersion < 2.4.10>
+        Header set Cache-Control "public, max-age=31536000, immutable" env=MAPOWNIK_IMMUTABLE
+      </IfVersion>
+    </IfModule>
+    <IfModule !mod_version.c>
+      Header set Cache-Control "public, max-age=31536000, immutable" env=MAPOWNIK_IMMUTABLE
+    </IfModule>
+  </FilesMatch>
+  <FilesMatch "^installations\.(json|csv)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  # Grafika nie ma tego problemu: nie importuje niczego i zmienia się razem
+  # z wydaniem, a nie w jego środku.
+  <FilesMatch "\.(png|webp|svg|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # 18.18.0: oznacz pliki z wersją w adresie do stałego przechowywania (patrz mod_headers).
+  RewriteRule ^app-[^/]+/.+\.(js|mjs|css)$ - [E=MAPOWNIK_IMMUTABLE:1]
+  RewriteCond %{QUERY_STRING} (^|&)v=
+  RewriteRule \.(js|mjs|css)$ - [E=MAPOWNIK_IMMUTABLE:1]
+  # Only the current application directory is executable. Any stale app-* URL gets 410.
+  # 19.8.0 (hosting bez VPS): dawne adresy usługi Python /vps/api/* obsługuje teraz PHP.
+  RewriteRule ^vps/api/(.*)$ api/vps.php?route=$1 [QSA,L]
+  RewriteRule ^vps/ - [R=404,L]
+  RewriteRule ^admin/?$ - [R=404,L]
+  RewriteRule ^api/ - [L]
+  RewriteRule ^app-19\.41\.4/ - [L]
+  RewriteRule ^app-[^/]+/ - [R=410,L]
+  RewriteRule ^data/kowr/installations\.(json|csv)$ - [L]
+  RewriteRule ^data/ - [R=404,L]
+  # 18.18.3: narzędzia (podbijanie wersji, testy parsera) uruchamia się z wiersza poleceń, nie przez WWW.
+  RewriteRule ^tools/ - [R=404,L]
+  RewriteRule ^vendor/shims/ - [R=410,L]
+  RewriteRule ^vendor/ - [L]
+  RewriteRule ^assets/ - [L]
+  RewriteRule ^setup-vendors\.php$ - [L]
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+  # Missing static/API resources must return 404 rather than the SPA shell.
+  RewriteRule ^(?:vendor|assets|api)/ - [R=404,L]
+  RewriteRule ^ index.html [L]
+</IfModule>

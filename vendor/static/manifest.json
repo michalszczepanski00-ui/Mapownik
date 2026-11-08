@@ -1,0 +1,61 @@
+{
+    "release": "vendor-react19.2.8-ol10.10.0-lucide1.47.0-v3",
+    "preparedAt": "2026-09-21T17:46:55+00:00",
+    "files": {
+        "react": {
+            "file": "react.js",
+            "bytes": 2104,
+            "sha256": "a18bbb96cfa025759778758b9b079f339b315a4eaf726512dcda19279a5f6cb8"
+        },
+        "react-jsx-runtime": {
+            "file": "react-jsx-runtime.js",
+            "bytes": 1252,
+            "sha256": "c3d764a345dc3929558cb71bb173458c2bf1a08afc69bab0a328a63067a9789d"
+        },
+        "react-dom": {
+            "file": "react-dom.js",
+            "bytes": 1910,
+            "sha256": "c1413aa9e0b60d1bb35e0cb22ba7ffe841722548bb51c0db096b8a89262193ef"
+        },
+        "react-dom-client": {
+            "file": "react-dom-client.js",
+            "bytes": 1282,
+            "sha256": "108ce6f8fb9d67b16613b0802f6d702997e67f33ae919eab05cca245f38f648f"
+        },
+        "radix-dropdown": {
+            "file": "radix-dropdown.js",
+            "bytes": 195394,
+            "sha256": "e829da2f071c54e083e21239c475f113932ca82e58ebc1bcfa3ea31ae03c37a5"
+        },
+        "radix-tooltip": {
+            "file": "radix-tooltip.js",
+            "bytes": 119199,
+            "sha256": "e4cb07cdcccf31bf4f1e3b431d101c581108272a257aae2c3dd912e8e4c39309"
+        },
+        "proj4": {
+            "file": "proj4.js",
+            "bytes": 239005,
+            "sha256": "75bae245a9f97490670a8c2413ad6e01d74b9a1f33aa3c2f8ff31fa28badce45"
+        },
+        "zod": {
+            "file": "zod.js",
+            "bytes": 757600,
+            "sha256": "1006ce709b8d924702e36c4cd1d864336e7fd9c459042a3686f93e641dc4ad65"
+        },
+        "lucide-react": {
+            "file": "lucide-react.js",
+            "bytes": 1312954,
+            "sha256": "87d49d7b8af8cd5bd6b2b4a5dc0bbd569a222a80674e7b4d652b7f3a90767f3b"
+        },
+        "openlayers-js": {
+            "file": "openlayers.js",
+            "bytes": 1043059,
+            "sha256": "b89af8ec3b76f564d515fd07fed3ec414aecf8f33f685b77b607451cb0c2029f"
+        },
+        "openlayers-css": {
+            "file": "openlayers.css",
+            "bytes": 6343,
+            "sha256": "abc8afd72cc10bd29cc143f443bae4a6804bd3cb3fb262e6b6a6bc6c924ea34f"
+        }
+    }
+}

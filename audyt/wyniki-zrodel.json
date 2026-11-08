@@ -1,0 +1,920 @@
+{
+  "generatedAt": "2026-10-14T13:25:20+0200",
+  "origin": "PHP CLI in audit environment; direct upstream checks; not hosting tests",
+  "results": [
+    {
+      "title": "Mapa standardowa OSM",
+      "id": "osm",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "Połączenie serwera ze źródłem; stała próbka kontrolna, bez cache mapy i bez testu CORS",
+        "source": "osm",
+        "mode": "service",
+        "checkedAt": 1791977060,
+        "durationMs": 3003,
+        "fingerprint": "b8768c7bf46f8eea10178354c31ed989672e47f14cad520a76c2f03d1624d3c5"
+      },
+      "wallMs": 3021
+    },
+    {
+      "title": "Ortofotomapa WMTS standardowa",
+      "id": "wmts_standard",
+      "result": {
+        "ok": false,
+        "error": "Diagnostyka jest zajęta."
+      },
+      "wallMs": 16
+    },
+    {
+      "title": "Ortofotomapa WMTS wysokiej rozdzielczości",
+      "id": "wmts_high",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "Połączenie serwera ze źródłem; stała próbka kontrolna, bez cache mapy i bez testu CORS",
+        "source": "wmts_high",
+        "mode": "service",
+        "checkedAt": 1791977060,
+        "durationMs": 3003,
+        "fingerprint": "bd89b148601f0a65f80ce1de8cc944fb3604777c4b80298a9b33f42d0c7cdf13"
+      },
+      "wallMs": 3027
+    },
+    {
+      "title": "ULDK — geometria działki",
+      "id": "uldk",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "Połączenie serwera ze źródłem; stała próbka kontrolna, bez cache mapy i bez testu CORS",
+        "source": "uldk",
+        "mode": "service",
+        "checkedAt": 1791977063,
+        "durationMs": 3003,
+        "fingerprint": "f30b971699c7e85abcd3ff85708b2d0c37177fba119f12f02ae253e64d3f7188"
+      },
+      "wallMs": 3022
+    },
+    {
+      "title": "NMT — wysokość punktu",
+      "id": "nmt",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "Połączenie serwera ze źródłem; stała próbka kontrolna, bez cache mapy i bez testu CORS",
+        "source": "nmt",
+        "mode": "service",
+        "checkedAt": 1791977064,
+        "durationMs": 3003,
+        "fingerprint": "8fe3ec9e9d3b40e43c0448d6235c22a4b77428e2517c00f90678eab18643a926"
+      },
+      "wallMs": 3027
+    },
+    {
+      "title": "Topografia",
+      "id": "basemap.topography",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "Raster"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "topography",
+        "mode": "service",
+        "checkedAt": 1791977067,
+        "durationMs": 3003,
+        "fingerprint": "f41e3c3962d2140c9c9a24eb7a1f29d2042eeebb6e9e190c47e997a629035ea7"
+      },
+      "wallMs": 3022
+    },
+    {
+      "title": "Ortofotomapa archiwalna",
+      "id": "basemap.orthophoto.archive",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "Raster"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "orthophoto_archive",
+        "mode": "service",
+        "checkedAt": 1791977067,
+        "durationMs": 3002,
+        "fingerprint": "a528acce6b84413171a3297e8caf4c469abc275d0221f6373d3ad95bddb5f900"
+      },
+      "wallMs": 3023
+    },
+    {
+      "title": "Prawdziwa ortofotomapa",
+      "id": "basemap.orthophoto.true",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "ok",
+        "http": 200,
+        "bytes": 8940,
+        "missingLayers": [],
+        "layerCount": 2,
+        "message": "Usługa odpowiada, skonfigurowane nazwy warstw są obecne.",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "orthophoto_true",
+        "mode": "service",
+        "checkedAt": 1791977070,
+        "durationMs": 3401,
+        "fingerprint": "63a538a41392524b3150a8e6617ddb03dcb229b68b34de41ef2fe12fe760c3f2"
+      },
+      "wallMs": 3417
+    },
+    {
+      "title": "Obszary chronione / Natura 2000",
+      "id": "overlay.natura2000",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "GDOS:ObszarySpecjalnejOchrony",
+          "GDOS:SpecjalneObszaryOchrony"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "natura2000",
+        "mode": "service",
+        "checkedAt": 1791977070,
+        "durationMs": 3003,
+        "fingerprint": "7701863f49b83eaa82d7e5666a9403bae906b270bb0920076fef5ee433313ce8"
+      },
+      "wallMs": 3021
+    },
+    {
+      "title": "Studium (KISKZP)",
+      "id": "overlay.studium",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "studium"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "studium",
+        "mode": "service",
+        "checkedAt": 1791977073,
+        "durationMs": 3003,
+        "fingerprint": "650408114753f9253acf418fe0ceeef2eae5d6138e050baa7960d437c258c70f"
+      },
+      "wallMs": 3029
+    },
+    {
+      "title": "MPZP (KIMP)",
+      "id": "overlay.mpzp",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "granice",
+          "raster",
+          "wektor-str",
+          "wektor-lzb",
+          "wektor-lin",
+          "wektor-pow",
+          "wektor-pkt"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "mpzp",
+        "mode": "service",
+        "checkedAt": 1791977073,
+        "durationMs": 3003,
+        "fingerprint": "e90250e5bdbec1da7a6864d51de75c52ac0be9e4f9b31e66c16f8106df23d8b1"
+      },
+      "wallMs": 3023
+    },
+    {
+      "title": "Działki ewidencyjne (KIEG)",
+      "id": "overlay.dzialki",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "dzialki",
+          "budynki",
+          "numery_dzialek"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "dzialki",
+        "mode": "service",
+        "checkedAt": 1791977076,
+        "durationMs": 3003,
+        "fingerprint": "b6bdf93ecf18d8a7e6132d9e41810e311daed09a32d9b8a5d887af3528b3b1f2"
+      },
+      "wallMs": 3023
+    },
+    {
+      "title": "Klasy gruntów ornych (EGiB)",
+      "id": "overlay.egib.arable-classes",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "kontury",
+          "uzytki"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "egib_classes",
+        "mode": "service",
+        "checkedAt": 1791977076,
+        "durationMs": 3003,
+        "fingerprint": "3cc7f6428149f66889ab1b6d29a922d209ef3c0f10202611ddcc851930978a7a"
+      },
+      "wallMs": 3020
+    },
+    {
+      "title": "Budynki (BDOT10k)",
+      "id": "overlay.bdot10k.buildings",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "BudGo",
+          "BudPWy",
+          "BudP2",
+          "BudP1",
+          "BudUWy",
+          "BudU",
+          "BudMWy",
+          "BudMJ",
+          "BudMW"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "bdot10k_buildings",
+        "mode": "service",
+        "checkedAt": 1791977079,
+        "durationMs": 3003,
+        "fingerprint": "7b88cb924c833ad87f33b30c4e887a085a19f5dd8db7e085e1304fd2cc64342a"
+      },
+      "wallMs": 3018
+    },
+    {
+      "title": "Drogi i kolej (BDOT10k)",
+      "id": "overlay.bdot10k.transport",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "JDrLNUt",
+          "JDLNTw",
+          "JDrZTw",
+          "JDrG",
+          "JDrEk",
+          "JAu",
+          "LKNc",
+          "LKBu",
+          "LKWs",
+          "TSt",
+          "LKNelJ",
+          "LKNelD",
+          "LKNelW",
+          "LKZelJ",
+          "LKZelD",
+          "LKZelW"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "bdot10k_transport",
+        "mode": "service",
+        "checkedAt": 1791977079,
+        "durationMs": 3003,
+        "fingerprint": "585d07aa61ebec4fabf2e52e7a54ef29c69f94b9350126c0083ae3d5f8978516"
+      },
+      "wallMs": 3024
+    },
+    {
+      "title": "Wody (BDOT10k)",
+      "id": "overlay.bdot10k.water",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "down",
+        "http": 502,
+        "bytes": 144,
+        "missingLayers": [
+          "WPow",
+          "LBrzN",
+          "LBrz",
+          "rz",
+          "kan",
+          "row",
+          "rzOk",
+          "kanOkr",
+          "RowEt",
+          "kanEt",
+          "rzEt"
+        ],
+        "layerCount": 0,
+        "message": "HTTP 502 lub odpowiedź nie jest WMS Capabilities.",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "bdot10k_water",
+        "mode": "service",
+        "checkedAt": 1791977083,
+        "durationMs": 4804,
+        "fingerprint": "a22eab5ef5a2e5e3660ea6b2a130dd23c7a7b14fd67b2d355413e3218f4187eb"
+      },
+      "wallMs": 4821
+    },
+    {
+      "title": "Użytkowanie terenu i lasy (BDOT10k)",
+      "id": "overlay.bdot10k.landuse",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "TPrz",
+          "TLes",
+          "RKr",
+          "RTr",
+          "UTrw",
+          "GNu2",
+          "GNu1",
+          "TPi2",
+          "TPi1",
+          "TKa2",
+          "TKa1",
+          "RZab"
+        ],
+        "layerCount": 0,
+        "message": "Operation timed out after 7002 milliseconds with 0 bytes received",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "bdot10k_landuse",
+        "mode": "service",
+        "checkedAt": 1791977086,
+        "durationMs": 7004,
+        "fingerprint": "f3a2968a988d9b5e3e42cd031bb9e085cbacd7e0786a0f921d8bc45040db2d3a"
+      },
+      "wallMs": 7024
+    },
+    {
+      "title": "Granice administracyjne (PRG)",
+      "id": "overlay.prg.boundaries",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "A01_Granice_wojewodztw",
+          "A02_Granice_powiatow",
+          "A03_Granice_gmin"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "prg_boundaries",
+        "mode": "service",
+        "checkedAt": 1791977086,
+        "durationMs": 3003,
+        "fingerprint": "5e1f230f922660b7e62b0e14fe0465d439271198588617a331b1c55fc8e95add"
+      },
+      "wallMs": 3020
+    },
+    {
+      "title": "Nazwy geograficzne (PRNG)",
+      "id": "overlay.prng.names",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "ok",
+        "http": 200,
+        "bytes": 24078,
+        "missingLayers": [],
+        "layerCount": 5,
+        "message": "Usługa odpowiada, skonfigurowane nazwy warstw są obecne.",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "prng_names",
+        "mode": "service",
+        "checkedAt": 1791977090,
+        "durationMs": 4437,
+        "fingerprint": "cf2d726bfc18d0b9ca76a3ec13b785be3286f392caefb5ffccd81fd5c9047af1"
+      },
+      "wallMs": 4458
+    },
+    {
+      "title": "Adresy i ulice (KINA)",
+      "id": "overlay.kina.addresses",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "ok",
+        "http": 200,
+        "bytes": 21022,
+        "missingLayers": [],
+        "layerCount": 4,
+        "message": "Usługa odpowiada, skonfigurowane nazwy warstw są obecne.",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "kina_addresses",
+        "mode": "service",
+        "checkedAt": 1791977091,
+        "durationMs": 4160,
+        "fingerprint": "f34020abd6c3418f9096be354eade4cf6215b193c4f4c0e67287b9f94022c96d"
+      },
+      "wallMs": 4179
+    },
+    {
+      "title": "Rezerwaty, parki i OChK (GDOŚ)",
+      "id": "overlay.gdos.protection",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "GDOS:ParkiNarodowe",
+          "GDOS:ParkiKrajobrazowe",
+          "GDOS:Rezerwaty",
+          "GDOS:ObszaryChronionegoKrajobrazu",
+          "GDOS:UzytkiEkologiczne",
+          "GDOS:ZespolyPrzyrodniczoKrajobrazowe"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "gdos_protection",
+        "mode": "service",
+        "checkedAt": 1791977093,
+        "durationMs": 3003,
+        "fingerprint": "672861796c6dadbb4aaa98e2d278eb18e70069aee144e6915ea6a940b2a7142e"
+      },
+      "wallMs": 3024
+    },
+    {
+      "title": "Energia elektryczna",
+      "id": "overlay.kiut.power",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "przewod_elektroenergetyczny"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "kiut_power",
+        "mode": "service",
+        "checkedAt": 1791977094,
+        "durationMs": 3003,
+        "fingerprint": "904aed43f115f33ed450dcfc1348011acdbf86d33f7991c27989968bb3f03337"
+      },
+      "wallMs": 3023
+    },
+    {
+      "title": "Gaz",
+      "id": "overlay.kiut.gas",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "ok",
+        "http": 200,
+        "bytes": 20780,
+        "missingLayers": [],
+        "layerCount": 12,
+        "message": "Usługa odpowiada, skonfigurowane nazwy warstw są obecne.",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "kiut_gas",
+        "mode": "service",
+        "checkedAt": 1791977098,
+        "durationMs": 4426,
+        "fingerprint": "6cbefeb7e8301634272c0a4129466e07de3e907c2e20a2ad157781e55938fb2e"
+      },
+      "wallMs": 4450
+    },
+    {
+      "title": "Wodociąg",
+      "id": "overlay.kiut.water",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "ok",
+        "http": 200,
+        "bytes": 20780,
+        "missingLayers": [],
+        "layerCount": 12,
+        "message": "Usługa odpowiada, skonfigurowane nazwy warstw są obecne.",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "kiut_water",
+        "mode": "service",
+        "checkedAt": 1791977098,
+        "durationMs": 3965,
+        "fingerprint": "4a7e8c6e38193c8618efa8d8d0763c53236457e057519d1671011271aaa2d5cc"
+      },
+      "wallMs": 3988
+    },
+    {
+      "title": "Kanalizacja",
+      "id": "overlay.kiut.sewer",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "przewod_kanalizacyjny"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "kiut_sewer",
+        "mode": "service",
+        "checkedAt": 1791977101,
+        "durationMs": 3003,
+        "fingerprint": "c7bfdc6b18aedea7f11099b9f7db4299dfd84640a554a8fc63e8beedb3363c18"
+      },
+      "wallMs": 3020
+    },
+    {
+      "title": "Telekomunikacja",
+      "id": "overlay.kiut.telecom",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "przewod_telekomunikacyjny"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "kiut_telecom",
+        "mode": "service",
+        "checkedAt": 1791977101,
+        "durationMs": 3003,
+        "fingerprint": "b7a25f03a521a5dae94f2d6be1fb2dc7755966eb0dc8b80d5712e2dbb8b59e22"
+      },
+      "wallMs": 3021
+    },
+    {
+      "title": "Sieć ciepłownicza",
+      "id": "overlay.kiut.heat",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "ok",
+        "http": 200,
+        "bytes": 20780,
+        "missingLayers": [],
+        "layerCount": 12,
+        "message": "Usługa odpowiada, skonfigurowane nazwy warstw są obecne.",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "kiut_heat",
+        "mode": "service",
+        "checkedAt": 1791977104,
+        "durationMs": 3754,
+        "fingerprint": "7be625f790836dbf6de155cbbd75508eac77ce73a9efff1e46af0ee7db7d06de"
+      },
+      "wallMs": 3773
+    },
+    {
+      "title": "Pozostałe przewody i urządzenia",
+      "id": "overlay.kiut.other",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "partial",
+        "http": 200,
+        "bytes": 20780,
+        "missingLayers": [
+          "przewod_inny"
+        ],
+        "layerCount": 12,
+        "message": "Usługa odpowiada; nazwy warstw wymagają sprawdzenia: przewod_inny",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "kiut_other",
+        "mode": "service",
+        "checkedAt": 1791977104,
+        "durationMs": 3093,
+        "fingerprint": "6f12a320954412fbf91644450d889d69f07375376866d3508cf658b0938ccaf1"
+      },
+      "wallMs": 3113
+    },
+    {
+      "title": "Obiekty topograficzne (BDOT500)",
+      "id": "overlay.kibdot.bdot500",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "bdot"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "kibdot_bdot500",
+        "mode": "service",
+        "checkedAt": 1791977107,
+        "durationMs": 3003,
+        "fingerprint": "045dc359934c3fa6262871d2164cfa1fe2d7ed4174f4aed74ec0b0017d079921"
+      },
+      "wallMs": 3019
+    },
+    {
+      "title": "NMT — cieniowanie",
+      "id": "basemap.nmt.shaded",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "Raster"
+        ],
+        "layerCount": 0,
+        "message": "SSL connection timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "nmt_shaded",
+        "mode": "service",
+        "checkedAt": 1791977107,
+        "durationMs": 3003,
+        "fingerprint": "8fc0845c861b56043a244cd67667673006f81f4e98ad6c78d6ff90223a0f11be"
+      },
+      "wallMs": 3020
+    },
+    {
+      "title": "Plan ogólny — uchwalony",
+      "id": "overlay.pog.adopted",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "aktPlanowaniaprzestrzennego",
+          "strefaPlanistyczna",
+          "obszarZabSrodmiejskiej",
+          "obszarUzupelnieniaZabudowy"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "pog_adopted",
+        "mode": "service",
+        "checkedAt": 1791977110,
+        "durationMs": 3003,
+        "fingerprint": "8c155656449e4372c2f65692ec866f204580e7dcf779fec90dab2738b4c3e3dd"
+      },
+      "wallMs": 3020
+    },
+    {
+      "title": "Plan ogólny — projektowany",
+      "id": "overlay.pog.draft",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "ok",
+        "http": 200,
+        "bytes": 13254,
+        "missingLayers": [],
+        "layerCount": 5,
+        "message": "Usługa odpowiada, skonfigurowane nazwy warstw są obecne.",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "pog_draft",
+        "mode": "service",
+        "checkedAt": 1791977112,
+        "durationMs": 4434,
+        "fingerprint": "d6ab384bb0ab2a65202f4d8302c7cf617f6ac26b85369dd73287d4f9c576bf0c"
+      },
+      "wallMs": 4450
+    },
+    {
+      "title": "Strefy planistyczne",
+      "id": "overlay.pog.zones",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "strefaPlanistyczna"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "pog_zones",
+        "mode": "service",
+        "checkedAt": 1791977113,
+        "durationMs": 3003,
+        "fingerprint": "1de11a8434050037e81ca9b23d5a172460a825ebecdf7dcabee2422aea563bb5"
+      },
+      "wallMs": 3021
+    },
+    {
+      "title": "Działki w zasobie KOWR",
+      "id": "overlay.kowr.parcels",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [
+          "dzialki"
+        ],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "kowr",
+        "mode": "service",
+        "checkedAt": 1791977115,
+        "durationMs": 3003,
+        "fingerprint": "20536babca88b0d7843a0a5efe9750f03b5c654f2689a1944cb24f69abb88655"
+      },
+      "wallMs": 3021
+    },
+    {
+      "title": "Złoża kopalin (MIDAS)",
+      "id": "overlay.pgi.deposits",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "unknown",
+        "http": 0,
+        "bytes": 0,
+        "missingLayers": [],
+        "layerCount": 0,
+        "message": "Proxy CONNECT aborted due to timeout",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "pgi_deposits",
+        "mode": "service",
+        "checkedAt": 1791977116,
+        "durationMs": 3003,
+        "fingerprint": "9a9c3546b55db4a13e8285c118de7a01477d0e0e85e4ef94f4caf9f99cc860fb"
+      },
+      "wallMs": 3023
+    },
+    {
+      "title": "Obszary górnicze (MIDAS)",
+      "id": "overlay.pgi.miningareas",
+      "result": {
+        "ok": true,
+        "cached": false,
+        "ageSeconds": 0,
+        "cacheSaved": true,
+        "state": "ok",
+        "http": 200,
+        "bytes": 17193,
+        "missingLayers": [],
+        "layerCount": 6,
+        "message": "Usługa odpowiada, skonfigurowane nazwy warstw są obecne.",
+        "scope": "GetCapabilities; nie potwierdza pokrycia, renderowania, CORS ani GetFeatureInfo",
+        "source": "pgi_miningareas",
+        "mode": "service",
+        "checkedAt": 1791977120,
+        "durationMs": 4665,
+        "fingerprint": "44343605ec2e22fe04ee0cff987c589168aa85ac25c6fa4f18b0d66f5fa6df82"
+      },
+      "wallMs": 4687
+    }
+  ]
+}
