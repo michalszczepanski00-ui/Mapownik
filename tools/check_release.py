@@ -33,7 +33,9 @@ def syntax_js(path,text):
 
 if not shutil.which('node'):raise SystemExit('Node.js is required.')
 for suffix in ('py','js','sh','php','html'):
-    paths=[p for p in ROOT.rglob('*.'+suffix) if 'vendor' not in p.relative_to(ROOT).parts and '__pycache__' not in p.parts]
+    # 19.42.0: bez zależności npm i wyników budowania/testów (sprawdzamy kod portalu).
+    SKIP={'vendor','node_modules','build','dist','test-results','playwright-report','.git'}
+    paths=[p for p in ROOT.rglob('*.'+suffix) if not SKIP.intersection(p.relative_to(ROOT).parts) and '__pycache__' not in p.parts]
     counts[suffix]=len(paths)
     for p in paths:
         text=p.read_text(encoding='utf-8-sig')

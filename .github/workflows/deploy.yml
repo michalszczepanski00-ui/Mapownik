@@ -1,0 +1,75 @@
+# msportal — wdrożenie na hosting przez FTP/SFTP (uruchamiane ręcznie: Actions → Wdrożenie → Run workflow).
+#
+# Wymagane sekrety w ustawieniach środowiska GitHub (Settings → Environments → test / produkcja):
+#   DEPLOY_URL      np. sftp://ssh.cluster0XX.hosting.ovh.net  albo  ftp://ftp.cluster0XX.hosting.ovh.net
+#   DEPLOY_USER     login FTP/SSH
+#   DEPLOY_PASSWORD hasło
+#   DEPLOY_DIR      katalog portalu na serwerze, np. www/test22
+#   SITE_URL        adres portalu, np. https://mapownik.swiadectwa.net/test22
+#
+# Zasady (jak w README_WGRAJ_NA_SERWER.txt): pliki są nadpisywane, nic nie jest usuwane poza starymi
+# katalogami app-<wersja>/ — dane (data/shared, data/rwdz, data/msportal) i cache/ zostają nietknięte,
+# a starsze paczki assets/build/ zostają dla kart otwartych przed wdrożeniem.
+name: Wdrożenie
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Środowisko'
+        type: choice
+        options: [test, produkcja]
+        default: test
+
+concurrency: deploy-${{ inputs.environment }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: curl, gd, zip, pdo_sqlite, mbstring
+          tools: none
+      - run: npm ci
+      - run: npm run typecheck && npm test && npm run build && python3 tools/check_release.py
+      - run: sudo apt-get install -y lftp
+      - name: Wgranie plików
+        env:
+          DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
+          DEPLOY_DIR: ${{ secrets.DEPLOY_DIR }}
+        run: |
+          set -euo pipefail
+          VERSION=$(tr -d '\r\n' < VERSION.txt)
+          SETTINGS="set ssl:verify-certificate true; set ftp:ssl-allow true; set sftp:auto-confirm yes; set net:max-retries 3"
+          # 1) wszystko poza index.html i .htaccess (nowe paczki muszą być na serwerze, zanim wskaże je index.html)
+          lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; mirror --reverse --verbose --parallel=4 \
+            --exclude-glob index.html --exclude-glob .htaccess build/www/ $DEPLOY_DIR/; bye"
+          # 2) na końcu index.html i .htaccess
+          lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; cd $DEPLOY_DIR; put build/www/.htaccess -o .htaccess; put build/www/index.html -o index.html; bye"
+          # 3) stare katalogi app-<wersja>/ (verify-deployment.php wymaga jednego)
+          for dir in $(lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; cls -1 $DEPLOY_DIR/; bye" | sed 's#.*/##; s#/$##' | grep -E '^app-[0-9]+\.[0-9]+\.[0-9]+$' || true); do
+            if [ "$dir" != "app-$VERSION" ]; then
+              echo "Usuwam stary katalog $dir"
+              lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; rm -r $DEPLOY_DIR/$dir; bye"
+            fi
+          done
+      - name: Kontrola wdrożenia
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          set -euo pipefail
+          sleep 5
+          curl -fsS "$SITE_URL/verify-deployment.php" | tee verify.json
+          python3 -c "import json,sys; d=json.load(open('verify.json')); sys.exit(0 if d.get('deployment_consistent') else 'deployment_consistent = false')"
+          curl -fsS "$SITE_URL/api/health.php" | python3 -c "import json,sys; d=json.load(sys.stdin); print('health:', d.get('version')); sys.exit(0 if d.get('ok') else 1)"

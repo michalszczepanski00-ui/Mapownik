@@ -5,3 +5,9 @@ data/rwdz/*.building
 
 # 19.41.4-b: paczki budowane lokalnie
 dist/
+
+# 19.42.0: npm / Vite / testy
+node_modules/
+build/
+test-results/
+playwright-report/

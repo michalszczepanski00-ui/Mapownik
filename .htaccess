@@ -103,6 +103,8 @@ Options -Indexes
   RewriteEngine On
   # 18.18.0: oznacz pliki z wersją w adresie do stałego przechowywania (patrz mod_headers).
   RewriteRule ^app-[^/]+/.+\.(js|mjs|css)$ - [E=MAPOWNIK_IMMUTABLE:1]
+  # 19.42.0: paczki Vite — nazwa zawiera sumę treści, więc plik pod danym adresem nigdy się nie zmienia.
+  RewriteRule ^assets/build/.+\.(js|mjs|css)$ - [E=MAPOWNIK_IMMUTABLE:1]
   RewriteCond %{QUERY_STRING} (^|&)v=
   RewriteRule \.(js|mjs|css)$ - [E=MAPOWNIK_IMMUTABLE:1]
   # Only the current application directory is executable. Any stale app-* URL gets 410.
@@ -113,8 +115,11 @@ Options -Indexes
   # 19.41.4-b (audyt B5/B6): pliki bibliotek PHP (api/_*.php), raporty audytu i skrypty crona nie są adresami WWW.
   RewriteRule ^api/_ - [R=404,L]
   RewriteRule ^(audyt|cron|konfiguracja/README) - [R=404,L]
+  # 19.42.0: pliki projektu npm/Vite, gdyby trafiły na serwer przez pomyłkę.
+  RewriteRule ^(node_modules|build|dist|tests|\.github)/ - [R=404,L]
+  RewriteRule ^(package(-lock)?\.json|vite\.config\.js|vitest\.config\.js|playwright\.config\.js|tsconfig\.json)$ - [R=404,L]
   RewriteRule ^api/ - [L]
-  RewriteRule ^app-19\.41\.4/ - [L]
+  RewriteRule ^app-19\.42\.0/ - [L]
   RewriteRule ^app-[^/]+/ - [R=410,L]
   RewriteRule ^data/kowr/installations\.(json|csv)$ - [L]
   RewriteRule ^data/ - [R=404,L]

@@ -15,7 +15,14 @@ $diag = $read($root . '/diagnostyka.html');
 $ht = $read($root . '/.htaccess');
 $health = $read($root . '/api/health.php');
 
-preg_match("/app-(\\d+\\.\\d+\\.\\d+)\\/main\\.js/", $index, $mIndex);
+// 19.42.0: index.html z budowania Vite — wersja w odwołaniu do assets/js/boot.js, kod w assets/build/.
+preg_match('/assets\/js\/boot\.js\?v=(\d+\.\d+\.\d+)/', $index, $mIndex);
+$boot = $read($root . '/assets/js/boot.js');
+preg_match("/var VERSION = '([0-9.]+)'/", $boot, $mBoot);
+preg_match_all('/(?:src|href)="\.\/(assets\/build\/[^"?]+)"/', $index, $mBuild);
+$bundleFiles = array_values(array_unique($mBuild[1] ?? []));
+$missingBundle = array_values(array_filter($bundleFiles, static fn(string $f): bool => !is_file($root . '/' . $f)));
+$hasMainBundle = (bool)array_filter($bundleFiles, static fn(string $f): bool => (bool)preg_match('~^assets/build/main-[\w-]+\.js$~', $f));
 preg_match('/Diagnostyka (?:MSPortalu|msportalu|Mapownika) ([0-9.]+)/i', $diag, $mDiag);
 preg_match("/'version'\\s*=>\\s*'([^']+-server)'/", $health, $mHealth);
 
@@ -34,6 +41,9 @@ $out = [
     'expected' => $version,
     'version_file' => $version,
     'index_app_version' => $mIndex[1] ?? null,
+    'boot_version' => $mBoot[1] ?? null,
+    'bundle_files' => count($bundleFiles),
+    'bundle_missing' => $missingBundle,
     'diagnostics_version' => $mDiag[1] ?? null,
     'health_version' => $mHealth[1] ?? null,
     'app_directories_present' => $appDirs,
@@ -42,6 +52,9 @@ $out = [
     'deployment_consistent' => (
         $version !== ''
         && (($mIndex[1] ?? '') === $version)
+        && (($mBoot[1] ?? '') === $version)
+        && $hasMainBundle
+        && !$missingBundle
         && (($mDiag[1] ?? '') === $version)
         && (($mHealth[1] ?? '') === $expectedHealth)
         && $appDirs === ['app-' . $version]

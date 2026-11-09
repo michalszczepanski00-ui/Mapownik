@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""msportal 19.41.4-b — Content-Security-Policy dla index.html (audyt B5).
+"""msportal 19.42.0-b — Content-Security-Policy dla index.html (audyt B5).
 
 Strona ma trzy skrypty wbudowane (wersja, importmap, start aplikacji). CSP dopuszcza je po sumie
 sha256 treści, więc KAŻDA zmiana takiego skryptu (także numer wersji z tools/bump_version.py)
@@ -27,7 +27,7 @@ META_RE = re.compile(r'(<meta http-equiv="Content-Security-Policy" content=")[^"
 # Skrypty wyłącznie z tego serwera: to jest główna ochrona przed wstrzyknięciem kodu.
 POLICY = [
     "default-src 'self'",
-    "script-src 'self' {hashes}",
+    "script-src 'self'{hashes}",
     "style-src 'self' 'unsafe-inline' data:",
     "img-src 'self' data: blob: https:",
     "connect-src 'self' https:",
@@ -50,7 +50,7 @@ def inline_hashes(html: str) -> list[str]:
 
 
 def policy_for(html: str) -> str:
-    hashes = " ".join(inline_hashes(html))
+    hashes = "".join(" " + h for h in inline_hashes(html))
     return "; ".join(part.format(hashes=hashes) for part in POLICY)
 
 

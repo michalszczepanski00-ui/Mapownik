@@ -31,7 +31,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SKIP_DIRS = {"audyt", "vendor", "cache", ".git", "node_modules", "data"}
+SKIP_DIRS = {"audyt", "vendor", "cache", ".git", "node_modules", "data", "build", "dist"}
 TEXT_EXT = {".html", ".js", ".mjs", ".css", ".php", ".json", ".txt", ".md", ".py", ".htaccess", ".example", ".conf", ".sh", ".service", ""}
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
 
@@ -71,7 +71,7 @@ def iter_text_files():
         dirnames[:] = [d for d in dirnames if not (rel == Path(".") and d in SKIP_DIRS)]
         for name in filenames:
             path = Path(dirpath) / name
-            if name.startswith("ZMIANY") or path.suffix.lower() not in TEXT_EXT:
+            if name.startswith(("ZMIANY", "RAPORT_AUDYTU", "aktualizuj-")) or path.suffix.lower() not in TEXT_EXT:  # 19.42.0: raporty i stare aktualizatory to historia
                 continue
             if name == "bump_version.py":
                 continue
@@ -88,7 +88,7 @@ def bump(old: str, new: str, dry_run: bool) -> int:
     changed = 0
     for path in iter_text_files():
         try:
-            text = path.read_text(encoding="utf-8")
+            text = path.read_bytes().decode("utf-8")  # 19.42.0: bez zamiany CRLF → LF
         except (UnicodeDecodeError, OSError):
             continue
         updated = text
@@ -101,7 +101,7 @@ def bump(old: str, new: str, dry_run: bool) -> int:
             hits = sum(len(rx.findall(text)) for rx, _ in rules)
             print(f"  {path.relative_to(ROOT)}  ({hits} odwołań)")
             if not dry_run:
-                path.write_text(updated, encoding="utf-8")
+                path.write_bytes(updated.encode("utf-8"))  # 19.42.0: zachowane końce linii
     print(f"{'Do zmiany' if dry_run else 'Zmieniono'}: {changed} plików")
     if not dry_run:
         old_app.rename(new_app)
@@ -116,9 +116,13 @@ def check(expected: str) -> list[str]:
     m = re.search(r"app-(\d+\.\d+\.\d+)/main\.js", index)
     if not m or m.group(1) != expected:
         problems.append(f"index.html wskazuje app-{m.group(1) if m else '?'}/main.js, oczekiwano {expected}")
-    m = re.search(r"__MAPOWNIK_DEPLOY_VERSION__\s*=\s*'([^']+)'", index)
+    # 19.42.0: numer wydania dla przeglądarki jest w assets/js/boot.js (index.html bez skryptów wbudowanych).
+    boot = (ROOT / "assets" / "js" / "boot.js").read_text(encoding="utf-8") if (ROOT / "assets" / "js" / "boot.js").is_file() else ""
+    m = re.search(r"var VERSION = '([^']+)'", boot)
     if not m or m.group(1) != expected:
-        problems.append("index.html: __MAPOWNIK_DEPLOY_VERSION__ nie zgadza się z VERSION.txt")
+        problems.append("assets/js/boot.js: VERSION nie zgadza się z VERSION.txt")
+    if f"assets/js/boot.js?v={expected}" not in index:
+        problems.append("index.html: odwołanie do assets/js/boot.js z inną wersją")
     dirs = sorted(p.name for p in ROOT.glob("app-*") if p.is_dir())
     if dirs != [f"app-{expected}"]:
         problems.append(f"katalogi aplikacji: {dirs} (oczekiwano tylko app-{expected})")

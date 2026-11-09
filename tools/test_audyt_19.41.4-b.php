@@ -1,6 +1,6 @@
 <?php
 /**
- * msportal 19.41.4-b — testy poprawek z audytu (uruchamiane z wiersza poleceń, bez sieci):
+ * msportal 19.42.0-b — testy poprawek z audytu (uruchamiane z wiersza poleceń, bez sieci):
  *   php tools/test_audyt_19.41.4-b.php
  * Sprawdza: ukrywanie danych osób fizycznych w pozwoleniach (Z1), walidację udostępnianych projektów (B3),
  * kontrolę adresów po przekierowaniu (B7) i przypięte sumy bibliotek (B4).
@@ -34,7 +34,7 @@ $check('pusty inwestor → null', permits_public_investor('') === null && permit
 // --- B3: projekt udostępniany
 $ring = static fn(float $x, float $y, float $s): array => [[$x, $y], [$x + $s, $y], [$x + $s, $y + $s], [$x, $y + $s], [$x, $y]];
 $project = [
-    'format' => 'mapownik-project', 'formatVersion' => 1, 'app' => ['name' => 'msportal', 'version' => '19.41.4'],
+    'format' => 'mapownik-project', 'formatVersion' => 1, 'app' => ['name' => 'msportal', 'version' => '19.42.0'],
     'exportedAt' => '2026-11-08T12:00:00Z', 'crs' => 'EPSG:2180', 'project' => ['name' => 'Test', 'schemaVersion' => 2], 'state' => null,
     'objects' => [
         ['id' => 'a', 'name' => 'Poligon', 'properties' => new stdClass(), 'geometry' => ['type' => 'Polygon', 'coordinates' => [$ring(471000, 698000, 100), $ring(471030, 698030, 20)]]],

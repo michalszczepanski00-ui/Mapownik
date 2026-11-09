@@ -13,7 +13,7 @@ if ($writable) @rmdir($testDir);
 echo json_encode([
   'ok' => true,
   'app' => 'msportal',
-  'version' => '19.41.4-server',
+  'version' => '19.42.0-server',
   // 19.41.4-b (audyt B6): bez dokładnego numeru wydania PHP (ułatwia dobór znanych błędów); wystarczy gałąź.
   'php' => PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
   // Poprawki bezpieczeństwa wgrane na wersję 19.41.4 (ZMIANY_19.41.4-b.md) — do sprawdzenia po wgraniu.

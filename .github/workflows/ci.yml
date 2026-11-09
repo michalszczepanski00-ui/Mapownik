@@ -1,0 +1,48 @@
+# msportal — testy i budowanie przy każdej zmianie (push / pull request).
+# Wynik: artefakt „msportal-www” = zawartość build/www/, gotowa do wgrania na serwer.
+name: Testy i budowanie
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'   # minimalna wersja wymagana przez portal (hosting OVH: 8.1+)
+          extensions: curl, gd, zip, pdo_sqlite, mbstring
+          tools: none
+      - run: npm ci
+      - name: TypeScript
+        run: npm run typecheck
+      - name: Testy jednostkowe (Vitest)
+        run: npm test
+      - name: Budowanie paczki (Vite + pliki serwera)
+        run: npm run build
+      - name: Kontrola wydania (składnia, wersje, CSP, testy PHP)
+        run: python3 tools/check_release.py
+      - name: Przeglądarka do testów E2E
+        run: npx playwright install --with-deps chromium
+      - name: Testy E2E (Playwright, na zbudowanej paczce)
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        with:
+          name: msportal-www
+          path: build/www/
+          include-hidden-files: true   # .htaccess
+          retention-days: 30
