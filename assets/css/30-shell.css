@@ -11,7 +11,6 @@
 /* Przypisanie pasm z-index elementom powłoki (Faza 0). */
 .map-statusbar { z-index: var(--z-map-statusbar); }
 .map-view-controls { z-index: var(--z-map-controls); }
-.floating-tools { z-index: var(--z-tools); }
 .layers-panel { z-index: var(--z-dock); }
 .objects-panel { z-index: var(--z-dock-raised); }
 .identify-panel { z-index: var(--z-dock-overlay); }
@@ -337,44 +336,6 @@
    mapa bywa niska, a paleta ma stałą liczbę pozycji i zasłaniała statusbar.
    17.8.13: odstęp liczony od paska stanu (12 px góra + 28 px pasek + 8 px);
    wcześniej przy 1280×720 paleta zawsze wchodziła 14 px na pasek stanu. */
-.floating-tools {
-  max-height: calc(100% - var(--statusbar-height) - 20px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-}
-.floating-tools-heading {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 26px;
-  gap: 2px;
-  color: var(--text-muted);
-  background: var(--surface);
-  font-size: 10px;
-  font-weight: var(--fw-semibold);
-  line-height: 1.1;
-}
-.floating-tools-collapse {
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 22px;
-  padding: 0;
-  border: 0;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--text-muted);
-  cursor: pointer;
-}
-.floating-tools-collapse:hover { background: var(--surface-hover); color: var(--text); }
-.floating-tools-collapse:focus-visible { outline: 2px solid var(--accent); outline-offset: -1px; }
-.floating-tools.is-collapsed { overflow: visible; }
-.floating-tools.is-collapsed .floating-tools-collapse svg { transform: rotate(-90deg); }
 
 /* Profil terenu używa własnych nazw przycisków, które nigdy nie dostały stylu
    — w oknie pływającym o stałej szerokości rzucało się to mniej w oczy niż
@@ -842,8 +803,6 @@
   .dock--right-panel .object-row-action { width: 40px; height: 40px; }
   .dock--right-panel .objects-controls input,
   .dock--right-panel .objects-controls select { min-height: 40px; }
-  .floating-tools--grouped .icon-button { min-height: 44px; }
-  .floating-tools-collapse { width: 28px; height: 36px; flex-basis: 28px; }
 }
 
 .app-shell.is-export-selection .map-column { width: 100%; }
@@ -1528,37 +1487,6 @@
 .layer-row-more { width: var(--icon-button); height: var(--icon-button); flex-basis: var(--icon-button); border-radius: var(--radius-sm); }
 .layer-row-titleline { gap: 5px; }
 .layer-row--compact .layer-row-copy { cursor: pointer; }
-.layer-active-strip {
-  padding: 6px 9px 7px;
-  border-bottom: 1px solid var(--border-soft);
-}
-.layer-active-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  max-height: calc(var(--control-h-sm) * 3 + 8px); /* trzy pełne rzędy, dalej przewijanie */
-  overflow-y: auto;
-  margin-top: 4px;
-}
-.layer-active-chip {
-  max-width: 100%;
-  height: var(--control-h-sm);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0 6px 0 8px;
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
-  border-radius: var(--radius-pill);
-  background: var(--accent-soft);
-  color: var(--text);
-  font: inherit;
-  font-size: var(--fs-sm);
-  cursor: pointer;
-}
-.layer-active-chip > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.layer-active-chip > svg { flex: 0 0 auto; color: var(--text-muted); }
-.layer-active-chip:hover > svg { color: var(--danger); }
-.layer-active-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .layer-favorite-mark { flex: 0 0 auto; color: var(--warning); fill: currentColor; }
 .zone-legend-panel.layer-inline-legend {
   max-height: 180px;
@@ -1584,7 +1512,6 @@
 .terrain-hypsometry small,
 .terrain-accuracy-control > span,
 .terrain-rectangle-info span { opacity: 1; color: var(--text-muted); }
-.terrain-chart-label { opacity: 1; fill: var(--text-muted); }
 .terrain-profile-error { align-items: flex-start; gap: 10px; }
 .terrain-profile-error-body { flex: 1 1 auto; min-width: 0; display: grid; gap: 4px; }
 .terrain-profile-error-details summary { color: var(--text-muted); font-size: var(--fs-sm); cursor: pointer; }
@@ -1965,40 +1892,10 @@
   --icon-button: 26px;
   --context-bar-height: 36px;
 }
-.app-shell[data-density="compact"] .floating-tools--grouped .icon-button { height: 28px; flex-basis: 28px; }
 
 .layer-coverage-note { margin: 4px 6px; font-size: 12px; line-height: 1.4; color: var(--text-muted); }
 /* Zanikanie u dołu: element o zerowej wysokości przyklejony do dolnej krawędzi
    palety (18.10.4: bez przycisku podpisów); wewnętrzna warstwa rysuje gradient. */
-.floating-tools-more {
-  position: sticky;
-  bottom: 0;
-  height: 0;
-  margin: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 120ms ease-out;
-}
-.floating-tools-more.is-visible { opacity: 1; }
-.floating-tools-more > svg {
-  position: absolute;
-  left: 50%;
-  bottom: 1px;
-  transform: translateX(-50%);
-  color: var(--text-muted);
-  z-index: 1;
-}
-.floating-tools-more::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 26px;
-  background: linear-gradient(to bottom, transparent, var(--surface));
-}
-@media (prefers-reduced-motion: reduce) { .floating-tools-more { transition: none; } }
 
 /* Stały układ nagłówka i pełna szerokość wykresu w doku i odpiętym oknie. */
 .terrain-profile-chart svg,
@@ -2007,7 +1904,6 @@
 .list-pagination > span { flex: 1; text-align: center; }
 
 /* 18.10.4: paleta ma same ikony — nazwy i skróty pokazuje podpowiedź po najechaniu. */
-.floating-tools--grouped { padding-bottom: 3px; }
 }
 
 /* 18.9.6 — compact elevation progress and cached raster controls. */
@@ -2051,8 +1947,6 @@
     .ortho-details { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
     .ortho-details summary { cursor: pointer; }
     .ortho-details p { margin: 6px 0; line-height: 1.5; }
-    .layers-ortho-shortcut { align-self: flex-start; margin: 6px 8px 0; min-height: 28px; }
-    @media (max-width: 760px), (pointer: coarse) and (max-height: 500px) { .layers-ortho-shortcut { min-height: 40px; } }
     /* 18.9.11: treść panelu Ortofotomap ma własny margines (pola dotykały ramki). */
     .ortho-body { min-height: 0; overflow: auto; padding: 10px 12px 12px; display: grid; gap: 10px; align-content: start; }
     .ortho-body .ortho-point { margin-top: 2px; }
@@ -2081,8 +1975,6 @@
 
 /* 18.11.0: gdy kod narzędzia jeszcze się wczytuje, mapa nie przyjmuje kliknięć
    (inaczej trafiały do nawigacji: dwuklik przybliżał, obiekt nie powstawał). */
-.app-shell:has(.floating-tools .tool-loading-icon) .map-host { cursor: progress; }
-.app-shell:has(.floating-tools .tool-loading-icon) .map-host .ol-viewport { pointer-events: none; }
 
 /* 18.11.0: prawy panel nie zachodzi na dolny dok (Profil terenu, Analiza wysokości). */
 @media (min-width: 761px) {

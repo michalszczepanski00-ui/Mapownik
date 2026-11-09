@@ -24,7 +24,6 @@
 .vps-data-panel .vps-input select:focus-visible,.vps-data-panel .vps-input input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .vps-data-panel .vps-input input::placeholder{color:var(--text-faint)}
 .vps-data-panel .vps-form-group{display:grid;gap:8px;margin:0;min-width:0}
-.vps-data-panel .vps-2col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;min-width:0}
 .vps-data-panel .vps-hint{margin:0;color:var(--text-muted);font-size:var(--fs-xs);line-height:var(--lh-normal)}
 .vps-data-panel .vps-metric{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 8px;border:1px solid var(--border-soft);border-radius:var(--radius-sm);background:var(--surface-raised);font-size:var(--fs-sm);color:var(--text-muted)}
 .vps-data-panel .vps-metric strong{color:var(--text);font-size:var(--fs-lg);font-variant-numeric:tabular-nums}
@@ -34,10 +33,6 @@
 .vps-data-panel .vps-stat{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
 .vps-data-panel .vps-stat>span{color:var(--text-muted)}
 .vps-data-panel .vps-stat>strong{color:var(--text);text-align:right;font-variant-numeric:tabular-nums}
-.vps-data-panel .vps-annual{display:grid;gap:3px;border-top:1px solid var(--border-soft);padding-top:6px}
-.vps-data-panel .vps-year{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:6px;font-size:var(--fs-sm)}
-.vps-data-panel .vps-year strong{text-align:right;font-variant-numeric:tabular-nums}
-.vps-data-panel .vps-year small{color:var(--text-faint)}
 .vps-data-panel .vps-toggle{display:flex;gap:6px;align-items:center;font-size:var(--fs-sm);color:var(--text)}
 .vps-data-panel .vps-toggle input{width:var(--checkbox);height:var(--checkbox);margin:0;accent-color:var(--accent)}
 .vps-data-panel .vps-items{display:flex;flex-direction:column;max-height:220px;overflow-y:auto;gap:0}
@@ -47,10 +42,6 @@
 .vps-data-panel .vps-source-list>strong{font-size:var(--fs-sm)}
 .vps-data-panel .vps-sync-item{display:flex;flex-direction:column;gap:1px;border-bottom:1px solid var(--border-soft);padding:4px 0}
 .vps-data-panel .vps-sync-item small,.vps-data-panel .vps-source-list small{font-size:var(--fs-xs);color:var(--text-muted)}
-.vps-data-panel .vps-area-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.vps-data-panel .vps-area-row button{height:var(--control-h-sm);padding:0 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface-solid);color:var(--text);font:inherit;font-size:var(--fs-sm);cursor:pointer}
-.vps-data-panel .vps-area-row button:disabled{opacity:.5;cursor:default}
-.vps-data-panel .vps-manager{display:grid;gap:8px;margin-top:6px}
 .vps-data-panel .vps-parcel-report{display:flex;flex-direction:column;gap:8px;min-width:0;padding:6px 0}
 .vps-data-panel .vps-parcel-category{display:flex;flex-direction:column;gap:3px;min-width:0;border-top:1px solid var(--border-soft);padding:6px 0}
 .vps-data-panel .vps-parcel-category>strong{font-size:var(--fs-sm)}

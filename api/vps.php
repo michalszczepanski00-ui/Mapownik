@@ -16,7 +16,7 @@ require_once __DIR__ . '/_vps_store.php';
 require_once __DIR__ . '/_vps_geo.php';
 require_once __DIR__ . '/_vps_ru.php';
 
-const VPS_VERSION = '19.42.0';
+const VPS_VERSION = '19.43.0';
 const VPS_EXPENSIVE = ['rcn/stats', 'bdot/nearby', 'site/screening', 'parcel/analyze'];
 
 final class VpsHttpError extends RuntimeException {
@@ -122,13 +122,19 @@ function vps_guard_expensive() {
             @flock($h, LOCK_UN); fclose($h);
         }
     }
-    $gate = @fopen($dir . DIRECTORY_SEPARATOR . 'analysis.lock', 'c');
-    if ($gate === false) return null;
-    if (!@flock($gate, LOCK_EX | LOCK_NB)) {
-        fclose($gate);
-        throw new VpsHttpError(429, 'Trwa analiza. Ponów za chwilę.', ['Retry-After' => '2']);
+    // 19.43.0 (audyt A2): dwie analizy naraz i do 6 s oczekiwania na wolne miejsce. Wcześniej jedna analiza
+    // na cały serwer i natychmiastowe 429 — drugi użytkownik dostawał raport z luką „Trwa analiza”.
+    $deadline = microtime(true) + 6.0;
+    while (true) {
+        for ($i = 0; $i < 2; $i++) {
+            $gate = @fopen($dir . DIRECTORY_SEPARATOR . "analysis-{$i}.lock", 'c');
+            if ($gate === false) return null;
+            if (@flock($gate, LOCK_EX | LOCK_NB)) return $gate;
+            fclose($gate);
+        }
+        if (microtime(true) > $deadline) throw new VpsHttpError(429, 'Trwa analiza. Ponów za chwilę.', ['Retry-After' => '3']);
+        usleep(250000);
     }
-    return $gate;
 }
 
 // ------------------------------------------------------------------ zapytania HTTP

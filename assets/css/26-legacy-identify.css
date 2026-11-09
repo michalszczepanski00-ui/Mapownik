@@ -51,7 +51,6 @@
 /* Informacja o miejscu */
 .identify-panel--compact { width: 322px; max-height: min(62vh, 560px); }
 .identify-panel--compact .identify-panel-body { padding: 6px; }
-.identify-section-heading { margin: 2px 3px 5px; color: var(--text); font-size: var(--fs-md); }
 .identify-summary-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -318,7 +317,6 @@
 .terrain-axis { stroke: currentColor; stroke-opacity: .28; stroke-width: 1; }
 .terrain-profile-fill { fill: color-mix(in srgb, var(--chart-line) 12%, transparent); stroke: none; }
 .terrain-profile-line { fill: none; stroke: var(--chart-line); stroke-width: 2.3; stroke-linejoin: round; stroke-linecap: round; }
-.terrain-chart-label { fill: currentColor; opacity: .7; font-size: var(--fs-sm); }
 .terrain-profile-note { margin-top: 2px; font-size: var(--fs-sm); opacity: .65; text-align: right; }
 @media (max-width: 760px), (pointer: coarse) and (max-height: 500px) {
   .terrain-profile-panel { left: 8px; right: 8px; bottom: 32px; min-width: 0; }
@@ -328,8 +326,6 @@
 
 /* 16.5.0 — Geoportal context action + parcel terrain analysis */
 .terrain-hover-line { stroke: currentColor; stroke-width: 1; stroke-dasharray: 3 3; opacity: .45; }
-.terrain-hover-point { fill: var(--surface-solid); stroke: var(--text); stroke-width: 2; }
-.terrain-hover-label { fill: currentColor; font-size: var(--fs-sm); font-weight: 600; paint-order: stroke; stroke: var(--panel-bg); stroke-width: 3px; stroke-linejoin: round; }
 .terrain-area-panel { min-width: min(760px, calc(100vw - 36px)); }
 .terrain-area-body { padding: 10px 11px 11px; display: grid; gap: 10px; }
 .terrain-area-intro { font-size: var(--fs-md); line-height: 1.45; opacity: .78; }

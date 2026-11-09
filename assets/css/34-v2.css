@@ -415,36 +415,6 @@
    nad kartą). Położenie jest stałe (bez przeciągania i zmiany rozmiaru) —
    !important przebija geometrię okna pływającego z usePanel (styl w linii). */
 .app-shell.is-v2 { --place-card-width: 360px; --place-card-top: 90px; }
-.place-card-tabs {
-  position: absolute;
-  z-index: calc(var(--z-dock-overlay) + 1);
-  left: var(--v2-gap);
-  top: 56px;
-  width: var(--place-card-width);
-  display: flex;
-  gap: 2px;
-  padding: 3px;
-  border-radius: 10px 10px 0 0;
-  background: var(--v2-ink);
-  border: var(--v2-dock-border, 0);
-  border-bottom: 0;
-  box-shadow: var(--v2-float-shadow);
-}
-.place-card-tab {
-  flex: 1 1 0;
-  height: 28px;
-  border: 0;
-  border-radius: 7px;
-  background: transparent;
-  color: var(--v2-ink-text);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.place-card-tab:hover { background: var(--v2-dock-hover); }
-.place-card-tab.is-active { background: var(--v2-dock-active-bg); color: var(--v2-dock-active-text); }
-.place-card-tab:focus-visible { outline: 2px solid var(--v2-dock-focus); outline-offset: 1px; }
 .app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) {
   position: absolute;
   z-index: var(--z-dock-overlay);
@@ -646,11 +616,6 @@
 /* Karta miejsca: zakładka jest tytułem — bez drugiego nagłówka i stopki. */
 .app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) > .panel-header,
 .app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) > .panel-footer { display: none; }
-.place-card-tabs { align-items: center; }
-.place-card-action.icon-button { flex: 0 0 28px; width: 28px; height: 28px; border-radius: 7px; color: var(--v2-ink-text); background: transparent; }
-.place-card-action.icon-button:hover { background: var(--v2-dock-hover); color: var(--v2-dock-strong); }
-.place-card-action.icon-button.is-active { background: var(--v2-dock-active-bg); color: var(--v2-dock-active-text); }
-.place-card-tab + .place-card-action { margin-left: 4px; }
 
 /* --- 2. Przyciski: główny, zwykły, tekstowy (+ chip do filtrów i statusów) --- */
 .app-shell.is-v2 .ui-panel .ui-button,
@@ -669,9 +634,6 @@
 .identify-verdict-show:hover:not(:disabled) { background: var(--accent-soft); }
 .identify-verdict-show.is-shown { border: 0; color: var(--text-muted); font-weight: 500; }
 /* Akcje karty Działka: akcja główna rozciągnięta, „Działania” obok. */
-.app-shell .identify-panel .identify-actions.identify-actions--v2 { display: flex; grid-template-columns: none; gap: 6px; align-items: center; flex-wrap: nowrap; }
-.app-shell .identify-panel .identify-actions--v2 > .ui-button { flex: 1 1 auto; justify-content: center; }
-.app-shell .identify-panel .identify-actions--v2 > .object-actions-trigger { flex: 0 0 auto; }
 
 /* --- 3. Jeden język stanów: ● jest · ○ brak · ▲ ograniczenie/błąd · ◌ sprawdzanie --- */
 .app-shell.is-v2 .identify-layer-dot {
@@ -724,7 +686,6 @@
 .app-shell.is-v2 .parcelplus-row { border-radius: 0; border-width: 0 0 1px; }
 .app-shell.is-v2 .parcelplus-row:last-child { border-bottom: 0; }
 .app-shell.is-v2 .parcelplus-disclaimer { padding: 6px 8px; font-size: 11px; line-height: 1.4; border-radius: 7px; }
-.app-shell.is-v2 .identify-section-heading { margin: 0; font-size: 12px; font-weight: 600; }
 .app-shell.is-v2 .identify-fact span { font-size: 11px; }
 .app-shell.is-v2 .identify-fact strong { font-size: 12px; }
 .app-shell.is-v2 .ui-panel :is(input, select):not([type="checkbox"]):not([type="radio"]):not([type="range"]) { min-height: 28px; font-size: 12px; border-radius: 7px; }
@@ -745,7 +706,5 @@
  .app-shell.is-v2 .map-topbar .map-search { min-width: 0; width: clamp(160px, 32vw, 320px); max-width: calc(100vw - 72px); }
 }
 @media (pointer: coarse) {
- .place-card-tab { min-height: 44px; }
- .place-card-action.icon-button { width: 44px; height: 44px; flex-basis: 44px; }
  .app-shell.is-v2 { --place-card-top: 106px; }
 }

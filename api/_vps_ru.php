@@ -398,7 +398,16 @@ function vps_kimp_parcel(array $parcel, ?array $prefetched = null): array {
         : vps_fetch_parallel($urls, 1500000, 6, ['mapy.geoportal.gov.pl'], VPS_FOLLOW_KEYS);
     $body = $raws['kimp:gfi'] ?? null;
     $status = is_string($body) ? 200 : 0;
-    $text = ($status >= 200 && $status < 300) ? vps_kimp_text((string)$body) : '';
+    // 19.43.0 (audyt A1): integracja krajowa składa odpowiedzi serwerów gmin, rozdzielone <hr/>.
+    // Odpowiedź-błąd serwera gminy (ServiceException, np. LayerNotDefined) NIE jest opisem planu —
+    // wcześniej każdy niepusty tekst dawał w raporcie „MPZP: … FAKT” z treścią błędu jako opisem.
+    $gfiError = false;
+    $parts = [];
+    foreach (preg_split('~<hr\s*/?>~i', (string)$body) ?: [] as $part) {
+        if (preg_match('~ServiceException|ExceptionReport|msWMS\w*\(\)|WMS server error|LayerNotDefined|Invalid layer~i', $part)) { $gfiError = true; continue; }
+        $parts[] = $part;
+    }
+    $text = ($status >= 200 && $status < 300) ? vps_kimp_text(implode("\n", $parts)) : '';
     $noResult = $text === '' || preg_match('~brak (wyniku|serwisu)~iu', $text);
     if (!$noResult) {
         return ['ok' => true, 'matches' => [[
@@ -416,7 +425,8 @@ function vps_kimp_parcel(array $parcel, ?array $prefetched = null): array {
         if (imagecolorsforindex($img, imagecolorat($img, $i, $j))['alpha'] < 100) $drawn++;
     }
     imagedestroy($img);
-    if ($drawn < 9) return ['ok' => true, 'matches' => [], 'checked' => 'raster-empty'];
+    // Pusty rysunek przy błędzie opisu nie dowodzi braku planu (serwer gminy mógł nie odpowiedzieć) — wynik nieznany.
+    if ($drawn < 9) return $gfiError ? ['ok' => false, 'matches' => [], 'checked' => 'gfi-error-raster-empty'] : ['ok' => true, 'matches' => [], 'checked' => 'raster-empty'];
     return ['ok' => true, 'matches' => [[
         'source' => 'GUGiK — krajowa integracja MPZP (rysunek planu)', 'kind' => 'plan',
         'label' => 'Miejscowy plan zagospodarowania przestrzennego (wg rysunku planu)', 'status' => null,

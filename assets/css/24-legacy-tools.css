@@ -9,46 +9,11 @@
    kolejności w warstwie, nie nazwa pliku.
 */
 @layer legacy {
-.floating-tools {
-  position: absolute;
-  z-index: 20;
-  left: 12px;
-  top: 12px;
-  width: 42px;
-  padding: 4px;
-  display: grid;
-  gap: 1px;
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(16px);
-}
-.floating-tools .icon-button { width: 32px; height: 32px; flex-basis: 32px; }
 
 /* Step 12 — ToolRegistry state */
-.floating-tools .icon-button.has-error {
-  color: var(--danger);
-  background: color-mix(in srgb, var(--danger) 8%, transparent);
-}
-.tool-loading-icon { animation: tool-spin 800ms linear infinite; }
 @keyframes tool-spin { to { transform: rotate(360deg); } }
 
 /* Floating tools */
-.floating-tools--grouped { width: 40px; padding: 3px; gap: 0; }
-.tool-group { display: grid; gap: 1px; }
-.tool-group--separated {
-  margin-top: 4px;
-  padding-top: 4px;
-  border-top: 1px solid var(--border);
-}
-.tool-button-shell { position: relative; }
-.floating-tools--grouped .icon-button { width: 32px; height: 31px; flex-basis: 31px; }
-.floating-tools--grouped .icon-button.is-active {
-  color: var(--accent);
-  background: var(--accent-soft);
-  box-shadow: inset 2px 0 0 var(--accent);
-}
 
 /* 15.0 — zaawansowane rysowanie */
 
@@ -74,16 +39,7 @@
 /* 16.5.0 — jawne ostrzeżenia uproszczonej analizy drogi */
 
 /* 18.10.4: paleta narzędzi to same ikony (nazwy i skróty w podpowiedzi po najechaniu). */
-.floating-tools--grouped { width: 44px; padding: 3px; }
-.floating-tools--grouped .icon-button { width: 36px; height: 30px; flex-basis: 30px; }
-.tool-button-shell { display: grid; place-items: center; }
 
 /* 17.8.3 — Performance & Vendor Cleanup: authoritative UI spacing */
 /* Odstępy paska przejęły .app-bar i .selection-bar (sekcja Fazy 2). */
-.tool-group { gap: 1px; }
-.tool-group--separated { margin-top: 1px; padding-top: 1px; }
-@media (max-width: 760px), (pointer: coarse) and (max-height: 500px) {
-  .floating-tools--grouped { width: 48px; }
-  .floating-tools--grouped .icon-button { width: 40px; height: 36px; flex-basis: 36px; }
-}
 }

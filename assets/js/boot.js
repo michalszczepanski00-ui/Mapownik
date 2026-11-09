@@ -1,5 +1,5 @@
 /*
- * msportal 19.42.0 — skrypt startowy (zwykły skrypt, nie moduł; ładowany przed aplikacją).
+ * msportal 19.43.0 — skrypt startowy (zwykły skrypt, nie moduł; ładowany przed aplikacją).
  *
  * Od 19.42.0 kod aplikacji jest budowany narzędziem Vite do kilku plików w assets/build/ o nazwach
  * z sumą treści. Ten plik zastępuje dawny skrypt wbudowany w index.html (CSP: bez skryptów inline):
@@ -10,7 +10,7 @@
  */
 (function () {
   'use strict';
-  var VERSION = '19.42.0';
+  var VERSION = '19.43.0';
   window.__MAPOWNIK_DEPLOY_VERSION__ = VERSION;
   window.__MAPOWNIK_BOOTED__ = false;
   var shown = false;
@@ -62,7 +62,31 @@
     if (!window.__MAPOWNIK_BOOTED__) showError('msportal nie wystartował', 'Aplikacja nie uruchomiła się w ciągu 45 sekund. Sprawdź połączenie i odśwież stronę (Ctrl+F5).');
   }, 45000);
 
+  // 19.43.0: tryb offline — service worker (sw.js, generowany przy budowaniu) zapamiętuje aplikację.
+  // Tylko na HTTPS albo localhost (wymóg przeglądarek); ?sw=0 w adresie pomija rejestrację (diagnoza).
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) && !/[?&]sw=0\b/.test(location.search)) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (error) { console.warn('msportal: tryb offline niedostępny', error); });
+    });
+  }
+
+  // Informacja o braku połączenia (projekt nadal zapisuje się w przeglądarce).
+  function offlineBanner() {
+    var id = 'msportal-offline';
+    var existing = document.getElementById(id);
+    if (navigator.onLine) { if (existing) existing.remove(); return; }
+    if (existing || !document.body) return;
+    var el = document.createElement('div');
+    el.id = id; el.setAttribute('role', 'status');
+    el.style.cssText = 'position:fixed;left:50%;top:64px;transform:translateX(-50%);z-index:9999;max-width:min(560px,92vw);padding:8px 14px;border-radius:10px;background:#3b2f0b;color:#fff8e1;font:13px/1.35 Inter,Segoe UI,Arial,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.25)';
+    el.textContent = 'Brak połączenia z internetem — mapy i dane z usług są niedostępne. Projekt nadal zapisuje się w tej przeglądarce.';
+    document.body.appendChild(el);
+  }
+  window.addEventListener('online', offlineBanner);
+  window.addEventListener('offline', offlineBanner);
+
   document.addEventListener('DOMContentLoaded', function () {
+    offlineBanner();
     var link = document.querySelector('.skip-link');
     if (link) link.addEventListener('click', function (event) {
       var input = document.getElementById('map-search-input');

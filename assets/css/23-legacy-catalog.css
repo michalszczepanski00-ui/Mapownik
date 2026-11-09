@@ -269,14 +269,6 @@
 .source-health-empty { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 18px; color: var(--text-muted); font-size: var(--fs-sm); }
 
 .layers-panel--v2 .layers-list { min-height: 0; overflow: auto; }
-.layer-shortcuts { padding: 5px 6px; border-bottom: 1px solid var(--border-soft); background: color-mix(in srgb, var(--surface-raised) 84%, var(--accent) 4%); }
-.layer-shortcuts-title { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; color: var(--text-muted); font-size: var(--fs-xs); font-weight: 600; }
-.layer-shortcuts-list { display: flex; flex-wrap: wrap; gap: 4px; max-height: 78px; overflow: auto; }
-.layer-shortcuts-list button {
-  max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  min-height: 22px; padding: 0 6px; border: 1px solid var(--border-soft); border-radius: 999px; background: var(--surface-solid); color: var(--text-muted); font: inherit; font-size: var(--fs-xs); cursor: pointer;
-}
-.layer-shortcuts-list button.is-active { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 48%, var(--border)); background: var(--accent-soft); }
 .layer-row--compact .layer-row-main { grid-template-columns: 16px 25px minmax(0, 1fr) 25px 25px 25px; }
 .layer-drag-handle { width: 16px; height: 24px; display: grid; place-items: center; color: var(--text-faint); cursor: grab; }
 .layer-row.is-dragging { opacity: .45; }

@@ -266,7 +266,7 @@ function bdot_bbox_distance(array $a, array $b): float {
 
 function bdot_query_buildings(array $bbox, string $category, int $limit, ?array $near = null): array {
     $status = bdot_store_status();
-    if (!$status['ready']) throw new RuntimeException('Lokalna baza BDOT10k nie jest zainstalowana. Wgraj przygotowany magazyn do data/bdot_buildings/.');
+    if (!$status['ready']) { error_log('msportal: brak magazynu BDOT10k w data/bdot_buildings/ (wgraj przygotowany magazyn).'); throw new RuntimeException('Lokalna baza budynków BDOT10k nie jest dostępna na tym serwerze.'); } // 19.43.0 (audyt A4): instrukcja dla administratora tylko w dzienniku
     $manifest = $status['manifest'];
     $bbox = bdot_validate_bbox($bbox);
     if (!in_array($category, ['single_family','residential','all'], true)) throw new InvalidArgumentException('Nieobsługiwana kategoria budynków.');

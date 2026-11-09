@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * msportal 19.42.0 — budowanie paczki serwerowej: npm run build
+ * msportal 19.43.0 — budowanie paczki serwerowej: npm run build
  *
  * 1. Vite buduje frontend (index.html + assets/build/*) do build/www/.
  * 2. Skrypt dokłada pliki serwera, które wgrywa się przez FTP jak dotąd (api/, PHP, konfiguracja, dane,
@@ -22,7 +22,7 @@ const version = readFileSync(join(ROOT, 'VERSION.txt'), 'utf8').trim();
 
 // Pliki i katalogi z repozytorium, które idą na serwer (poza index.html, który powstaje w budowaniu).
 const SERVER_ENTRIES = [
-  '.htaccess', 'VERSION.txt', 'verify-deployment.php', 'setup-vendors.php', 'diagnostyka.html', 'monitor-zrodel.html',
+  '.htaccess', 'manifest.webmanifest', 'VERSION.txt', 'verify-deployment.php', 'setup-vendors.php', 'diagnostyka.html', 'monitor-zrodel.html',
   'api', 'assets', 'cache', 'cron', 'data', 'konfiguracja', 'monitor', 'tools', 'vendor', 'audyt', `app-${version}`,
 ];
 const DOC_PATTERN = /^(ZMIANY.*\.md|RAPORT_AUDYTU.*\.md|README.*\.(txt|md))$/;
@@ -56,6 +56,16 @@ const copy = (rel) => {
 for (const entry of SERVER_ENTRIES) copy(entry);
 for (const name of readdirSync(ROOT)) if (DOC_PATTERN.test(name)) copy(name);
 
+// 19.43.0: manifest aplikacji (instalacja na telefonie) — dopisany po budowaniu, żeby Vite go nie przenosił
+// do assets/build/ (ścieżki ikon w manifeście są względne do katalogu portalu).
+{
+  const file = join(OUT, 'index.html');
+  const html = readFileSync(file, 'utf8');
+  if (!html.includes('rel="manifest"')) {
+    writeFileSync(file, html.replace('</head>', '  <link rel="manifest" href="./manifest.webmanifest" />\n  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png" />\n</head>'));
+  }
+}
+
 // --- kontrole wyniku
 const index = readFileSync(join(OUT, 'index.html'), 'utf8');
 if (/<script(?![^>]*\bsrc=)[^>]*>/i.test(index.replace(/<script type="importmap"[\s\S]*?<\/script>/, ''))) {
@@ -86,6 +96,18 @@ try {
 }
 
 const bundle = files.filter((f) => f.startsWith('assets/build/'));
+
+// 19.43.0: service worker (tryb offline) z listą plików do zapamiętania; wersja = wydanie + suma index.html.
+{
+  const { createHash } = await import('node:crypto');
+  const precache = ['./', './index.html', `./assets/js/boot.js?v=${version}`, './manifest.webmanifest',
+    './assets/icons/icon-192.png', './assets/icons/icon-512.png', ...bundle.filter((f) => !f.endsWith('BUILD.txt')).map((f) => './' + f)];
+  const swVersion = `${version}-${createHash('sha256').update(index).digest('hex').slice(0, 10)}`;
+  const template = readFileSync(join(ROOT, 'tools', 'sw.template.js'), 'utf8');
+  writeFileSync(join(OUT, 'sw.js'), template.replace("'__VERSION__'", JSON.stringify(swVersion)).replace('__PRECACHE__', JSON.stringify(precache, null, 1)));
+  for (const f of precache.slice(4)) if (!existsSync(join(OUT, f.replace(/^\.\//, '').replace(/\?.*$/, '')))) fail(`sw.js: brak pliku ${f}`);
+  console.log(`sw.js: tryb offline, ${precache.length} plików (${swVersion})`);
+}
 const size = (list) => list.reduce((sum, f) => sum + statSync(join(OUT, f)).size, 0);
 writeFileSync(join(OUT, 'assets', 'build', 'BUILD.txt'),
   `msportal ${version}\nzbudowano: ${new Date().toISOString()}\nplików paczki: ${bundle.length}\n`);

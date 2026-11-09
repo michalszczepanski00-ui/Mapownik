@@ -101,7 +101,6 @@ button.workspace-start-item:focus-visible { outline: 2px solid var(--accent); ou
 .workspace-card .vps-stat > strong { font-size: 13px; }
 .app-shell.is-v2 .workspace-card .identify-verdict-item { font-size: 12.5px; min-height: 28px; }
 .workspace-card :is(.vps-hint, .analysis-hint, .screening-target-help small, .parcelplus-disclaimer) { font-size: 12px; line-height: 1.4; }
-.workspace-context :is(.context-tool-hint, .context-bar-hint, p) { font-size: 12px; }
 .app-shell.is-workspace-1c .layers-panel--v2 .layer-row-titleline strong { font-size: 12px; }
 .app-shell.is-v2 .layers-panel--v2 .layer-group-title { font-size: 12.5px; }
 .activity-bar-label { font-size: 10.5px; }

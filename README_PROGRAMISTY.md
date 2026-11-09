@@ -67,6 +67,13 @@ Wszystkie uruchamia też GitHub Actions przy każdej zmianie.
 - Uwaga: `diagnostyka.html` importuje pliki źródłowe bez budowania, więc moduł przeniesiony do `.ts`
   trzeba w diagnostyce zastąpić testem Vitest/Playwright (albo zostawić w JS do czasu przeniesienia diagnostyki).
 
+## Narzędzia dodane w 19.43.0
+- `node tools/css_unused.mjs` — raport nieużywanych reguł CSS; `--apply` usuwa je (po zmianie porównaj wygląd).
+- `php tools/client_errors_report.php 7` — błędy JavaScript zgłoszone przez przeglądarki w ostatnich 7 dniach.
+- `tools/sw.template.js` — szablon service workera (tryb offline); `tools/build.mjs` wpisuje listę plików i wersję.
+- `app-*/core/apiCache.js` — pamięć zapytań (TanStack Query). Nowe zapytania GET do API z odpowiedzią `{ok: true}`
+  warto kierować przez `cachedJson(url, { signal, retry })`; nie dla odpowiedzi „w toku” (np. pozwolenia z `pending`).
+
 ## Zasady, których pilnują narzędzia
 - `index.html` nie może mieć skryptów wbudowanych (CSP `script-src 'self'`) — sprawdza `tools/build.mjs`.
 - Zod musi być w trybie `jitless` przed pierwszym schematem — `core/zodConfig.js` jest w tej samej paczce co zod (`vite.config.js`).

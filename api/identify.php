@@ -312,6 +312,9 @@ if ($winnerFormat !== '' && in_array($winnerFormat, $formats, true)) {
 $stopReason = '';
 
 $lastError = '';
+// 19.43.0: serwer (w integracji krajowej — serwer gminy) odrzucił nazwy warstw (LayerNotDefined).
+// To nie awaria usługi, tylko brak publikacji danych przez gminę — „Ponów” nic nie zmieni.
+$layerRejected = false;
 $validEmptyResponse = false;
 $emptyBasis = 'html';
 $remember = static function (array $candidate, string $format) use ($winnerFile, $candidateSig): void {
@@ -363,7 +366,10 @@ foreach ($candidates as $candidate) {
         }
         if ($status < 200 || $status >= 300 || trim($body) === '') continue;
         $result = identify_analyze($body, $infoFormat, (string)$type);
-        if ($result['state'] === 'invalid') continue; // format nieobsługiwany albo wyjątek — następny format
+        if ($result['state'] === 'invalid') {
+            if (preg_match('~LayerNotDefined|Invalid layer\(s\)~i', substr($body, 0, 8000))) $layerRejected = true;
+            continue; // format nieobsługiwany albo wyjątek — następny format
+        }
         $structured = in_array($result['basis'], ['json', 'gml', 'xml'], true);
         if ($result['state'] === 'found') {
             $remember($candidate, $infoFormat);
@@ -461,6 +467,16 @@ if ($validEmptyResponse) {
     exit;
 }
 
+if ($layerRejected && $stopReason === '') {
+    // Rysunek planu bywa dostępny, choć opis (GetFeatureInfo) nie — jak przy pustej odpowiedzi.
+    if (!empty($source['raster_probe']) && identify_raster_drawn($source, $x, $y) === true) {
+        echo json_encode(['ok' => true, 'found' => true, 'count' => null, 'basis' => 'raster',
+            'text' => (string)$source['raster_probe'],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+    identify_fail('Serwer gminy nie udostępnia tych danych w krajowej integracji GUGiK.', 502, 'not_published');
+}
 if ($stopReason === 'timeout') identify_fail('Serwis nie odpowiedział na czas.', 504, 'timeout');
 if ($stopReason === 'unavailable') identify_fail('Serwis jest chwilowo niedostępny.', 503, 'unavailable');
 identify_fail('Serwis nie zwrócił informacji o tym miejscu.', 502, 'upstream');

@@ -20,7 +20,6 @@
 .workspace-place-tab:hover { background: var(--accent-soft); }
 .workspace-place-tab.is-active { background: var(--accent); color: var(--on-accent); font-weight: 600; }
 .workspace-place-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.workspace-empty { color: var(--text-muted); font-size: 12px; padding: 12px; margin: 0; }
 /* Old floating-panel geometry must not escape the stable left card. */
 .app-shell.is-v2.is-workspace-1c .workspace-card .ui-panel {
   position: static !important; inset: auto !important; width: 100% !important;

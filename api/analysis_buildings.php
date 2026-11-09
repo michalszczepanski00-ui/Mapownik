@@ -57,7 +57,7 @@ try {
     if ($rawNear !== '') $near = bdot_validate_bbox(array_map('trim', explode(',', $rawNear)));
 
     $status = bdot_store_status();
-    if (!$status['ready']) throw new RuntimeException('Lokalna baza BDOT10k nie jest zainstalowana. Wgraj przygotowany magazyn do data/bdot_buildings/.');
+    if (!$status['ready']) { error_log('msportal: brak magazynu BDOT10k w data/bdot_buildings/ (wgraj przygotowany magazyn).'); throw new RuntimeException('Lokalna baza budynków BDOT10k nie jest dostępna na tym serwerze.'); } // 19.43.0 (audyt A4): instrukcja dla administratora tylko w dzienniku
     $manifest = $status['manifest'];
     $queryBbox = bdot_query_cache_bbox($bbox, BDOT_QUERY_CACHE_QUANTUM_METERS);
     $key = bdot_query_cache_key($queryBbox, $category, $limit, $manifest);

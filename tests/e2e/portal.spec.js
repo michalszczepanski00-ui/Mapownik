@@ -1,4 +1,4 @@
-// msportal 19.42.0 — scenariusze w przeglądarce na zbudowanej paczce.
+// msportal 19.43.0 — scenariusze w przeglądarce na zbudowanej paczce.
 import { test, expect } from '@playwright/test';
 
 /** Zbiera błędy konsoli, wyjątki i naruszenia CSP strony. */
@@ -83,4 +83,44 @@ test('brak pliku paczki (niepełne wgranie) → komunikat zamiast pustego ekranu
   await page.goto('/index.html');
   await expect(page.getByText('Niepełna aktualizacja na serwerze')).toBeVisible({ timeout: 30_000 });
   await expect(page.getByText(/assets\/build\//).first()).toBeVisible();
+});
+
+test('wyszukiwanie po współrzędnych (WGS84, PUWG 1992, link Google Maps)', async ({ page }) => {
+  await page.goto('/index.html');
+  const input = page.locator('#map-search-input');
+  await expect(input).toBeVisible({ timeout: 60_000 });
+  for (const [query, expected] of [
+    ['54.1496, 18.5654', /54,14960° N, 18,56540° E/],
+    ['https://www.google.com/maps/@54.1496,18.5654,17z', /Link Google Maps/],
+    ['698030 471720', /PUWG 1992: X 698030,00 m, Y 471720,00 m/],
+  ]) {
+    await input.fill(query);
+    await expect(page.getByRole('option').first()).toContainText(expected, { timeout: 10_000 });
+  }
+  await input.fill('54.1496, 18.5654');
+  await page.getByRole('option').first().click();
+  // Wybór przenosi mapę i otwiera kartę miejsca (sprawdzanie działki w punkcie).
+  await expect(page.getByRole('complementary', { name: 'Działka i narzędzia' })).toBeVisible({ timeout: 30_000 });
+});
+
+test('tryb offline: aplikacja otwiera się bez internetu', async ({ page, context }) => {
+  await page.goto('/index.html');
+  await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
+  await page.evaluate(async () => { await navigator.serviceWorker.ready; });
+  await page.reload(); // strona pod kontrolą service workera, pliki zapamiętane
+  await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
+  await context.setOffline(true);
+  await page.reload();
+  await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('#msportal-offline')).toContainText('Brak połączenia');
+  await context.setOffline(false);
+  await expect(page.locator('#msportal-offline')).toHaveCount(0);
+});
+
+test('zgłaszanie błędów z przeglądarki: przyjmuje POST, odrzuca inne', async ({ request }) => {
+  const ok = await request.post('/api/client_errors.php', { data: { type: 'error', message: 'test e2e', stack: '', source: 'x.js:1:1', path: '/', appVersion: 'e2e' } });
+  expect(ok.status()).toBe(204);
+  expect((await request.get('/api/client_errors.php')).status()).toBe(405);
+  expect((await request.post('/api/client_errors.php', { data: { message: '' } })).status()).toBe(400);
+  expect((await request.post('/api/client_errors.php', { data: { message: 'x'.repeat(9000) } })).status()).toBe(413);
 });
