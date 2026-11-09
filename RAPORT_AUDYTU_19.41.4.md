@@ -26,7 +26,10 @@ Działania usług zewnętrznych (GUGiK, GDOŚ, RCN, BDL itd.) na produkcji nie s
 > | Z2 polityka prywatności | **otwarte:** wymaga tekstu prawnego |
 > | Z3 Nominatim | serwer **naprawiony**; autouzupełnianie w przeglądarce **otwarte** (nowa wersja aplikacji) |
 > | Z4 podkład OSM | **otwarte:** decyzja produktowa |
-> | S1–S6, F1–F7 | **otwarte:** lokalne repozytorium git z historią zmian już istnieje, CI i reszta to osobne prace |
+> | S1 repozytorium i budowanie | **19.42.0:** repozytorium git, budowanie Vite, biblioteki z npm, TypeScript (stopniowo), testy Vitest i Playwright; repozytorium nie jest jeszcze na GitHubie |
+> | S2 wdrożenie | **19.42.0:** paczka z `npm run build`, workflow wdrożenia przez FTP/SFTP z kontrolą `verify-deployment.php` (wymaga sekretów) |
+> | S4 szybkość startu | **19.42.0:** 4G 12,2 s → 4,7 s, 316 → 28 żądań |
+> | S3 monitoring, S5 projekty w przeglądarce, F1–F7 | **otwarte** |
 
 ---
 

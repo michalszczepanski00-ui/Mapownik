@@ -1,3 +1,11 @@
+msportal 19.42.0 — PEŁNA PACZKA (09.11.2026)
+Paczka: msportal-19.42.0-serwer.zip (zawartość katalogu portalu). Opis i kroki: ZMIANY_19.42.0.md.
+1. Kopia projektu .mapownik i kopia obecnych plików portalu poza katalogiem WWW.
+2. Wgraj CAŁĄ zawartość ZIP („nadpisz zawsze”, z .htaccess); index.html i .htaccess najlepiej na końcu.
+3. Usuń stary katalog app-19.41.4/. NIE usuwaj data/, cache/ ani starszych plików w assets/build/.
+4. verify-deployment.php → "deployment_consistent": true; Ctrl+F5; api/health.php → 19.42.0-server.
+Programista: README_PROGRAMISTY.md (npm run build tworzy tę paczkę; wdrożenie także przez GitHub Actions).
+
 msportal 19.42.0-b — POPRAWKI BEZPIECZEŃSTWA (08.11.2026)
 Wersja aplikacji bez zmian. Wgranie i kontrola: ZMIANY_19.41.4-b.md (sekcja „Wgranie na serwer”).
 W skrócie: wgraj cały api/, potem data/.htaccess, index.html, setup-vendors.php, na końcu .htaccess;
