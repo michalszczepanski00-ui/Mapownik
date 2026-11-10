@@ -48,7 +48,7 @@ export function AppBar() {
 
     return h('div', { className: 'app-bar' },
         h('div', { className: 'brand', 'aria-label': 'Mapownik' },
-            h('img', { className: 'brand-logo-image', src: './assets/mapownik-logo-icon.png?v=19.48.0', alt: '', 'aria-hidden': true }),
+            h('img', { className: 'brand-logo-image', src: './assets/mapownik-logo-icon.png?v=19.49.0', alt: '', 'aria-hidden': true }),
             h('div', { className: 'brand-copy' }, h('strong', null, 'Mapownik'))),
 
         h(ProjectMenu, null),
@@ -88,33 +88,15 @@ export function AppBar() {
  */
 export function MapTopBar() {
     const dispatch = useAppDispatch();
-    const commandBus = useService('commands');
-    const editingManager = useService('editing');
     const searchManager = useService('search');
-    const commands = useServiceSnapshot('commands', EMPTY_COMMANDS);
-    const editing = useServiceSnapshot('editing', EMPTY_EDITING);
-    const ctx = useService('featureContext');
-    const sketch = useServiceSnapshot('sketch', IDLE_SKETCH);
-    const tools = useServiceSnapshot('tools', NO_TOOLS);
-    // 19.48.0 (M2): przyciąganie, cofnij i ponów tylko w trybach Rysuj / Mierz (aktywne narzędzie albo szkic).
-    // W trybie Sprawdź ich nie ma — także gdy projekt ma obiekty. Skróty Ctrl+Z / Ctrl+Y działają zawsze.
-    const drawingTool = tools.items.some((tool) => tool.active && !['core.pan', 'core.identify'].includes(tool.id));
-    const showEditing = sketch.active || drawingTool;
 
     return h('div', { className: 'map-topbar' },
         h('div', { className: 'map-topbar-start' },
             h(IconButton, { className: 'map-brand-button', label: 'Mapownik — polecenia (Ctrl+K)', tooltipSide: 'bottom', onClick: () => dispatch(openOverlay('palette')) },
-                h('img', { src: './assets/mapownik-logo-icon.png?v=19.48.0', alt: '', 'aria-hidden': true })),
+                h('img', { src: './assets/mapownik-logo-icon.png?v=19.49.0', alt: '', 'aria-hidden': true })),
             h(SearchToolbar, { manager: searchManager })),
         h('div', { className: 'map-topbar-end', role: 'toolbar', 'aria-label': 'Projekt i widok' },
-            showEditing && h('div', { className: 'map-topbar-group' },
-                h(IconButton, {
-                    label: editing.snapEnabled ? t('appbar.snapOn', { count: editing.snapTargetCount ?? 0 }) : t('appbar.snapOff'),
-                    tooltipSide: 'bottom', className: `topbar-primary-action${editing.snapEnabled ? ' is-active' : ''}`,
-                    'aria-pressed': editing.snapEnabled, disabled: !editingManager, onClick: () => editingManager?.toggleSnap(),
-                }, h(Magnet, { size: 16 })),
-                h(IconButton, { className: 'topbar-primary-action', label: sketch.active ? 'Cofnij punkt szkicu' : commands.undoLabel ? t('appbar.undo', { label: commands.undoLabel }) : t('appbar.undoNone'), tooltipSide: 'bottom', disabled: !commandBus || (!sketch.active && !commands.canUndo), onClick: () => sketch.active ? ctx?.interactions.undoLastPoint() : commandBus?.undo() }, h(Undo2, { size: 16 })),
-                h(IconButton, { className: 'topbar-primary-action', label: commands.redoLabel ? t('appbar.redo', { label: commands.redoLabel }) : t('appbar.redoNone'), tooltipSide: 'bottom', disabled: !commandBus || !commands.canRedo, onClick: () => commandBus?.redo() }, h(Redo2, { size: 16 }))),
+            // 19.49.0 (M2, Etap 2): przyciąganie, cofnij i ponów przeniesione do paska kontekstowego (MapContextBar).
             h('div', { className: 'map-topbar-group map-topbar-project' }, h(ProjectMenu, null)),
             h('button', { type: 'button', className: 'export-map-trigger', onClick: () => dispatch(openPanel('export')) }, 'Eksport'),
             h(QuickHelp, null),

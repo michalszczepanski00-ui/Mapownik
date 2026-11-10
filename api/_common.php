@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-const MAPOWNIK_USER_AGENT = 'MSPortal/19.48.0 (+server-cache)';
+const MAPOWNIK_USER_AGENT = 'MSPortal/19.49.0 (+server-cache)';
 const MAPOWNIK_TIMEOUT = 20;
 const MAPOWNIK_TILE_CACHE_MAX_AGE = 7776000; // 90 dni
 const MAPOWNIK_TILE_CACHE_MAX_BYTES = 3221225472; // 3 GiB
@@ -135,7 +135,7 @@ function vendor_remote_get(string $url, string $accept = '*/*', int $timeout = 3
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_CONNECTTIMEOUT => $connectTimeout,
             CURLOPT_TIMEOUT => $timeout,
-            CURLOPT_USERAGENT => 'Mozilla/5.0 MSPortalVendor/19.48.0',
+            CURLOPT_USERAGENT => 'Mozilla/5.0 MSPortalVendor/19.49.0',
             CURLOPT_HTTPHEADER => ['Accept: ' . $accept],
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
@@ -150,7 +150,7 @@ function vendor_remote_get(string $url, string $accept = '*/*', int $timeout = 3
         $context = stream_context_create([
             'http' => [
                 'timeout' => $timeout,
-                'user_agent' => 'Mozilla/5.0 MSPortalVendor/19.48.0',
+                'user_agent' => 'Mozilla/5.0 MSPortalVendor/19.49.0',
                 'header' => "Accept: {$accept}\r\n",
                 'follow_location' => 1,
                 'max_redirects' => 5,
@@ -261,7 +261,7 @@ function official_gis_http11_get(string $url, string $accept, int $timeout = 6):
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_CONNECTTIMEOUT => min(4, max(2, $timeout)),
         CURLOPT_TIMEOUT => $timeout,
-        CURLOPT_USERAGENT => 'Mozilla/5.0 MSPortal/19.48.0',
+        CURLOPT_USERAGENT => 'Mozilla/5.0 MSPortal/19.49.0',
         CURLOPT_HTTPHEADER => ['Accept: ' . $accept, 'Connection: close'],
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,

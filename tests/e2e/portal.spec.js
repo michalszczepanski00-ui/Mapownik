@@ -1,4 +1,4 @@
-// msportal 19.48.0 — scenariusze w przeglądarce na zbudowanej paczce.
+// msportal 19.49.0 — scenariusze w przeglądarce na zbudowanej paczce.
 import { test, expect } from '@playwright/test';
 
 /** Zbiera błędy konsoli, wyjątki i naruszenia CSP strony. */

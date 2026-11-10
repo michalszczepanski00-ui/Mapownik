@@ -12,7 +12,7 @@ import { Terrain3DHost } from '../terrain3d/terrain3dService.js';
 import { Dock } from './components/Dock.js';
 import { FloatingPanels } from './components/FloatingPanels.js';
 import { ToolDock } from './components/ToolDock.js';
-import { MapToolHint } from './components/MapToolHint.js';
+import { MapContextBar } from './components/MapContextBar.js';
 import { MapLegend } from './components/MapLegend.js';
 import { WorkspaceCard } from './components/WorkspaceCard.js';
 import { MapStage } from './components/MapStage.js';
@@ -251,7 +251,8 @@ function AppShell() {
                     mapOnly && !exportSelectionMode && h('button', { ref: restoreButtonRef, type: 'button', className: 'map-only-exit', 'aria-label': t('mapOnly.exit'), title: t('mapOnly.exitHint'), onClick: () => dispatch(setMapOnly(false)) }, h(Focus, { size: 16 }), h('span', null, t('mapOnly.exit'))),
                     chrome && !mobile && h(MapTopBar, null),
                     chrome && !mobile && h(ToolDock, null),
-                    chrome && !mobile && h(MapToolHint, null),
+                    // 19.49.0: pasek kontekstowy (dawny baner podpowiedzi) — narzędzie, opcje, przyciąganie, historia, Esc.
+                    chrome && !mobile && h(MapContextBar, null),
                     chrome && !mobile && h(BasemapSwitcher, null),
                     chrome && !mobile && h(MapLegend, null),
                     chrome && !mobile && h(WorkspaceCard, null),

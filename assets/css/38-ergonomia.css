@@ -55,9 +55,6 @@
 .vps-pdf-shortcut > .ui-button { flex: 1; justify-content: center; }
 @media (prefers-reduced-motion: reduce) { .export-advanced > summary::before { transition: none; } }
 
-/* ---- Rysuj / Mierz: podpowiedź raz, przy mapie ---- */
-/* Pasek przy mapie (MapToolHint) pokazuje następny krok; karta powtarzała to samo zdanie. Treść zostaje pod ikoną „i”. */
-.app-shell:has(.map-tool-hint) .workspace-card .context-next-step { display: none; }
 
 /* ---- Profil terenu: czytelne etykiety, niższy panel na niskich ekranach ---- */
 .terrain-profile-chart { position: relative; }
@@ -117,3 +114,40 @@
 .panel-skeleton-head { padding-bottom: 8px; border-bottom: 1px solid var(--border); }
 .panel-skeleton-body { display: grid; gap: 9px; }
 .panel-skeleton-bar { display: block; border-radius: 4px; background: color-mix(in srgb, var(--border) 75%, transparent); }
+
+/* ---- 19.49.0 (przebudowa UI, Etap 2): pasek kontekstowy u góry mapy ----
+   Jeden wiersz, maks. 40 px, wyśrodkowany nad widoczną częścią mapy (między lewą kartą a prawą kolumną / dokiem),
+   pod górnym paskiem. [narzędzie · podpowiedź | opcje | przyciąganie · ↶ · ↷ | Esc]. Kolory z palety (tokeny). */
+.map-context-bar {
+  --mcb-left: var(--work-card-inset-left, 0px);
+  --mcb-right: calc(var(--dock-inset-right, 0px) + var(--activity-bar-width, 62px) + var(--v2-gap, 8px));
+  position: absolute; z-index: 35; top: 60px;
+  left: calc(var(--mcb-left) + (100% - var(--mcb-left) - var(--mcb-right)) / 2); transform: translateX(-50%);
+  max-width: calc(100% - var(--mcb-left) - var(--mcb-right) - 16px); height: 40px; box-sizing: border-box;
+  display: flex; align-items: center; padding: 0 4px 0 2px; white-space: nowrap;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface-solid); color: var(--text);
+  box-shadow: var(--v2-float-shadow, 0 4px 14px rgba(0,0,0,.12)); font-size: 12.5px; line-height: 1.2;
+}
+.mcb-zone { display: flex; align-items: center; gap: 6px; min-width: 0; height: 28px; padding: 0 8px; }
+.mcb-zone + .mcb-zone { border-left: 1px solid var(--border); }
+.mcb-zone--tool { flex: 0 1 auto; min-width: 0; overflow: hidden; }
+.mcb-zone--options, .mcb-zone--edit { flex: 0 0 auto; }
+.mcb-zone--edit { gap: 0; padding: 0 2px 0 4px; }
+.mcb-zone--object { flex: 0 1 auto; }
+.mcb-icon { display: inline-flex; color: var(--accent); flex: 0 0 auto; }
+.mcb-name { flex: 0 0 auto; min-width: 0; max-width: 220px; overflow: hidden; text-overflow: ellipsis; }
+.mcb-hint { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--text-muted); }
+.mcb-object-label { color: var(--text-muted); }
+.map-context-bar .ui-field { display: inline-flex; flex-direction: row; align-items: center; gap: 4px; margin: 0; }
+.map-context-bar .ui-field-label { color: var(--text-muted); font-size: 12px; white-space: nowrap; }
+.map-context-bar select { width: auto; max-width: 136px; }
+.map-context-bar select, .map-context-bar input { height: 28px; min-height: 28px; padding-top: 0; padding-bottom: 0; font-size: 12.5px; }
+.map-context-bar .ui-button { height: 28px; min-height: 28px; }
+.map-context-bar .ui-readout { display: inline-flex; align-items: baseline; gap: 4px; }
+.mcb-readouts { display: inline-flex; gap: 10px; }
+.map-context-bar .context-readouts { display: inline-flex; gap: 10px; flex-wrap: nowrap; }
+.mcb-icon-button { width: 30px; height: 30px; min-width: 30px; }
+.mcb-icon-button.is-active { color: var(--accent); background: var(--accent-soft); }
+.mcb-escape { flex: 0 0 auto; margin-left: 4px; height: 24px; padding: 0 7px; border: 1px solid var(--border); border-radius: 6px;
+  background: transparent; color: var(--text-muted); font: inherit; font-size: 11px; font-weight: 600; cursor: pointer; }
+.mcb-escape:hover, .mcb-escape:focus-visible { color: var(--text); border-color: var(--text-muted); }

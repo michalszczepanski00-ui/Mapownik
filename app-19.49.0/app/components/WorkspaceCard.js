@@ -1,7 +1,6 @@
 import { useSketchActive } from '../hooks/useSketchActive.js';
 import { createElement as h, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, Layers3, MousePointer2, Pin, Search, X } from 'lucide-react';
-import { ContextBar } from './ContextBar.js';
 import { IconButton } from './IconButton.js';
 import { getPanel, PanelView } from '../panels/PanelRegistry.js';
 import { useService, useServiceSnapshot } from '../services/AppServicesContext.js';
@@ -11,7 +10,6 @@ import { clampWorkCardWidth, readWorkCardPreferences, WORK_CARD_MIN_WIDTH, WORK_
 const IDS = Object.keys(PANEL_DEFS).filter((id) => PANEL_DEFS[id].placeCard).sort((a,b) => PANEL_DEFS[a].order-PANEL_DEFS[b].order);
 const IDLE = Object.freeze({ active: false });
 const NO_IDENTIFY = Object.freeze({ open: false });
-const NO_TOOLS = Object.freeze({ items: [] });
 function storage() { try { return window.localStorage; } catch { return null; } }
 
 /** One stable left card. Collapsing it never changes the map/tool runtime. */
@@ -21,7 +19,6 @@ export function WorkspaceCard() {
     const identifyManager = useService('identify');
     const identify = useServiceSnapshot('identify', NO_IDENTIFY);
     const sketch = { active: useSketchActive() };
-    const tools = useServiceSnapshot('tools', NO_TOOLS);
     const openId = useAppSelector((state) => IDS.find((id) => selectPanelMode(state,id) === PANEL_MODE.floating && selectPanelOpen(state,id)) ?? null);
     // Remember visited tabs, keeping their component state when changing tools.
     const [visited, setVisited] = useState([]);
@@ -79,9 +76,6 @@ export function WorkspaceCard() {
         key:id,id:`place-tab-${id}`,type:'button',role:'tab','aria-selected':openId===id,'aria-controls':`place-panel-${id}`,tabIndex:openId===id||(!openId&&id===IDS[0])?0:-1,
         className:`workspace-place-tab${openId===id?' is-active':''}`,onClick:()=>pick(id),onKeyDown:(event)=>tabKeys(event,id),
     },PANEL_DEFS[id].placeCardLabel??PANEL_DEFS[id].title)));
-    const hasTask = tools.items.some((tool) => tool.active && !['core.pan', 'core.identify'].includes(tool.id));
-    // 19.28.0: opis narzędzia tylko przy zadaniu (rysowanie, pomiar) — w spoczynku zastępuje go krótki „Jak zacząć”.
-    const showContext = sketch.active || hasTask;
     const focusSearch = () => { const input = document.getElementById('map-search-input'); input?.focus(); input?.select?.(); };
     const start = h('div', { className: 'workspace-start' },
         h('p', { className: 'workspace-start-title' }, 'Wybierz działkę, aby zobaczyć plan, ochronę i raport:'),
@@ -96,10 +90,10 @@ export function WorkspaceCard() {
             !collapsed&&openId&&PANEL_DEFS[openId].controlledBy==='identify'&&h(IconButton,{label:identify.pinned?'Odepnij wynik':'Przypnij wynik','aria-pressed':Boolean(identify.pinned),onClick:()=>identifyManager?.togglePinned()},h(Pin,{size:14})),
             !collapsed&&openId&&h(IconButton,{label:'Zamknij wynik miejsca',onClick:close},h(X,{size:15}))),
         h('div',{id:'workspace-card-body',className:'workspace-card-body',hidden:collapsed},
-            h('div',{className:'workspace-context',hidden:!showContext},h(ContextBar,{presentation:'card'})),
-            // ContextBar alone during an active sketch. Keep other tabs mounted.
-            h('div',{className:'workspace-place',hidden:sketch.active},tabs,
-                !openId&&!hasTask&&start,
+            // 19.49.0 (M1, Etap 2): opcje narzędzi są w pasku kontekstowym u góry mapy. Karta pokazuje wyłącznie
+            // wynik wskazania — włączenie narzędzia Rysuj / Mierz nie zmienia jej zawartości.
+            h('div',{className:'workspace-place'},tabs,
+                !openId&&start,
                 [...new Set([...visited,...(openId?[openId]:[])])].map((id)=>{
                     const entry=getPanel(id);
                     return entry?h('div',{key:id,id:`place-panel-${id}`,role:'tabpanel','aria-labelledby':`place-tab-${id}`,hidden:openId!==id,className:'workspace-place-content'},h(PanelView,{entry})):null;

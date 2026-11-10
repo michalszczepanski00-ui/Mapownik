@@ -1,4 +1,4 @@
-// msportal 19.48.0 — testy E2E (npm run test:e2e) na ZBUDOWANEJ paczce build/www/ (najpierw npm run build).
+// msportal 19.49.0 — testy E2E (npm run test:e2e) na ZBUDOWANEJ paczce build/www/ (najpierw npm run build).
 // Serwer: wbudowany serwer PHP (bez .htaccess — reguły Apache sprawdza diagnostyka i verify-deployment.php).
 import { defineConfig } from '@playwright/test';
 

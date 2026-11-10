@@ -176,14 +176,7 @@ button.workspace-start-item:focus-visible { outline: 2px solid var(--accent); ou
 .permits-types { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; }
 
 /* ------------------------------------------------------------------ 19.33.0 — intuicyjny układ */
-/* Podpowiedź aktywnego narzędzia przy mapie (u góry, na środku; nie łapie kliknięć). */
-.map-tool-hint { position: absolute; top: 62px; left: 50%; transform: translateX(-50%); z-index: 35; display: flex; align-items: center; flex-wrap: wrap; gap: 2px 8px;
-  max-width: min(640px, calc(100vw - 680px)); min-width: 260px; padding: 6px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-solid);
-  box-shadow: var(--v2-float-shadow, 0 4px 14px rgba(0,0,0,.12)); color: var(--text); font-size: 12.5px; line-height: 1.35; pointer-events: none; }
-.map-tool-hint-icon { display: inline-flex; color: var(--accent); }
-.map-tool-hint-text { min-width: 0; color: var(--text); }
-.map-tool-hint small { flex-basis: 100%; color: var(--text-muted); font-size: 11px; }
-@media (max-width: 1100px) { .map-tool-hint { max-width: calc(100vw - 340px); min-width: 0; left: auto; right: 72px; transform: none; } }
+/* 19.49.0: baner podpowiedzi zastąpiony paskiem kontekstowym (.map-context-bar, 38-ergonomia.css). */
 /* Nagłówek panelu w jednej linii — podtytuł skrócony, pełny w dymku. */
 .panel-title--compact > div { min-width: 0; }
 .panel-title--compact > div > span { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }

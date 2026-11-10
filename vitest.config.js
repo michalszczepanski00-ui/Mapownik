@@ -1,4 +1,4 @@
-// msportal 19.48.0 — testy jednostkowe (npm test). Moduły aplikacji importuje się aliasem „@app/…”,
+// msportal 19.49.0 — testy jednostkowe (npm test). Moduły aplikacji importuje się aliasem „@app/…”,
 // który wskazuje bieżący katalog app-<wersja>/ (zmienia się przy każdym podbiciu wersji).
 import { defineConfig } from 'vitest/config';
 import { readdirSync, statSync } from 'node:fs';
