@@ -255,17 +255,21 @@ export function SearchToolbar({ manager }) {
                     ]);
                     // 19.26.0: „miejscowość + numer” — gdy znamy punkt tej miejscowości, działka jest szukana
                     // we wszystkich obrębach jej jednostki ewidencyjnej (obręby w miastach mają inne nazwy).
-                    let parcelItems = parcels;
-                    const town = parcelMatch ? localities.find((item) => sameName(item.localityName, place)) : null;
-                    if (town && Number.isFinite(town.lon) && !controller.signal.aborted) {
-                        parcelItems = await quiet(requestSearch({ mode: 'parcel', q: parcelMatch[2], locality: place, ...lonLatOf(town) }, controller.signal));
-                    }
-                    const items = [
+                    const combine = (parcelList) => [
                         ...addresses.map((item) => ({ ...item, _kind: 'address' })),
-                        ...parcelItems.slice(0, 8).map((item) => ({ ...item, _kind: 'parcel' })),
+                        ...parcelList.slice(0, 8).map((item) => ({ ...item, _kind: 'parcel' })),
                         ...localities,
                     ];
-                    if (!controller.signal.aborted) setLocalityItems(items);
+                    const town = parcelMatch ? localities.find((item) => sameName(item.localityName, place)) : null;
+                    if (town && Number.isFinite(town.lon) && !controller.signal.aborted) {
+                        // 19.44.0: wyniki pierwszego etapu (obręb o nazwie miejscowości) od razu; przeszukanie wszystkich
+                        // obrębów jednostki (ok. 4 s) tylko je uzupełnia. Wcześniej lista była pusta przez 6–7 s.
+                        if (parcels.length) { setLocalityItems(combine(parcels)); setPlaceLoading(false); }
+                        const wider = await quiet(requestSearch({ mode: 'parcel', q: parcelMatch[2], locality: place, ...lonLatOf(town) }, controller.signal));
+                        const seen = new Set(wider.map((item) => item.id));
+                        if (!controller.signal.aborted) setLocalityItems(combine([...wider, ...parcels.filter((item) => !seen.has(item.id))]));
+                    }
+                    else if (!controller.signal.aborted) setLocalityItems(combine(parcels));
                 }
             } catch (error) {
                 if (!controller.signal.aborted) {

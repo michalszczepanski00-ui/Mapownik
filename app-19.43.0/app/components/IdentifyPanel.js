@@ -1,3 +1,4 @@
+import { runTerrainFor } from '../../terrain/runTerrainFor.js';
 import { cachedJson } from '../../core/apiCache.js';
 import { createElement as h, memo, useEffect, useState } from 'react';
 import { transform } from 'ol/proj.js';
@@ -249,10 +250,11 @@ export const IdentifyPanel = memo(function IdentifyPanel({ snapshot, manager, to
     const [collapsed, setCollapsed] = useState(false);
     const parcels = useService('parcels');
     const registeredTools = useService('tools');
+    const terrainService = useService('terrainProfile');
     const objects = useService('objects');
     const dispatch = useAppDispatch();
     const toasts = useService('featureContext')?.toasts;
-    const actOnParcel = async (action) => { try { const id = parcels?.addParcel(snapshot.parcel); if (!id) return; if (action === 'buffer') { manager?.close(); await registeredTools?.activate('core.buffer'); } else if (action === 'terrain') { manager?.close(); await registeredTools?.activate('core.terrain.area'); } else dispatch(openPanel('objects')); } catch (error) { toasts?.show({ tone: 'danger', message: error instanceof Error ? error.message : String(error) }); } };
+    const actOnParcel = async (action) => { try { const id = parcels?.addParcel(snapshot.parcel); if (!id) return; if (action === 'buffer') { manager?.close(); await registeredTools?.activate('core.buffer'); } else if (action === 'terrain') { manager?.close(); await registeredTools?.activate('core.terrain.area'); await runTerrainFor(terrainService, id); } else dispatch(openPanel('objects')); } catch (error) { toasts?.show({ tone: 'danger', message: error instanceof Error ? error.message : String(error) }); } };
     if (!snapshot?.open) {
         // 18.9.11: pusty stan jest też w oknie — odpięty pusty panel nie znika.
         const title = t('panel.identify.title');

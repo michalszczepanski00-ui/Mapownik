@@ -64,12 +64,9 @@ jobs:
               lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; rm -r $DEPLOY_DIR/$dir; bye"
             fi
           done
-      - name: Kontrola wdrożenia
+      - name: Kontrola wdrożenia (tools/check_deploy.mjs)
         env:
           SITE_URL: ${{ secrets.SITE_URL }}
         run: |
-          set -euo pipefail
           sleep 5
-          curl -fsS "$SITE_URL/verify-deployment.php" | tee verify.json
-          python3 -c "import json,sys; d=json.load(open('verify.json')); sys.exit(0 if d.get('deployment_consistent') else 'deployment_consistent = false')"
-          curl -fsS "$SITE_URL/api/health.php" | python3 -c "import json,sys; d=json.load(sys.stdin); print('health:', d.get('version')); sys.exit(0 if d.get('ok') else 1)"
+          node tools/check_deploy.mjs "$SITE_URL"

@@ -8,6 +8,8 @@ import { useService, useServiceSnapshot } from '../services/AppServicesContext.j
 import { useSketchActive } from '../hooks/useSketchActive.js';
 
 const NO_OBJECTS = Object.freeze({ selectedId: null, items: [] });
+const NO_TOOLS = Object.freeze({ items: [] });
+const MEASURE_TOOL = /^core\.(measure\.|terrain\.|buffer$)/;
 /** Pola pokazywane w pasku — pozostałe (parametry rodzaju obiektu, nazwa, działania) są w oknie „Zaawansowane”. */
 const MAIN_FIELDS = Object.freeze(['color', 'strokeWidth', 'pattern', 'strokeOpacity', 'fontSize']);
 // 19.25.0: okno poziome — nowy klucz, żeby pozycja wąskiego okna z 19.24.0 nie wypychała go poza mapę.
@@ -121,13 +123,17 @@ export function ObjectStyleBar() {
     const objectsService = useService('objects');
     const objects = useServiceSnapshot('objects', NO_OBJECTS);
     const sketching = useSketchActive();
+    // 19.44.0 (audyt 19.43.0): przy narzędziach pomiaru i terenu pasek stylu nie zasłania mapy — działka dodana
+    // przyciskiem „Wysokości”/„Bufor” jest zaznaczona, ale użytkownik nie zmienia teraz jej wyglądu.
+    const tools = useServiceSnapshot('tools', NO_TOOLS);
+    const measuring = (tools.items ?? []).some((item) => item.active && MEASURE_TOOL.test(item.id));
     const [advanced, setAdvanced] = useState(false);
     const [host, setHost] = useState(null);
     const barRef = useRef(null);
     const selected = objects.items.find((item) => item.id === objects.selectedId) ?? null;
     useEffect(() => { setHost(barRef.current?.closest('.map-area') ?? null); });
     useEffect(() => { if (!selected) setAdvanced(false); }, [selected]);
-    if (!selected || sketching || !ctx || !features) return null;
+    if (!selected || sketching || measuring || !ctx || !features) return null;
     let fields = [];
     try {
         fields = features.list('objectFields').filter((entry) => entry.appliesTo(selected)).flatMap((entry) => entry.fields(selected, ctx))

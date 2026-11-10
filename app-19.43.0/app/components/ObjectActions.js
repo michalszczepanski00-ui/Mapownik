@@ -1,3 +1,4 @@
+import { runTerrainFor } from '../../terrain/runTerrainFor.js';
 import { createElement as h } from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ChevronDown } from 'lucide-react';
@@ -25,7 +26,7 @@ export function ObjectActions({ object, compact = false, menu = false }) {
     const actions = [
         ['Bufor', () => ctx.tools.activate('core.buffer')],
         area && ['Analizuj otoczenie', async () => { await ctx.tools.activate('core.pan'); dispatch(openPanel('analysis')); await ctx.get('analysis').runParcelScreening(); }, analysis.busy || analysis.screeningBusy],
-        area && ['Wysokości', async () => { await ctx.tools.activate('core.terrain.area'); const terrain = ctx.get('terrainProfile'); terrain.clearAreaSelection(); terrain.setAreaParcelSelected(object.id, true); }],
+        area && ['Wysokości', async () => { await ctx.tools.activate('core.terrain.area'); await runTerrainFor(ctx.get('terrainProfile'), object.id); }],
         (area || line) && ['Teren 3D', async () => { const { openObject3D } = await import('../../terrain3d/terrain3dTool.js'); openObject3D(ctx.get('objects').getObject(object.id)); }],
         line && ['Profil wysokości', async () => { await ctx.tools.activate('core.pan'); await ctx.get('terrainProfile').profileObject(object.id); }],
         area && ['Odległości', async () => { await ctx.tools.activate('core.pan'); const manager = ctx.get('analysis'); manager.setAreaMode('selected'); manager.setOperationId('distance'); manager.setPanelMode?.('manual'); dispatch(openPanel('analysis')); }],

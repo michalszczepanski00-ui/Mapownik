@@ -36,5 +36,7 @@ echo json_encode([
   // 19.8.0: hosting bez VPS — analizy RCN/BDOT/działki w PHP (api/vps.php).
   'pdo_sqlite' => class_exists('PDO') && in_array('sqlite', PDO::getAvailableDrivers(), true),
   'msportal_db_present' => is_file(dirname(__DIR__) . '/data/msportal/msportal.sqlite3'),
+  // 19.44.0: ile sekund temu działało sprzątanie cache (cron: php tools/maintain_cache.php); null = nigdy.
+  'cache_maintenance_age_s' => is_file($cache . '/.maintenance-18.18.0') ? max(0, time() - (int)@filemtime($cache . '/.maintenance-18.18.0')) : null,
   'time' => gmdate('c'),
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
