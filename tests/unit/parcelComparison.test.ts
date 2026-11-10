@@ -115,3 +115,30 @@ describe('porównanie działek — dane', () => {
     expect(cellText({ plan: empty, zoning: summarizeZoning([{ error: 'not_published' }]) }, 'mpzp')).toBe('brak w rejestrze');
   });
 });
+
+describe('porównanie działek — plan ogólny z mapy planów (19.46.0)', () => {
+  it('projekt planu ze strefą, gdy rejestr nic nie zwrócił', async () => {
+    const { summarizePogPoint } = await import('@app/parcels/parcelComparison');
+    const plan = summarizePlan({ parcel: { admin: {} }, layers: { mpzp: { matches: [] }, pog: { matches: [], online: { status: 'complete' } } } });
+    const draft = { ok: true, found: true, text: 'Tytuł: Plan ogólny gminy miasta Wałcz\nStatus: w opracowaniu\n\nNazwa: strefa usługowa\nSymbol: SU\nOznaczenie: 4SU' };
+    expect(cellText({ plan, pogPoint: summarizePogPoint({ ok: true, found: false }, draft) }, 'pog')).toBe('w opracowaniu (4SU)');
+    expect(cellText({ plan, pogPoint: summarizePogPoint({ ok: true, found: false }, { ok: true, found: false }) }, 'pog')).toBe('brak planu');
+    expect(cellText({ plan, pogPoint: summarizePogPoint({ error: 'x' }, { ok: true, found: false }) }, 'pog')).toBe('brak w rejestrze');
+  });
+});
+
+describe('ceny RCN — wspólne ustawienia i mała liczba transakcji (19.46.0)', () => {
+  it('wspólne domyślne: 500 m, 5 lat, grunty; mediana wiarygodna od 3 transakcji', async () => {
+    const { RCN_DEFAULTS, medianReliable, radiusLabel, yearsLabel } = await import('@app/core/rcnDefaults.js');
+    expect(RCN_DEFAULTS).toEqual({ radius: 500, years: 5, kind: 'grunty' });
+    expect(medianReliable({ medianPerM2: 116, perM2Count: 1 })).toBe(false);
+    expect(medianReliable({ medianPerM2: 418, perM2Count: 5 })).toBe(true);
+    expect(medianReliable({ medianPerM2: 418, perM2Count: 5, medianReliable: false })).toBe(false);
+    expect(medianReliable({ medianPerM2: null, perM2Count: 0 })).toBe(false);
+    expect([radiusLabel(500), radiusLabel(1000), yearsLabel(5), yearsLabel(3)]).toEqual(['500 m', '1 km', '5 lat', '3 lata']);
+  });
+  it('porównanie: mediana z 1 transakcji z dopiskiem', () => {
+    const prices = summarizePrices({ radius: 500, years: 5, marketCount: 1, stats: { medianPerM2: 116, perM2Count: 1 } });
+    expect(plain(cellText({ prices }, 'price'))).toBe('116 zł/m² (tylko 1 trans.)');
+  });
+});

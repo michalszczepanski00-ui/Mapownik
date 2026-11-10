@@ -222,3 +222,6 @@ button.workspace-start-item:focus-visible { outline: 2px solid var(--accent); ou
 /* 19.34.0: wyszukiwarka — ostatnio sprawdzane działki. */
 .map-search-recent-clear { margin-left: auto; padding: 0 2px; border: 0; background: none; color: var(--accent); font: inherit; font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 .m-card-details .identify-nearby { display: none; }
+
+/* 19.46.0: mediana z 1–2 transakcji — ostrzeżenie pod wartością. */
+.rcn-main .rcn-warning { display: block; margin-top: 4px; color: var(--warning); font-size: var(--fs-sm); line-height: 1.35; }

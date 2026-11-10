@@ -16,7 +16,8 @@
 .app-shell .identify-panel .identify-actions.identify-actions--v3 { display: grid; gap: 6px; margin: 8px 0 4px; }
 .identify-actions-main { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 .identify-actions-main > .ui-button { justify-content: center; min-width: 0; }
-.identify-actions-more { display: flex; gap: 4px; }
+/* 19.46.0: zawijanie — w wąskiej karcie „3D” nie wychodzi poza krawędź, przyciski w pełnej szerokości przechodzą do drugiego wiersza. */
+.identify-actions-more { display: flex; flex-wrap: wrap; gap: 4px; }
 .identify-actions-more > button {
   flex: 1 1 auto; min-height: 28px; padding: 3px 5px; border: 1px solid var(--border); border-radius: 7px;
   background: var(--surface-solid); color: var(--text); font: inherit; font-size: var(--fs-xs); font-weight: 550; cursor: pointer;
@@ -75,3 +76,10 @@
 
 /* ---- telefon: nagłówek arkusza już podaje numer, gminę i powierzchnię — w szczegółach tylko identyfikator ---- */
 .m-card-details .identify-headline-title, .m-card-details .identify-headline-sub { display: none; }
+
+/* 19.46.0: przycisk raportu z numerem działki — zawija się zamiast ucinać nazwę. */
+.vps-pdf-wide { white-space: normal; height: auto; min-height: 30px; text-align: center; line-height: 1.25; }
+
+/* 19.46.0: podsumowanie karty — dłuższa wartość („w opracowaniu (4SU)”) zawija się, zamiast ściskać etykietę „Plan ogólny”. */
+.app-shell.is-v2 .workspace-card .identify-verdict-item { grid-template-columns: 14px minmax(74px, 1fr) minmax(0, auto) auto; }
+.app-shell.is-v2 .workspace-card .identify-verdict-item > strong { white-space: normal; line-height: 1.2; }

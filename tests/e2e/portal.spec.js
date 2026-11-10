@@ -1,4 +1,4 @@
-// msportal 19.45.0 — scenariusze w przeglądarce na zbudowanej paczce.
+// msportal 19.46.0 — scenariusze w przeglądarce na zbudowanej paczce.
 import { test, expect } from '@playwright/test';
 
 /** Zbiera błędy konsoli, wyjątki i naruszenia CSP strony. */
@@ -184,4 +184,28 @@ test('diagnostyka zbudowana przez Vite: bez dawnych bibliotek, testy ruszają', 
   expect(await page.locator('#tests .test.bad').filter({ hasText: /Biblioteki w paczce|React lokalny|Zod lokalny|OpenLayers lokalny/ }).count()).toBe(0);
   expect(legacy).toEqual([]);
   expect(problems.filter((p) => !/Failed to load|ERR_/.test(p))).toEqual([]);
+});
+
+test('Esc zamyka panel Eksport, a wybrana działka zostaje (19.46.0)', async ({ page }) => {
+  test.slow();
+  await page.goto('/index.html');
+  await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
+  await expect(page).toHaveTitle(/Mapownik/);
+  await page.fill('#map-search-input', '220408_2.0006.210/2');
+  await page.getByRole('option').first().click();
+  await expect(page.getByText('Działka 210/2').first()).toBeVisible({ timeout: 60_000 });
+  await page.getByRole('button', { name: 'Eksport', exact: true }).click();
+  await expect(page.locator('.export-panel').first()).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.export-panel')).toHaveCount(0);
+  await expect(page.getByText('Działka 210/2').first()).toBeVisible();
+});
+
+test('start: mało plików, bez paczki diagnostyki i bez całego zestawu ikon (19.46.0)', async ({ page }) => {
+  const scripts = [];
+  page.on('request', (r) => { if (r.resourceType() === 'script') scripts.push(r.url()); });
+  await page.goto('/index.html');
+  await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
+  expect(scripts.some((u) => u.includes('/assets/build/diag/'))).toBe(false);
+  expect(scripts.length).toBeLessThan(60);
 });

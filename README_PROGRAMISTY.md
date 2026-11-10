@@ -93,6 +93,14 @@ Wszystkie uruchamia też GitHub Actions przy każdej zmianie.
 - Panel „Porównanie działek” (`parcelCompare`, dolny dok, bez pozycji w szynie): `app/components/ParcelComparisonPanel.js`,
   dane w `parcels/parcelComparison.ts`. Otwierany z panelu Obiekty (od 2 działek) i z palety poleceń.
 
+## Zmiany w 19.46.0
+- Diagnostyka budowana **osobno** (`vite build --mode diag` w `tools/build.mjs`, wynik w `assets/build/diag/`) — nie wpływa na podział paczki portalu.
+- `npm run build` wypisuje pliki ładowane przy starcie; `STARTUP_LIST=1 npm run build` — pełna lista z rozmiarami.
+- Nie importuj całych pakietów jako przestrzeni nazw: `import('lucide-react')`, `import { z } from 'zod'` dołączają wszystko
+  (ikony: 630 KB, zod z lokalizacjami: 380 KB). Ikony imiennie, zod przez `import * as z from 'zod'`.
+- Ceny RCN: wspólne parametry w `core/rcnDefaults.js` (500 m, 5 lat; mediana od 3 transakcji) — tak samo w `api/rcn.php`.
+- Okno raportu PDF ładowane przy pierwszym otwarciu: stan w `app/components/reportDialogStore.js`.
+
 ## Zasady, których pilnują narzędzia
 - `index.html` nie może mieć skryptów wbudowanych (CSP `script-src 'self'`) — sprawdza `tools/build.mjs`.
 - Zod musi być w trybie `jitless` przed pierwszym schematem — `core/zodConfig.js` jest w tej samej paczce co zod (`vite.config.js`).

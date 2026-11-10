@@ -1,4 +1,4 @@
-// msportal 19.45.0 — budowanie frontendu (npm run build → tools/build.mjs → build/www/).
+// msportal 19.46.0 — budowanie frontendu (npm run build → tools/build.mjs → build/www/).
 //
 // Wynik to zwykłe pliki statyczne: index.html i assets/build/*.js|css z sumą treści w nazwie.
 // Wgrywa się je przez FTP jak dotąd; na serwerze nie jest potrzebny Node.js. Backend PHP (api/) bez zmian.
@@ -6,7 +6,9 @@
 import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
 
-export default defineConfig({
+// 19.46.0: diagnostyka budowana OSOBNO (tryb „diag”, tools/build.mjs) — wspólne budowanie z portalem dzieliło kod
+// portalu na ponad 140 drobnych plików ładowanych przy starcie (moduły wspólne dla obu wejść).
+export default defineConfig(({ mode }) => ({
   base: './',
   publicDir: false,
   resolve: {
@@ -17,22 +19,23 @@ export default defineConfig({
   },
   build: {
     outDir: 'build/www',
-    assetsDir: 'assets/build',
-    emptyOutDir: true,
+    assetsDir: mode === 'diag' ? 'assets/build/diag' : 'assets/build',
+    emptyOutDir: mode !== 'diag',
     target: 'es2022',
     sourcemap: false,
     // Lista plików każdego wejścia — tools/build.mjs zapamiętuje do trybu offline tylko pliki portalu (bez diagnostyki).
-    manifest: true,
+    manifest: mode !== 'diag',
     // Największy plik to teksty źródeł dla diagnostyki (diag/zrodla.js, ok. 2,3 MB) — wczytuje go tylko diagnostyka.html.
     chunkSizeWarningLimit: 2500,
     rollupOptions: {
-      input: {
-        main: fileURLToPath(new URL('./index.html', import.meta.url)),
-        // 19.45.0: diagnostyka z tych samych pakietów npm co portal (wcześniej importmapa + vendor/ i źródła app-*/).
-        diagnostyka: fileURLToPath(new URL('./diagnostyka.html', import.meta.url)),
-      },
+      // 19.45.0: diagnostyka z tych samych pakietów npm co portal (wcześniej importmapa + vendor/ i źródła app-*/).
+      input: mode === 'diag'
+        ? { diagnostyka: fileURLToPath(new URL('./diagnostyka.html', import.meta.url)) }
+        : { main: fileURLToPath(new URL('./index.html', import.meta.url)) },
       output: {
         // Ikony w jednym pliku zamiast kilkunastu drobnych (każda użyta ikona to osobny moduł lucide-react).
+        // 19.46.0: do pliku trafiają tylko ikony importowane imiennie (aplikacja: ok. 60, diagnostyka: diag/ikony.js) —
+        // nikt nie może importować całego pakietu ('lucide-react' jako przestrzeń nazw), bo wtedy plik ma ~630 KB.
         manualChunks(id) {
           if (id.includes('/node_modules/lucide-react/')) return 'icons';
           // zod razem z core/zodConfig.js: konfiguracja (jitless, CSP) wykonuje się w tym samym pliku co biblioteka,
@@ -58,4 +61,4 @@ export default defineConfig({
       '/vendor/pdf': 'http://127.0.0.1:8000',
     },
   },
-});
+}));

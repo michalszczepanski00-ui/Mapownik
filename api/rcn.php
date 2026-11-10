@@ -15,6 +15,8 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Content-Type-Options: nosniff');
 
+// 19.46.0: najmniejsza liczba transakcji, od której mediana jest pokazywana jako wynik (wspólna z przeglądarką: core/rcnDefaults.js).
+const RCN_MIN_MEDIAN_COUNT = 3;
 const RCN_WFS = 'https://mapy.geoportal.gov.pl/wss/service/rcn';
 const RCN_CACHE_TTL = 3 * 86400;
 const RCN_MAX_FEATURES = 3000;
@@ -59,7 +61,7 @@ $years = in_array($years, [1, 2, 3, 5, 10], true) ? $years : 5;
 $from = (new DateTimeImmutable('today'))->modify("-{$years} years")->format('Y-m-d');
 
 $cacheDir = dirname(__DIR__) . '/cache/rcn';
-$key = hash('sha256', implode('|', [$kind, $years, round($x / 25), round($y / 25), $r, $from, $bbox ? implode(',', array_map(static fn ($v) => (int)round($v / 25), $bbox)) : '']));
+$key = hash('sha256', implode('|', ['v2', $kind, $years, round($x / 25), round($y / 25), $r, $from, $bbox ? implode(',', array_map(static fn ($v) => (int)round($v / 25), $bbox)) : '']));
 $cacheFile = $cacheDir . '/' . $key . '.json';
 if (is_file($cacheFile) && (time() - (int)filemtime($cacheFile)) < RCN_CACHE_TTL) {
     $cached = json_decode((string)file_get_contents($cacheFile), true);
@@ -215,12 +217,20 @@ foreach ($groups as $id => $recs) {
         $label = $address($houses[0]['BUD_ADRES'] ?? '');
         $extraInfo = ['landArea' => $landArea($first['NIER_POW_GRUNTU'] ?? null), 'buildings' => count($houses)];
     }
-    $perM2 = ($price && $price > 0 && $area && $area > 0) ? $price / $area : null;
+    // 19.46.0: sprzedaż udziału (np. 1/10) — cena dotyczy tylko części, więc zł/m² liczymy od tej części powierzchni.
+    // Udział o nieczytelnym zapisie: bez zł/m² (wcześniej cena udziału dzielona przez całą działkę dawała np. 22 zł/m²).
+    $shareFraction = null;
+    if ($share) {
+        $shareFraction = preg_match('~^(\d+)\s*/\s*(\d+)$~', trim((string)($first['NIER_UDZIAL'] ?? '')), $sm) && (int)$sm[2] > 0 && (int)$sm[1] > 0 && (int)$sm[1] < (int)$sm[2]
+            ? (int)$sm[1] / (int)$sm[2] : null;
+    }
+    $effectiveArea = $share ? ($shareFraction !== null && $area ? $area * $shareFraction : null) : $area;
+    $perM2 = ($price && $price > 0 && $effectiveArea && $effectiveArea > 0) ? $price / $effectiveArea : null;
     $type = $first['TRAN_RODZAJ_TRANS'] ?? '';
     $inStats = true;
     if (!in_array($type, RCN_MARKET, true)) { $inStats = false; $excluded['nonMarket']++; $note = $note ?? 'transakcja nierynkowa'; }
     elseif (!$price || $price <= 0) { $inStats = false; $excluded['noPrice']++; $note = $note ?? 'bez ceny'; }
-    elseif ($share) { $inStats = false; $excluded['share']++; $note = 'udział ' . trim((string)$first['NIER_UDZIAL']); }
+    elseif ($share) { $inStats = false; $excluded['share']++; $note = 'udział ' . trim((string)$first['NIER_UDZIAL']) . ($perM2 !== null ? ' — zł/m² od części działki, poza medianą' : ' — poza medianą'); }
     elseif ($kind === 'grunty' && ($first['DZI_SPOSOB_UZYT'] ?? '') === 'terenyKomunikacyjne') { $inStats = false; $excluded['road']++; $note = 'grunt pod drogą'; }
     elseif ($kind === 'grunty' && $area !== null && $area < 150) { $inStats = false; $excluded['small']++; $note = 'mała działka (pas gruntu)'; }
     elseif ($note !== null && str_starts_with($note, 'pakiet')) { $inStats = false; $excluded['package']++; }
@@ -240,6 +250,7 @@ foreach ($groups as $id => $recs) {
         'inStats' => $inStats,
         'note' => $note,
         'usufruct' => ($first['NIER_PRAWO'] ?? '') === 'uzytkowanieWieczyste',
+        'share' => $share ? trim((string)($first['NIER_UDZIAL'] ?? '')) : null,
     ], $extraInfo);
 }
 usort($items, fn ($a, $b) => strcmp($b['date'], $a['date']) ?: $a['dist'] <=> $b['dist']);
@@ -271,6 +282,8 @@ $payload = [
         'p25PerM2' => $round($quantile($per, 0.25)),
         'p75PerM2' => $round($quantile($per, 0.75)),
         'perM2Count' => count($per),
+        // 19.46.0: mediana z 1–2 transakcji to nie statystyka — klienci pokazują ją z ostrzeżeniem albo wcale.
+        'medianReliable' => count($per) >= RCN_MIN_MEDIAN_COUNT,
         'medianPrice' => $round($quantile($prices, 0.5), 100),
         'medianArea' => $round($quantile($areas, 0.5)),
         'firstDate' => $dates ? min($dates) : null,

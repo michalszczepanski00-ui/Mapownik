@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * msportal 19.45.0 — budowanie paczki serwerowej: npm run build
+ * msportal 19.46.0 — budowanie paczki serwerowej: npm run build
  *
  * 1. Vite buduje frontend (index.html + assets/build/*) do build/www/.
  * 2. Skrypt dokłada pliki serwera, które wgrywa się przez FTP jak dotąd (api/, PHP, konfiguracja, dane,
@@ -37,6 +37,8 @@ const fail = (message) => { console.error(`\nBŁĄD: ${message}`); process.exit(
 
 console.log(`msportal ${version} — budowanie frontendu (Vite)…`);
 await build({ root: ROOT, configFile: join(ROOT, 'vite.config.js'), logLevel: 'warn' });
+// 19.46.0: diagnostyka osobno (assets/build/diag/) — nie wpływa na podział paczki portalu.
+await build({ root: ROOT, configFile: join(ROOT, 'vite.config.js'), logLevel: 'warn', mode: 'diag' });
 
 // 19.45.0: pliki potrzebne portalowi (wejście index.html z importami) — według manifestu Vite.
 // Paczka diagnostyki (w tym teksty źródeł) nie trafia do pamięci trybu offline.
@@ -56,6 +58,17 @@ const appBundle = (() => {
   };
   visit('index.html');
   if (!out.size) fail('manifest Vite nie zawiera wejścia index.html');
+  // 19.46.0: pliki pobierane przy starcie (tylko importy statyczne od index.html) — do kontroli wydajności.
+  const startup = new Set(); const seenStart = new Set();
+  const visitStart = (key) => {
+    if (seenStart.has(key) || !manifest[key]) return;
+    seenStart.add(key);
+    startup.add(manifest[key].file);
+    for (const f of manifest[key].css || []) startup.add(f);
+    for (const k of manifest[key].imports || []) visitStart(k);
+  };
+  visitStart('index.html');
+  globalThis.__startupFiles = [...startup];
   return [...out].sort();
 })();
 
@@ -142,6 +155,13 @@ const bundle = files.filter((f) => f.startsWith('assets/build/'));
   console.log(`sw.js: tryb offline, ${precache.length} plików (${swVersion})`);
 }
 const size = (list) => list.reduce((sum, f) => sum + statSync(join(OUT, f)).size, 0);
+{
+  const start = globalThis.__startupFiles ?? [];
+  const js = start.filter((f) => f.endsWith('.js'));
+  const startBytes = size(start); const jsBytes = size(js);
+  console.log(`Start aplikacji: ${start.length} plików (${js.length} JS), ${(startBytes / 1024).toFixed(0)} KB, w tym JS ${(jsBytes / 1024).toFixed(0)} KB (przed kompresją).`);
+  if (process.env.STARTUP_LIST) for (const f of start.sort((a, b) => statSync(join(OUT, b)).size - statSync(join(OUT, a)).size)) console.log(`  ${(statSync(join(OUT, f)).size / 1024).toFixed(0).padStart(5)} KB  ${f}`);
+}
 writeFileSync(join(OUT, 'assets', 'build', 'BUILD.txt'),
   `msportal ${version}\nzbudowano: ${new Date().toISOString()}\nplików paczki: ${bundle.length}\n`);
 console.log(`Gotowe: build/www/ — ${files.length - 1} plików, paczka aplikacji ${appBundle.length} plików (${(size(appBundle) / 1048576).toFixed(2)} MB), diagnostyka ${bundle.length - appBundle.length} plików.`);

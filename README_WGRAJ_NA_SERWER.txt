@@ -1,5 +1,5 @@
-msportal 19.45.0 — PEŁNA PACZKA (10.11.2026)
-Paczka: msportal-19.45.0-serwer.zip (zawartość katalogu portalu). Opis zmian: ZMIANY_19.45.0.md, kontrola po wgraniu: README_KONTROLA_WDROZENIA.md.
+msportal 19.46.0 — PEŁNA PACZKA (10.11.2026)
+Paczka: msportal-19.46.0-serwer.zip (zawartość katalogu portalu). Opis zmian: ZMIANY_19.46.0.md (i ZMIANY_19.45.0.md przy aktualizacji z 19.44.0), kontrola po wgraniu: README_KONTROLA_WDROZENIA.md.
 1. Kopia projektu .mapownik i kopia obecnych plików portalu poza katalogiem WWW.
 2. Wgraj CAŁĄ zawartość ZIP („nadpisz zawsze”, z .htaccess); index.html i .htaccess najlepiej na końcu.
 3. Od 19.45.0 na serwerze NIE MA już kodu źródłowego ani dawnych bibliotek. Usuń przez FTP (jeśli są):
@@ -10,7 +10,7 @@ Paczka: msportal-19.45.0-serwer.zip (zawartość katalogu portalu). Opis zmian: 
    NIE usuwaj data/, cache/, vendor/pdf/ ani starszych plików w assets/build/.
    Pozostawione pliki nie psują działania (serwer zwraca dla nich 410/404); listę pokazuje
    verify-deployment.php w polu "leftover_files".
-4. verify-deployment.php → "deployment_consistent": true i "leftover_files": []; Ctrl+F5; api/health.php → 19.45.0-server.
+4. verify-deployment.php → "deployment_consistent": true i "leftover_files": []; Ctrl+F5; api/health.php → 19.46.0-server.
 Programista: README_PROGRAMISTY.md (npm run build tworzy tę paczkę; wdrożenie także przez GitHub Actions — usuwa pozostałości samo).
 
 msportal 19.41.4-b — POPRAWKI BEZPIECZEŃSTWA (08.11.2026)
@@ -19,7 +19,7 @@ W skrócie: wgraj cały api/, potem data/.htaccess, index.html, setup-vendors.ph
 sprawdź api/health.php → "patch": "19.41.4-b". Błąd 500 po .htaccess → usuń linię „Options -Indexes”.
 setup-vendors.php działa już tylko z wiersza poleceń; brakujące biblioteki wgrywa się z paczki (vendor/). Od 19.45.0 plik usunięty — biblioteki są w paczce aplikacji.
 
-msportal 19.45.0 — HOSTING WSPÓŁDZIELONY (bez VPS)
+msportal 19.46.0 — HOSTING WSPÓŁDZIELONY (bez VPS)
 
 PEŁNA PACZKA 19.41.4 — AKTUALIZACJA DZIAŁAJĄCEGO PORTALU (np. /test22/ z 19.27.0)
 1. Pobierz kopię projektu .mapownik (Projekt → Zapisz plik projektu).

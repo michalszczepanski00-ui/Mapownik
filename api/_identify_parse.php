@@ -63,13 +63,36 @@ const IDENTIFY_FIELD_LABELS = [
     // 19.8.6: MPZP z Oracle MapViewer (np. Warszawa).
     'fun_symb' => 'Symbol przeznaczenia', 'fun_nazwa' => 'Przeznaczenie',
     'inten_zab' => 'Intensywność zabudowy', 'max_wys' => 'Maks. wysokość zabudowy',
+    // 19.46.0: pola planów ogólnych z integracji GUGiK — wcześniej surowe nazwy (typPlanu, profilPodstawowy…).
+    'nazwa' => 'Nazwa', 'symbol' => 'Symbol', 'status' => 'Status',
+    'typplanu' => 'Rodzaj planu', 'poziomhierarchii' => 'Poziom', 'tytulalternatywny' => 'Nazwa skrócona',
+    'profilpodstawowy' => 'Profil podstawowy', 'profildodatkowy' => 'Profil dodatkowy',
+    'charakterustalenia' => 'Charakter ustalenia', 'dataprzyjecia' => 'Data przyjęcia', 'datauchwalenia' => 'Data uchwalenia',
 ];
+
+/** 19.46.0: nieznane pola w zapisie camelCase („rodzajObszaru”) → „Rodzaj obszaru”. */
+function identify_field_label(string $key, bool $draft): string {
+    $k = strtolower($key);
+    // „Obowiązuje od” przy projekcie planu (status „w opracowaniu”) myli — to data wersji danych, nie wejście w życie.
+    if ($draft && $k === 'obowiazujeod') return 'Data wersji';
+    if (isset(IDENTIFY_FIELD_LABELS[$k])) return IDENTIFY_FIELD_LABELS[$k];
+    if (preg_match('/^[a-z]+(?:[A-Z][a-z]+)+$/', $key)) {
+        $words = strtolower((string)preg_replace('/(?<!^)([A-Z])/', ' $1', $key));
+        return mb_strtoupper(mb_substr($words, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($words, 1, null, 'UTF-8');
+    }
+    return $key;
+}
 
 /** @param array<int,array<string,mixed>> $rows */
 function identify_rows_text(array $rows): string {
     $blocks = [];
-    foreach (array_slice($rows, 0, 10) as $row) {
+    foreach ($rows as $row) {
+        if (count($blocks) >= 10) break;
         $lines = [];
+        // 19.46.0: projekt planu (status „w opracowaniu”, „projekt”) — inne etykiety dat.
+        $status = '';
+        foreach ($row as $key => $value) if (strtolower((string)$key) === 'status' && is_scalar($value)) $status = strtolower((string)$value);
+        $draft = $status !== '' && preg_match('/opracowan|projekt|przygotow|konsultac/u', $status) === 1;
         foreach ($row as $key => $value) {
             if (identify_skip_field((string)$key)) continue;
             if (is_array($value) || is_object($value)) continue;
@@ -78,10 +101,13 @@ function identify_rows_text(array $rows): string {
             if ($value === '' || $value === '-' || strtolower($value) === 'null') continue;
             if (str_ends_with((string)$key, '_uom')) continue;
             $unit = trim((string)($row[$key . '_uom'] ?? ''));
-            $label = IDENTIFY_FIELD_LABELS[strtolower((string)$key)] ?? $key;
+            $label = identify_field_label((string)$key, $draft);
+            // 19.46.0: listy „teren usług,teren komunikacji” — spacja po przecinku (liczby „1,5” bez zmian).
+            $value = (string)preg_replace('/,(?=\p{L})/u', ', ', $value);
             $lines[] = $label . ': ' . $value . ($unit !== '' && !is_array($row[$key . '_uom']) ? ' ' . $unit : '');
         }
-        if ($lines) $blocks[] = implode("\n", $lines);
+        // 19.46.0: usługi planów ogólnych zwracają ten sam obiekt z kilku warstw — bez powtórzeń.
+        if ($lines) { $block = implode("\n", $lines); if (!in_array($block, $blocks, true)) $blocks[] = $block; }
     }
     return identify_limit_text(implode("\n\n", $blocks));
 }

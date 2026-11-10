@@ -78,7 +78,7 @@ elif lock_path.is_file():
 else:fail(lock_path,'Brak tools/vendor-lock.json — utwórz: check_release.py --update-vendor-lock')
 # 19.41.4-b: testy CLI poprawek bezpieczeństwa i parserów (bez sieci).
 if shutil.which('php'):
-    for test in ('test_audyt_19.41.4-b.php','test_audyt_19.43.0.php','test_identify_parse.php','test_wms_merge.php'):
+    for test in ('test_audyt_19.41.4-b.php','test_audyt_19.43.0.php','test_19.46.0.php','test_identify_parse.php','test_wms_merge.php'):
         if (ROOT/'tools'/test).is_file():
             r=subprocess.run(['php',str(ROOT/'tools'/test)],capture_output=True,text=True)
             if r.returncode!=0:fail(ROOT/'tools'/test,(r.stdout+r.stderr).strip()[-600:])
