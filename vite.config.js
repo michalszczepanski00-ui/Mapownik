@@ -1,4 +1,4 @@
-// msportal 19.47.0 — budowanie frontendu (npm run build → tools/build.mjs → build/www/).
+// msportal 19.48.0 — budowanie frontendu (npm run build → tools/build.mjs → build/www/).
 //
 // Wynik to zwykłe pliki statyczne: index.html i assets/build/*.js|css z sumą treści w nazwie.
 // Wgrywa się je przez FTP jak dotąd; na serwerze nie jest potrzebny Node.js. Backend PHP (api/) bez zmian.

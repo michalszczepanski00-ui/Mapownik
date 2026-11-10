@@ -1,5 +1,5 @@
 /*
- * msportal 19.47.0 — skrypt startowy (zwykły skrypt, nie moduł; ładowany przed aplikacją).
+ * msportal 19.48.0 — skrypt startowy (zwykły skrypt, nie moduł; ładowany przed aplikacją).
  *
  * Od 19.42.0 kod aplikacji jest budowany narzędziem Vite do kilku plików w assets/build/ o nazwach
  * z sumą treści. Ten plik zastępuje dawny skrypt wbudowany w index.html (CSP: bez skryptów inline):
@@ -10,7 +10,7 @@
  */
 (function () {
   'use strict';
-  var VERSION = '19.47.0';
+  var VERSION = '19.48.0';
   window.__MAPOWNIK_DEPLOY_VERSION__ = VERSION;
   window.__MAPOWNIK_BOOTED__ = false;
   var shown = false;

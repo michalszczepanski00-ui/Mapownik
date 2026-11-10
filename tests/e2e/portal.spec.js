@@ -1,4 +1,4 @@
-// msportal 19.47.0 — scenariusze w przeglądarce na zbudowanej paczce.
+// msportal 19.48.0 — scenariusze w przeglądarce na zbudowanej paczce.
 import { test, expect } from '@playwright/test';
 
 /** Zbiera błędy konsoli, wyjątki i naruszenia CSP strony. */
@@ -54,14 +54,19 @@ test('podkłady: każdy kończy ładowanie, większość działa', async ({ page
     await option.click();
     // nie może zawisnąć w „Ładowanie…”
     // Po wyborze przełącznik zwija się do jednej miniatury — stan sprawdzamy po rozwinięciu.
+    // 19.48.0: prawdziwa ortofotomapa przy małej skali czeka na przybliżenie (is-awaiting-zoom) — to stan końcowy.
     await expect(page.locator('button.basemap-option.is-pending')).toHaveCount(0, { timeout: 60_000 });
+    if (await page.locator('button.basemap-option.is-awaiting-zoom').count()) {
+      results.push(`${label}: czeka na przybliżenie`);
+      continue;
+    }
     await page.mouse.move(700, 300);
     await switcher.hover();
     const active = /is-active/.test((await options.nth(i).getAttribute('class')) || '');
     results.push(`${label}: ${active ? 'działa' : 'usługa nie odpowiada — powrót do poprzedniego'}`);
   }
   console.log(results.join('\n'));
-  expect(results.filter((r) => r.endsWith('działa')).length).toBeGreaterThanOrEqual(count - 2);
+  expect(results.filter((r) => !r.endsWith('poprzedniego')).length).toBeGreaterThanOrEqual(count - 2);
 });
 
 test('projekt z linku udostępniania otwiera się po potwierdzeniu', async ({ page, request }) => {
@@ -83,6 +88,8 @@ test('projekt z linku udostępniania otwiera się po potwierdzeniu', async ({ pa
   await page.getByRole('button', { name: 'Otwórz', exact: true }).click();
   expect((await backup).suggestedFilename()).toMatch(/kopia-przed-importem\.mapownik$/);
   // Projekt z linku ma jeden obiekt (licznik przy przyciąganiu pokazuje liczbę obiektów projektu).
+  // 19.48.0: przyciąganie jest widoczne tylko w trybie Rysuj.
+  await page.getByRole('button', { name: 'Rysuj', exact: true }).first().click();
   await expect(page.getByRole('button', { name: /obiekty: 1\)/ })).toBeVisible({ timeout: 30_000 });
 });
 

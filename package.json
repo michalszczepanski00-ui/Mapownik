@@ -1,6 +1,6 @@
 {
   "name": "msportal",
-  "version": "19.47.0",
+  "version": "19.48.0",
   "private": true,
   "type": "module",
   "description": "Mapownik / msportal — portal mapowy (frontend React + OpenLayers budowany Vite, backend PHP)",
