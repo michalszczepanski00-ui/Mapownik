@@ -110,3 +110,16 @@ przycisk Otoczenie przełącza na Analizy z gotowym wynikiem.
 2. 3.4 i 3.6 — szerokości domyślne, usunięcie nagłówków i podtytułów (małe zmiany, duży efekt).
 3. 3.1–3.3 — nawigacja.
 4. 3.5 — nazwy (wymaga też zmian w pomocy i tekstach raportu).
+
+## 5. Status wdrożenia (paczka `dist/msportal-19.49.0-ux1-serwer.zip`)
+
+Wykonane bez źródeł (CSS + `assets/js/ux.js`, szczegóły w [ZMIANY_19.49.0-ux1.md](ZMIANY_19.49.0-ux1.md)):
+3.1 Eksport w szynie (górny róg: Projekt, pomoc, ustawienia), 3.3 pasek kontekstu nad dolnym paskiem narzędzi,
+3.4 bez nagłówka karty i szerokość 320 px, 3.6 szerokość 300 px i brak podtytułów, 3.7 powtórzona etykieta w telefonie.
+
+Wymagają źródeł aplikacji (nie ruszane): połączenie pomocy i ustawień w jedno menu, paleta poleceń w polu wyszukiwania (3.2),
+„Więcej" w akcjach karty i jedna lista źródeł (3.4), zmiana nazw (3.5), komponenty zamiast list systemowych (3.6),
+okno „Jak zacząć" i kolor logo (3.7), „Szybkie warstwy" w telefonie.
+
+Sprawdzone na paczce rozpakowanej od zera: kontrola wdrożenia (`verify-deployment.php`) = spójne, service worker instaluje
+się z nowymi plikami, aplikacja otwiera się offline z nowym wyglądem.

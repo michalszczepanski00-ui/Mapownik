@@ -240,3 +240,32 @@
 .app-shell.is-mobile .search-permanent-label {
   clip: rect(0 0 0 0); white-space: nowrap; width: 1px; height: 1px; overflow: hidden; position: absolute;
 }
+
+/* 9. Układ (bez zmian w kodzie aplikacji) ------------------------------------------------------ */
+
+/* 9.1 Karta działki: tytuł „Działka i narzędzia" zbędny — przyciski karty przechodzą do wiersza zakładek. */
+.app-shell.is-v2 .workspace-card:not(.is-collapsed) { --ux-tabs-end: 86px; }
+.app-shell.is-v2 .workspace-card:not(.is-collapsed) > .workspace-card-head {
+  position: absolute; top: 3px; right: 4px; z-index: 3; min-height: 0; padding: 0; width: auto; gap: 0;
+  background: none; border: 0;
+}
+.app-shell.is-v2 .workspace-card:not(.is-collapsed) > .workspace-card-head > strong { display: none; }
+.app-shell.is-v2 .workspace-card:not(.is-collapsed) > .workspace-card-head .icon-button { width: 28px; height: 28px; flex-basis: 28px; }
+.app-shell.is-v2 .workspace-card:not(.is-collapsed) .workspace-place-tabs { padding-right: var(--ux-tabs-end); }
+.app-shell.is-v2 .workspace-card:not(.is-collapsed) .workspace-card-body { padding-top: 0; }
+
+/* 9.2 Panele po prawej: podtytuły były ucięte albo powtarzały tytuł. Licznik w Warstwach i Obiektach zostaje. */
+.app-shell.is-v2 .ui-panel:not(.layers-panel):not(.objects-panel) .panel-title--compact > div > span { display: none; }
+
+/* 9.3 Pasek kontekstu narzędzia tuż nad dolnym paskiem narzędzi — wzrok nie skacze przez całą mapę. */
+.app-shell.is-v2 .map-context-bar { top: auto; bottom: 122px; }
+.app-shell.is-v2 .tool-dock:not(.is-expanded) ~ .map-context-bar,
+.app-shell.is-v2 .map-column .map-context-bar { bottom: 122px; }
+
+/* 9.4 Eksport w szynie paneli; przycisk w górnym pasku ukryty dopiero, gdy ux.js dodał zamiennik. */
+html.ux-export-rail .app-shell .export-map-trigger { display: none; }
+.app-shell .ux-export-slot { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+.app-shell .ux-export-button { width: 100%; }
+
+/* 9.5 Szerokość rzeczywista: nazwy warstw i wartości w karcie nie powinny się łamać. */
+.app-shell.is-v2 .layer-row-titleline strong { text-overflow: ellipsis; }
