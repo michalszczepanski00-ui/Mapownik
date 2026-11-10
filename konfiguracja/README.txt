@@ -1,4 +1,4 @@
-Mapownik 19.43.0 — konfiguracja raportu działki PDF
+Mapownik 19.44.0 — konfiguracja raportu działki PDF
 
 Plik konfiguracja/raport-pdf.json (opcjonalny) zmienia raport dla wszystkich użytkowników portalu.
 Bez niego działają ustawienia domyślne. Aktualizacje portalu nie nadpisują raport-pdf.json ani logo.
@@ -28,3 +28,9 @@ Bez niego działają ustawienia domyślne. Aktualizacje portalu nie nadpisują r
   "otoczenie.mieszkalne". Pełna lista w app-<wersja>/report/reportRules.js.
 - Szablony mają nowe pola: "typInwestycji" (ogolny | biometan | pv | przemysl) i "buforUzbrojenia" (60 | 150 | 300 | 500).
 Wersja reguł (np. „reguły 1.0”) jest drukowana w stopce raportu.
+
+19.44.0 — POLITYKA PRYWATNOŚCI
+- polityka-prywatnosci.szkic.html — szkic opisujący, jakie dane przetwarza portal (niedostępny z internetu).
+- Uzupełnij pola wyróżnione na żółto, daj tekst do sprawdzenia prawnikowi, usuń ramkę „SZKIC”
+  i zapisz plik jako polityka-prywatnosci.html w tym katalogu. Wtedy w pomocy portalu („?”) pojawi się link.
+- Aktualizacje portalu nie nadpisują polityka-prywatnosci.html.

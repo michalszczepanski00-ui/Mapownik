@@ -48,7 +48,7 @@ export function AppBar() {
 
     return h('div', { className: 'app-bar' },
         h('div', { className: 'brand', 'aria-label': 'msportal' },
-            h('img', { className: 'brand-logo-image', src: './assets/mapownik-logo-icon.png?v=19.43.0', alt: '', 'aria-hidden': true }),
+            h('img', { className: 'brand-logo-image', src: './assets/mapownik-logo-icon.png?v=19.44.0', alt: '', 'aria-hidden': true }),
             h('div', { className: 'brand-copy' }, h('strong', null, 'msportal'))),
 
         h(ProjectMenu, null),
@@ -104,7 +104,7 @@ export function MapTopBar() {
     return h('div', { className: 'map-topbar' },
         h('div', { className: 'map-topbar-start' },
             h(IconButton, { className: 'map-brand-button', label: 'msportal — polecenia (Ctrl+K)', tooltipSide: 'bottom', onClick: () => dispatch(openOverlay('palette')) },
-                h('img', { src: './assets/mapownik-logo-icon.png?v=19.43.0', alt: '', 'aria-hidden': true })),
+                h('img', { src: './assets/mapownik-logo-icon.png?v=19.44.0', alt: '', 'aria-hidden': true })),
             h(SearchToolbar, { manager: searchManager })),
         h('div', { className: 'map-topbar-end', role: 'toolbar', 'aria-label': 'Projekt i widok' },
             showEditing && h('div', { className: 'map-topbar-group' },

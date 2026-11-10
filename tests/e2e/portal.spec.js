@@ -1,4 +1,4 @@
-// msportal 19.43.0 — scenariusze w przeglądarce na zbudowanej paczce.
+// msportal 19.44.0 — scenariusze w przeglądarce na zbudowanej paczce.
 import { test, expect } from '@playwright/test';
 
 /** Zbiera błędy konsoli, wyjątki i naruszenia CSP strony. */
@@ -123,4 +123,37 @@ test('zgłaszanie błędów z przeglądarki: przyjmuje POST, odrzuca inne', asyn
   expect((await request.get('/api/client_errors.php')).status()).toBe(405);
   expect((await request.post('/api/client_errors.php', { data: { message: '' } })).status()).toBe(400);
   expect((await request.post('/api/client_errors.php', { data: { message: 'x'.repeat(9000) } })).status()).toBe(413);
+});
+
+test('pomoc: link do polityki prywatności tylko gdy jest opublikowana', async ({ page }) => {
+  await page.goto('/index.html');
+  await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
+  await page.getByRole('button', { name: 'Jak zacząć — pomoc' }).click();
+  await expect(page.getByRole('button', { name: 'Skróty klawiszowe' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Polityka prywatności' })).toHaveCount(0); // paczka zawiera tylko szkic
+  await page.keyboard.press('Escape');
+  await page.route('**/konfiguracja/polityka-prywatnosci.html', (route) => route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>Polityka</title>' }));
+  await page.reload();
+  await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
+  await page.getByRole('button', { name: 'Jak zacząć — pomoc' }).click();
+  await expect(page.getByRole('link', { name: 'Polityka prywatności' })).toHaveAttribute('href', './konfiguracja/polityka-prywatnosci.html');
+});
+
+test('„miejscowość + numer działki”: wynik pierwszego etapu bez czekania na przeszukanie gminy', async ({ page }) => {
+  test.slow();
+  await page.goto('/index.html');
+  await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
+  await page.fill('#map-search-input', 'Kórnik 1000');
+  await expect(page.getByRole('option', { name: /dz\. 1000/ }).first()).toBeVisible({ timeout: 20_000 });
+});
+
+test('„Wysokości” w karcie działki liczy od razu, pasek stylu nie zasłania mapy', async ({ page }) => {
+  test.slow();
+  await page.goto('/index.html');
+  await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
+  await page.fill('#map-search-input', '220408_2.0006.210/2');
+  await page.getByRole('option').first().click();
+  await page.getByRole('button', { name: 'Wysokości', exact: true }).click({ timeout: 60_000 });
+  await expect(page.getByText('deniwelacja').first()).toBeVisible({ timeout: 90_000 });
+  await expect(page.locator('.object-style-bar')).toHaveCount(0);
 });

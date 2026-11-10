@@ -74,6 +74,13 @@ Wszystkie uruchamia też GitHub Actions przy każdej zmianie.
 - `app-*/core/apiCache.js` — pamięć zapytań (TanStack Query). Nowe zapytania GET do API z odpowiedzią `{ok: true}`
   warto kierować przez `cachedJson(url, { signal, retry })`; nie dla odpowiedzi „w toku” (np. pozwolenia z `pending`).
 
+## Narzędzia dodane w 19.44.0
+- `node tools/check_deploy.mjs https://adres [--monitor] [--browser] [--json]` — kontrola wgranego portalu
+  (wersja, nagłówki, blokady, usługi, offline). Uruchamiana też przez workflow „Wdrożenie”.
+- `.github/workflows/monitor.yml` — kontrola dostępności co 15 min; sekret `MONITOR_URL`; e-mail z GitHuba przy awarii.
+- `konfiguracja/polityka-prywatnosci.szkic.html` — szkic polityki; opublikowana wersja to `konfiguracja/polityka-prywatnosci.html`
+  (link w pomocy pojawia się automatycznie). Przy zmianie przetwarzania danych (nowa usługa, nowe dane na serwerze) zaktualizuj szkic.
+
 ## Zasady, których pilnują narzędzia
 - `index.html` nie może mieć skryptów wbudowanych (CSP `script-src 'self'`) — sprawdza `tools/build.mjs`.
 - Zod musi być w trybie `jitless` przed pierwszym schematem — `core/zodConfig.js` jest w tej samej paczce co zod (`vite.config.js`).

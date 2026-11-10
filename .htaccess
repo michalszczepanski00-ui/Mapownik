@@ -9,7 +9,7 @@ Options -Indexes
   Require all denied
 </FilesMatch>
 # 19.41.4-b (audyt B6): dokumentacja wydania, raporty, kopie i pliki narzędzi nie są publiczne.
-<FilesMatch "^((ZMIANY|RAPORT_AUDYTU|README|INSTRUKCJA)[^/]*[.](md|txt)|[.]htaccess[.]bak.*|.*[.](py|sh|sqlite|sqlite3|db|bak|log|lock|part))$">
+<FilesMatch "^((ZMIANY|RAPORT_AUDYTU|README|INSTRUKCJA)[^/]*[.](md|txt)|[.]htaccess[.]bak.*|.*[.](py|sh|sqlite|sqlite3|db|bak|log|lock|part)|.*[.]szkic[.]html)$">
   Require all denied
 </FilesMatch>
 
@@ -124,7 +124,7 @@ Options -Indexes
   RewriteRule ^(node_modules|build|dist|tests|\.github)/ - [R=404,L]
   RewriteRule ^(package(-lock)?\.json|vite\.config\.js|vitest\.config\.js|playwright\.config\.js|tsconfig\.json)$ - [R=404,L]
   RewriteRule ^api/ - [L]
-  RewriteRule ^app-19\.43\.0/ - [L]
+  RewriteRule ^app-19\.44\.0/ - [L]
   RewriteRule ^app-[^/]+/ - [R=410,L]
   RewriteRule ^data/kowr/installations\.(json|csv)$ - [L]
   RewriteRule ^data/ - [R=404,L]

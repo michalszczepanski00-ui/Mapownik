@@ -119,7 +119,7 @@ if (!monitor) {
   });
   const blocked = ['README_WGRAJ_NA_SERWER.txt', 'ZMIANY_19.43.0.md', 'api/_common.php', 'api/certs/cacert.pem', 'data/rwdz/rwdz.sqlite',
     'data/shared/00/0000000000.json', 'data/msportal/msportal.sqlite3', 'setup-vendors.php', 'cron/rwdz_update.php', 'tools/check_release.py',
-    'audyt/wyniki-serwera.json', 'cache/', '.htaccess', 'package.json', 'node_modules/', 'app-1.0.0/main.js'];
+    'audyt/wyniki-serwera.json', 'konfiguracja/polityka-prywatnosci.szkic.html', 'cache/', '.htaccess', 'package.json', 'node_modules/', 'app-1.0.0/main.js'];
   await check('Bezpieczeństwo', 'Zablokowane pliki i katalogi', async () => {
     const open = [];
     for (const path of blocked) { const r = await get(path, { redirect: 'manual', method: 'HEAD' }); if (r.status === 200) open.push(path); }

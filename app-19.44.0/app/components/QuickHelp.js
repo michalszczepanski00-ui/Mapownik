@@ -12,6 +12,17 @@ const STEPS = Object.freeze([
     ['Rysuj, Mierz, Eksport', 'Rysowanie i pomiary — na dole mapy. Eksport obrazu mapy — u góry.'],
 ]);
 
+/**
+ * 19.44.0: link „Polityka prywatności” tylko wtedy, gdy administrator opublikował plik
+ * konfiguracja/polityka-prywatnosci.html (szkic: konfiguracja/polityka-prywatnosci.szkic.html). Sprawdzane raz, przy otwarciu pomocy.
+ */
+const PRIVACY_URL = './konfiguracja/polityka-prywatnosci.html';
+let privacyCheck = null;
+function privacyPolicyAvailable() {
+    privacyCheck ??= fetch(PRIVACY_URL, { method: 'HEAD', cache: 'no-store' }).then((r) => r.ok && /html/.test(r.headers.get('content-type') || '')).catch(() => false);
+    return privacyCheck;
+}
+
 function readSeen() { try { return window.localStorage.getItem(SEEN_KEY) === '1'; } catch { return true; } }
 function writeSeen() { try { window.localStorage.setItem(SEEN_KEY, '1'); } catch { /* tryb prywatny */ } }
 
@@ -22,6 +33,8 @@ function writeSeen() { try { window.localStorage.setItem(SEEN_KEY, '1'); } catch
 export function QuickHelp() {
     const dispatch = useAppDispatch();
     const [open, setOpen] = useState(false);
+    const [privacy, setPrivacy] = useState(false);
+    useEffect(() => { if (open) void privacyPolicyAvailable().then(setPrivacy); }, [open]);
     const rootRef = useRef(null);
     // 19.33.0: pomoc nie otwiera się sama — tylko przyciskiem „?” (start ma być spokojny: mapa, wyszukiwarka, karta).
     useEffect(() => {
@@ -45,5 +58,6 @@ export function QuickHelp() {
                 STEPS.map(([title, text]) => h('li', { key: title }, h('strong', null, title), h('span', null, text)))),
             h('div', { className: 'quick-help-foot' },
                 h('button', { type: 'button', className: 'quick-help-link', onClick: () => { close(); dispatch(openOverlay('shortcuts')); } }, 'Skróty klawiszowe'),
+                privacy && h('a', { className: 'quick-help-link', href: PRIVACY_URL, target: '_blank', rel: 'noopener' }, 'Polityka prywatności'),
                 h('button', { type: 'button', className: 'quick-help-ok', onClick: close }, 'Rozumiem'))));
 }
