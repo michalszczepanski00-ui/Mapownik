@@ -1,0 +1,95 @@
+name: Wdrożenie na OVH (FTP)
+
+# Ręczne uruchomienie: GitHub → Actions → „Wdrożenie na OVH (FTP)" → Run workflow.
+# Wgrywa zawartość paczki ZIP do podkatalogu na hostingu i sprawdza verify-deployment.php.
+# Zasada z README_WGRAJ_NA_SERWER.txt: każdy etap zmian UI idzie do NOWEGO katalogu testowego,
+# produkcji nie nadpisujemy — dlatego katalog docelowy musi mieć postać testNN (np. test25).
+
+on:
+  workflow_dispatch:
+    inputs:
+      katalog:
+        description: 'Katalog docelowy na serwerze, tylko testNN (np. test25)'
+        required: true
+        default: 'test25'
+      paczka:
+        description: 'Plik ZIP w repozytorium'
+        required: true
+        default: 'dist/msportal-19.49.0-ux1-serwer.zip'
+
+permissions:
+  contents: read
+
+jobs:
+  wdrozenie:
+    runs-on: ubuntu-latest
+    env:
+      KATALOG: ${{ inputs.katalog }}
+      PACZKA: ${{ inputs.paczka }}
+      FTP_HOST: ${{ secrets.FTP_HOST }}
+      FTP_USER: ${{ secrets.FTP_USER }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      FTP_ROOT: ${{ secrets.FTP_ROOT }}        # np. /www  (katalog domeny na hostingu OVH)
+      SITE_URL: ${{ vars.SITE_URL }}            # np. https://twoja-domena.pl  (bez końcowego /)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sprawdź dane wejściowe
+        run: |
+          set -eu
+          [[ "$KATALOG" =~ ^test[0-9]+$ ]] || { echo "::error::Katalog musi mieć postać testNN (np. test25). Produkcji nie nadpisujemy tym workflow."; exit 1; }
+          [ -f "$PACZKA" ] || { echo "::error::Brak pliku $PACZKA w repozytorium"; exit 1; }
+          for v in FTP_HOST FTP_USER FTP_PASSWORD FTP_ROOT SITE_URL; do
+            [ -n "${!v}" ] || { echo "::error::Brak ustawienia $v (Settings → Secrets and variables → Actions)"; exit 1; }
+          done
+
+      - name: Rozpakuj paczkę
+        run: |
+          set -eu
+          mkdir -p build/www
+          unzip -q "$PACZKA" -d build/www
+          test -f build/www/index.html && test -f build/www/verify-deployment.php
+          echo "Plików: $(find build/www -type f | wc -l)"
+
+      - name: Zainstaluj lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Wgraj przez FTPS
+        run: |
+          set -eu
+          cat > build/lftp.rc <<RC
+          set ftp:ssl-force true
+          set ftp:ssl-protect-data true
+          set ssl:verify-certificate yes
+          set net:max-retries 3
+          set net:timeout 30
+          set mirror:parallel-transfer-count 4
+          open -u "$FTP_USER","$FTP_PASSWORD" "$FTP_HOST"
+          mkdir -p "$FTP_ROOT/$KATALOG"
+          # 1) wszystko oprócz index.html i .htaccess; bez --delete, więc data/ i cache/ na serwerze zostają
+          mirror -R --overwrite --no-perms --exclude-glob index.html --exclude-glob .htaccess build/www "$FTP_ROOT/$KATALOG"
+          # 2) na końcu index.html i .htaccess (strona zmienia się dopiero, gdy pliki są już na miejscu)
+          cd "$FTP_ROOT/$KATALOG"
+          lcd build/www
+          put index.html
+          put .htaccess
+          # 3) prawa zapisu dla cache/ i data/ (jeśli serwer na to pozwala)
+          site chmod 775 cache
+          site chmod 775 data
+          bye
+          RC
+          lftp -f build/lftp.rc
+
+      - name: Sprawdź wdrożenie
+        run: |
+          set -eu
+          URL="$SITE_URL/$KATALOG"
+          sleep 3
+          curl -fsS "$URL/verify-deployment.php" | tee build/verify.json
+          python3 - <<'PY'
+          import json,sys
+          d=json.load(open('build/verify.json'))
+          print({k:d.get(k) for k in ('expected','deployment_consistent','bundle_missing','leftover_files')})
+          sys.exit(0 if d.get('deployment_consistent') else 1)
+          PY
+          echo "Gotowe: $URL/ — odśwież Ctrl+F5"
