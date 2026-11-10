@@ -36,6 +36,8 @@ Bez Node.js — ręcznie w przeglądarce. Zamień `ADRES` na adres portalu, np. 
   - Eksport → podkład „Ortofotomapa” → plik PNG pokazuje zdjęcie, nie białe tło;
   - zdjęcie ładuje się też w panelu „Zdjęcia”.
 - [ ] **Wysokości** w karcie działki: wynik (deniwelacja, spadek) bez dodatkowego klikania.
+- [ ] **Działki KIEG** (19.47.0): Warstwy → „Działki ewidencyjne (KIEG)” przy skali ok. 1:1 800 — granice i numery działek w ciągu kilku sekund.
+- [ ] **Plany przy przybliżaniu:** włącz strefy POG, przybliż mapę — po chwili obraz jest ostry (nie powiększony stary).
 - [ ] **Porównanie działek:** dodaj dwie działki do projektu (karta działki → „Do projektu”) → panel Obiekty → „Porównaj działki (2)”:
   - tabela wypełnia się w ok. 10–20 s;
   - przycisk „CSV” pobiera plik, który otwiera się w Excelu z polskimi znakami.

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-10-30",
+  "updated_at": "2026-11-10",
   "sources": {
     "pgi_deposits": {
       "url": "https://cbdgmapa.pgi.gov.pl/arcgis/services/midas/MapServer/WMSServer",
@@ -328,6 +328,80 @@
           "url": "https://rejestr-urbanistyczny.gov.pl/uslugi-sieciowe/wms-pog/wms",
           "layers": "APP.POG.WTrakciePrzyjmowania,APP.POG.SW.WTrakciePrzyjmowania,APP.POG.SJ.WTrakciePrzyjmowania,APP.POG.SZ.WTrakciePrzyjmowania,APP.POG.SU.WTrakciePrzyjmowania,APP.POG.SH.WTrakciePrzyjmowania,APP.POG.SP.WTrakciePrzyjmowania,APP.POG.SR.WTrakciePrzyjmowania,APP.POG.SI.WTrakciePrzyjmowania,APP.POG.SN.WTrakciePrzyjmowania,APP.POG.SC.WTrakciePrzyjmowania,APP.POG.SG.WTrakciePrzyjmowania,APP.POG.SO.WTrakciePrzyjmowania,APP.POG.SK.WTrakciePrzyjmowania",
           "query_layers": "APP.POG.WTrakciePrzyjmowania,APP.POG.SW.WTrakciePrzyjmowania,APP.POG.SJ.WTrakciePrzyjmowania,APP.POG.SZ.WTrakciePrzyjmowania,APP.POG.SU.WTrakciePrzyjmowania,APP.POG.SH.WTrakciePrzyjmowania,APP.POG.SP.WTrakciePrzyjmowania,APP.POG.SR.WTrakciePrzyjmowania,APP.POG.SI.WTrakciePrzyjmowania,APP.POG.SN.WTrakciePrzyjmowania,APP.POG.SC.WTrakciePrzyjmowania,APP.POG.SG.WTrakciePrzyjmowania,APP.POG.SO.WTrakciePrzyjmowania,APP.POG.SK.WTrakciePrzyjmowania",
+          "version": "1.3.0"
+        }
+      ],
+      "map_layer": false,
+      "map_layer_note": "19.47.0: tylko identyfikacja (akt + strefy w jednym zapytaniu); na mapie pog_draft_map i pog_draft_zones."
+    },
+    "pog_draft_map": {
+      "url": "https://mapy.geoportal.gov.pl/wss/ext/ProjektowanePlanyOgolneGmin",
+      "layers": "aktPlanowaniaprzestrzennego,obszarStandardowDostepnosciInfrastrukturySpolecznej,obszarZabSrodmiejskiej,obszarUzupelnieniaZabudowy",
+      "version": "1.1.1",
+      "format": "image/png",
+      "transparent": true,
+      "ttl": 86400,
+      "error_mode": "http",
+      "title": "POG — w trakcie przyjmowania (obszary)",
+      "layer_id": "overlay.pog.draft",
+      "group": "Planowanie przestrzenne",
+      "description": "Projekt planu ogólnego — akt i obszary (OZS, OUZ, dostępność infrastruktury), bez stref. Strefy projektu: osobna warstwa „Strefy POG — projektowane”. Krajowa integracja GUGiK, zapasowo Rejestr Urbanistyczny.",
+      "min_zoom": 9,
+      "z_index": 46,
+      "provider": "GUGiK — Krajowa Integracja Planów Ogólnych (zapas: Rejestr Urbanistyczny)",
+      "provider_url": "https://www.geoportal.gov.pl/",
+      "identify": true,
+      "expected_titles": {},
+      "verified_at": "2026-10-27",
+      "timeout": 10,
+      "budget": 12,
+      "variants": [
+        {
+          "url": "https://mapy.geoportal.gov.pl/wss/ext/ProjektowanePlanyOgolneGmin",
+          "layers": "aktPlanowaniaprzestrzennego,obszarStandardowDostepnosciInfrastrukturySpolecznej,obszarZabSrodmiejskiej,obszarUzupelnieniaZabudowy",
+          "query_layers": "aktPlanowaniaprzestrzennego,obszarStandardowDostepnosciInfrastrukturySpolecznej,obszarZabSrodmiejskiej,obszarUzupelnieniaZabudowy",
+          "version": "1.1.1"
+        },
+        {
+          "url": "https://rejestr-urbanistyczny.gov.pl/uslugi-sieciowe/wms-pog/wms",
+          "layers": "APP.POG.WTrakciePrzyjmowania",
+          "query_layers": "APP.POG.WTrakciePrzyjmowania",
+          "version": "1.3.0"
+        }
+      ]
+    },
+    "pog_draft_zones": {
+      "url": "https://mapy.geoportal.gov.pl/wss/ext/ProjektowanePlanyOgolneGmin",
+      "layers": "strefaPlanistyczna",
+      "version": "1.1.1",
+      "format": "image/png",
+      "transparent": true,
+      "ttl": 86400,
+      "error_mode": "http",
+      "title": "Strefy POG — projektowane",
+      "layer_id": "overlay.pog.draft.zones",
+      "group": "Planowanie przestrzenne",
+      "description": "Strefy planistyczne z projektów planów ogólnych (jeszcze nieuchwalone). Osobna warstwa z własnym kryciem — nie dubluje obszarów projektu.",
+      "min_zoom": 12.4,
+      "z_index": 47,
+      "provider": "GUGiK — Krajowa Integracja Planów Ogólnych (zapas: Rejestr Urbanistyczny)",
+      "provider_url": "https://www.geoportal.gov.pl/",
+      "identify": true,
+      "expected_titles": {},
+      "verified_at": "2026-10-27",
+      "timeout": 10,
+      "budget": 12,
+      "variants": [
+        {
+          "url": "https://mapy.geoportal.gov.pl/wss/ext/ProjektowanePlanyOgolneGmin",
+          "layers": "strefaPlanistyczna",
+          "query_layers": "strefaPlanistyczna",
+          "version": "1.1.1"
+        },
+        {
+          "url": "https://rejestr-urbanistyczny.gov.pl/uslugi-sieciowe/wms-pog/wms",
+          "layers": "APP.POG.SW.WTrakciePrzyjmowania,APP.POG.SJ.WTrakciePrzyjmowania,APP.POG.SZ.WTrakciePrzyjmowania,APP.POG.SU.WTrakciePrzyjmowania,APP.POG.SH.WTrakciePrzyjmowania,APP.POG.SP.WTrakciePrzyjmowania,APP.POG.SR.WTrakciePrzyjmowania,APP.POG.SI.WTrakciePrzyjmowania,APP.POG.SN.WTrakciePrzyjmowania,APP.POG.SC.WTrakciePrzyjmowania,APP.POG.SG.WTrakciePrzyjmowania,APP.POG.SO.WTrakciePrzyjmowania,APP.POG.SK.WTrakciePrzyjmowania",
+          "query_layers": "APP.POG.SW.WTrakciePrzyjmowania,APP.POG.SJ.WTrakciePrzyjmowania,APP.POG.SZ.WTrakciePrzyjmowania,APP.POG.SU.WTrakciePrzyjmowania,APP.POG.SH.WTrakciePrzyjmowania,APP.POG.SP.WTrakciePrzyjmowania,APP.POG.SR.WTrakciePrzyjmowania,APP.POG.SI.WTrakciePrzyjmowania,APP.POG.SN.WTrakciePrzyjmowania,APP.POG.SC.WTrakciePrzyjmowania,APP.POG.SG.WTrakciePrzyjmowania,APP.POG.SO.WTrakciePrzyjmowania,APP.POG.SK.WTrakciePrzyjmowania",
           "version": "1.3.0"
         }
       ]

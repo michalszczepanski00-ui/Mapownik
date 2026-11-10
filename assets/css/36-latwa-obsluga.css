@@ -146,13 +146,7 @@ button.workspace-start-item:focus-visible { outline: 2px solid var(--accent); ou
 .rcn-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 
 /* ------------------------------------------------------------------ 19.30.0 — nowe podkłady */
-/* Rozwinięty przełącznik (7 podkładów) w dwóch rzędach po 4; pasek narzędzi i skala odsuwają się, nic się nie nakłada. */
-.app-shell.is-v2 .basemap-switcher:not(.is-collapsed) { flex-wrap: wrap; max-width: 300px; row-gap: 4px; }
-.app-shell.is-workspace-1c:has(.basemap-switcher:not(.is-collapsed)) .tool-dock { left: calc(max(var(--work-card-inset-left, 272px), 304px) + 8px); }
-.app-shell.is-v2:has(.basemap-switcher:not(.is-collapsed)) .map-scalebar { bottom: 150px; }
-@media (max-width: 1150px) { .app-shell.is-workspace-1c:has(.basemap-switcher:not(.is-collapsed)) .tool-dock { left: 316px; } }
 .basemap-thumb img[src*="assets/basemaps/"] { object-fit: cover; }
-.app-shell.is-workspace-1c:has(.basemap-switcher:not(.is-collapsed)) .workspace-card { max-height: calc(100% - 214px); }
 
 /* 19.32.0: narzędzia „Ceny transakcyjne” i „Pozwolenia na budowę” (prawa belka). */
 :is(.market-body, .permits-body) { display: grid; gap: 8px; padding: 8px 10px 12px; min-width: 0; font-size: 12.5px; }

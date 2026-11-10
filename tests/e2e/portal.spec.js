@@ -1,4 +1,4 @@
-// msportal 19.46.0 — scenariusze w przeglądarce na zbudowanej paczce.
+// msportal 19.47.0 — scenariusze w przeglądarce na zbudowanej paczce.
 import { test, expect } from '@playwright/test';
 
 /** Zbiera błędy konsoli, wyjątki i naruszenia CSP strony. */
@@ -39,18 +39,26 @@ test('podkłady: każdy kończy ładowanie, większość działa', async ({ page
   test.slow();
   await page.goto('/index.html');
   await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
-  await page.locator('button[aria-label="Pokaż wszystkie podkłady"]').click();
+  // 19.47.0: przełącznik jak w Google Maps — rozwija się po najechaniu i zwija po wyborze.
+  const switcher = page.locator('.basemap-switcher');
+  await switcher.hover();
   const options = page.locator('button.basemap-option');
   const count = await options.count();
   expect(count).toBeGreaterThanOrEqual(5);
   const results = [];
   for (let i = 0; i < count; i += 1) {
+    await page.mouse.move(700, 300);
+    await switcher.hover();
     const option = options.nth(i);
+    const label = await option.getAttribute('aria-label');
     await option.click();
     // nie może zawisnąć w „Ładowanie…”
-    await expect(option).not.toHaveClass(/is-pending/, { timeout: 60_000 });
-    const active = /is-active/.test((await option.getAttribute('class')) || '');
-    results.push(`${await option.getAttribute('aria-label')}: ${active ? 'działa' : 'usługa nie odpowiada — powrót do poprzedniego'}`);
+    // Po wyborze przełącznik zwija się do jednej miniatury — stan sprawdzamy po rozwinięciu.
+    await expect(page.locator('button.basemap-option.is-pending')).toHaveCount(0, { timeout: 60_000 });
+    await page.mouse.move(700, 300);
+    await switcher.hover();
+    const active = /is-active/.test((await options.nth(i).getAttribute('class')) || '');
+    results.push(`${label}: ${active ? 'działa' : 'usługa nie odpowiada — powrót do poprzedniego'}`);
   }
   console.log(results.join('\n'));
   expect(results.filter((r) => r.endsWith('działa')).length).toBeGreaterThanOrEqual(count - 2);

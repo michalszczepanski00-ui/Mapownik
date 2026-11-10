@@ -85,19 +85,35 @@ $filter = '<fes:Filter xmlns:fes="http://www.opengis.net/fes/2.0" xmlns:gml="htt
 $url = RCN_WFS . '?' . http_build_query(['SERVICE' => 'WFS', 'VERSION' => '2.0.0', 'REQUEST' => 'GetFeature', 'TYPENAMES' => $typeName, 'COUNT' => RCN_MAX_FEATURES, 'FILTER' => $filter]);
 
 $started = microtime(true);
-$ch = curl_init($url);
+// 19.47.0: do 3 prób. Serwery GUGiK zrywają czasem połączenie z hostingu („SSL_ERROR_SYSCALL, errno 104”,
+// „Connection reset by peer”) — kolejna próba idzie nowym połączeniem, HTTP/1.1 i IPv4.
 $caBundle = __DIR__ . '/certs/cacert.pem';
-curl_setopt_array($ch, [
-    CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 3,
-    CURLOPT_PROTOCOLS => CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
-    CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => 45, CURLOPT_ENCODING => '',
-    CURLOPT_USERAGENT => 'MSPortal-RCN/19.29 (+https://mapownik.swiadectwa.net)',
-    CURLOPT_HTTPHEADER => ['Accept: application/gml+xml, text/xml'],
-] + (is_file($caBundle) ? [CURLOPT_CAINFO => $caBundle] : []));
-$body = curl_exec($ch);
-$status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-$curlError = curl_error($ch);
-curl_close($ch);
+$body = false; $status = 0; $curlError = '';
+foreach ([0, 400000, 1200000] as $attempt => $delayUs) {
+    if ($delayUs > 0) usleep($delayUs);
+    $ch = curl_init($url);
+    $opts = [
+        CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => true, CURLOPT_MAXREDIRS => 3,
+        CURLOPT_PROTOCOLS => CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
+        CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => $attempt === 0 ? 45 : 30, CURLOPT_ENCODING => '',
+        CURLOPT_USERAGENT => 'MSPortal-RCN/19.47 (+https://mapownik.swiadectwa.net)',
+        CURLOPT_HTTPHEADER => ['Accept: application/gml+xml, text/xml'],
+    ] + (is_file($caBundle) ? [CURLOPT_CAINFO => $caBundle] : []);
+    if ($attempt > 0) {
+        $opts[CURLOPT_FRESH_CONNECT] = true; $opts[CURLOPT_FORBID_REUSE] = true;
+        if (defined('CURL_HTTP_VERSION_1_1')) $opts[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
+        if (defined('CURL_IPRESOLVE_V4')) $opts[CURLOPT_IPRESOLVE] = CURL_IPRESOLVE_V4;
+    }
+    curl_setopt_array($ch, $opts);
+    $body = curl_exec($ch);
+    $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+    if (is_string($body) && $status === 200) break;
+    // Ponawiamy tylko zerwane połączenie i błędy serwera; przekroczenie czasu (45 s) — nie.
+    if ($status >= 400 && $status < 500) break;
+    if ($curlError !== '' && stripos($curlError, 'timed out') !== false) break;
+}
 $upstreamMs = (int)round((microtime(true) - $started) * 1000);
 
 $failed = !is_string($body) || $status !== 200 || !str_contains(substr($body, 0, 2000), 'FeatureCollection');
@@ -107,8 +123,13 @@ if ($failed) {
         $cached = json_decode((string)file_get_contents($cacheFile), true);
         if (is_array($cached)) { $cached['cached'] = true; $cached['stale'] = true; rcn_out($cached); }
     }
-    $reason = $curlError !== '' ? $curlError : ('HTTP ' . $status . (is_string($body) && str_contains($body, 'ExceptionText') ? ' (błąd usługi WFS)' : ''));
-    rcn_out(['ok' => false, 'error' => 'Rejestr cen GUGiK nie odpowiada: ' . $reason, 'retryable' => true, 'upstreamMs' => $upstreamMs], 502);
+    // 19.47.0: zwykły komunikat dla użytkownika; szczegół techniczny (np. tekst OpenSSL) tylko w polu detail i w dzienniku.
+    $detail = $curlError !== '' ? $curlError : ('HTTP ' . $status . (is_string($body) && str_contains($body, 'ExceptionText') ? ' (błąd usługi WFS)' : ''));
+    error_log('msportal rcn.php: ' . $detail);
+    $message = $curlError !== '' && stripos($curlError, 'timed out') !== false
+        ? 'Rejestr cen GUGiK odpowiada zbyt wolno. Spróbuj ponownie za chwilę.'
+        : 'Rejestr cen GUGiK chwilowo nie odpowiada (połączenie przerwane po stronie GUGiK). Spróbuj ponownie za chwilę.';
+    rcn_out(['ok' => false, 'error' => $message, 'detail' => $detail, 'retryable' => true, 'upstreamMs' => $upstreamMs], 502);
 }
 
 // --- odczyt GML: każdy rekord -> pola + środek geometrii
@@ -198,6 +219,8 @@ foreach ($groups as $id => $recs) {
         $area = $landArea($first['NIER_POW_GRUNTU'] ?? null) ?: array_sum(array_map(fn ($p) => (float)$landArea($p['DZI_POW_EWID'] ?? '0'), $parcels));
         $numbers = array_values(array_filter(array_map(fn ($p) => $p['DZI_NR_DZIALKI'] ?? '', $parcels)));
         $label = 'dz. ' . implode(', ', array_slice($numbers, 0, 3)) . (count($numbers) > 3 ? ' i ' . (count($numbers) - 3) . ' inne' : '');
+        // 19.47.0: transakcja kilku działek — opis na liście (zł/m² liczone od łącznej powierzchni, statystyka bez zmian).
+        if (count($parcels) > 1 && (in_array(null, $parcelPrices, true) || array_sum($parcelPrices) <= 0)) $note = 'transakcja wielodziałkowa: ' . count($parcels) . ' działek, cena łączna za całość';
         $extraInfo = ['parcels' => array_keys($parcels), 'use' => $first['DZI_SPOSOB_UZYT'] ?? '', 'mpzp' => $first['DZI_PRZEZN_WMPZP'] ?? ''];
     } elseif ($kind === 'mieszkania') {
         $flats = array_values(array_filter($recs, fn ($rec) => ($rec['LOK_FUNKCJA'] ?? '') === 'mieszkalna'));

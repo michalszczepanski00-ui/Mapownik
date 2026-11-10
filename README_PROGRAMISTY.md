@@ -101,6 +101,17 @@ Wszystkie uruchamia też GitHub Actions przy każdej zmianie.
 - Ceny RCN: wspólne parametry w `core/rcnDefaults.js` (500 m, 5 lat; mediana od 3 transakcji) — tak samo w `api/rcn.php`.
 - Okno raportu PDF ładowane przy pierwszym otwarciu: stan w `app/components/reportDialogStore.js`.
 
+## Zmiany w 19.47.0
+- Droga zapytań nakładek WMS: `transport: 'proxy-then-direct'` (serwer pośredniczący z pamięcią, przeglądarka awaryjnie;
+  po 2 błędach serwera 10 min najpierw bezpośrednio) — `data/sources/adapters/wmsTransport.js`. Wyjątek: KIEG (`direct-then-proxy`, EPSG:2180).
+- Warstwy planistyczne (grupa „Planowanie przestrzenne”) jako jeden obraz na widok (`tiled: false`, `ratio: 1.2`); pozostałe kafle `gutter: 64`, nakładki bez `transition`.
+- Jeden obraz na widok: `cancelOnGeneration: false` (`SourceRegistry.js`) — inaczej warstwa nie odświeżała się przy przybliżaniu.
+- Profil źródła z `"map_layer": false` (np. `pog_draft`) służy tylko identyfikacji; na mapie `pog_draft_map` i `pog_draft_zones`.
+  Po zmianie `data/source-profiles.json`: `python3 tools/build_source_profiles.py`.
+- Krycie efektywne: `effectiveOpacityFactor()` w `layers/LayerManager.js` (suwak × mnożnik czytelności).
+- Zapytania JSON z ponowieniem i zwykłym komunikatem: `core/fetchRetry.js`.
+- Hooki Reacta zawsze PRZED warunkowym `return` (błąd #300 w 19.46.0).
+
 ## Zasady, których pilnują narzędzia
 - `index.html` nie może mieć skryptów wbudowanych (CSP `script-src 'self'`) — sprawdza `tools/build.mjs`.
 - Zod musi być w trybie `jitless` przed pierwszym schematem — `core/zodConfig.js` jest w tej samej paczce co zod (`vite.config.js`).

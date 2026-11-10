@@ -83,3 +83,14 @@
 /* 19.46.0: podsumowanie karty — dłuższa wartość („w opracowaniu (4SU)”) zawija się, zamiast ściskać etykietę „Plan ogólny”. */
 .app-shell.is-v2 .workspace-card .identify-verdict-item { grid-template-columns: 14px minmax(74px, 1fr) minmax(0, auto) auto; }
 .app-shell.is-v2 .workspace-card .identify-verdict-item > strong { white-space: normal; line-height: 1.2; }
+
+/* 19.47.0: przełącznik podkładów jak w Google Maps — jedna miniatura; po najechaniu rozwija się w JEDNYM rzędzie
+   nad mapą (nakładka, nic nie przesuwa: pasek narzędzi, skala i lewy panel zostają na miejscu). */
+.app-shell.is-v2 .basemap-switcher:not(.is-collapsed) {
+  flex-wrap: nowrap; max-width: calc(100vw - 2 * var(--v2-gap, 12px)); overflow-x: auto;
+  z-index: calc(var(--z-dock-overlay, 40) + 5);
+}
+/* Strzałka rozwijania tylko na ekranach bez najechania myszą (dotyk). */
+@media (hover: hover) { .app-shell.is-v2 .basemap-switcher-toggle { display: none; } }
+/* Lewy panel (karta działki) kończy się wyraźnie nad miniaturą podkładu — bez stykania się. */
+.app-shell.is-workspace-1c .workspace-card { max-height: calc(100% - 176px); }

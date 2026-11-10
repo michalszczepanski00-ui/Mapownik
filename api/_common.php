@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-const MAPOWNIK_USER_AGENT = 'MSPortal/19.46.0 (+server-cache)';
+const MAPOWNIK_USER_AGENT = 'MSPortal/19.47.0 (+server-cache)';
 const MAPOWNIK_TIMEOUT = 20;
 const MAPOWNIK_TILE_CACHE_MAX_AGE = 7776000; // 90 dni
 const MAPOWNIK_TILE_CACHE_MAX_BYTES = 3221225472; // 3 GiB
@@ -135,7 +135,7 @@ function vendor_remote_get(string $url, string $accept = '*/*', int $timeout = 3
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_CONNECTTIMEOUT => $connectTimeout,
             CURLOPT_TIMEOUT => $timeout,
-            CURLOPT_USERAGENT => 'Mozilla/5.0 MSPortalVendor/19.46.0',
+            CURLOPT_USERAGENT => 'Mozilla/5.0 MSPortalVendor/19.47.0',
             CURLOPT_HTTPHEADER => ['Accept: ' . $accept],
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
@@ -150,7 +150,7 @@ function vendor_remote_get(string $url, string $accept = '*/*', int $timeout = 3
         $context = stream_context_create([
             'http' => [
                 'timeout' => $timeout,
-                'user_agent' => 'Mozilla/5.0 MSPortalVendor/19.46.0',
+                'user_agent' => 'Mozilla/5.0 MSPortalVendor/19.47.0',
                 'header' => "Accept: {$accept}\r\n",
                 'follow_location' => 1,
                 'max_redirects' => 5,
@@ -261,7 +261,7 @@ function official_gis_http11_get(string $url, string $accept, int $timeout = 6):
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_CONNECTTIMEOUT => min(4, max(2, $timeout)),
         CURLOPT_TIMEOUT => $timeout,
-        CURLOPT_USERAGENT => 'Mozilla/5.0 MSPortal/19.46.0',
+        CURLOPT_USERAGENT => 'Mozilla/5.0 MSPortal/19.47.0',
         CURLOPT_HTTPHEADER => ['Accept: ' . $accept, 'Connection: close'],
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
@@ -270,6 +270,8 @@ function official_gis_http11_get(string $url, string $accept, int $timeout = 6):
         CURLOPT_FRESH_CONNECT => true,
     ];
     if (defined('CURL_HTTP_VERSION_1_1')) $options[CURLOPT_HTTP_VERSION] = CURL_HTTP_VERSION_1_1;
+    // 19.47.0: ponowienie przez IPv4 — część serwerów zrywa połączenia przychodzące po IPv6 z hostingu.
+    if (defined('CURL_IPRESOLVE_V4')) $options[CURLOPT_IPRESOLVE] = CURL_IPRESOLVE_V4;
     $caBundle = mapownik_ca_bundle();
     if ($caBundle !== null) $options[CURLOPT_CAINFO] = $caBundle;
     curl_setopt_array($ch, $options + mapownik_curl_hardening());
@@ -294,9 +296,11 @@ function official_gis_remote_get(string $url, string $accept = '*/*', int $timeo
     }
 
     $last = [0, '', '', 'request failed'];
-    $delaysUs = [0, 350000];
+    // 19.47.0: trzecia próba tylko po zerwanym połączeniu (errno 104, SSL_ERROR_SYSCALL, „reset by peer”).
+    $delaysUs = [0, 350000, 900000];
 
     foreach ($delaysUs as $attempt => $delayUs) {
+        if ($attempt === 2 && !gis_is_connection_reset((string)($last[3] ?? ''))) break;
         if ($delayUs > 0) usleep($delayUs);
         $useHttp11 = $attempt > 0;
         if ($useHttp11) $last = official_gis_http11_get($url, $accept, $timeout);
@@ -318,6 +322,10 @@ function official_gis_remote_get(string $url, string $accept = '*/*', int $timeo
     }
     gis_circuit_record($circuit, false);
     return $last;
+}
+
+function gis_is_connection_reset(string $error): bool {
+    return $error !== '' && preg_match('/reset by peer|errno 104|SSL_ERROR_SYSCALL|Recv failure|Empty reply|Connection reset|unexpected eof/i', $error) === 1;
 }
 
 function gis_is_timeout_error(string $error): bool {
