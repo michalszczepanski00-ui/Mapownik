@@ -1,0 +1,242 @@
+/*
+ * Mapownik — odświeżenie wyglądu (propozycja do 19.50.0), przygotowane na paczce 19.49.0.
+ *
+ * Arkusz jest celowo POZA warstwami kaskady (@layer), więc wygrywa z regułami
+ * tokens/legacy/shell/utilities bez podbijania specyficzności. Dołącz go w index.html
+ * jako ostatni <link rel="stylesheet">. Docelowo wartości z sekcji 1 warto przenieść
+ * do warstwy „tokens", a resztę do 30-shell.css — wtedy ten plik znika.
+ *
+ * Zasady stylu:
+ *  - jedna „farba": ciemny atrament (zieleń prawie czarna) dla stanu aktywnego i akcji głównej,
+ *    zieleń marki tylko jako sygnał (zaznaczenie, wynik pozytywny, odnośnik);
+ *  - dwa promienie: 6 px (pływające karty) i 4 px (kontrolki) zamiast 4/5/6/7/8/10/12;
+ *  - krawędź + krótki cień zamiast rozmytej poświaty; powierzchnie nieprzezroczyste;
+ *  - liczby tabelaryczne, identyfikatory i współrzędne pismem o stałej szerokości;
+ *  - zakładka wygląda jak zakładka (podkreślenie), przycisk jak przycisk (wypełnienie).
+ */
+
+/* 1. Tokeny ------------------------------------------------------------------------------ */
+:root,
+.app-shell {
+  --panel-radius: 6px;
+  --radius: 6px;
+  --radius-md: 6px;
+  --control-radius: 4px;
+  --radius-control: 4px;
+  --radius-sm: 3px;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo, Consolas, monospace;
+}
+
+.app-shell:is(.is-v2, .is-mobile):not([data-theme=dark]) {
+  --ink: #14201a;
+  --ink-soft: #2b3a32;
+  --bg: #eef0ec;
+  --surface: #fff;
+  --surface-raised: #f6f7f4;
+  --surface-hover: #eef1ec;
+  --surface-active: #e3ebe5;
+  --border: #dcdfd8;
+  --border-strong: #c3c8bf;
+  --control-border: #8a9389;
+  --text: #14201a;
+  --text-muted: #56635b;
+  --text-faint: #6b766f;
+  --accent: #23603c;
+  --accent-soft: #e4eee7;
+  --v2-ink-line: #dcdfd8;
+  --v2-dock-active-bg: var(--ink);
+  --v2-dock-active-muted: #b9c6bd;
+  --v2-dock-hover: #eef1ec;
+  --v2-dock-hover-solid: #eef1ec;
+  --v2-dock-border: 1px solid #c9cec6;
+  --v2-float-shadow: 0 0 0 1px #14201a24, 0 2px 5px #14201a26;
+  --v2-dock-shadow: 0 0 0 1px #14201a24, 0 2px 5px #14201a26;
+  --shadow: 0 0 0 1px #14201a1f, 0 6px 16px #14201a24;
+  --shadow-soft: 0 0 0 1px #14201a1a, 0 2px 6px #14201a1a;
+}
+
+.app-shell:is(.is-v2, .is-mobile)[data-theme=dark] {
+  --ink: #e6ede8;
+  --ink-soft: #c5d0c8;
+  --bg: #101512;
+  --surface: #1a211d;
+  --surface-solid: #1a211d;
+  --surface-raised: #212a25;
+  --surface-hover: #28322c;
+  --surface-active: #23382b;
+  --border: #2f3a33;
+  --border-strong: #41504a;
+  --text: #e9efea;
+  --text-muted: #a9b6ad;
+  --text-faint: #8a978f;
+  --v2-dock-active-bg: var(--ink);
+  --v2-dock-active-text: #101512;
+  --v2-float-shadow: 0 0 0 1px #ffffff1a, 0 2px 6px #0009;
+  --v2-dock-shadow: 0 0 0 1px #ffffff1a, 0 2px 6px #0009;
+  --shadow: 0 0 0 1px #ffffff1a, 0 8px 20px #0009;
+}
+
+.app-shell { font-variant-numeric: tabular-nums; font-feature-settings: "cv05", "cv08", "ss03"; }
+
+/* 2. Geometria: pływające elementy mapy mają jedną krawędź i jeden promień ----------------- */
+.app-shell.is-v2 :is(
+  .map-brand-button, .map-search-fields, .map-topbar-project, .export-map-trigger,
+  .map-topbar-end .icon-button, .activity-bar, .workspace-card, .tool-dock-row,
+  .map-context-bar, .map-view-controls, .basemap-switcher, .dock, .dock > .ui-panel
+) { border-radius: var(--panel-radius); }
+
+.app-shell.is-v2 :is(.map-brand-button, .map-topbar-project, .map-topbar-end .icon-button,
+  .workspace-card, .tool-dock-row, .map-context-bar) { border-color: transparent; }
+
+.app-shell.is-v2 :is(.icon-button, .tool-dock-group, .tool-dock-tool, .workspace-place-tab,
+  .workspace-start-item, .activity-bar-button, .layer-visibility, .identify-verdict-show,
+  .identify-nearby-item, .mcb-escape) { border-radius: var(--control-radius); }
+
+.app-shell.is-v2 :is(.map-view-controls, .basemap-switcher, .map-scalebar, .map-statusbar) {
+  background: var(--surface-solid);
+  box-shadow: var(--v2-float-shadow);
+}
+.app-shell.is-v2 .map-view-controls button + button { border-top: 1px solid var(--border); }
+.app-shell.is-v2 :is(.map-scalebar, .map-statusbar) { border-radius: var(--control-radius); }
+.app-shell.is-v2 :is(.map-scalebar-label, .status-item, .status-scale) { font-family: var(--mono); font-size: 11px; letter-spacing: -.01em; }
+
+/* 3. Górny pasek --------------------------------------------------------------------------- */
+.app-shell.is-v2 .map-search-fields { box-shadow: var(--v2-float-shadow); }
+.app-shell.is-v2 .map-search-fields:focus-within { box-shadow: 0 0 0 2px var(--ink), 0 2px 5px #14201a26; }
+.app-shell.is-v2 .map-search input { font-size: 14px; }
+.app-shell.is-v2 .map-search-chip { border-radius: var(--control-radius); background: var(--surface-active); color: var(--text); font-weight: 500; }
+
+/* Eksport: akcja główna w kolorze atramentu; Projekt: zwykły przycisk tej samej wysokości. */
+.app-shell.is-v2 .export-map-trigger {
+  background: var(--ink); border-color: var(--ink); color: var(--surface-solid);
+  font-weight: 600; padding-inline: 14px; box-shadow: var(--v2-float-shadow);
+}
+.app-shell.is-v2 .export-map-trigger:hover { background: var(--ink-soft); }
+.app-shell.is-v2 .project-trigger { font-weight: 500; border-radius: var(--control-radius); }
+.app-shell.is-v2 .map-topbar-end > .icon-button { width: 36px; height: 36px; flex-basis: 36px; }
+
+/* 4. Szyna paneli i dolny pasek narzędzi --------------------------------------------------- */
+.app-shell.is-v2 .activity-bar-button { color: var(--text-muted); }
+.app-shell.is-v2 .activity-bar-button:hover { color: var(--text); background: var(--surface-hover); }
+.app-shell.is-v2 .activity-bar-button:is(.is-active, [aria-expanded=true]) {
+  background: var(--ink); color: var(--surface-solid); border-color: transparent; box-shadow: none;
+}
+
+.app-shell.is-v2 :is(.tool-dock-group, .tool-dock-tool) { color: var(--text-muted); font-weight: 500; }
+.app-shell.is-v2 :is(.tool-dock-group, .tool-dock-tool):hover { color: var(--text); }
+.app-shell.is-v2 :is(.tool-dock-group, .tool-dock-tool).is-active { color: var(--v2-dock-active-text); font-weight: 600; }
+.app-shell.is-v2 .tool-dock-group { padding-inline: 14px; }
+
+/* Pasek kontekstu narzędzia: nazwa + jedna wskazówka, bez ramek w ramce. */
+.app-shell.is-v2 .map-context-bar { box-shadow: var(--v2-float-shadow); }
+.app-shell.is-v2 .mcb-hint { color: var(--text-muted); }
+.app-shell.is-v2 .mcb-escape { font-family: var(--mono); font-size: 10.5px; color: var(--text-muted); }
+
+/* 5. Karta działki ------------------------------------------------------------------------- */
+.app-shell.is-v2 .workspace-card-head { border-bottom: 0; min-height: 36px; }
+.app-shell.is-v2 .workspace-card-head strong { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+
+/* Zakładki: podkreślenie zamiast wypełnionej pastylki. */
+.app-shell.is-v2 .workspace-place-tabs { gap: 0; padding: 0 8px; border-bottom: 1px solid var(--border); }
+.app-shell.is-v2 .workspace-place-tab {
+  flex: 1 1 0; height: 34px; border-radius: 0; background: none; color: var(--text-muted);
+  font-size: 13px; font-weight: 500; box-shadow: inset 0 -2px 0 transparent;
+}
+.app-shell.is-v2 .workspace-place-tab:hover { color: var(--text); background: none; }
+.app-shell.is-v2 .workspace-place-tab.is-active {
+  background: none; color: var(--text); font-weight: 600; box-shadow: inset 0 -2px 0 var(--ink);
+}
+
+/* Stan początkowy: same czynności — zdanie wstępu powtarza to, co mówią przyciski. */
+.app-shell.is-v2 .workspace-start-title { display: none; }
+.app-shell.is-v2 .workspace-start { padding-top: 6px; }
+.app-shell.is-v2 .workspace-start-item { min-height: 34px; }
+
+/* Nagłówek działki: numer jako tytuł, identyfikator pismem stałej szerokości. */
+.app-shell.is-v2 .identify-headline-title { font-size: 18px; letter-spacing: -.01em; }
+.app-shell.is-v2 .identify-headline-sub { font-weight: 400; color: var(--text-muted); }
+.app-shell.is-v2 .identify-headline-id .identify-fact-value { font-family: var(--mono); font-size: 12px; letter-spacing: -.01em; }
+.app-shell.is-v2 .identify-more-facts > summary { color: var(--text-muted); }
+
+/* Lista werdyktów i sekcje: linie rozdzielające zamiast kart w karcie. */
+.app-shell.is-v2 .workspace-card :is(.identify-verdict, .identify-nearby) {
+  border: 0; border-radius: 0; background: none; box-shadow: none;
+  border-top: 1px solid var(--border); padding-inline: 0;
+}
+.app-shell.is-v2 .workspace-card .identify-verdict-item { min-height: 30px; padding-inline: 2px; }
+.app-shell.is-v2 .workspace-card .identify-verdict-item > :nth-child(3) { white-space: nowrap; font-size: 12px; }
+.app-shell.is-v2 .identify-verdict-show { border-color: transparent; background: none; color: var(--text-muted); }
+.app-shell.is-v2 .identify-verdict-show:hover { background: var(--surface-hover); color: var(--text); }
+.app-shell.is-v2 .identify-nearby-title { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+
+/* Akcje: jedna główna (atrament), reszta spokojna, w równej siatce. */
+.app-shell.is-v2 .ui-panel .ui-button { border-radius: var(--control-radius); font-weight: 500; }
+.app-shell.is-v2 .ui-panel .ui-button--primary { background: var(--ink); border-color: var(--ink); color: var(--surface-solid); font-weight: 600; }
+.app-shell.is-v2 .ui-panel .ui-button--primary:hover:not(:disabled) { background: var(--ink-soft); }
+.app-shell.is-v2 .ui-panel .ui-button--secondary { border-color: var(--border-strong); background: var(--surface-solid); }
+.app-shell.is-v2 .ui-panel .ui-button--secondary:hover:not(:disabled) { background: var(--surface-hover); border-color: var(--control-border); }
+.app-shell.is-v2 .identify-actions-more { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.app-shell.is-v2 .identify-actions-more > * { width: auto; min-width: 0; margin: 0; }
+
+/* Zastrzeżenie: przypis, nie alarm. */
+.app-shell.is-v2 .parcelplus-disclaimer {
+  border: 0; border-left: 2px solid var(--border-strong); border-radius: 0; background: none;
+  padding: 2px 0 2px 8px; color: var(--text-muted) !important; font-size: 11.5px;
+}
+
+.app-shell.is-v2 :is(.parcelplus-section, .parcelplus-list) { border-radius: var(--control-radius); }
+.app-shell.is-v2 .parcelplus-section-head { background: none; font-weight: 600; text-align: left; }
+.app-shell.is-v2 .parcelplus-status { font-size: 11px; }
+
+/* 6. Panele po prawej ---------------------------------------------------------------------- */
+.app-shell.is-v2 .dock--right-panel { box-shadow: var(--v2-float-shadow); }
+.app-shell.is-v2 .ui-panel .panel-title strong { font-size: 13.5px; letter-spacing: -.005em; }
+.app-shell.is-v2 .ui-panel .panel-header { border-bottom: 1px solid var(--border); }
+
+/* Warstwy: filtry jako pasek zakładek z licznikiem w wierszu. */
+.app-shell.is-v2 .layers-panel--v2 .layers-filter-bar {
+  display: flex; justify-content: space-between; gap: 0; padding: 0 10px; border-bottom: 1px solid var(--border);
+}
+.app-shell.is-v2 .layers-panel--v2 .layers-filter {
+  flex: 0 0 auto; flex-direction: row; height: 32px; border: 0; border-radius: 0; background: none;
+  color: var(--text-muted); font-size: 11.5px; font-weight: 500; box-shadow: inset 0 -2px 0 transparent; overflow: visible;
+}
+.app-shell.is-v2 .layers-panel--v2 .layers-filter.is-active { color: var(--text); font-weight: 600; box-shadow: inset 0 -2px 0 var(--ink); }
+/* Liczniki filtrów znikają: liczbę aktywnych warstw podaje już nagłówek panelu. */
+.app-shell.is-v2 .layers-panel--v2 .layers-filter > small { display: none; }
+
+.app-shell.is-v2 .layer-group-title { min-height: 32px; }
+.app-shell.is-v2 .layer-group-toggle > span { font-weight: 600; }
+.app-shell.is-v2 .layer-group-toggle > small,
+.app-shell.is-v2 .layer-family-count { font-family: var(--mono); font-size: 10.5px; color: var(--text-faint); }
+.app-shell.is-v2 .layer-row--compact { min-height: 30px; }
+.app-shell.is-v2 .layer-row--compact:hover { background: var(--surface-hover); }
+.app-shell.is-v2 .layer-row-titleline strong { font-weight: 400; }
+.app-shell.is-v2 .layer-row.is-visible .layer-row-titleline strong { font-weight: 600; }
+
+/* Pola formularzy w panelach. */
+.app-shell.is-v2 :is(.ui-control, .ui-select, .ui-search) { border-color: var(--border-strong); }
+.app-shell.is-v2 :is(.ui-control, .ui-select):hover { border-color: var(--control-border); }
+.app-shell.is-v2 :is(.ui-control, .ui-select, .ui-search):focus-within,
+.app-shell.is-v2 :is(.ui-control, .ui-select):focus { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); outline: 0; }
+.app-shell.is-v2 :is(input[type=checkbox], .layer-visibility-box) { accent-color: var(--ink); }
+
+/* 7. Menu, okna, podpowiedzi ---------------------------------------------------------------- */
+.app-shell.is-v2 :is([role=menu], [role=dialog], .quick-help-card, .dialog-window, .toast) { border-radius: var(--panel-radius); }
+.app-shell.is-v2 [role=menuitem], .app-shell.is-v2 [role=menuitemradio], .app-shell.is-v2 [role=menuitemcheckbox] { border-radius: var(--radius-sm); }
+.app-shell.is-v2 kbd { font-family: var(--mono); border-radius: var(--radius-sm); }
+
+/* 8. Telefon -------------------------------------------------------------------------------- */
+/* Ten sam język co na komputerze: krawędź + krótki cień, mniejsze promienie (cel dotyku bez zmian). */
+.app-shell.is-mobile .m-search { border-radius: 10px; box-shadow: var(--v2-float-shadow); }
+.app-shell.is-mobile .m-chip { border-radius: 8px; box-shadow: var(--v2-float-shadow); font-weight: 500; }
+.app-shell.is-mobile .m-chip:is(.is-active, [aria-pressed=true]) { background: var(--ink); color: var(--surface-solid); }
+.app-shell.is-mobile .m-fab { border-radius: 10px; box-shadow: var(--v2-float-shadow); }
+.app-shell.is-mobile .m-nav { border-top: 1px solid var(--border); }
+.app-shell.is-mobile .m-nav button { color: var(--text-muted); }
+.app-shell.is-mobile .m-nav button.is-active { color: var(--text); font-weight: 600; }
+
+/* Etykieta nad polem powtarza podpowiedź w polu — zostaje dla czytników ekranu. */
+.app-shell.is-mobile .search-permanent-label {
+  clip: rect(0 0 0 0); white-space: nowrap; width: 1px; height: 1px; overflow: hidden; position: absolute;
+}
