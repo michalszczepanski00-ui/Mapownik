@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * msportal 19.44.0 — kontrola wgranego portalu (lista kontrolna wdrożenia jako skrypt).
+ * msportal 19.45.0 — kontrola wgranego portalu (lista kontrolna wdrożenia jako skrypt).
  *
  *   node tools/check_deploy.mjs https://mapownik.example.pl/test22            # pełna kontrola po wgraniu
  *   node tools/check_deploy.mjs https://… --monitor                           # krótka kontrola dostępności (monitoring)
@@ -88,6 +88,8 @@ if (!monitor) {
     const d = json(r);
     if (!d) return ['BŁĄD', `HTTP ${r.status} — plik niewgrany albo błąd PHP`];
     if (!d.deployment_consistent) return ['BŁĄD', `niespójne: wersja ${d.expected}, katalogi ${JSON.stringify(d.app_directories_present)}, brakujące pliki ${JSON.stringify(d.bundle_missing)}`];
+    // 19.45.0: katalogi app-*, dawne biblioteki vendor/ i setup-vendors.php są zbędne (kod jest w assets/build/).
+    if (d.leftover_files?.length) return ['OSTRZEŻENIE', `wersja ${d.expected}; do usunięcia z serwera: ${d.leftover_files.join(', ')}`];
     return ['OK', `wersja ${d.expected}, ${d.bundle_files} plików paczki`];
   });
   await check('Wgranie', 'Rozszerzenia PHP', async () => {
@@ -118,7 +120,7 @@ if (!monitor) {
     return powered ? ['OSTRZEŻENIE', `X-Powered-By: ${powered}`] : ['OK', 'CSP, X-Frame-Options, nosniff, Permissions-Policy' + (base.startsWith('https:') ? ', HSTS' : '')];
   });
   const blocked = ['README_WGRAJ_NA_SERWER.txt', 'ZMIANY_19.43.0.md', 'api/_common.php', 'api/certs/cacert.pem', 'data/rwdz/rwdz.sqlite',
-    'data/shared/00/0000000000.json', 'data/msportal/msportal.sqlite3', 'setup-vendors.php', 'cron/rwdz_update.php', 'tools/check_release.py',
+    'data/shared/00/0000000000.json', 'data/msportal/msportal.sqlite3', 'setup-vendors.php', 'api/vendor_status.php', 'vendor/static/react.js', 'app-19.44.0/main.js', 'cron/rwdz_update.php', 'tools/check_release.py',
     'audyt/wyniki-serwera.json', 'konfiguracja/polityka-prywatnosci.szkic.html', 'cache/', '.htaccess', 'package.json', 'node_modules/', 'app-1.0.0/main.js'];
   await check('Bezpieczeństwo', 'Zablokowane pliki i katalogi', async () => {
     const open = [];

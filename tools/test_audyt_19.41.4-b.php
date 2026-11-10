@@ -1,9 +1,10 @@
 <?php
 /**
- * msportal 19.44.0-b — testy poprawek z audytu (uruchamiane z wiersza poleceń, bez sieci):
+ * msportal 19.41.4-b — testy poprawek z audytu (uruchamiane z wiersza poleceń, bez sieci):
  *   php tools/test_audyt_19.41.4-b.php
  * Sprawdza: ukrywanie danych osób fizycznych w pozwoleniach (Z1), walidację udostępnianych projektów (B3),
- * kontrolę adresów po przekierowaniu (B7) i przypięte sumy bibliotek (B4).
+ * kontrolę adresów po przekierowaniu (B7).
+ * (B4 — przypięte sumy bibliotek vendor/static — nieaktualne od 19.45.0: biblioteki są w paczce Vite.)
  */
 declare(strict_types=1);
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
@@ -11,7 +12,6 @@ if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 require __DIR__ . '/../api/_common.php';
 require __DIR__ . '/../api/_permits_privacy.php';
 require __DIR__ . '/../api/_shared_project_schema.php';
-require __DIR__ . '/../api/_vendor_builder.php';
 
 $failures = 0; $count = 0;
 $check = static function (string $name, bool $ok, string $detail = '') use (&$failures, &$count): void {
@@ -34,7 +34,7 @@ $check('pusty inwestor → null', permits_public_investor('') === null && permit
 // --- B3: projekt udostępniany
 $ring = static fn(float $x, float $y, float $s): array => [[$x, $y], [$x + $s, $y], [$x + $s, $y + $s], [$x, $y + $s], [$x, $y]];
 $project = [
-    'format' => 'mapownik-project', 'formatVersion' => 1, 'app' => ['name' => 'msportal', 'version' => '19.44.0'],
+    'format' => 'mapownik-project', 'formatVersion' => 1, 'app' => ['name' => 'msportal', 'version' => '19.45.0'],
     'exportedAt' => '2026-11-08T12:00:00Z', 'crs' => 'EPSG:2180', 'project' => ['name' => 'Test', 'schemaVersion' => 2], 'state' => null,
     'objects' => [
         ['id' => 'a', 'name' => 'Poligon', 'properties' => new stdClass(), 'geometry' => ['type' => 'Polygon', 'coordinates' => [$ring(471000, 698000, 100), $ring(471030, 698030, 20)]]],
@@ -73,11 +73,6 @@ foreach (['127.0.0.1', '10.1.2.3', '192.168.1.1', '172.16.0.5', '169.254.169.254
 }
 $hardening = mapownik_curl_hardening();
 $check('cURL: limit przekierowań i protokoły HTTP/HTTPS', ($hardening[CURLOPT_MAXREDIRS] ?? 0) === 5 && ($hardening[CURLOPT_REDIR_PROTOCOLS] ?? 0) === (CURLPROTO_HTTP | CURLPROTO_HTTPS));
-
-// --- B4: biblioteki
-$status = vendor_status_data();
-$check('biblioteki zgodne z przypiętymi sumami SHA-256', $status['ready'] === true);
-$check('przypięte sumy dla wszystkich bibliotek', count(MAPOWNIK_VENDOR_PINNED) === count(vendor_specs()));
 
 printf("\n%d/%d testów poprawnych\n", $count - $failures, $count);
 exit($failures > 0 ? 1 : 0);

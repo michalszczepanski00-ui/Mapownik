@@ -222,6 +222,13 @@ if ($lp) {
     $lines[] = 'Źródło: uproszczony plan urządzenia lasu' . (!empty($other['a_year']) ? ' (stan ' . $other['a_year'] . ')' : '');
     $details['kategoria'] = $cat;
 }
+// 19.45.0: „brak lasu” tylko przy pełnej odpowiedzi BDL. Gdy jedna z warstw (LP albo lasy niepaństwowe) nie odpowiedziała
+// albo zwróciła błąd usługi, pusty wynik nie jest pewny — wcześniej trafiał do pamięci podręcznej na 7 dni.
+$answered = static fn (array $r): bool => $r['code'] === 200 && !preg_match('/ServiceException/i', (string)$r['body']);
+$complete = $answered($res['lp']) && $answered($res['inne']);
+if ($kind === null && !$complete) {
+    forest_json(['ok' => false, 'error' => 'Bank Danych o Lasach odpowiedział częściowo — spróbuj ponownie.', 'code' => 'upstream', 'retryable' => true], 502);
+}
 $payload = [
     'ok' => true, 'found' => $kind !== null, 'kind' => $kind, 'owner' => $owner,
     'text' => $kind ? implode("\n", $lines) : null, 'count' => $kind ? 1 : 0, 'basis' => 'structured',

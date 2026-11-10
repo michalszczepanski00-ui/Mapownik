@@ -1,4 +1,4 @@
-// msportal 19.44.0 — budowanie frontendu (npm run build → tools/build.mjs → build/www/).
+// msportal 19.45.0 — budowanie frontendu (npm run build → tools/build.mjs → build/www/).
 //
 // Wynik to zwykłe pliki statyczne: index.html i assets/build/*.js|css z sumą treści w nazwie.
 // Wgrywa się je przez FTP jak dotąd; na serwerze nie jest potrzebny Node.js. Backend PHP (api/) bez zmian.
@@ -21,9 +21,16 @@ export default defineConfig({
     emptyOutDir: true,
     target: 'es2022',
     sourcemap: false,
-    chunkSizeWarningLimit: 1500,
+    // Lista plików każdego wejścia — tools/build.mjs zapamiętuje do trybu offline tylko pliki portalu (bez diagnostyki).
+    manifest: true,
+    // Największy plik to teksty źródeł dla diagnostyki (diag/zrodla.js, ok. 2,3 MB) — wczytuje go tylko diagnostyka.html.
+    chunkSizeWarningLimit: 2500,
     rollupOptions: {
-      input: { main: fileURLToPath(new URL('./index.html', import.meta.url)) },
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        // 19.45.0: diagnostyka z tych samych pakietów npm co portal (wcześniej importmapa + vendor/ i źródła app-*/).
+        diagnostyka: fileURLToPath(new URL('./diagnostyka.html', import.meta.url)),
+      },
       output: {
         // Ikony w jednym pliku zamiast kilkunastu drobnych (każda użyta ikona to osobny moduł lucide-react).
         manualChunks(id) {

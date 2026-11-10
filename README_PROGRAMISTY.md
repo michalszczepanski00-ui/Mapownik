@@ -3,12 +3,13 @@
 ## Układ repozytorium
 | Ścieżka | Co to jest |
 |---|---|
-| `app-<wersja>/` | Kod aplikacji (React + OpenLayers, moduły ES). Nazwa katalogu zmienia się z wersją (`tools/bump_version.py`). |
+| `app-<wersja>/` | Kod aplikacji (React + OpenLayers, moduły ES, nowe moduły w TypeScript). Nazwa katalogu zmienia się z wersją (`tools/bump_version.py`). Od 19.45.0 tylko źródło dla Vite — na serwer nie trafia. |
 | `index.html` | Wejście dla Vite (źródło). Zbudowany `index.html` powstaje w `build/www/`. |
-| `assets/css/` | Style (warstwy kaskady, kolejność `<link>` w `index.html` ma znaczenie); Vite łączy je w jeden plik. |
+| `assets/css/` | Style (warstwy kaskady, kolejność `<link>` w `index.html` ma znaczenie); Vite łączy je w jeden plik. Na serwer trafia tylko `monitor.css` (monitor źródeł). |
 | `assets/js/boot.js` | Zwykły skrypt startowy: wersja wydania, komunikaty przy nieudanym starcie. |
 | `api/`, `cron/`, `*.php` | Backend PHP (hosting OVH, PHP 8.1+). Bez budowania. |
-| `vendor/` | Biblioteki w dawnej postaci — używa ich już tylko `diagnostyka.html` (oraz `vendor/pdf/` i `vendor/geometry/`, wczytywane przez aplikację w czasie działania). |
+| `vendor/` | `vendor/pdf/` — jsPDF i czcionki raportu, wczytywane w czasie działania (na serwerze). `vendor/geometry/` — JSTS, dołączany do paczki przez Vite (na serwer nie trafia). |
+| `diagnostyka.html`, `diag/` | Diagnostyka — drugie wejście Vite (od 19.45.0). `diag/srodowisko.js` podaje testom treść źródeł (`diag/zrodla.js`, dołączane w budowaniu) i `window.ol` z pakietu npm. |
 | `tests/unit/` | Testy jednostkowe Vitest (TypeScript). Moduły aplikacji importuje się przez alias `@app/…`. |
 | `tests/e2e/` | Testy Playwright na zbudowanej paczce. |
 | `tools/` | Budowanie (`build.mjs`), wersja (`bump_version.py`), CSP (`csp_hashes.py`), kontrola wydania (`check_release.py`), testy PHP. |
@@ -64,8 +65,10 @@ Wszystkie uruchamia też GitHub Actions przy każdej zmianie.
 - Istniejący plik przenosisz zmianą rozszerzenia `.js` → `.ts` i poprawą błędów z `npm run typecheck`.
   Importy w innych plikach mogą zostać z `.js` albo zmienić się na `.ts`.
 - Plik JS można sprawdzać bez zmiany rozszerzenia: komentarz `// @ts-check` w pierwszej linii.
-- Uwaga: `diagnostyka.html` importuje pliki źródłowe bez budowania, więc moduł przeniesiony do `.ts`
-  trzeba w diagnostyce zastąpić testem Vitest/Playwright (albo zostawić w JS do czasu przeniesienia diagnostyki).
+- Od 19.45.0 diagnostyka jest budowana przez Vite, więc przeniesienie modułu do `.ts` jej nie psuje. Wyjątek: testy diagnostyki,
+  które czytają TREŚĆ pliku (`fetch('./app-…/plik.js')`) — dostają teksty tylko plików `.js` (`diag/zrodla.js`);
+  taki test przepisz na Vitest.
+- Przykład modułu w TS: `app-*/parcels/parcelComparison.ts` (+ `tests/unit/parcelComparison.test.ts`).
 
 ## Narzędzia dodane w 19.43.0
 - `node tools/css_unused.mjs` — raport nieużywanych reguł CSS; `--apply` usuwa je (po zmianie porównaj wygląd).
@@ -81,7 +84,17 @@ Wszystkie uruchamia też GitHub Actions przy każdej zmianie.
 - `konfiguracja/polityka-prywatnosci.szkic.html` — szkic polityki; opublikowana wersja to `konfiguracja/polityka-prywatnosci.html`
   (link w pomocy pojawia się automatycznie). Przy zmianie przetwarzania danych (nowa usługa, nowe dane na serwerze) zaktualizuj szkic.
 
+## Zmiany w 19.45.0
+- `diagnostyka.html` jako drugie wejście Vite (`vite.config.js`). Importmapa i `vendor/static`, `vendor/ol-esm-2`, `vendor/opt`,
+  `setup-vendors.php`, `api/vendor_status.php`, `api/_vendor_builder.php` usunięte z repozytorium.
+- `tools/build.mjs` wyznacza pliki trybu offline z manifestu Vite (tylko wejście `index.html`), więc paczka diagnostyki
+  (w tym ok. 2,3 MB tekstów źródeł) nie trafia do pamięci telefonu.
+- `verify-deployment.php` → `leftover_files`: pozostałości po starszych wydaniach (workflow „Wdrożenie” usuwa je sam).
+- Panel „Porównanie działek” (`parcelCompare`, dolny dok, bez pozycji w szynie): `app/components/ParcelComparisonPanel.js`,
+  dane w `parcels/parcelComparison.ts`. Otwierany z panelu Obiekty (od 2 działek) i z palety poleceń.
+
 ## Zasady, których pilnują narzędzia
 - `index.html` nie może mieć skryptów wbudowanych (CSP `script-src 'self'`) — sprawdza `tools/build.mjs`.
 - Zod musi być w trybie `jitless` przed pierwszym schematem — `core/zodConfig.js` jest w tej samej paczce co zod (`vite.config.js`).
 - Pliki w `vendor/` są „immutable” — zmiana treści pod tym samym adresem nie dotrze do przeglądarek (`tools/vendor-lock.json`).
+- Strony bez budowania (`monitor-zrodel.html`) muszą wskazywać istniejące pliki paczki — sprawdza `tools/build.mjs`.

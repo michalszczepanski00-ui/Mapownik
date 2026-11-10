@@ -127,8 +127,9 @@ def check(expected: str) -> list[str]:
     if dirs != [f"app-{expected}"]:
         problems.append(f"katalogi aplikacji: {dirs} (oczekiwano tylko app-{expected})")
     ht = (ROOT / ".htaccess").read_text(encoding="utf-8")
-    if f"RewriteRule ^app-{expected.replace('.', chr(92) + '.')}/ - [L]" not in ht:
-        problems.append(".htaccess nie dopuszcza bieżącego katalogu aplikacji")
+    # 19.45.0: katalog app-<wersja>/ to tylko źródło dla Vite — na serwerze każdy app-* ma dawać 410.
+    if "RewriteRule ^app-[^/]+/ - [R=410,L]" not in ht or re.search(r"RewriteRule \^app-\d", ht):
+        problems.append(".htaccess: oczekiwano wyłącznie reguły 410 dla app-* (bez wyjątku dla bieżącej wersji)")
     health = (ROOT / "api" / "health.php").read_text(encoding="utf-8")
     if f"'{expected}-server'" not in health:
         problems.append("api/health.php ma inną wersję")

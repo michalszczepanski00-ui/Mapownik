@@ -20,6 +20,7 @@ Bez Node.js — ręcznie w przeglądarce. Zamień `ADRES` na adres portalu, np. 
 - [ ] `ADRES/api/_common.php`
 - [ ] `ADRES/data/rwdz/rwdz.sqlite`
 - [ ] `ADRES/setup-vendors.php`
+- [ ] `ADRES/app-19.44.0/main.js` (410 — dawny katalog aplikacji)
 - [ ] `ADRES/konfiguracja/polityka-prywatnosci.szkic.html`
 - [ ] `ADRES/assets/` (nie może pokazać listy plików)
 
@@ -35,6 +36,10 @@ Bez Node.js — ręcznie w przeglądarce. Zamień `ADRES` na adres portalu, np. 
   - Eksport → podkład „Ortofotomapa” → plik PNG pokazuje zdjęcie, nie białe tło;
   - zdjęcie ładuje się też w panelu „Zdjęcia”.
 - [ ] **Wysokości** w karcie działki: wynik (deniwelacja, spadek) bez dodatkowego klikania.
+- [ ] **Porównanie działek:** dodaj dwie działki do projektu (karta działki → „Do projektu”) → panel Obiekty → „Porównaj działki (2)”:
+  - tabela wypełnia się w ok. 10–20 s;
+  - przycisk „CSV” pobiera plik, który otwiera się w Excelu z polskimi znakami.
+- [ ] **Diagnostyka:** `ADRES/diagnostyka.html` — testy ruszają; „Biblioteki w paczce aplikacji” i „brak dawnych bibliotek” na zielono.
 
 ## 4. Tryb offline (tylko HTTPS)
 - [ ] W telefonie otwórz portal, poczekaj na mapę.
@@ -44,6 +49,7 @@ Bez Node.js — ręcznie w przeglądarce. Zamień `ADRES` na adres portalu, np. 
 - [ ] **Awaryjne wyłączenie trybu offline:** skopiuj `assets/sw-wylacz.js` jako `sw.js` w katalogu portalu.
 
 ## 5. Po odbiorze
-- [ ] Usuń stary katalog `app-*` (inny niż bieżąca wersja).
+- [ ] `ADRES/verify-deployment.php` → `"leftover_files": []`. Jeśli lista nie jest pusta — usuń wymienione katalogi i pliki
+  (od 19.45.0: wszystkie `app-*`, dawne `vendor/…`, `setup-vendors.php`; szczegóły w `README_WGRAJ_NA_SERWER.txt`).
 - [ ] To samo wdrożenie na produkcję.
 - [ ] **Monitoring:** w repozytorium GitHub ustaw sekret `MONITOR_URL` — patrz `.github/workflows/monitor.yml`.

@@ -112,7 +112,7 @@ Options -Indexes
   RewriteRule ^assets/build/.+\.(js|mjs|css)$ - [E=MAPOWNIK_IMMUTABLE:1]
   RewriteCond %{QUERY_STRING} (^|&)v=
   RewriteRule \.(js|mjs|css)$ - [E=MAPOWNIK_IMMUTABLE:1]
-  # Only the current application directory is executable. Any stale app-* URL gets 410.
+  # 19.45.0: kod aplikacji jest wyłącznie w assets/build/ (paczki Vite). Katalogi app-* z dawnych wydań → 410.
   # 19.8.0 (hosting bez VPS): dawne adresy usługi Python /vps/api/* obsługuje teraz PHP.
   RewriteRule ^vps/api/(.*)$ api/vps.php?route=$1 [QSA,L]
   RewriteRule ^vps/ - [R=404,L]
@@ -124,13 +124,14 @@ Options -Indexes
   RewriteRule ^(node_modules|build|dist|tests|\.github)/ - [R=404,L]
   RewriteRule ^(package(-lock)?\.json|vite\.config\.js|vitest\.config\.js|playwright\.config\.js|tsconfig\.json)$ - [R=404,L]
   RewriteRule ^api/ - [L]
-  RewriteRule ^app-19\.44\.0/ - [L]
   RewriteRule ^app-[^/]+/ - [R=410,L]
   RewriteRule ^data/kowr/installations\.(json|csv)$ - [L]
   RewriteRule ^data/ - [R=404,L]
   # 18.18.3: narzędzia (podbijanie wersji, testy parsera) uruchamia się z wiersza poleceń, nie przez WWW.
   RewriteRule ^tools/ - [R=404,L]
-  RewriteRule ^vendor/shims/ - [R=410,L]
+  # 19.45.0: dawne biblioteki (vendor/static, ol-esm-2, opt, shims) zastąpiła paczka Vite; zostaje vendor/pdf.
+  RewriteRule ^vendor/(static|ol-esm|ol-esm-2|opt|shims|geometry)/ - [R=410,L]
+  RewriteRule ^api/vendor_status\.php$ - [R=410,L]
   RewriteRule ^vendor/ - [L]
   RewriteRule ^assets/ - [L]
   RewriteRule ^setup-vendors\.php$ - [R=404,L]

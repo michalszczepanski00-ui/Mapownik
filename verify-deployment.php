@@ -30,11 +30,17 @@ $appDirs = [];
 foreach (glob($root . '/app-*', GLOB_ONLYDIR) ?: [] as $dir) $appDirs[] = basename($dir);
 sort($appDirs, SORT_NATURAL);
 
-$escaped = str_replace('.', '\\.', $version);
-$currentRule = 'RewriteRule ^app-' . $escaped . '/ - [L]';
+// 19.45.0: kod aplikacji jest tylko w assets/build/ — katalogi app-* i dawne biblioteki to pozostałości do usunięcia.
+// Nie psują działania (.htaccess zwraca dla nich 410), więc nie wpływają na deployment_consistent.
 $genericStaleRule = 'RewriteRule ^app-[^/]+/ - [R=410,L]';
-$allowsCurrent = $version !== '' && str_contains($ht, $currentRule);
 $blocksOtherApps = str_contains($ht, $genericStaleRule);
+$leftovers = $appDirs;
+foreach (['vendor/static', 'vendor/ol-esm', 'vendor/ol-esm-2', 'vendor/opt', 'vendor/shims', 'vendor/geometry'] as $dir) {
+    if (is_dir($root . '/' . $dir)) $leftovers[] = $dir;
+}
+foreach (['setup-vendors.php', 'api/vendor_status.php', 'api/_vendor_builder.php'] as $file) {
+    if (is_file($root . '/' . $file)) $leftovers[] = $file;
+}
 $expectedHealth = $version !== '' ? $version . '-server' : null;
 
 $out = [
@@ -47,8 +53,8 @@ $out = [
     'diagnostics_version' => $mDiag[1] ?? null,
     'health_version' => $mHealth[1] ?? null,
     'app_directories_present' => $appDirs,
-    'htaccess_allows_current_app' => $allowsCurrent,
     'htaccess_blocks_other_app_directories' => $blocksOtherApps,
+    'leftover_files' => $leftovers,
     'deployment_consistent' => (
         $version !== ''
         && (($mIndex[1] ?? '') === $version)
@@ -57,8 +63,6 @@ $out = [
         && !$missingBundle
         && (($mDiag[1] ?? '') === $version)
         && (($mHealth[1] ?? '') === $expectedHealth)
-        && $appDirs === ['app-' . $version]
-        && $allowsCurrent
         && $blocksOtherApps
     ),
 ];

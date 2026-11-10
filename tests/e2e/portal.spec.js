@@ -1,4 +1,4 @@
-// msportal 19.44.0 — scenariusze w przeglądarce na zbudowanej paczce.
+// msportal 19.45.0 — scenariusze w przeglądarce na zbudowanej paczce.
 import { test, expect } from '@playwright/test';
 
 /** Zbiera błędy konsoli, wyjątki i naruszenia CSP strony. */
@@ -156,4 +156,32 @@ test('„Wysokości” w karcie działki liczy od razu, pasek stylu nie zasłani
   await page.getByRole('button', { name: 'Wysokości', exact: true }).click({ timeout: 60_000 });
   await expect(page.getByText('deniwelacja').first()).toBeVisible({ timeout: 90_000 });
   await expect(page.locator('.object-style-bar')).toHaveCount(0);
+});
+
+test('porównanie działek: polecenie w palecie, pusty projekt → podpowiedź', async ({ page }) => {
+  const problems = await watch(page);
+  await page.goto('/index.html');
+  await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
+  await page.locator('.ol-viewport').click({ position: { x: 300, y: 300 } });
+  await page.keyboard.press('Control+K');
+  await page.keyboard.type('Porównaj działki');
+  await page.getByRole('option', { name: /Porównaj działki projektu/ }).click();
+  const panel = page.locator('.parcel-compare-panel');
+  await expect(panel).toBeVisible();
+  await expect(panel.getByText('Brak działek w projekcie')).toBeVisible();
+  await expect(panel.getByRole('button', { name: 'CSV' })).toBeDisabled();
+  expect(problems).toEqual([]);
+});
+
+test('diagnostyka zbudowana przez Vite: bez dawnych bibliotek, testy ruszają', async ({ page }) => {
+  const problems = await watch(page);
+  const legacy = [];
+  page.on('request', (r) => { if (/\/(vendor\/(static|ol-esm|opt)|app-\d)/.test(r.url())) legacy.push(r.url()); });
+  await page.goto('/diagnostyka.html');
+  await expect(page.locator('#tests .test').first()).toBeVisible({ timeout: 60_000 });
+  await expect(page.locator('#tests').getByText('Biblioteki w paczce aplikacji')).toBeVisible({ timeout: 60_000 });
+  await expect(page.locator('#tests').getByText(/React lokalny/)).toBeVisible({ timeout: 60_000 });
+  expect(await page.locator('#tests .test.bad').filter({ hasText: /Biblioteki w paczce|React lokalny|Zod lokalny|OpenLayers lokalny/ }).count()).toBe(0);
+  expect(legacy).toEqual([]);
+  expect(problems.filter((p) => !/Failed to load|ERR_/.test(p))).toEqual([]);
 });

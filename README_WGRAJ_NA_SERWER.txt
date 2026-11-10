@@ -1,18 +1,25 @@
-msportal 19.44.0 — PEŁNA PACZKA (10.11.2026)
-Paczka: msportal-19.44.0-serwer.zip (zawartość katalogu portalu). Opis i kroki: ZMIANY_19.44.0.md, kontrola po wgraniu: README_KONTROLA_WDROZENIA.md.
+msportal 19.45.0 — PEŁNA PACZKA (10.11.2026)
+Paczka: msportal-19.45.0-serwer.zip (zawartość katalogu portalu). Opis zmian: ZMIANY_19.45.0.md, kontrola po wgraniu: README_KONTROLA_WDROZENIA.md.
 1. Kopia projektu .mapownik i kopia obecnych plików portalu poza katalogiem WWW.
 2. Wgraj CAŁĄ zawartość ZIP („nadpisz zawsze”, z .htaccess); index.html i .htaccess najlepiej na końcu.
-3. Usuń stary katalog app-19.42.0/ (albo inny app-* niż app-19.44.0/). NIE usuwaj data/, cache/ ani starszych plików w assets/build/.
-4. verify-deployment.php → "deployment_consistent": true; Ctrl+F5; api/health.php → 19.44.0-server.
-Programista: README_PROGRAMISTY.md (npm run build tworzy tę paczkę; wdrożenie także przez GitHub Actions).
+3. Od 19.45.0 na serwerze NIE MA już kodu źródłowego ani dawnych bibliotek. Usuń przez FTP (jeśli są):
+     app-19.44.0/ (i każdy inny katalog app-*),
+     vendor/static/, vendor/ol-esm-2/, vendor/opt/, vendor/geometry/ (zostaje vendor/pdf/),
+     setup-vendors.php, api/vendor_status.php, api/_vendor_builder.php,
+     assets/css/ — wszystkie pliki OPRÓCZ monitor.css.
+   NIE usuwaj data/, cache/, vendor/pdf/ ani starszych plików w assets/build/.
+   Pozostawione pliki nie psują działania (serwer zwraca dla nich 410/404); listę pokazuje
+   verify-deployment.php w polu "leftover_files".
+4. verify-deployment.php → "deployment_consistent": true i "leftover_files": []; Ctrl+F5; api/health.php → 19.45.0-server.
+Programista: README_PROGRAMISTY.md (npm run build tworzy tę paczkę; wdrożenie także przez GitHub Actions — usuwa pozostałości samo).
 
-msportal 19.44.0-b — POPRAWKI BEZPIECZEŃSTWA (08.11.2026)
+msportal 19.41.4-b — POPRAWKI BEZPIECZEŃSTWA (08.11.2026)
 Wersja aplikacji bez zmian. Wgranie i kontrola: ZMIANY_19.41.4-b.md (sekcja „Wgranie na serwer”).
 W skrócie: wgraj cały api/, potem data/.htaccess, index.html, setup-vendors.php, na końcu .htaccess;
 sprawdź api/health.php → "patch": "19.41.4-b". Błąd 500 po .htaccess → usuń linię „Options -Indexes”.
-setup-vendors.php działa już tylko z wiersza poleceń; brakujące biblioteki wgrywa się z paczki (vendor/).
+setup-vendors.php działa już tylko z wiersza poleceń; brakujące biblioteki wgrywa się z paczki (vendor/). Od 19.45.0 plik usunięty — biblioteki są w paczce aplikacji.
 
-msportal 19.44.0 — HOSTING WSPÓŁDZIELONY (bez VPS)
+msportal 19.45.0 — HOSTING WSPÓŁDZIELONY (bez VPS)
 
 PEŁNA PACZKA 19.41.4 — AKTUALIZACJA DZIAŁAJĄCEGO PORTALU (np. /test22/ z 19.27.0)
 1. Pobierz kopię projektu .mapownik (Projekt → Zapisz plik projektu).
@@ -35,7 +42,7 @@ PEŁNA PACZKA 19.41.4 — AKTUALIZACJA DZIAŁAJĄCEGO PORTALU (np. /test22/ z 19
 3c. Raport działki PDF (19.36.0): katalog vendor/pdf/ musi być na serwerze. Ustawienia dla wszystkich
     (nazwa biura, logo, szablony): konfiguracja/raport-pdf.json — opis w konfiguracja/README.txt.
 4. verify-deployment.php → "deployment_consistent": true,
-   "app_directories_present": ["app-19.44.0"].
+   "app_directories_present": [] (od 19.45.0 bez katalogów app-*).
 5. Ctrl+F5 w portalu. Sprawdź: podkłady Pastel, Zmierzch, Karto; Warstwy → Nachylenie terenu; działka → Raport → „Ceny transakcyjne
    w okolicy”; diagnostyka.html → testy 19.29.0, 19.30.0 i 19.31.0 na zielono.
 Zakres zmian: ZMIANY_19.41.0.md (Teren 3D — model terenu w Three.js), ZMIANY_19.40.0.md (raport PDF dla inwestycji OZE i przemysłowych), ZMIANY_19.39.0.md (ergonomia: karta działki, Analizy, Eksport, profil terenu), ZMIANY_19.38.0.md (raport: uzbrojenie, opis POG, ochrona przyrody, profile terenu), ZMIANY_19.37.2.md (ostrzeżenia przy warstwach planowania), ZMIANY_19.37.1.md (raport PDF: mapy i nowy wygląd), ZMIANY_19.37.0.md (czyj las — BDL), ZMIANY_19.36.0.md (raport działki PDF z szablonami), ZMIANY_19.35.0.md (eksport jak na ekranie, automatyczna aktualizacja pozwoleń), ZMIANY_19.34.0.md (ostatnie działki, W okolicy na telefonie), ZMIANY_19.33.0.md (intuicyjny układ), ZMIANY_19.32.1.md (Karto nie zasłania warstw), ZMIANY_19.32.0.md (ceny transakcyjne i pozwolenia na budowę), ZMIANY_19.31.1.md (rzeźba w Karto), RAPORT_AUDYTU_19.31.0.md i ZMIANY_19.31.0.md (audyt, poprawki, wydajność), ZMIANY_19.30.1.md (czytelność podkładów), ZMIANY_19.30.0.md (nowe podkłady, nachylenie), ZMIANY_19.29.0.md (ceny RCN), ZMIANY_19.28.0.md (layout).
@@ -56,8 +63,7 @@ Pierwsza instalacja:
    Pliki .htaccess są ukryte — upewnij się, że klient FTP je wysyła.
 2. Nadaj prawa zapisu (755 lub 775) katalogom: cache/ oraz data/
    (projekty udostępnione i pamięć podręczna kafli).
-3. Otwórz:  https://TWOJA-DOMENA/setup-vendors.php  (jeśli brak bibliotek)
-            https://TWOJA-DOMENA/verify-deployment.php
+3. Otwórz:  https://TWOJA-DOMENA/verify-deployment.php
    Oczekiwane: "deployment_consistent": true oraz w sekcji "hosting":
    "php_api_present": true, "pdo_sqlite": true, "curl": true.
 4. Otwórz portal. Panel „Działka, ceny i otoczenie” → analiza działki 360°

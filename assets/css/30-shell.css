@@ -2444,3 +2444,32 @@ html:has(.app-shell.is-mobile), body:has(.app-shell.is-mobile) { overflow: hidde
 .terrain-slope-row > strong { text-align: right; font-variant-numeric: tabular-nums; }
 .terrain-earthworks-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; align-items: end; }
 .terrain-slope-summary, .terrain-earthworks { max-width: 680px; }
+
+/* 19.45.0 — porównanie działek projektu (tabela jak wyniki analizy, nagłówki bez sortowania, tekst zawijany). */
+.parcel-compare-panel .compare-progress { margin-inline-end: auto; color: var(--text-muted); font-size: var(--fs-sm); }
+.compare-table { white-space: normal; }
+.compare-table thead th {
+  padding: 7px 10px;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  vertical-align: bottom;
+}
+.compare-table thead th.is-numeric { text-align: right; }
+.compare-table tbody td, .compare-table tbody th { vertical-align: top; min-width: 96px; max-width: 240px; }
+.compare-table tbody th.compare-name {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  padding: 6px 10px;
+  text-align: left;
+  font-weight: 400;
+  background: var(--surface-raised);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+}
+.compare-table .compare-name strong { display: block; }
+.compare-table .compare-name small { color: var(--text-muted); }
+.compare-table tbody td.is-muted { color: var(--text-muted); font-style: italic; }
+.compare-table tbody td.is-warn { color: var(--warning); font-weight: 600; }
+.compare-table tbody td.compare-wait { color: var(--text-muted); }
+.objects-compare { margin: 0 10px 6px; width: auto; align-self: flex-start; }

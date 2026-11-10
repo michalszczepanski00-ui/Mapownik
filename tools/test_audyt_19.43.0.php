@@ -1,6 +1,6 @@
 <?php
 /**
- * msportal 19.44.0 — testy poprawek z audytu funkcjonalnego (CLI, bez sieci):  php tools/test_audyt_19.43.0.php
+ * msportal 19.45.0 — testy poprawek z audytu funkcjonalnego (CLI, bez sieci):  php tools/test_audyt_19.43.0.php
  * A1: odpowiedź-błąd serwera gminy w krajowej integracji MPZP nie może być uznana za opis planu.
  */
 declare(strict_types=1);

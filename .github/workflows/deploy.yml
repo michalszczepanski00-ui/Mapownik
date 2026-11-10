@@ -7,8 +7,8 @@
 #   DEPLOY_DIR      katalog portalu na serwerze, np. www/test22
 #   SITE_URL        adres portalu, np. https://mapownik.swiadectwa.net/test22
 #
-# Zasady (jak w README_WGRAJ_NA_SERWER.txt): pliki są nadpisywane, nic nie jest usuwane poza starymi
-# katalogami app-<wersja>/ — dane (data/shared, data/rwdz, data/msportal) i cache/ zostają nietknięte,
+# Zasady (jak w README_WGRAJ_NA_SERWER.txt): pliki są nadpisywane, nic nie jest usuwane poza dawnymi
+# katalogami app-<wersja>/ i bibliotekami sprzed 19.45.0 (lista w kroku 4) — dane (data/shared, data/rwdz, data/msportal) i cache/ zostają nietknięte,
 # a starsze paczki assets/build/ zostają dla kart otwartych przed wdrożeniem.
 name: Wdrożenie
 
@@ -57,13 +57,21 @@ jobs:
             --exclude-glob index.html --exclude-glob .htaccess build/www/ $DEPLOY_DIR/; bye"
           # 2) na końcu index.html i .htaccess
           lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; cd $DEPLOY_DIR; put build/www/.htaccess -o .htaccess; put build/www/index.html -o index.html; bye"
-          # 3) stare katalogi app-<wersja>/ (verify-deployment.php wymaga jednego)
+          # 3) 19.45.0: kod aplikacji jest tylko w assets/build/ — usuwamy wszystkie katalogi app-<wersja>/
+          #    (dawne źródła, serwer i tak zwraca dla nich 410)
           for dir in $(lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; cls -1 $DEPLOY_DIR/; bye" | sed 's#.*/##; s#/$##' | grep -E '^app-[0-9]+\.[0-9]+\.[0-9]+$' || true); do
-            if [ "$dir" != "app-$VERSION" ]; then
-              echo "Usuwam stary katalog $dir"
-              lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; rm -r $DEPLOY_DIR/$dir; bye"
-            fi
+            echo "Usuwam dawny katalog $dir"
+            lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; rm -r $DEPLOY_DIR/$dir; bye"
           done
+          # 4) 19.45.0: dawne biblioteki i przygotowanie bibliotek (zastąpione paczką Vite); brak pliku nie jest błędem
+          for old in vendor/static vendor/ol-esm vendor/ol-esm-2 vendor/opt vendor/shims vendor/geometry; do
+            lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; rm -r $DEPLOY_DIR/$old; bye" 2>/dev/null && echo "Usunięto $old" || true
+          done
+          for old in setup-vendors.php api/vendor_status.php api/_vendor_builder.php; do
+            lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; rm $DEPLOY_DIR/$old; bye" 2>/dev/null && echo "Usunięto $old" || true
+          done
+          # Arkusze warstw aplikacji (zostaje assets/css/monitor.css dla monitora źródeł)
+          lftp -u "$DEPLOY_USER","$DEPLOY_PASSWORD" "$DEPLOY_URL" -e "$SETTINGS; cd $DEPLOY_DIR/assets/css; mrm [0-9][0-9]-*.css; bye" 2>/dev/null || true
       - name: Kontrola wdrożenia (tools/check_deploy.mjs)
         env:
           SITE_URL: ${{ secrets.SITE_URL }}
