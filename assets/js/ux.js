@@ -1,7 +1,7 @@
 /*
  * Mapownik — dodatek interfejsu (propozycja do 19.50.0). Zwykły skrypt (nie moduł), ładowany po boot.js.
  *
- * Robi trzy rzeczy i nic więcej (3: przycisk „Więcej" ukrywający akcje drugorzędne karty działki); gdy któregoś elementu strony nie ma, po prostu go pomija:
+ * Robi pięć rzeczy i nic więcej (4: ukrywa archiwum MIDAS, 5: pozycja „Zadania” w prawej belce) (3: przycisk „Więcej" ukrywający akcje drugorzędne karty działki); gdy któregoś elementu strony nie ma, po prostu go pomija:
  *  1. Wartości domyślne szerokości paneli — tylko gdy użytkownik nie ustawił własnych
  *     (karta działki 320 px, panele po prawej 300 px). Zapis w localStorage czyta aplikacja przy starcie.
  *  2. Przycisk „Eksport" w szynie paneli (pod separatorem), zamiast osobnego przycisku w górnym pasku.
@@ -62,6 +62,8 @@
     var bar = document.querySelector('.activity-bar');
     var trigger = document.querySelector('.export-map-trigger');
     syncMore();
+    syncTasks();
+    hideRemoved();
     if (!bar || !trigger) return;
     var slot = bar.querySelector('.ux-export-slot');
     if (!slot) {
@@ -113,6 +115,196 @@
     more.parentNode.insertBefore(btn, more);
   }
 
+  // 4. Archiwum MIDAS i ukryte warstwy: zniknęły z oferty (decyzja: usunięte) ------------------------------
+  function hideRemoved() {
+    var groups = document.querySelectorAll('.layers-list .layer-group');
+    for (var i = 0; i < groups.length; i++) {
+      var t = groups[i].querySelector('.layer-group-toggle span');
+      if (t && /^Archiwum/.test((t.textContent || '').trim())) groups[i].style.display = 'none';
+    }
+    var items = document.querySelectorAll('[role^="menuitem"]');
+    for (var j = 0; j < items.length; j++) {
+      if (/warstwy archiwalne/i.test(items[j].textContent || '')) items[j].style.display = 'none';
+    }
+  }
+
+  // 5. „Zadania" — osobna pozycja prawej belki --------------------------------------------------------------
+  // Zadanie = zestaw warstw (albo otwarcie panelu) pod jeden cel. Warstwy włącza się tak, jak zrobiłby to
+  // użytkownik: przez wiersze panelu Warstwy (panel jest w tym czasie niewidoczny). Nie ruszamy kodu aplikacji.
+  var TASKS = [
+    { id: 'plan', title: 'Plan zagospodarowania', hint: 'Plan miejscowy i plan ogólny na mapie',
+      layers: ['MPZP — obszary planów', 'POG — obszary planów ogólnych'] },
+    { id: 'dzialki', title: 'Działki i grunty', hint: 'Granice działek i klasy gruntów (od ok. 1:2600)',
+      layers: ['Działki ewidencyjne (KIEG)', 'Klasy bonitacyjne I–VI i użytki (EGiB)'] },
+    { id: 'ryzyka', title: 'Ryzyka: powódź i ochrona przyrody', hint: 'Zagrożenie powodziowe, Natura 2000, obszary chronionego krajobrazu',
+      layers: ['Powódź rzeczna — obszary zagrożenia', 'Powódź morska — obszary zagrożenia', 'Zagrożenie przy awarii budowli piętrzących',
+               'Natura 2000 — siedliskowa', 'Natura 2000 — ptasia', 'Obszary chronionego krajobrazu'] },
+    { id: 'uzbrojenie', title: 'Uzbrojenie terenu', hint: 'Sieci: prąd, gaz, woda, kanalizacja, telekom., ciepło (od ok. 1:2600)',
+      layers: ['Energia elektryczna', 'Gaz', 'Wodociąg', 'Kanalizacja', 'Telekomunikacja', 'Sieć ciepłownicza'] },
+    { id: 'energetyka', title: 'Energetyka i OZE', hint: 'Biogazownie (KOWR), linie i stacje najwyższych napięć (PSE)',
+      layers: ['Biogazownie rolnicze (KOWR)', 'Linie i stacje najwyższych napięć (PSE)'] },
+    { id: 'ceny', title: 'Ceny w okolicy', hint: 'Otwiera panel Ceny transakcyjne', panel: 'marketPrices' },
+    { id: 'budowy', title: 'Budowy i pozwolenia', hint: 'Otwiera panel Budowy i pozwolenia', panel: 'buildingPermits' }
+  ];
+
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  function until(test, ms) {
+    var t0 = Date.now();
+    return new Promise(function (resolve) {
+      (function tick() {
+        var v = test();
+        if (v || Date.now() - t0 > ms) return resolve(v);
+        setTimeout(tick, 80);
+      })();
+    });
+  }
+  function railButton(id) { return document.querySelector('.activity-bar [data-panel-id="' + id + '"]'); }
+  function layerRows() { return document.querySelectorAll('.layers-list .layer-row'); }
+  function rowTitle(r) { var s = r.querySelector('strong'); return s ? (s.textContent || '').trim() : ''; }
+  function findRow(title) {
+    var rows = layerRows();
+    for (var i = 0; i < rows.length; i++) if (rowTitle(rows[i]) === title) return rows[i];
+    return null;
+  }
+  function rowOn(row) {
+    var b = row.querySelector('.layer-visibility');
+    return !!b && (b.classList.contains('is-visible') || b.getAttribute('aria-pressed') === 'true' || b.getAttribute('aria-checked') === 'true');
+  }
+
+  var busy = false;
+  // Zwraca { found: [...], missing: [...] } po włączeniu (on = true) albo wyłączeniu zestawu warstw.
+  async function setLayers(titles, on) {
+    var layersBtn = railButton('layers');
+    if (!layersBtn) return { found: [], missing: titles.slice() };
+    var wasOpen = !!document.querySelector('.layers-panel');
+    var root = document.documentElement;
+    root.classList.add('ux-silent');
+    try {
+      if (!wasOpen) layersBtn.click();
+      await until(function () { return layerRows().length > 0; }, 4000);
+      // filtr „Wszystkie", żeby wiersze były na liście
+      var filters = document.querySelectorAll('.layers-panel .layers-filter');
+      if (filters.length && !filters[0].classList.contains('is-active')) { filters[0].click(); await wait(150); }
+      // rozwiń grupy, w których szukamy
+      for (var g = 0; g < 10; g++) {
+        var closed = document.querySelectorAll('.layers-list .layer-group.is-collapsed .layer-group-toggle');
+        if (!closed.length) break;
+        closed[0].click(); await wait(120);
+      }
+      var found = [], missing = [];
+      for (var i = 0; i < titles.length; i++) {
+        var row = findRow(titles[i]);
+        if (!row) { missing.push(titles[i]); continue; }
+        found.push(titles[i]);
+        if (rowOn(row) !== on) { var b = row.querySelector('.layer-visibility'); if (b) { b.click(); await wait(120); } }
+      }
+      return { found: found, missing: missing };
+    } finally {
+      if (!wasOpen) {
+        var again = railButton('layers');
+        if (again && document.querySelector('.layers-panel')) again.click();
+      }
+      await wait(120);
+      root.classList.remove('ux-silent');
+    }
+  }
+
+  function tasksState(task) {
+    if (!task.layers) return null;
+    if (!document.querySelector('.layers-list')) return null; // stan znany tylko przy otwartym panelu Warstwy
+    var n = 0, total = 0;
+    for (var i = 0; i < task.layers.length; i++) { var r = findRow(task.layers[i]); if (r) { total++; if (rowOn(r)) n++; } }
+    return { n: n, total: total };
+  }
+
+  var tasksState_ = {}; // id -> true, gdy zestaw włączono z tego panelu
+  function closeTasks() {
+    var p = document.querySelector('.ux-tasks');
+    if (p) p.remove();
+    var b = document.querySelector('.ux-tasks-button');
+    if (b) { b.classList.remove('is-active'); b.setAttribute('aria-expanded', 'false'); }
+  }
+
+  function buildTasks() {
+    var shell = document.querySelector('.app-shell');
+    var rail = document.querySelector('.activity-bar');
+    if (!shell || !rail) return;
+    closeTasks();
+    // zwolnij miejsce: zamknij otwarty panel po prawej (ten sam obszar)
+    var openBtn = document.querySelector('.activity-bar .activity-bar-button.is-active[data-panel-id]');
+    if (openBtn) openBtn.click();
+    var panel = document.createElement('section');
+    panel.className = 'ux-tasks';
+    panel.setAttribute('aria-label', 'Zadania');
+    var head = document.createElement('div'); head.className = 'ux-tasks-head';
+    var h = document.createElement('strong'); h.textContent = 'Zadania'; head.appendChild(h);
+    var x = document.createElement('button'); x.type = 'button'; x.className = 'ux-tasks-close'; x.setAttribute('aria-label', 'Zamknij zadania'); x.textContent = '✕'; x.addEventListener('click', closeTasks); head.appendChild(x);
+    panel.appendChild(head);
+    var lead = document.createElement('p'); lead.className = 'ux-tasks-lead'; lead.textContent = 'Wybierz cel — włączę właściwe warstwy.'; panel.appendChild(lead);
+    var msg = document.createElement('p'); msg.className = 'ux-tasks-msg'; msg.setAttribute('role', 'status');
+    TASKS.forEach(function (task) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ux-task';
+      var t = document.createElement('span'); t.className = 'ux-task-title'; t.textContent = task.title;
+      var d = document.createElement('span'); d.className = 'ux-task-hint'; d.textContent = task.hint;
+      var st = document.createElement('span'); st.className = 'ux-task-state'; st.textContent = task.layers ? (tasksState_[task.id] ? 'włączone' : '') : '›';
+      b.appendChild(t); b.appendChild(st); b.appendChild(d);
+      b.addEventListener('click', async function () {
+        if (busy) return; busy = true; b.disabled = true;
+        try {
+          if (task.panel) {
+            closeTasks();
+            var pb = railButton(task.panel); if (pb) pb.click();
+            return;
+          }
+          var on = !tasksState_[task.id];
+          msg.textContent = on ? 'Włączam warstwy…' : 'Wyłączam warstwy…';
+          var res = await setLayers(task.layers, on);
+          tasksState_[task.id] = on && res.found.length > 0;
+          st.textContent = tasksState_[task.id] ? 'włączone' : '';
+          msg.textContent = (on ? 'Włączono: ' : 'Wyłączono: ') + res.found.length + ' z ' + task.layers.length + ' warstw' +
+            (res.missing.length ? ' (brak: ' + res.missing.join(', ') + ')' : '') + '.';
+        } finally { busy = false; b.disabled = false; }
+      });
+      panel.appendChild(b);
+    });
+    panel.appendChild(msg);
+    shell.appendChild(panel);
+    var r = rail.getBoundingClientRect();
+    panel.style.right = Math.max(8, window.innerWidth - r.left + 8) + 'px';
+    var tb = document.querySelector('.ux-tasks-button');
+    if (tb) { tb.classList.add('is-active'); tb.setAttribute('aria-expanded', 'true'); }
+  }
+
+  function syncTasks() {
+    var bar = document.querySelector('.activity-bar');
+    if (!bar) return;
+    if (!bar.querySelector('.ux-tasks-slot')) {
+      var slot = document.createElement('div');
+      slot.className = 'activity-bar-slot ux-tasks-slot';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'icon-button activity-bar-button has-label ux-tasks-button';
+      btn.setAttribute('aria-label', 'Zadania'); btn.setAttribute('aria-expanded', 'false');
+      btn.title = 'Zadania: gotowe zestawy warstw do jednego celu';
+      var svg = document.createElementNS(SVG_NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('width', '20'); svg.setAttribute('height', '20'); svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '2'); svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round'); svg.setAttribute('aria-hidden', 'true');
+      var pth = document.createElementNS(SVG_NS, 'path'); pth.setAttribute('d', 'M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2'); svg.appendChild(pth);
+      var lab = document.createElement('span'); lab.className = 'activity-bar-label'; lab.setAttribute('aria-hidden', 'true'); lab.textContent = 'Zadania';
+      btn.appendChild(svg); btn.appendChild(lab);
+      btn.addEventListener('click', function () { if (document.querySelector('.ux-tasks')) closeTasks(); else buildTasks(); });
+      slot.appendChild(btn);
+      var firstSlot = bar.querySelector('.activity-bar-slot');
+      if (firstSlot) bar.insertBefore(slot, firstSlot); else bar.appendChild(slot);
+      // kliknięcie innego przycisku belki zamyka zadania
+      bar.addEventListener('click', function (e) {
+        if (busy) return; // kliknięcia wykonywane przez samo zadanie nie zamykają panelu zadań
+        if (e.target.closest && e.target.closest('.ux-tasks-button')) return;
+        if (e.target.closest && e.target.closest('.activity-bar-button')) closeTasks();
+      });
+    }
+  }
+
   function schedule() {
     if (scheduled) return;
     scheduled = true;
@@ -120,7 +312,7 @@
   }
 
   function start() {
-    var root = document.getElementById('root') || document.body;
+    var root = document.body; // menu i okna Radix są poza #root
     if (!root || !window.MutationObserver) return;
     new MutationObserver(schedule).observe(root, { childList: true, subtree: true });
     schedule();
