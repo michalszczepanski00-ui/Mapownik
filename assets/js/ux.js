@@ -1,7 +1,7 @@
 /*
  * Mapownik — dodatek interfejsu (propozycja do 19.50.0). Zwykły skrypt (nie moduł), ładowany po boot.js.
  *
- * Robi dwie rzeczy i nic więcej; gdy któregoś elementu strony nie ma, po prostu go pomija:
+ * Robi trzy rzeczy i nic więcej (3: przycisk „Więcej" ukrywający akcje drugorzędne karty działki); gdy któregoś elementu strony nie ma, po prostu go pomija:
  *  1. Wartości domyślne szerokości paneli — tylko gdy użytkownik nie ustawił własnych
  *     (karta działki 320 px, panele po prawej 300 px). Zapis w localStorage czyta aplikacja przy starcie.
  *  2. Przycisk „Eksport" w szynie paneli (pod separatorem), zamiast osobnego przycisku w górnym pasku.
@@ -61,6 +61,7 @@
     scheduled = false;
     var bar = document.querySelector('.activity-bar');
     var trigger = document.querySelector('.export-map-trigger');
+    syncMore();
     if (!bar || !trigger) return;
     var slot = bar.querySelector('.ux-export-slot');
     if (!slot) {
@@ -91,6 +92,25 @@
       b.classList.toggle('is-active', open);
       b.setAttribute('aria-expanded', open ? 'true' : 'false');
     }
+  }
+
+  // 3. „Więcej" w akcjach karty działki ---------------------------------------------------------------
+  var moreOpen = false;
+  function syncMore() {
+    var more = document.querySelector('.workspace-card .identify-actions-more');
+    if (!more) return;
+    var prev = more.previousElementSibling;
+    if (prev && prev.classList.contains('ux-more-toggle')) return;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'ux-more-toggle';
+    var paint = function () {
+      btn.setAttribute('aria-expanded', moreOpen ? 'true' : 'false');
+      btn.textContent = moreOpen ? 'Mniej ▴' : 'Więcej ▾';
+    };
+    paint();
+    btn.addEventListener('click', function () { moreOpen = !moreOpen; paint(); });
+    more.parentNode.insertBefore(btn, more);
   }
 
   function schedule() {

@@ -269,3 +269,35 @@ html.ux-export-rail .app-shell .export-map-trigger { display: none; }
 
 /* 9.5 Szerokość rzeczywista: nazwy warstw i wartości w karcie nie powinny się łamać. */
 .app-shell.is-v2 .layer-row-titleline strong { text-overflow: ellipsis; }
+
+/* 10. Kolejne usprawnienia (19.49.0-ux2) ------------------------------------------------------- */
+
+/* 10.1 Logo w zieleni interfejsu (plik logo jest niebieski). */
+.app-shell .map-brand-button img { filter: hue-rotate(-70deg) saturate(.8) brightness(.9); }
+
+/* 10.2 Karta działki: źródła „w toku" nie zajmują po wierszu — jedna linia zbiorcza zamiast pięciu „…". */
+.app-shell.is-v2 .workspace-card .identify-verdict-item--state-loading { display: none !important; }
+.app-shell.is-v2 .workspace-card .identify-verdict:has(.identify-verdict-item--state-loading)::after {
+  content: "Sprawdzam kolejne źródła…"; display: block; padding: 6px 2px 2px; font-size: 12px; color: var(--text-muted);
+}
+
+/* 10.3 Akcje drugorzędne pod przyciskiem „Więcej" (przycisk dodaje ux.js). */
+.app-shell.is-v2 .ux-more-toggle {
+  width: 100%; height: 28px; margin: 6px 0 0; border: 0; border-radius: var(--control-radius); background: none;
+  color: var(--text-muted); font-size: 12px; font-weight: 500; cursor: pointer;
+}
+.app-shell.is-v2 .ux-more-toggle:hover { background: var(--surface-hover); color: var(--text); }
+.app-shell.is-v2 .ux-more-toggle[aria-expanded=false] + .identify-actions-more { display: none; }
+.app-shell.is-v2 .ux-more-toggle[aria-expanded=true] + .identify-actions-more { margin-top: 2px; }
+
+/* 10.4 Stan zerowy karty: jedna wskazówka zamiast trzech wierszy (Warstwy są w szynie po prawej). */
+.app-shell.is-v2 .workspace-start > .workspace-start-item.is-static,
+.app-shell.is-v2 .workspace-start > .workspace-start-item:last-child { display: none; }
+.app-shell.is-v2 .workspace-start > button.workspace-start-item:not(:last-child) > span { font-size: 0; }
+.app-shell.is-v2 .workspace-start > button.workspace-start-item:not(:last-child) > span::before {
+  content: "Kliknij działkę na mapie lub wpisz adres"; font-size: 13px;
+}
+
+/* 10.5 Telefon: „Szybkie warstwy" są już nad mapą — w arkuszu Warstwy zostają podkłady i pełna lista. */
+.app-shell.is-mobile .m-layers-sheet .m-chips,
+.app-shell.is-mobile .m-layers-sheet .m-section-title:has(+ .m-chips) { display: none; }

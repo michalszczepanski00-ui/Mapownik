@@ -3,19 +3,19 @@ name: Wdrożenie na OVH (FTP)
 # Ręczne uruchomienie: GitHub → Actions → „Wdrożenie na OVH (FTP)" → Run workflow.
 # Wgrywa zawartość paczki ZIP do podkatalogu na hostingu i sprawdza verify-deployment.php.
 # Zasada z README_WGRAJ_NA_SERWER.txt: każdy etap zmian UI idzie do NOWEGO katalogu testowego,
-# produkcji nie nadpisujemy — dlatego katalog docelowy musi mieć postać testNN (np. test25).
+# produkcji nie nadpisujemy — dlatego katalog docelowy musi mieć postać testNN (np. test26).
 
 on:
   workflow_dispatch:
     inputs:
       katalog:
-        description: 'Katalog docelowy na serwerze, tylko testNN (np. test25)'
+        description: 'Katalog docelowy na serwerze, tylko testNN (np. test26)'
         required: true
-        default: 'test25'
+        default: 'test26'
       paczka:
         description: 'Plik ZIP w repozytorium'
         required: true
-        default: 'dist/msportal-19.49.0-ux1-serwer.zip'
+        default: 'dist/msportal-19.49.0-ux2-serwer.zip'
 
 permissions:
   contents: read
@@ -37,7 +37,7 @@ jobs:
       - name: Sprawdź dane wejściowe
         run: |
           set -eu
-          [[ "$KATALOG" =~ ^test[0-9]+$ ]] || { echo "::error::Katalog musi mieć postać testNN (np. test25). Produkcji nie nadpisujemy tym workflow."; exit 1; }
+          [[ "$KATALOG" =~ ^test[0-9]+$ ]] || { echo "::error::Katalog musi mieć postać testNN (np. test26). Produkcji nie nadpisujemy tym workflow."; exit 1; }
           [ -f "$PACZKA" ] || { echo "::error::Brak pliku $PACZKA w repozytorium"; exit 1; }
           for v in FTP_HOST FTP_USER FTP_PASSWORD FTP_ROOT SITE_URL; do
             [ -n "${!v}" ] || { echo "::error::Brak ustawienia $v (Settings → Secrets and variables → Actions)"; exit 1; }
