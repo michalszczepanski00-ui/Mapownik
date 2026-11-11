@@ -111,9 +111,9 @@ przycisk Otoczenie przełącza na Analizy z gotowym wynikiem.
 3. 3.1–3.3 — nawigacja.
 4. 3.5 — nazwy (wymaga też zmian w pomocy i tekstach raportu).
 
-## 5. Status wdrożenia (paczka `dist/msportal-19.49.0-ux2-serwer.zip`)
+## 5. Status wdrożenia (paczka `dist/msportal-19.49.0-ux3-serwer.zip`)
 
-Wykonane bez źródeł (CSS + `assets/js/ux.js`, szczegóły w [ZMIANY_19.49.0-ux2.md](ZMIANY_19.49.0-ux1.md)):
+Wykonane bez źródeł (CSS + `assets/js/ux.js`, szczegóły w [ZMIANY_19.49.0-ux3.md](ZMIANY_19.49.0-ux1.md)):
 3.1 Eksport w szynie (górny róg: Projekt, pomoc, ustawienia), 3.3 pasek kontekstu nad dolnym paskiem narzędzi,
 3.4 bez nagłówka karty i szerokość 320 px, 3.6 szerokość 300 px i brak podtytułów, 3.7 powtórzona etykieta w telefonie.
 

@@ -225,3 +225,11 @@ Przy przeniesieniu do źródeł należy zdecydować jedno miejsce; nakładka jes
 3. Czy usuwamy archiwa MIDAS i ukryty NMT definitywnie?
 4. Czy „Zadania” (Plan / Ceny / Ryzyka / Uzbrojenie / Energetyka) mają być w głównym menu warstw czy jako osobne przyciski w prawym pasku?
 5. Czy Mapownik ma mieć notatki i projekty zespołowe jak wersja płatna 1map.pl, czy zostaje przy plikach `.mapownik`?
+
+## 9. Decyzje podjęte (11.11.2026) i ich wdrożenie w paczce `ux3`
+| Decyzja | Wdrożenie |
+|---|---|
+| GDOŚ i PIG zostają | bez zmian; do sprawdzenia z OVH (sekcja 0) |
+| Podkład OSM zostaje | bez zmian |
+| Usunięcie archiwów MIDAS i ukrytej NMT | usunięte z `data/source-profiles.json`, `monitor/catalog.json`, `api/source_monitor.php`; w aplikacji ukryte: grupa „Archiwum” i menu „Pokaż warstwy archiwalne”. Licznik „/55” zniknie dopiero po zmianie w źródłach |
+| „Zadania” jako osobna pozycja prawej belki | wdrożone (`assets/js/ux.js`): 5 zestawów warstw + skróty do Cen i Budów |
