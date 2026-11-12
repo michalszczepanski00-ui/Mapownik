@@ -1,4 +1,4 @@
-# 19.49.0-ux3 — odświeżony wygląd i prostsza obsługa (bez zmian w kodzie aplikacji)
+# 19.49.0-ux4 — odświeżony wygląd i prostsza obsługa (bez zmian w kodzie aplikacji)
 
 Numer wersji aplikacji pozostaje 19.49.0 (kod w `assets/build/` jest bez zmian). Dodatek to dwa pliki
 i dwie linie w `index.html`; `sw.js` dostał nowy znacznik wydania, więc przeglądarki z trybem offline pobiorą stronę od nowa.
@@ -46,6 +46,11 @@ Szczegóły i uzasadnienia: `docs/AUDYT_UI_19.49.0.md` w repozytorium.
   i `api/source_monitor.php`. W aplikacji grupa „Archiwum” i pozycja „Pokaż warstwy archiwalne” są ukryte.
 - **Zostaje bez zmian:** GDOŚ, PIG-MIDAS (bieżące) i podkład OSM.
 
-## Znane ograniczenia ux3
+## Dodane w ux4
+- **Teren i zasięg** — nowa pozycja prawej belki (nad „Eksport"): Profil wysokości, Wysokości obszaru, Model 3D terenu, Zasięg (bufor),
+  każdy z jednozdaniowym opisem. Z grupy „Mierz" znikły te cztery narzędzia (zostają: odległość i powierzchnia).
+- **Telefon:** „Zadania" w arkuszu Warstwy (pięć zestawów warstw), komunikat o wyniku na dole ekranu.
+
+## Znane ograniczenia ux4
 - Licznik w nagłówku Warstw nadal pokazuje „/55” (katalog warstw jest wbudowany w kod aplikacji; poprawi się po zmianie w źródłach).
 - Diagnostyka (`diagnostyka.html`) może zgłosić błędy testów dla usuniętych źródeł — to oczekiwane.

@@ -327,3 +327,22 @@ html.ux-silent .dock--right-panel { visibility: hidden; }
 .ux-task-state { font-size: 11px; font-weight: 600; color: var(--accent); align-self: center; }
 .ux-task-hint { grid-column: 1 / -1; font-size: 11.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.35; }
 .ux-tasks-msg { margin: 0; padding: 8px 14px 0; font-size: 12px; color: var(--text-muted); min-height: 20px; }
+
+/* 12. Teren i zasięg w prawej belce; telefon: Zadania w arkuszu Warstwy -------------------------------- */
+/* Narzędzia analityczne znikają z grupy „Mierz" (zostają odległość i powierzchnia); ux.js uruchamia je z belki. */
+.app-shell .tool-dock-tool:is([title^="Profil wysokości"], [title^="Wysokości obszaru"], [title^="Teren 3D"], [title^="Bufor wokół obiektu"]) { display: none; }
+.app-shell .tool-dock-tools:has([title^="Zmierz odległość"]) .tool-dock-sep { display: none; }
+
+.app-shell .ux-tools-slot { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+.app-shell .ux-tools-button { width: 100%; }
+.app-shell .ux-tools-slot + .ux-export-slot { margin-top: 0; padding-top: 0; border-top: 0; }
+
+.app-shell .ux-m-tasks { margin: 4px 0 8px; }
+.app-shell .ux-m-tasks .ux-task { padding: 12px 4px; min-height: 48px; }
+.app-shell .ux-m-tasks .ux-task-title { font-size: 15px; }
+.app-shell .ux-m-tasks .ux-task-hint { font-size: 12.5px; }
+.app-shell .ux-toast {
+  position: absolute; left: 12px; right: 12px; bottom: 84px; z-index: 300; padding: 10px 14px; border-radius: 8px;
+  background: var(--ink, #14201a); color: var(--surface-solid, #fff); font-size: 13px; text-align: center;
+  box-shadow: 0 2px 8px #0004;
+}

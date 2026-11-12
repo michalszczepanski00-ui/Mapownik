@@ -63,6 +63,8 @@
     var trigger = document.querySelector('.export-map-trigger');
     syncMore();
     syncTasks();
+    syncTools();
+    syncMobileTasks();
     hideRemoved();
     if (!bar || !trigger) return;
     var slot = bar.querySelector('.ux-export-slot');
@@ -174,9 +176,10 @@
   var busy = false;
   // Zwraca { found: [...], missing: [...] } po włączeniu (on = true) albo wyłączeniu zestawu warstw.
   async function setLayers(titles, on) {
-    var layersBtn = railButton('layers');
-    if (!layersBtn) return { found: [], missing: titles.slice() };
+    var mobile = !!document.querySelector('.app-shell.is-mobile');
+    var layersBtn = mobile ? document.querySelector('.m-list-button') : railButton('layers');
     var wasOpen = !!document.querySelector('.layers-panel');
+    if (!layersBtn && !wasOpen) return { found: [], missing: titles.slice() };
     var root = document.documentElement;
     root.classList.add('ux-silent');
     try {
@@ -201,8 +204,9 @@
       return { found: found, missing: missing };
     } finally {
       if (!wasOpen) {
-        var again = railButton('layers');
-        if (again && document.querySelector('.layers-panel')) again.click();
+        var x = document.querySelector('.layers-panel [aria-label="Zamknij panel Warstwy"]');
+        if (x) x.click();
+        else { var again = railButton('layers'); if (again && document.querySelector('.layers-panel')) again.click(); }
       }
       await wait(120);
       root.classList.remove('ux-silent');
@@ -221,8 +225,8 @@
   function closeTasks() {
     var p = document.querySelector('.ux-tasks');
     if (p) p.remove();
-    var b = document.querySelector('.ux-tasks-button');
-    if (b) { b.classList.remove('is-active'); b.setAttribute('aria-expanded', 'false'); }
+    var bs = document.querySelectorAll('.ux-rail-extra');
+    for (var i = 0; i < bs.length; i++) { bs[i].classList.remove('is-active'); bs[i].setAttribute('aria-expanded', 'false'); }
   }
 
   function buildTasks() {
@@ -283,7 +287,7 @@
       slot.className = 'activity-bar-slot ux-tasks-slot';
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'icon-button activity-bar-button has-label ux-tasks-button';
+      btn.className = 'icon-button activity-bar-button has-label ux-rail-extra ux-tasks-button';
       btn.setAttribute('aria-label', 'Zadania'); btn.setAttribute('aria-expanded', 'false');
       btn.title = 'Zadania: gotowe zestawy warstw do jednego celu';
       var svg = document.createElementNS(SVG_NS, 'svg');
@@ -299,10 +303,118 @@
       // kliknięcie innego przycisku belki zamyka zadania
       bar.addEventListener('click', function (e) {
         if (busy) return; // kliknięcia wykonywane przez samo zadanie nie zamykają panelu zadań
-        if (e.target.closest && e.target.closest('.ux-tasks-button')) return;
+        if (e.target.closest && e.target.closest('.ux-rail-extra')) return;
         if (e.target.closest && e.target.closest('.activity-bar-button')) closeTasks();
       });
     }
+  }
+
+  // 6. „Teren" — narzędzia analityczne w prawej belce (zamiast w grupie „Mierz") --------------------------
+  var TOOLS = [
+    { title: 'Profil wysokości', hint: 'Narysuj linię na mapie — pokażę przekrój terenu (NMT GUGiK)', match: 'Profil wysokości' },
+    { title: 'Wysokości obszaru', hint: 'Działka, narysowany obszar albo prostokąt — statystyki wysokości', match: 'Wysokości obszaru' },
+    { title: 'Model 3D terenu', hint: 'Kliknij działkę — trójwymiarowy model terenu z otoczeniem', match: 'Teren 3D' },
+    { title: 'Zasięg (bufor)', hint: 'Wybierz obiekt i odległość — powstanie strefa wokół niego', match: 'Bufor wokół obiektu' }
+  ];
+
+  async function runTool(match) {
+    var sel = '.tool-dock-tool[title^="' + match + '"]';
+    if (!document.querySelector(sel)) {
+      var g = document.querySelector('[data-tool-group="measurement"]');
+      if (g) g.click();
+      await until(function () { return document.querySelector(sel); }, 2500);
+    }
+    var t = document.querySelector(sel);
+    if (t) t.click();
+  }
+
+  function buildTools() {
+    var shell = document.querySelector('.app-shell');
+    var rail = document.querySelector('.activity-bar');
+    if (!shell || !rail) return;
+    closeTasks();
+    var openBtn = document.querySelector('.activity-bar .activity-bar-button.is-active[data-panel-id]');
+    if (openBtn) openBtn.click();
+    var panel = document.createElement('section');
+    panel.className = 'ux-tasks ux-tools';
+    panel.setAttribute('aria-label', 'Teren i zasięg');
+    var head = document.createElement('div'); head.className = 'ux-tasks-head';
+    var h = document.createElement('strong'); h.textContent = 'Teren i zasięg'; head.appendChild(h);
+    var x = document.createElement('button'); x.type = 'button'; x.className = 'ux-tasks-close'; x.setAttribute('aria-label', 'Zamknij'); x.textContent = '✕'; x.addEventListener('click', closeTasks); head.appendChild(x);
+    panel.appendChild(head);
+    var lead = document.createElement('p'); lead.className = 'ux-tasks-lead'; lead.textContent = 'Wybierz, co chcesz sprawdzić. Narzędzie włączy się na mapie.'; panel.appendChild(lead);
+    TOOLS.forEach(function (tool) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ux-task';
+      var t = document.createElement('span'); t.className = 'ux-task-title'; t.textContent = tool.title;
+      var st = document.createElement('span'); st.className = 'ux-task-state'; st.textContent = '›';
+      var d = document.createElement('span'); d.className = 'ux-task-hint'; d.textContent = tool.hint;
+      b.appendChild(t); b.appendChild(st); b.appendChild(d);
+      b.addEventListener('click', function () { closeTasks(); runTool(tool.match); });
+      panel.appendChild(b);
+    });
+    shell.appendChild(panel);
+    var r = rail.getBoundingClientRect();
+    panel.style.right = Math.max(8, window.innerWidth - r.left + 8) + 'px';
+    var tb = document.querySelector('.ux-tools-button');
+    if (tb) { tb.classList.add('is-active'); tb.setAttribute('aria-expanded', 'true'); }
+  }
+
+  function syncTools() {
+    var bar = document.querySelector('.activity-bar');
+    if (!bar || bar.querySelector('.ux-tools-slot')) return;
+    var slot = document.createElement('div');
+    slot.className = 'activity-bar-slot ux-tools-slot';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'icon-button activity-bar-button has-label ux-rail-extra ux-tools-button';
+    btn.setAttribute('aria-label', 'Teren i zasięg'); btn.setAttribute('aria-expanded', 'false');
+    btn.title = 'Teren i zasięg: profil, wysokości, model 3D, bufor';
+    var svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('width', '20'); svg.setAttribute('height', '20'); svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '2'); svg.setAttribute('stroke-linecap', 'round'); svg.setAttribute('stroke-linejoin', 'round'); svg.setAttribute('aria-hidden', 'true');
+    var pth = document.createElementNS(SVG_NS, 'path'); pth.setAttribute('d', 'M3 19l6-11 4 7 3-4 5 8z'); svg.appendChild(pth);
+    var lab = document.createElement('span'); lab.className = 'activity-bar-label'; lab.setAttribute('aria-hidden', 'true'); lab.textContent = 'Teren';
+    btn.appendChild(svg); btn.appendChild(lab);
+    btn.addEventListener('click', function () { if (document.querySelector('.ux-tools')) closeTasks(); else buildTools(); });
+    slot.appendChild(btn);
+    var exp = bar.querySelector('.ux-export-slot');
+    if (exp) bar.insertBefore(slot, exp); else bar.appendChild(slot);
+  }
+
+  // 7. Telefon: „Zadania" w arkuszu Warstwy (zamiast „Szybkich warstw") ----------------------------------
+  function toast(text) {
+    var shell = document.querySelector('.app-shell');
+    if (!shell) return;
+    var old = shell.querySelector('.ux-toast'); if (old) old.remove();
+    var t = document.createElement('div'); t.className = 'ux-toast'; t.setAttribute('role', 'status'); t.textContent = text;
+    shell.appendChild(t);
+    setTimeout(function () { if (t.parentNode) t.remove(); }, 3800);
+  }
+
+  function syncMobileTasks() {
+    var body = document.querySelector('.m-layers-sheet .m-sheet-body');
+    if (!body || body.querySelector('.ux-m-tasks')) return;
+    var anchor = body.querySelector('.m-list-button');
+    var wrap = document.createElement('div'); wrap.className = 'ux-m-tasks';
+    var h = document.createElement('h3'); h.className = 'm-section-title'; h.textContent = 'Zadania'; wrap.appendChild(h);
+    TASKS.filter(function (t) { return t.layers; }).forEach(function (task) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'ux-task';
+      var t = document.createElement('span'); t.className = 'ux-task-title'; t.textContent = task.title;
+      var st = document.createElement('span'); st.className = 'ux-task-state'; st.textContent = tasksState_[task.id] ? 'włączone' : '';
+      var d = document.createElement('span'); d.className = 'ux-task-hint'; d.textContent = task.hint;
+      b.appendChild(t); b.appendChild(st); b.appendChild(d);
+      b.addEventListener('click', async function () {
+        if (busy) return; busy = true; b.disabled = true;
+        try {
+          var on = !tasksState_[task.id];
+          var res = await setLayers(task.layers, on);
+          tasksState_[task.id] = on && res.found.length > 0;
+          toast((on ? 'Włączono: ' : 'Wyłączono: ') + res.found.length + ' z ' + task.layers.length + ' warstw — ' + task.title);
+        } finally { busy = false; b.disabled = false; }
+      });
+      wrap.appendChild(b);
+    });
+    if (anchor) body.insertBefore(wrap, anchor); else body.appendChild(wrap);
   }
 
   function schedule() {

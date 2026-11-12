@@ -233,3 +233,6 @@ Przy przeniesieniu do źródeł należy zdecydować jedno miejsce; nakładka jes
 | Podkład OSM zostaje | bez zmian |
 | Usunięcie archiwów MIDAS i ukrytej NMT | usunięte z `data/source-profiles.json`, `monitor/catalog.json`, `api/source_monitor.php`; w aplikacji ukryte: grupa „Archiwum” i menu „Pokaż warstwy archiwalne”. Licznik „/55” zniknie dopiero po zmianie w źródłach |
 | „Zadania” jako osobna pozycja prawej belki | wdrożone (`assets/js/ux.js`): 5 zestawów warstw + skróty do Cen i Budów |
+
+## 10. Paczka `ux4`
+Wdrożone: pozycja „Teren i zasięg” w prawej belce (Profil, Wysokości, Model 3D, Bufor; zniknęły z grupy „Mierz”) oraz „Zadania” w arkuszu Warstwy na telefonie.
