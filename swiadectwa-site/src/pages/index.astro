@@ -1,0 +1,87 @@
+---
+import Base from '../layouts/Base.astro';
+const services = [
+  { icon: '📐', t: 'Projektowa charakterystyka energetyczna', d: 'Opracowanie do projektu budowlanego zgodnie z obowiązującymi warunkami technicznymi. Dla pracowni i deweloperów, na każdym etapie projektu.' },
+  { icon: '📄', t: 'Świadectwa energetyczne', d: 'Świadectwa charakterystyki energetycznej dla budynków i lokali, także seryjnie – dla całych inwestycji deweloperskich.' },
+  { icon: '🌿', t: 'Analizy alternatywnych źródeł energii', d: 'Pompy ciepła, fotowoltaika, magazyny energii. Analiza opłacalności i wpływu na wskaźniki EP.' },
+];
+const audiences = [
+  { t: 'Biura projektowe', d: 'Stały podwykonawca branży energetycznej. Przewidywalne terminy i spójna dokumentacja dla całego portfela projektów.' },
+  { t: 'Deweloperzy', d: 'Obsługa inwestycji wielolokalowych, umowy ramowe i świadectwa dla wszystkich lokali w jednym procesie.' },
+  { t: 'Architekci', d: 'Szybka weryfikacja rozwiązań na etapie koncepcji, aby wskaźniki energetyczne nie zaskoczyły przy pozwoleniu.' },
+];
+const steps = [
+  { t: 'Zapytanie', d: 'Wysyłasz dane inwestycji i dokumentację projektową przez formularz.' },
+  { t: 'Wycena i termin', d: 'Przygotowujemy indywidualną ofertę. Termin realizacji ustalamy na początku zlecenia.' },
+  { t: 'Opracowanie', d: 'Wykonujemy analizę na profesjonalnym oprogramowaniu i konsultujemy ewentualne korekty.' },
+  { t: 'Dokumenty', d: 'Przekazujemy gotowe opracowanie. Płatność dopiero po dostarczeniu dokumentu.' },
+];
+---
+<Base title="swiadectwa.net – charakterystyka energetyczna dla biur projektowych i deweloperów">
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Analizy energetyczne dla branży budowlanej</div>
+      <h1>Charakterystyka energetyczna bez opóźnień w Twoim projekcie.</h1>
+      <p class="lead">Wspieramy biura projektowe, deweloperów i architektów w całej Polsce. Opracowania do projektów budowlanych i świadectwa energetyczne, z terminem uzgodnionym na starcie.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/kontakt#wycena">Zapytaj o wycenę</a>
+        <a class="btn btn-ghost" href="/oferta">Zobacz ofertę</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats"><div class="wrap"><div class="grid">
+    <div class="stat"><b>600+</b><span>wykonanych analiz energetycznych</span></div>
+    <div class="stat"><b>Cała Polska</b><span>obsługa zdalna inwestycji</span></div>
+    <div class="stat"><b>Po dostawie</b><span>płatność po odbiorze dokumentu</span></div>
+  </div></div></section>
+
+  <section>
+    <div class="wrap">
+      <div class="center">
+        <div class="eyebrow">Oferta</div>
+        <h2>Specjalizacja: projektowa charakterystyka energetyczna</h2>
+        <p class="lead">Kluczowe usługi dla inwestycji budowlanych, w jednym miejscu i z jednym wykonawcą.</p>
+      </div>
+      <div class="grid-3">
+        {services.map(s => (
+          <div class="card"><div class="icon">{s.icon}</div><h3>{s.t}</h3><p>{s.d}</p></div>
+        ))}
+      </div>
+      <p class="center" style="margin-top:32px"><a class="btn btn-outline" href="/oferta">Pełna oferta</a></p>
+    </div>
+  </section>
+
+  <section class="soft" id="dla-kogo">
+    <div class="wrap">
+      <div class="center">
+        <div class="eyebrow">Dla kogo</div>
+        <h2>Pracujemy z firmami z branży budowlanej</h2>
+        <p class="lead">Jesteśmy partnerem dla profesjonalistów. Obsługujemy wyłącznie klientów biznesowych.</p>
+      </div>
+      <div class="grid-3">
+        {audiences.map(a => (<div class="card dark"><h3>{a.t}</h3><p>{a.d}</p></div>))}
+      </div>
+    </div>
+  </section>
+
+  <section id="proces">
+    <div class="wrap">
+      <div class="center">
+        <div class="eyebrow">Jak pracujemy</div>
+        <h2>Prosty proces, przewidywalny wynik</h2>
+      </div>
+      <div class="steps">
+        {steps.map(s => (<div class="step"><h3>{s.t}</h3><p>{s.d}</p></div>))}
+      </div>
+    </div>
+  </section>
+
+  <section class="cta center">
+    <div class="wrap">
+      <h2>Masz projekt do opracowania?</h2>
+      <p class="lead">Prześlij zapytanie. Przygotujemy indywidualną wycenę i zaproponujemy termin.</p>
+      <p><a class="btn btn-primary" style="background:#fff;color:var(--navy)" href="/kontakt#wycena">Zapytaj o wycenę</a></p>
+    </div>
+  </section>
+</Base>

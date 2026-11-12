@@ -1,0 +1,60 @@
+---
+import '../styles/global.css';
+interface Props { title: string; description?: string }
+const { title, description = 'Projektowa charakterystyka energetyczna i świadectwa energetyczne dla biur projektowych, deweloperów i architektów w całej Polsce.' } = Astro.props;
+const nav = [
+  { href: '/oferta', label: 'Oferta' },
+  { href: '/#dla-kogo', label: 'Dla kogo' },
+  { href: '/#proces', label: 'Jak pracujemy' },
+  { href: '/kontakt', label: 'Kontakt' },
+];
+---
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content="pl_PL" />
+  </head>
+  <body>
+    <div class="topbar"><div class="wrap">
+      <span>Analizy energetyczne dla inwestycji w całej Polsce</span>
+      <span><a href="tel:+48694460538">+48 694 460 538</a> · <a href="mailto:biuro@swiadectwa.net">biuro@swiadectwa.net</a></span>
+    </div></div>
+    <header class="site"><div class="wrap">
+      <a href="/"><img src="/logo.png" alt="swiadectwa.net" /></a>
+      <button class="menu-toggle" aria-label="Menu" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
+      <nav class="main" id="nav">
+        {nav.map(n => <a href={n.href}>{n.label}</a>)}
+        <a class="btn btn-primary" href="/kontakt#wycena">Zapytaj o wycenę</a>
+      </nav>
+    </div></header>
+    <main><slot /></main>
+    <footer class="site"><div class="wrap">
+      <div class="cols">
+        <div>
+          <img src="/logo.png" alt="swiadectwa.net" style="height:30px;margin-bottom:14px" />
+          <p>Eksperci w zakresie analiz energetycznych. Obsługujemy biura projektowe, deweloperów i architektów.</p>
+        </div>
+        <div>
+          <h4>Oferta</h4>
+          <a href="/oferta#charakterystyka">Projektowa charakterystyka energetyczna</a>
+          <a href="/oferta#swiadectwa">Świadectwa energetyczne</a>
+          <a href="/oferta#dodatkowe">Usługi dodatkowe</a>
+        </div>
+        <div>
+          <h4>Kontakt</h4>
+          <a href="mailto:biuro@swiadectwa.net">biuro@swiadectwa.net</a>
+          <a href="tel:+48694460538">+48 694 460 538</a>
+          <span>Al. Jana Pawła II 1D/26, Gdańsk</span>
+        </div>
+      </div>
+      <div class="copy">© {new Date().getFullYear()} swiadectwa.net · Wszelkie prawa zastrzeżone</div>
+    </div></footer>
+  </body>
+</html>

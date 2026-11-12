@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="Kontakt i wycena | swiadectwa.net">
+  <div class="page-head"><div class="wrap">
+    <h1>Kontakt i wycena</h1>
+    <p>Opisz inwestycję. Wycenę przygotowujemy indywidualnie, a termin ustalamy na początku zlecenia.</p>
+  </div></div>
+
+  <section id="wycena"><div class="wrap two-col">
+    <div>
+      <h2>Dane kontaktowe</h2>
+      <p>Obsługujemy klientów biznesowych w całej Polsce.</p>
+      <p><strong>E-mail:</strong> <a href="mailto:biuro@swiadectwa.net">biuro@swiadectwa.net</a><br />
+         <strong>Telefon:</strong> <a href="tel:+48694460538">+48 694 460 538</a></p>
+      <p><strong>Gdańsk:</strong> Al. Jana Pawła II 1D/26<br /><strong>Starogard Gdański:</strong> Chopina 2A/D19</p>
+    </div>
+    <form class="quote" method="post" action="/api/wycena">
+      <h2 style="margin:0">Zapytanie ofertowe</h2>
+      <div class="row">
+        <label>Firma <input name="firma" required /></label>
+        <label>NIP <input name="nip" inputmode="numeric" pattern="[0-9\- ]{10,13}" required /></label>
+      </div>
+      <div class="row">
+        <label>Imię i nazwisko <input name="osoba" required /></label>
+        <label>Telefon <input name="telefon" type="tel" /></label>
+      </div>
+      <label>E-mail <input name="email" type="email" required /></label>
+      <div class="row">
+        <label>Rodzaj usługi
+          <select name="usluga" required>
+            <option value="">Wybierz…</option>
+            <option>Projektowa charakterystyka energetyczna</option>
+            <option>Świadectwa energetyczne</option>
+            <option>Inne / nie wiem</option>
+          </select>
+        </label>
+        <label>Typ inwestycji
+          <select name="inwestycja">
+            <option value="">Wybierz…</option>
+            <option>Budynek jednorodzinny (seria)</option>
+            <option>Budynek wielorodzinny</option>
+            <option>Budynek usługowy / biurowy</option>
+            <option>Inny</option>
+          </select>
+        </label>
+      </div>
+      <label>Opis inwestycji <textarea name="opis" rows="5" placeholder="Lokalizacja, liczba budynków/lokali, etap projektu, oczekiwany termin"></textarea></label>
+      <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <p class="small">Wysyłając formularz, zgadzasz się na kontakt w sprawie oferty. Obsługujemy wyłącznie klientów biznesowych.</p>
+      <button class="btn btn-primary" type="submit">Wyślij zapytanie</button>
+    </form>
+  </div></section>
+</Base>
