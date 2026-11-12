@@ -124,3 +124,10 @@ footer.site a:hover { color: #fff; }
 footer.site .copy { border-top: 1px solid rgba(255,255,255,.12); margin-top: 36px; padding-top: 20px; font-size: .82rem; }
 .page-head { background: var(--navy); color: #fff; padding: 72px 0; }
 .page-head h1 { color: #fff; margin: 0 0 .3em; } .page-head p { color: #cfe0ee; margin: 0; max-width: 60ch; }
+
+/* faq */
+details.faq { border-bottom: 1px solid var(--line); padding: 18px 0; }
+details.faq summary { cursor: pointer; font-weight: 600; color: var(--navy); list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+details.faq summary::after { content: '+'; color: var(--accent-dark); font-size: 1.4rem; line-height: 1; }
+details.faq[open] summary::after { content: '–'; }
+details.faq p { margin: 12px 0 0; color: var(--muted); }

@@ -5,10 +5,19 @@ const services = [
   { icon: '📄', t: 'Świadectwa energetyczne', d: 'Świadectwa charakterystyki energetycznej dla budynków i lokali, także seryjnie – dla całych inwestycji deweloperskich.' },
   { icon: '🌿', t: 'Analizy alternatywnych źródeł energii', d: 'Pompy ciepła, fotowoltaika, magazyny energii. Analiza opłacalności i wpływu na wskaźniki EP.' },
 ];
-const audiences = [
-  { t: 'Biura projektowe', d: 'Stały podwykonawca branży energetycznej. Przewidywalne terminy i spójna dokumentacja dla całego portfela projektów.' },
-  { t: 'Deweloperzy', d: 'Obsługa inwestycji wielolokalowych, umowy ramowe i świadectwa dla wszystkich lokali w jednym procesie.' },
-  { t: 'Architekci', d: 'Szybka weryfikacja rozwiązań na etapie koncepcji, aby wskaźniki energetyczne nie zaskoczyły przy pozwoleniu.' },
+import { audiences } from '../data/audiences.js';
+const why = [
+  { t: 'Termin na starcie', d: 'Czas realizacji ustalamy na początku zlecenia, więc możesz zaplanować kolejne etapy projektu.' },
+  { t: 'Płatność po dostawie', d: 'Płacisz dopiero po otrzymaniu gotowego dokumentu.' },
+  { t: 'Profesjonalne narzędzia', d: 'Pracujemy na profesjonalnym oprogramowaniu i sprzęcie pomiarowym.' },
+  { t: 'Cała Polska', d: 'Obsługujemy inwestycje zdalnie, bez względu na lokalizację.' },
+];
+const faq = [
+  { q: 'Dla kogo jest oferta?', a: 'Dla firm z branży budowlanej: biur projektowych, deweloperów i architektów. Nie obsługujemy klientów indywidualnych.' },
+  { q: 'Jak wyceniacie zlecenia?', a: 'Każde zlecenie wyceniamy indywidualnie na podstawie dokumentacji projektowej i zakresu opracowania.' },
+  { q: 'Ile trwa realizacja?', a: 'Termin ustalamy zawsze na początku zlecenia, po zapoznaniu się z dokumentacją.' },
+  { q: 'Kiedy płacę?', a: 'Płatność następuje po dostarczeniu gotowego dokumentu.' },
+  { q: 'Czy pracujecie poza Pomorzem?', a: 'Tak, obsługujemy inwestycje w całej Polsce, zdalnie.' },
 ];
 const steps = [
   { t: 'Zapytanie', d: 'Wysyłasz dane inwestycji i dokumentację projektową przez formularz.' },
@@ -60,12 +69,24 @@ const steps = [
         <p class="lead">Jesteśmy partnerem dla profesjonalistów. Obsługujemy wyłącznie klientów biznesowych.</p>
       </div>
       <div class="grid-3">
-        {audiences.map(a => (<div class="card dark"><h3>{a.t}</h3><p>{a.d}</p></div>))}
+        {audiences.map(a => (<a class="card dark" href={`/dla-kogo/${a.slug}`} style="text-decoration:none"><h3>{a.name}</h3><p>{a.short}</p><p style="margin-top:14px;color:#7fe0d9;font-weight:600">Dowiedz się więcej →</p></a>))}
       </div>
     </div>
   </section>
 
-  <section id="proces">
+  <section>
+    <div class="wrap">
+      <div class="center">
+        <div class="eyebrow">Dlaczego my</div>
+        <h2>Współpraca bez niespodzianek</h2>
+      </div>
+      <div class="grid-3" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
+        {why.map(w => (<div class="card"><h3>{w.t}</h3><p>{w.d}</p></div>))}
+      </div>
+    </div>
+  </section>
+
+  <section class="soft" id="proces">
     <div class="wrap">
       <div class="center">
         <div class="eyebrow">Jak pracujemy</div>
@@ -73,6 +94,15 @@ const steps = [
       </div>
       <div class="steps">
         {steps.map(s => (<div class="step"><h3>{s.t}</h3><p>{s.d}</p></div>))}
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap" style="max-width:820px">
+      <div class="center"><div class="eyebrow">FAQ</div><h2>Najczęstsze pytania</h2></div>
+      <div style="margin-top:32px">
+        {faq.map(f => (<details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}
       </div>
     </div>
   </section>
