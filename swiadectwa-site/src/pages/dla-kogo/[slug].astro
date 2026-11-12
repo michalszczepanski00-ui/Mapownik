@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import Tag from '../../components/Tag.astro';
 import { audiences } from '../../data/audiences.js';
 export function getStaticPaths() {
   return audiences.map(a => ({ params: { slug: a.slug }, props: { a } }));
@@ -8,7 +9,7 @@ const { a } = Astro.props;
 ---
 <Base title={`${a.name} – ${a.headline} | swiadectwa.net`} description={a.intro}>
   <div class="page-head"><div class="wrap">
-    <div class="eyebrow" style="color:#7fe0d9">Dla kogo · {a.name}</div>
+    <Tag t="Dla kogo" dark />
     <h1>{a.headline}</h1>
     <p>{a.intro}</p>
   </div></div>
@@ -16,9 +17,9 @@ const { a } = Astro.props;
     <div>
       <h2>Co zyskujesz</h2>
       <ul class="checks">{a.benefits.map(b => <li>{b}</li>)}</ul>
-      <p><a class="btn btn-primary" href="/kontakt#wycena">Zapytaj o wycenę</a></p>
+      <p><a class="btn btn-teal" href="/kontakt#wycena">Zapytaj o wycenę</a></p>
     </div>
-    <div class="card dark">
+    <div class="card mint">
       <h3>Jak to wygląda w praktyce</h3>
       <p>Wysyłasz zapytanie z danymi inwestycji. Przygotowujemy indywidualną wycenę, a termin ustalamy na początku zlecenia. Płatność następuje po dostarczeniu gotowego dokumentu.</p>
     </div>
@@ -27,7 +28,7 @@ const { a } = Astro.props;
     <h2>Pozostałe grupy klientów</h2>
     <div class="grid-3">
       {audiences.filter(x => x.slug !== a.slug).map(x => (
-        <a class="card" href={`/dla-kogo/${x.slug}`} style="text-decoration:none"><h3>{x.name}</h3><p>{x.short}</p></a>
+        <a class="card" href={`/dla-kogo/${x.slug}`} style="text-decoration:none;text-align:left"><h3>{x.name}</h3><p>{x.short}</p><div class="go"><i>→</i></div></a>
       ))}
     </div>
   </div></section>

@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Tag from '../components/Tag.astro';
 ---
 <Base title="Oferta – projektowa charakterystyka energetyczna i świadectwa | swiadectwa.net">
   <div class="page-head"><div class="wrap">
@@ -9,7 +10,7 @@ import Base from '../layouts/Base.astro';
 
   <section id="charakterystyka"><div class="wrap two-col">
     <div>
-      <div class="eyebrow">Usługa główna</div>
+      <Tag t="Usługa główna" />
       <h2>Projektowa charakterystyka energetyczna</h2>
       <p class="lead">Opracowanie do projektu budowlanego, potwierdzające spełnienie wymagań energetycznych.</p>
     </div>
@@ -25,7 +26,7 @@ import Base from '../layouts/Base.astro';
 
   <section class="soft" id="swiadectwa"><div class="wrap two-col">
     <div>
-      <div class="eyebrow">Usługa główna</div>
+      <Tag t="Usługa główna" />
       <h2>Świadectwa energetyczne</h2>
       <p class="lead">Świadectwa charakterystyki energetycznej dla budynków i lokali, także w seriach dla całych inwestycji.</p>
     </div>
@@ -41,7 +42,7 @@ import Base from '../layouts/Base.astro';
 
   <section id="dodatkowe"><div class="wrap">
     <div class="center">
-      <div class="eyebrow">Usługi dodatkowe</div>
+      <Tag t="Usługi dodatkowe" />
       <h2>Uzupełnienie dla Twoich inwestycji</h2>
     </div>
     <div class="grid-3">
@@ -50,6 +51,6 @@ import Base from '../layouts/Base.astro';
       <div class="card"><h3>OZE i magazyny energii</h3><p>Fotowoltaika, biogaz, magazyny energii – analizy techniczne.</p></div>
       <div class="card"><h3>Badania termowizyjne</h3><p>Diagnostyka przegród i wykrywanie nieszczelności.</p></div>
     </div>
-    <p class="center" style="margin-top:40px"><a class="btn btn-primary" href="/kontakt#wycena">Zapytaj o wycenę</a></p>
+    <p class="center" style="margin-top:40px"><a class="btn btn-teal" href="/kontakt#wycena">Zapytaj o wycenę</a></p>
   </div></section>
 </Base>

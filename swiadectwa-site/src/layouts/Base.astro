@@ -1,4 +1,5 @@
 ---
+import '@fontsource-variable/plus-jakarta-sans';
 import '../styles/global.css';
 interface Props { title: string; description?: string }
 const { title, description = 'Projektowa charakterystyka energetyczna i świadectwa energetyczne dla biur projektowych, deweloperów i architektów w całej Polsce.' } = Astro.props;
@@ -32,7 +33,7 @@ const nav = [
       <button class="menu-toggle" aria-label="Menu" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
       <nav class="main" id="nav">
         {nav.map(n => <a href={n.href}>{n.label}</a>)}
-        <a class="btn btn-primary" href="/kontakt#wycena">Zapytaj o wycenę</a>
+        <a class="btn btn-mint sm" href="/kontakt#wycena">Zapytaj o wycenę</a>
       </nav>
     </div></header>
     <main><slot /></main>
