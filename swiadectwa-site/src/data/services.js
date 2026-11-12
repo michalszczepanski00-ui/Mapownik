@@ -1,0 +1,117 @@
+export const services = [
+  {
+    slug: 'projektowa-charakterystyka-energetyczna',
+    main: true,
+    icon: 'blueprint',
+    name: 'Projektowa charakterystyka energetyczna',
+    short: 'Opracowanie do projektu budowlanego zgodnie z obowiązującymi warunkami technicznymi. Dla pracowni i deweloperów, na każdym etapie projektu.',
+    headline: 'Projektowa charakterystyka energetyczna do projektu budowlanego',
+    intro: 'Opracowujemy charakterystykę energetyczną jako element projektu budowlanego: z obliczeniami, zestawieniem przyjętych rozwiązań i wnioskiem o spełnieniu wymagań warunków technicznych.',
+    when: [
+      'Przygotowujesz projekt budowlany do złożenia wniosku o pozwolenie na budowę',
+      'Zmiany w projekcie wpływają na przegrody, instalacje lub źródło ciepła',
+      'Chcesz sprawdzić spełnienie wymagań energetycznych, zanim projekt trafi do urzędu',
+      'Porównujesz warianty rozwiązań i potrzebujesz wyliczeń do decyzji',
+    ],
+    deliver: [
+      'Obliczenia wskaźników zapotrzebowania na energię użytkową, końcową i pierwotną',
+      'Zestawienie przegród budowlanych i ich parametrów cieplnych',
+      'Opis przyjętych rozwiązań instalacyjnych i źródeł ciepła',
+      'Analizę alternatywnych źródeł energii, w tym odnawialnych',
+      'Wnioski dotyczące spełnienia wymagań warunków technicznych',
+      'Opracowanie w formie gotowej do włączenia do projektu budowlanego',
+    ],
+    faq: [
+      { q: 'Na jakim etapie projektu warto zamówić opracowanie?', a: 'Najlepiej już na etapie koncepcji lub projektu zagospodarowania. Zmiana rozwiązań na wczesnym etapie jest tańsza niż poprawki przed złożeniem wniosku.' },
+      { q: 'Czy uwzględniacie zmiany w projekcie?', a: 'Tak. Gdy projektant zmienia przegrody lub instalacje, aktualizujemy obliczenia i opracowanie.' },
+    ],
+  },
+  {
+    slug: 'swiadectwa-energetyczne',
+    main: true,
+    icon: 'certificate',
+    name: 'Świadectwa energetyczne',
+    short: 'Świadectwa charakterystyki energetycznej dla budynków i lokali, także seryjnie, dla całych inwestycji deweloperskich.',
+    headline: 'Świadectwa charakterystyki energetycznej budynków i lokali',
+    intro: 'Wykonujemy świadectwa charakterystyki energetycznej dla budynków i lokali, pojedynczo oraz seryjnie dla całych inwestycji. Pracujemy zdalnie, w całej Polsce.',
+    when: [
+      'Oddajesz budynek lub lokale do użytkowania',
+      'Sprzedajesz lub wynajmujesz budynek albo lokal i musisz przekazać świadectwo',
+      'Realizujesz inwestycję wielolokalową i potrzebujesz świadectw dla wszystkich lokali',
+      'Wymaga go program dofinansowania, np. Czyste Powietrze',
+    ],
+    deliver: [
+      'Świadectwo charakterystyki energetycznej w formie wymaganej przepisami',
+      'Wpis świadectwa do centralnego rejestru charakterystyki energetycznej budynków',
+      'Uporządkowany komplet dokumentów dla całej inwestycji',
+      'Możliwość umowy ramowej na kolejne etapy i inwestycje',
+    ],
+    faq: [
+      { q: 'Jak długo ważne jest świadectwo?', a: 'Świadectwo jest ważne 10 lat, chyba że wcześniej nastąpią zmiany wpływające na charakterystykę energetyczną budynku.' },
+      { q: 'Czy wykonujecie świadectwa dla całych inwestycji?', a: 'Tak. To nasza specjalność przy współpracy z deweloperami. Termin realizacji ustalamy na początku zlecenia.' },
+    ],
+  },
+  {
+    slug: 'obliczeniowe-zapotrzebowanie-na-cieplo',
+    icon: 'heatpump',
+    name: 'OZC i dobór pomp ciepła',
+    short: 'Obliczeniowe zapotrzebowanie na ciepło oraz dobór mocy pomp ciepła.',
+    headline: 'Obliczeniowe zapotrzebowanie na ciepło i dobór pomp ciepła',
+    intro: 'Obliczamy zapotrzebowanie budynku na moc cieplną i dobieramy źródło ciepła, tak aby instalacja była dopasowana do budynku, a nie przewymiarowana.',
+    when: [
+      'Projektujesz instalację grzewczą i potrzebujesz podstaw do doboru źródła ciepła',
+      'Rozważasz pompę ciepła i chcesz sprawdzić jej moc oraz współpracę z instalacją',
+      'Potrzebujesz opracowania OZC do dokumentacji lub wniosku',
+    ],
+    deliver: [
+      'Obliczenie obliczeniowego zapotrzebowania na moc cieplną budynku',
+      'Dobór mocy źródła ciepła, w tym pompy ciepła',
+      'Wnioski dotyczące współpracy źródła z instalacją grzewczą',
+    ],
+    faq: [
+      { q: 'Czy opracowanie nadaje się do wniosku o dofinansowanie?', a: 'Zakres opracowania dopasowujemy do wymagań konkretnego programu. Opisz go w zapytaniu, a uwzględnimy to w wycenie.' },
+    ],
+  },
+  {
+    slug: 'odnawialne-zrodla-energii',
+    icon: 'sun',
+    name: 'Odnawialne źródła energii',
+    short: 'Fotowoltaika, magazyny energii i biogaz: analizy techniczne i ich wpływ na wskaźniki EP.',
+    headline: 'Analizy odnawialnych źródeł energii dla budynków',
+    intro: 'Sprawdzamy, jak fotowoltaika, magazyny energii czy biogaz wpływają na wskaźniki energetyczne budynku i czy rozwiązanie ma sens dla Twojej inwestycji.',
+    when: [
+      'Wybierasz źródła energii dla nowej inwestycji',
+      'Chcesz obniżyć wskaźnik energii pierwotnej budynku',
+      'Porównujesz warianty zasilania w fazie koncepcji',
+    ],
+    deliver: [
+      'Analizę techniczną wybranych rozwiązań OZE',
+      'Wpływ rozwiązań na wskaźniki energetyczne budynku',
+      'Porównanie wariantów z rekomendacją',
+    ],
+    faq: [
+      { q: 'Czy analiza obejmuje opłacalność?', a: 'Tak. Zakres analizy, w tym część ekonomiczna, ustalamy indywidualnie na podstawie zapytania.' },
+    ],
+  },
+  {
+    slug: 'badania-termowizyjne',
+    icon: 'camera',
+    name: 'Badania termowizyjne',
+    short: 'Diagnostyka przegród budynku i wykrywanie nieszczelności.',
+    headline: 'Badania termowizyjne budynków',
+    intro: 'Wykonujemy badania termowizyjne, które pokazują miejsca strat ciepła, mostki termiczne i nieszczelności, zanim staną się problemem dla użytkowników.',
+    when: [
+      'Odbierasz budynek i chcesz sprawdzić jakość wykonania przegród',
+      'Podejrzewasz mostki termiczne lub nieszczelności',
+      'Potrzebujesz materiału dowodowego do rozmowy z wykonawcą',
+    ],
+    deliver: [
+      'Badanie z użyciem profesjonalnego sprzętu pomiarowego',
+      'Raport z dokumentacją zdjęciową i opisem wykrytych miejsc',
+      'Wnioski i wskazanie obszarów do poprawy',
+    ],
+    faq: [
+      { q: 'Czy badanie wymaga obecności na miejscu?', a: 'Tak, badanie termowizyjne wykonujemy na obiekcie. Termin i koszt dojazdu ustalamy w wycenie.' },
+    ],
+  },
+];

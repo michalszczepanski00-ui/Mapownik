@@ -3,6 +3,15 @@ import '@fontsource-variable/plus-jakarta-sans';
 import '../styles/global.css';
 interface Props { title: string; description?: string }
 const { title, description = 'Projektowa charakterystyka energetyczna i świadectwa energetyczne dla biur projektowych, deweloperów i architektów w całej Polsce.' } = Astro.props;
+const ld = {
+  '@context': 'https://schema.org', '@type': 'ProfessionalService', name: 'swiadectwa.net',
+  url: 'https://swiadectwa.net', telephone: '+48694460538', email: 'biuro@swiadectwa.net',
+  description: 'Projektowa charakterystyka energetyczna i świadectwa energetyczne dla biur projektowych, deweloperów i architektów.',
+  areaServed: 'PL', address: [
+    { '@type': 'PostalAddress', streetAddress: 'Al. Jana Pawła II 1D/26', addressLocality: 'Gdańsk', addressCountry: 'PL' },
+    { '@type': 'PostalAddress', streetAddress: 'Chopina 2A/D19', addressLocality: 'Starogard Gdański', addressCountry: 'PL' },
+  ],
+};
 const nav = [
   { href: '/oferta', label: 'Oferta' },
   { href: '/#dla-kogo', label: 'Dla kogo' },
@@ -22,6 +31,13 @@ const nav = [
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:locale" content="pl_PL" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#176974" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
   </head>
   <body>
     <div class="topbar"><div class="wrap">
@@ -37,6 +53,7 @@ const nav = [
       </nav>
     </div></header>
     <main><slot /></main>
+    <div class="mbar"><a class="call" href="tel:+48694460538">Zadzwoń</a><a class="quote" href="/kontakt#wycena">Zapytaj o wycenę</a></div>
     <footer class="site"><div class="wrap">
       <div class="cols">
         <div>
@@ -45,9 +62,9 @@ const nav = [
         </div>
         <div>
           <h4>Oferta</h4>
-          <a href="/oferta#charakterystyka">Projektowa charakterystyka energetyczna</a>
-          <a href="/oferta#swiadectwa">Świadectwa energetyczne</a>
-          <a href="/oferta#dodatkowe">Usługi dodatkowe</a>
+          <a href="/oferta/projektowa-charakterystyka-energetyczna">Projektowa charakterystyka energetyczna</a>
+          <a href="/oferta/swiadectwa-energetyczne">Świadectwa energetyczne</a>
+          <a href="/oferta">Wszystkie usługi</a>
         </div>
         <div>
           <h4>Kontakt</h4>

@@ -1,17 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
 import Tag from '../components/Tag.astro';
+import Icon from '../components/Icon.astro';
+import HeroArt from '../components/HeroArt.astro';
 import { audiences } from '../data/audiences.js';
-const services = [
-  { t: 'Projektowa charakterystyka energetyczna', d: 'Opracowanie do projektu budowlanego zgodnie z obowiązującymi warunkami technicznymi. Dla pracowni i deweloperów, na każdym etapie projektu.', href: '/oferta#charakterystyka' },
-  { t: 'Świadectwa energetyczne', d: 'Świadectwa charakterystyki energetycznej dla budynków i lokali, także seryjnie, dla całych inwestycji deweloperskich.', href: '/oferta#swiadectwa' },
-  { t: 'Analizy źródeł energii', d: 'Pompy ciepła, fotowoltaika, magazyny energii. Analiza opłacalności i wpływu na wskaźniki EP.', href: '/oferta#dodatkowe' },
-];
+import { services as allServices } from '../data/services.js';
+const services = allServices.slice(0, 3);
 const why = [
-  { t: 'Termin na starcie', d: 'Czas realizacji ustalamy na początku zlecenia, więc możesz zaplanować kolejne etapy projektu.' },
-  { t: 'Płatność po dostawie', d: 'Płacisz dopiero po otrzymaniu gotowego dokumentu.' },
-  { t: 'Profesjonalne narzędzia', d: 'Pracujemy na profesjonalnym oprogramowaniu i sprzęcie pomiarowym.' },
-  { t: 'Cała Polska', d: 'Obsługujemy inwestycje zdalnie, bez względu na lokalizację.' },
+  { i: 'clock', t: 'Termin na starcie', d: 'Czas realizacji ustalamy na początku zlecenia, więc możesz zaplanować kolejne etapy projektu.' },
+  { i: 'wallet', t: 'Płatność po dostawie', d: 'Płacisz dopiero po otrzymaniu gotowego dokumentu.' },
+  { i: 'tool', t: 'Profesjonalne narzędzia', d: 'Pracujemy na profesjonalnym oprogramowaniu i sprzęcie pomiarowym.' },
+  { i: 'map', t: 'Cała Polska', d: 'Obsługujemy inwestycje zdalnie, bez względu na lokalizację.' },
 ];
 const steps = [
   { t: 'Zapytanie', d: 'Wysyłasz dane inwestycji i dokumentację projektową przez formularz.' },
@@ -26,7 +25,6 @@ const faq = [
   { q: 'Kiedy płacę?', a: 'Płatność następuje po dostarczeniu gotowego dokumentu.' },
   { q: 'Czy pracujecie poza Pomorzem?', a: 'Tak, obsługujemy inwestycje w całej Polsce, zdalnie.' },
 ];
-const classes = [['A+',96],['A',84],['B',72],['C',60],['D',48],['E',38],['F',28],['G',20]];
 ---
 <Base title="swiadectwa.net – charakterystyka energetyczna dla biur projektowych i deweloperów">
   <section class="hero">
@@ -40,10 +38,7 @@ const classes = [['A+',96],['A',84],['B',72],['C',60],['D',48],['E',38],['F',28]
           <a class="btn btn-glass" href="/oferta">Zobacz ofertę</a>
         </div>
       </div>
-      <div class="scale" aria-hidden="true">
-        <h3>Klasa energetyczna budynku</h3>
-        {classes.map(([l,w]) => (<div class={`bar${l==='A'?' a':''}`}><b>{l}</b><span style={`width:${w}%`}></span></div>))}
-      </div>
+      <div class="hero-art"><HeroArt /></div>
     </div>
   </section>
 
@@ -59,8 +54,8 @@ const classes = [['A+',96],['A',84],['B',72],['C',60],['D',48],['E',38],['F',28]
       <h2 style="max-width:18ch">Specjalizacja: projektowa charakterystyka energetyczna</h2>
       <p class="lead">Kluczowe usługi dla inwestycji budowlanych, w jednym miejscu i z jednym wykonawcą.</p>
       <div class="grid-3">
-        {services.map((s,i) => (
-          <a class="card" href={s.href} style="text-decoration:none"><div class="num">0{i+1}</div><h3>{s.t}</h3><p>{s.d}</p><div class="go"><i>→</i></div></a>
+        {services.map(s => (
+          <a class="card" href={`/oferta/${s.slug}`} style="text-decoration:none"><div class="ico"><Icon name={s.icon} /></div><h3>{s.name}</h3><p>{s.short}</p><div class="go"><i>→</i></div></a>
         ))}
       </div>
     </div>
@@ -73,7 +68,7 @@ const classes = [['A+',96],['A',84],['B',72],['C',60],['D',48],['E',38],['F',28]
       <p class="lead">Jesteśmy partnerem dla profesjonalistów. Obsługujemy wyłącznie klientów biznesowych.</p>
       <div class="grid-3">
         {audiences.map(a => (
-          <a class="card mint" href={`/dla-kogo/${a.slug}`} style="text-decoration:none"><h3 style="font-size:1.5rem;margin-bottom:1em">{a.name}</h3><p>{a.short}</p><div class="go"><i>→</i></div></a>
+          <a class="card mint" href={`/dla-kogo/${a.slug}`} style="text-decoration:none"><div class="ico"><Icon name={a.icon} size={34} /></div><h3 style="font-size:1.5rem">{a.name}</h3><p>{a.short}</p><div class="go"><i>→</i></div></a>
         ))}
       </div>
     </div>
@@ -84,7 +79,7 @@ const classes = [['A+',96],['A',84],['B',72],['C',60],['D',48],['E',38],['F',28]
       <Tag t="Dlaczego my" />
       <h2>Współpraca bez niespodzianek</h2>
       <div class="grid-3" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
-        {why.map(w => (<div class="card"><h3>{w.t}</h3><p>{w.d}</p></div>))}
+        {why.map(w => (<div class="card"><div class="ico"><Icon name={w.i} /></div><h3>{w.t}</h3><p>{w.d}</p></div>))}
       </div>
     </div>
   </section>

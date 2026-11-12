@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import Tag from '../../components/Tag.astro';
+import Icon from '../../components/Icon.astro';
+import { services } from '../../data/services.js';
+const main = services.filter(s => s.main);
+const extra = services.filter(s => !s.main);
+---
+<Base title="Oferta – projektowa charakterystyka energetyczna i świadectwa | swiadectwa.net" description="Projektowa charakterystyka energetyczna, świadectwa energetyczne, OZC, OZE i badania termowizyjne dla biur projektowych, deweloperów i architektów.">
+  <div class="page-head"><div class="wrap">
+    <Tag t="Nasza oferta" dark />
+    <h1>Oferta</h1>
+    <p>Usługi dla biur projektowych, deweloperów i architektów. Każde zlecenie wyceniamy indywidualnie.</p>
+  </div></div>
+
+  <section><div class="wrap">
+    <Tag t="Usługi główne" />
+    <h2>Nasza specjalizacja</h2>
+    <div class="grid-3" style="grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr))">
+      {main.map(s => (
+        <a class="card mint" href={`/oferta/${s.slug}`} style="text-decoration:none"><div class="ico"><Icon name={s.icon} size={34} /></div><h3 style="font-size:1.5rem">{s.name}</h3><p>{s.short}</p><div class="go"><i>→</i></div></a>
+      ))}
+    </div>
+  </div></section>
+
+  <section class="soft"><div class="wrap">
+    <Tag t="Usługi dodatkowe" />
+    <h2>Uzupełnienie dla Twoich inwestycji</h2>
+    <div class="grid-3">
+      {extra.map(s => (
+        <a class="card" href={`/oferta/${s.slug}`} style="text-decoration:none"><div class="ico"><Icon name={s.icon} /></div><h3>{s.name}</h3><p>{s.short}</p><div class="go"><i>→</i></div></a>
+      ))}
+    </div>
+  </div></section>
+
+  <section class="cta center"><div class="wrap"><div class="glass">
+    <Tag t="Zapytaj teraz" />
+    <h2>Nie wiesz, czego potrzebujesz?</h2>
+    <p class="lead">Opisz inwestycję. Doradzimy zakres opracowania i przygotujemy wycenę.</p>
+    <a class="btn btn-teal" href="/kontakt#wycena">Zapytaj o wycenę</a>
+  </div></div></section>
+</Base>

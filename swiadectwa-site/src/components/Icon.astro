@@ -1,0 +1,19 @@
+---
+interface Props { name: string; size?: number }
+const { name, size = 36 } = Astro.props;
+const paths = {
+  certificate: '<path d="M12 6h18l8 8v28H12z"/><path d="M30 6v8h8"/><path d="M18 22h14M18 28h14"/><circle cx="24" cy="37" r="3.5"/>',
+  blueprint: '<rect x="6" y="10" width="36" height="28" rx="3"/><path d="M6 18h36M16 10v28"/><path d="M22 24h14M22 30h9"/>',
+  heatpump: '<rect x="8" y="12" width="32" height="24" rx="4"/><circle cx="24" cy="24" r="7"/><path d="M24 17v14M17 24h14"/>',
+  sun: '<circle cx="24" cy="24" r="7"/><path d="M24 6v6M24 36v6M6 24h6M36 24h6M11 11l4 4M33 33l4 4M37 11l-4 4M15 33l-4 4"/>',
+  camera: '<rect x="6" y="14" width="36" height="24" rx="4"/><circle cx="24" cy="26" r="7"/><path d="M16 14l3-5h10l3 5"/>',
+  building: '<path d="M10 42V10h20v32M30 20h8v22M6 42h36"/><path d="M16 16h4M16 22h4M16 28h4M16 34h4"/>',
+  users: '<circle cx="18" cy="17" r="6"/><path d="M6 40c0-7 5-12 12-12s12 5 12 12"/><circle cx="34" cy="19" r="4.5"/><path d="M34 29c5 0 8 4 8 10"/>',
+  pen: '<path d="M8 40l4-12L34 6l8 8-22 22z"/><path d="M30 10l8 8"/>',
+  clock: '<circle cx="24" cy="24" r="16"/><path d="M24 14v10l7 4"/>',
+  wallet: '<rect x="6" y="12" width="36" height="26" rx="4"/><path d="M6 20h36"/><circle cx="34" cy="29" r="2"/>',
+  tool: '<path d="M30 8a9 9 0 0 0-8 12L8 34l6 6 14-14a9 9 0 0 0 12-8l-6 4-5-5z"/>',
+  map: '<path d="M24 42s13-11 13-21a13 13 0 0 0-26 0c0 10 13 21 13 21z"/><circle cx="24" cy="21" r="4.5"/>',
+};
+---
+<svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={paths[name]} />

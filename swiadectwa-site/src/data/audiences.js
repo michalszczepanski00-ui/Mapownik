@@ -1,6 +1,7 @@
 export const audiences = [
   {
     slug: 'biura-projektowe',
+    icon: 'pen',
     name: 'Biura projektowe',
     short: 'Stały podwykonawca branży energetycznej. Przewidywalne terminy i spójna dokumentacja dla całego portfela projektów.',
     headline: 'Charakterystyka energetyczna dla pracowni projektowych',
@@ -14,6 +15,7 @@ export const audiences = [
   },
   {
     slug: 'deweloperzy',
+    icon: 'building',
     name: 'Deweloperzy',
     short: 'Obsługa inwestycji wielolokalowych, umowy ramowe i świadectwa dla wszystkich lokali w jednym procesie.',
     headline: 'Świadectwa energetyczne dla inwestycji deweloperskich',
@@ -27,6 +29,7 @@ export const audiences = [
   },
   {
     slug: 'architekci',
+    icon: 'blueprint',
     name: 'Architekci',
     short: 'Szybka weryfikacja rozwiązań na etapie koncepcji, aby wskaźniki energetyczne nie zaskoczyły przy pozwoleniu.',
     headline: 'Wsparcie energetyczne dla architektów',
