@@ -1,0 +1,11 @@
+{
+ "page": "index.html",
+ "url": null,
+ "root": null,
+ "kind": "service",
+ "category": "projektowa charakterystyka energetyczna i świadectwa energetyczne",
+ "primary": "Zapytaj o wycenę",
+ "rounds": 3,
+ "start": "2026-11-13T08:16:48.765Z",
+ "by": "gate.mjs --start"
+}

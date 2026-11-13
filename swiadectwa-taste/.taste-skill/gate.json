@@ -1,0 +1,623 @@
+{
+ "start": "2026-11-13T08:16:48.765Z",
+ "round": 3,
+ "idle": 0,
+ "errors": 0,
+ "status": "open",
+ "history": [
+  {
+   "at": "2026-11-13T08:29:11.157Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 22,
+   "round": 1,
+   "reused": false,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-13T08:32:54.589Z",
+   "mode": "manual",
+   "status": "fail",
+   "fails": 22,
+   "round": 2,
+   "reused": false,
+   "stopHookActive": false
+  },
+  {
+   "at": "2026-11-13T08:35:32.235Z",
+   "mode": "manual",
+   "status": "open",
+   "fails": 9,
+   "round": 3,
+   "reused": false,
+   "stopHookActive": false
+  }
+ ],
+ "max": 3,
+ "marker": {
+  "page": "index.html",
+  "url": null,
+  "root": null,
+  "kind": "service",
+  "category": "projektowa charakterystyka energetyczna i świadectwa energetyczne",
+  "primary": "Zapytaj o wycenę",
+  "rounds": 3,
+  "start": "2026-11-13T08:16:48.765Z",
+  "by": "gate.mjs --start"
+ },
+ "manual": true,
+ "roundKey": "2b3c091d494e900f:da39a3ee",
+ "roundFree": false,
+ "idleFree": false,
+ "blockKey": null,
+ "fp": "2b3c091d494e900f",
+ "page": "index.html",
+ "found": {
+  "fails": [
+   {
+    "check": "copy-headings",
+    "where": "div.wrap > div.grid > article.card.card--row:nth-of-type(1) > h3 \"Wyślij zapytanie\"",
+    "msg": "\"Wyślij zapytanie\" names no product, part, place or section (8 headings like it; at most one brand line per page) (and 7 more like it: \"Odbierz wycenę i termin\", \"Odbierz dokumenty\", \"Czy obsługujecie klientó\", \"Jak wyceniacie zlecenia?\", ...)",
+    "fix": "name the thing in every heading: the product, a part, the place or a section noun",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "copy-headings"
+    ],
+    "wheres": [
+     "div.wrap > div.grid > article.card.card--row:nth-of-type(1) > h3 \"Wyślij zapytanie\""
+    ]
+   },
+   {
+    "check": "text-contrast",
+    "where": "div.wrap > div.grid.grid--top > form.form.span-6 > p.t-small.muted \"Odpowiadamy w ciągu jednego dnia robocze\"",
+    "msg": "body text in #4a5068 on #c3d7e5 reads 5.37:1 (needs 7:1)",
+    "fix": "body text in the ink at 7:1 or more; grey (4.5:1 or more) only for captions and labels",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "text-contrast"
+    ],
+    "wheres": [
+     "div.wrap > div.grid.grid--top > form.form.span-6 > p.t-small.muted \"Odpowiadamy w ciągu jednego dnia robocze\""
+    ]
+   },
+   {
+    "check": "section-gaps",
+    "where": "section#proces / section#zapytanie",
+    "msg": "319px between these sections, +75% against the median 182px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-gaps"
+    ],
+    "wheres": [
+     "section#proces / section#zapytanie"
+    ]
+   },
+   {
+    "check": "photo-upscale",
+    "where": "div.wrap > div.grid.grid--top > div.frame.frame--photo > img.frame__img \"img: Biała elewacja bloku z regularnymi \"",
+    "msg": "photo-f150095329-960.webp: 720x465 shown at 628x751, blown up 1.61x",
+    "fix": "use a source at least as wide as the picture is shown (twice that for sharp screens)",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "photo-upscale"
+    ],
+    "wheres": [
+     "div.wrap > div.grid.grid--top > div.frame.frame--photo > img.frame__img \"img: Biała elewacja bloku z regularnymi \""
+    ]
+   },
+   {
+    "check": "section-height",
+    "where": "section#uslugi \"Usługi: charakterystyka i świadectwa ene\"",
+    "msg": "the section's content does not fit it: its lowest content ends 871px below its top, past 828px (the section less 72px of bottom padding) (SR-2)",
+    "fix": "fit the content above the section's bottom padding (--padb), or make it two screens (.g2) in two groups",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "section-height"
+    ],
+    "wheres": [
+     "section#uslugi \"Usługi: charakterystyka i świadectwa ene\""
+    ]
+   },
+   {
+    "check": "split-pair",
+    "where": "section#zapytanie > div.wrap > div.grid.grid--top \"Zapytanie ofertowe Firma Wpisz nazwę fir\"",
+    "msg": "the split's left column starts with a picture or a box, not text: text left, the visual right, on every split (SR-8)",
+    "fix": "put the text in the left column and the visual in the right, on every split",
+    "widths": [
+     1440
+    ],
+    "from": "consistency",
+    "ids": [
+     "split-pair"
+    ],
+    "wheres": [
+     "section#zapytanie > div.wrap > div.grid.grid--top \"Zapytanie ofertowe Firma Wpisz nazwę fir\""
+    ]
+   },
+   {
+    "check": "overlap-text",
+    "where": "section#zapytanie > div.wrap > div.grid.grid--top > div.frame.frame--photo",
+    "msg": "lies over the text \"Pytania o charakterystykę energetyczną\" (h2#pytania-h)",
+    "fix": "move the box off the text (or the text off the box)",
+    "widths": [
+     390
+    ],
+    "from": "consistency",
+    "ids": [
+     "overlap-text"
+    ],
+    "wheres": [
+     "section#zapytanie > div.wrap > div.grid.grid--top > div.frame.frame--photo"
+    ]
+   },
+   {
+    "check": "collide",
+    "where": "section#uslugi > div.wrap > div.grid.grid--top > div.frame.frame--photo",
+    "msg": "the words \"Podejście\" and the card div.grid.grid--top > div.frame.frame--photo of another section lie in one place: the card runs out of its section, which is shorter than what it holds",
+    "fix": "on a phone nothing lies on anything else: let the section grow with its content (min-height for its screens, never a fixed height; --hm: 2 when it needs two) or cut what it holds; keep pictures and cards off the buttons; pad the page under a fixed bar by the bar's height (top: the first section; end: the footer)",
+    "widths": [
+     320
+    ],
+    "from": "consistency",
+    "ids": [
+     "collide"
+    ],
+    "wheres": [
+     "section#uslugi > div.wrap > div.grid.grid--top > div.frame.frame--photo"
+    ]
+   },
+   {
+    "check": "screen-height",
+    "where": "#zapytanie section.section.g2 \"Pytania o charakterystykę energe\"",
+    "msg": "2532px, 3.00 screens; a section is exactly one or two (--h), or on a phone at least one that its content fills",
+    "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+    "widths": [
+     390
+    ],
+    "from": "layout",
+    "ids": [
+     "screen-height"
+    ],
+    "wheres": [
+     "#zapytanie section.section.g2 \"Pytania o charakterystykę energe\""
+    ]
+   }
+  ],
+  "warns": [
+   {
+    "check": "scroll-reveal",
+    "where": "section#podejscie > div.wrap > p.mo-wh__text \"Projekt stoi, bo brakuje jednego dokumen\"",
+    "msg": "starts \"color\" (0.2 s) the moment it is scrolled into view (an IntersectionObserver) on span.mo-w:nth-of-type(1) (inside a dealt moment's section, [data-moment]: an enter moment is expected on every kind; its still is judged under reduced motion)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "scroll-reveal",
+    "where": "section#klienci \"Charakterystyka energetyczna dla firm bu\"",
+    "msg": "starts \"opacity\" (0.4 s) the moment it is scrolled into view (an IntersectionObserver) on div.mo-ph__words (inside a dealt moment's section, [data-moment]: an enter moment is expected on every kind; its still is judged under reduced motion)",
+    "fix": "show it at rest: no fade, rise or unmask when it is scrolled into view",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "pinned",
+    "where": "section#klienci > div.wrap.mo-ph \"Charakterystyka energetyczna dla firm bu\"",
+    "msg": "held on screen for 2 screens of scroll (position: sticky) while the page moves on (inside a dealt moment's section, [data-moment]: expected on every kind, two moments at most, house rule; its still is judged under reduced motion)",
+    "fix": "let the section scroll with the page",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "no-visual",
+    "where": "section#zapytanie \"Pytania o charakterystykę energetyczną\"",
+    "msg": "pictures, effects and mocks cover 17% of this section; a feature section needs a visual (about 25% or more)",
+    "fix": "give the section a visual: a UI fragment on a ground, real icons, or a photograph that fits",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "same-action",
+    "where": "div.grid.grid--top > div.span-5 > p > a.link \"Zapytaj o wycenę\"",
+    "msg": "\"Zapytaj o wycenę\" is a button in one place and a text link in another: one action in two looks",
+    "fix": "show one action one way: the same button wherever it repeats, or a text link everywhere",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cta",
+    "where": "section#klienci \"Charakterystyka energetyczna dla firm bu\"",
+    "msg": "a section over 1.5 screens long with no link or button in it",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "copy-buttons",
+    "where": "header.nav > div.wrap.nav__bar > div.nav__actions > a.btn.btn--primary \"Zapytaj o wycenę\"",
+    "msg": "\"Zapytaj o wycenę\" does not start with a verb (book, buy, try, start, get, see...)",
+    "fix": "label buttons with a verb and what the visitor gets (\"Book a room\", \"Start free trial\")",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "photo-set",
+    "where": "div.grid > article.card.card--row:nth-of-type(2) > div.panel > img.frame__img \"photo-f87827466-960.webp\"",
+    "msg": "7 photographs in more than one look: lightness from 0.23 to 0.68; saturation from 0.25 to 0.64; warm and cool photographs mixed (b* -18 to +10); the odd one out is photo-f87827466-960.webp",
+    "fix": "grade the photographs to one look (light, colour, warmth), or replace the odd one out",
+    "widths": [
+     1440,
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "photo-credit",
+    "where": "(the page text)",
+    "msg": "1 library source (wikimedia): the page credits wikimedia; confirm each shows the client's own product, place or people",
+    "fix": "confirm the library photograph shows the client's own product, place or people; otherwise replace it",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "header.nav > div.wrap.nav__bar > a.nav__logo \"swiadectwa.net\"",
+    "msg": "\"swiadectwa.net\" opens a section headed \"Charakterystyka energetyczna dla projektów i inwes\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "div.nav__menu > div.wrap.grid > div.menu-col.span-3:nth-of-type(2) > a:nth-of-type(1) \"OZC i pompy ciepłaMoc cieplna i dobór źr\"",
+    "msg": "\"OZC i pompy ciepłaMoc cieplna i dobór źr\" opens a section headed \"Usługi: charakterystyka i świadectwa energetyczne\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "div.nav__menu > div.wrap.grid > div.menu-col.span-3:nth-of-type(2) > a:nth-of-type(2) \"Odnawialne źródła energiiFotowoltaika i \"",
+    "msg": "\"Odnawialne źródła energiiFotowoltaika i \" opens a section headed \"Usługi: charakterystyka i świadectwa energetyczne\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "div.nav__menu > div.wrap.grid > div.menu-col.span-3:nth-of-type(2) > a:nth-of-type(3) \"Badania termowizyjneMostki i nieszczelno\"",
+    "msg": "\"Badania termowizyjneMostki i nieszczelno\" opens a section headed \"Usługi: charakterystyka i świadectwa energetyczne\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "div.wrap.nav__bar > nav.nav__links > div.nav__item:nth-of-type(3) > a.nav__link \"Jak pracujemy\"",
+    "msg": "\"Jak pracujemy\" opens a section headed \"Zlecenie w 3 krokach\"",
+    "fix": "name each nav link after the heading of the section it opens",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-labels",
+    "where": "div.nav__menu > div.wrap.grid > div.menu-col.span-3:nth-of-type(1) > a:nth-of-type(1) \"Projektowa charakterystykaOpra\"",
+    "msg": "5 entries of one menu go to the same place (#uslugi): \"Projektowa charakterystykaOpra\", \"Świadectwa energetyczneDla bud\", \"OZC i pompy ciepłaMoc cieplna \", \"Odnawialne źródła energiiFotow\"",
+    "fix": "give each menu entry its own target (its section, its tab, its page), or show fewer entries",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "nav-current",
+    "where": "header.nav",
+    "msg": "the nav stays on screen with 4 links to the page's sections, but never marks the one you are in (no link changes as the page scrolls)",
+    "fix": "mark the link of the section on screen (a colour, a weight or a line under it) as the visitor scrolls",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "action-count",
+    "where": "footer#contact > div.wrap > div.closing__cta.close--type > a.btn.btn--primary",
+    "msg": "the main action \"Zapytaj o wycenę\" is on 5 buttons and links: the nav, the hero and the closing call carry it; elsewhere a section has its own action",
+    "fix": "the main action in the nav, the hero and the closing call; give the other sections their own action",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "skip-link",
+    "where": "header.nav > div.wrap.nav__bar > a.skip-link:nth-of-type(1) \"Przejdź do treści\"",
+    "msg": "the first Tab stop is \"Przejdź do treści\", not a skip link: a keyboard user tabs through the whole nav on every visit",
+    "fix": "add the starter's skip link as the header's first child: <a class=\"skip-link\" href=\"#top\">Skip to content</a>",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "lang",
+    "where": "html \"pl\"",
+    "msg": "<html lang=\"pl\">, but the words read as pt (20 common pt words against 0 pl ones in 329)",
+    "fix": "set <html lang> to the language the page is written in, from the brief (\"de\" for a German page)",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "action-repeat",
+    "where": "header.nav > div.wrap.nav__bar > div.nav__actions > a.btn.btn--primary \"zapytaj o wycenę\"",
+    "msg": "\"zapytaj o wycenę\" shows 2 times on the first screen at 1440px (nav, hero): the nav's button and the hero's; nothing else on the screen may repeat it",
+    "fix": "show the action once a screen besides the nav's button: the hero's, the close's or the phone bar's, never all at once",
+    "widths": [
+     1440
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "tap-size",
+    "where": "div.span-6.start-7 > dl.hours > dd:nth-of-type(3) > a \"biuro@swiadectwa.net\"",
+    "msg": "a 159x21px tap target: under the 44px a phone needs",
+    "fix": "make every link and control outside running text 44px tall on a phone: display: inline-flex; align-items: center; min-height: 44px (a footer list then needs no gap), a 44px small button, or a transparent ::before laid past the box",
+    "widths": [
+     390,
+     320
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cut-text",
+    "where": "h2#pytania-h \"Pytania o charakterystykę energetyczną\"",
+    "msg": "sits across the edge of a panel behind it",
+    "fix": "give the text room: no overflow clipping a line, no line past its box",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "cta",
+    "where": "section#proces \"Zlecenie w 3 krokach\"",
+    "msg": "a section over 1.5 screens long with no link or button in it",
+    "fix": "add the action: a button in the hero, one on every priced item, one in the closing section",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "section-gaps",
+    "where": "main#top > section.hero.hero--split / section#uslugi",
+    "msg": "116px between these sections, -41% against the median 197px",
+    "fix": "use one gap between sections (all within 25% of each other)",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   },
+   {
+    "check": "visual-caption",
+    "where": "p#form-h \"Zapytanie ofertowe\"",
+    "msg": "a muted 13px line of 1 row sits 32px under the picture photo-f19313331-960.webp: it reads as a caption: \"Zapytanie ofertowe\"; no caption or description under any image, render or visual (house rule)",
+    "fix": "take the line away: no caption or description under, over or on any image, render or visual; a licence credit goes in one footer line",
+    "widths": [
+     390
+    ],
+    "from": "consistency"
+   }
+  ],
+  "crashed": [],
+  "seconds": {
+   "consistency": 118,
+   "layout": 3
+  }
+ },
+ "open": [
+  {
+   "check": "copy-headings",
+   "where": "div.wrap > div.grid > article.card.card--row:nth-of-type(1) > h3 \"Wyślij zapytanie\"",
+   "msg": "\"Wyślij zapytanie\" names no product, part, place or section (8 headings like it; at most one brand line per page) (and 7 more like it: \"Odbierz wycenę i termin\", \"Odbierz dokumenty\", \"Czy obsługujecie klientó\", \"Jak wyceniacie zlecenia?\", ...)",
+   "fix": "name the thing in every heading: the product, a part, the place or a section noun",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "copy-headings"
+   ],
+   "wheres": [
+    "div.wrap > div.grid > article.card.card--row:nth-of-type(1) > h3 \"Wyślij zapytanie\""
+   ]
+  },
+  {
+   "check": "text-contrast",
+   "where": "div.wrap > div.grid.grid--top > form.form.span-6 > p.t-small.muted \"Odpowiadamy w ciągu jednego dnia robocze\"",
+   "msg": "body text in #4a5068 on #c3d7e5 reads 5.37:1 (needs 7:1)",
+   "fix": "body text in the ink at 7:1 or more; grey (4.5:1 or more) only for captions and labels",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "text-contrast"
+   ],
+   "wheres": [
+    "div.wrap > div.grid.grid--top > form.form.span-6 > p.t-small.muted \"Odpowiadamy w ciągu jednego dnia robocze\""
+   ]
+  },
+  {
+   "check": "section-gaps",
+   "where": "section#proces / section#zapytanie",
+   "msg": "319px between these sections, +75% against the median 182px",
+   "fix": "use one gap between sections (all within 25% of each other)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-gaps"
+   ],
+   "wheres": [
+    "section#proces / section#zapytanie"
+   ]
+  },
+  {
+   "check": "photo-upscale",
+   "where": "div.wrap > div.grid.grid--top > div.frame.frame--photo > img.frame__img \"img: Biała elewacja bloku z regularnymi \"",
+   "msg": "photo-f150095329-960.webp: 720x465 shown at 628x751, blown up 1.61x",
+   "fix": "use a source at least as wide as the picture is shown (twice that for sharp screens)",
+   "widths": [
+    1440,
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "photo-upscale"
+   ],
+   "wheres": [
+    "div.wrap > div.grid.grid--top > div.frame.frame--photo > img.frame__img \"img: Biała elewacja bloku z regularnymi \""
+   ]
+  },
+  {
+   "check": "section-height",
+   "where": "section#uslugi \"Usługi: charakterystyka i świadectwa ene\"",
+   "msg": "the section's content does not fit it: its lowest content ends 871px below its top, past 828px (the section less 72px of bottom padding) (SR-2)",
+   "fix": "fit the content above the section's bottom padding (--padb), or make it two screens (.g2) in two groups",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "section-height"
+   ],
+   "wheres": [
+    "section#uslugi \"Usługi: charakterystyka i świadectwa ene\""
+   ]
+  },
+  {
+   "check": "split-pair",
+   "where": "section#zapytanie > div.wrap > div.grid.grid--top \"Zapytanie ofertowe Firma Wpisz nazwę fir\"",
+   "msg": "the split's left column starts with a picture or a box, not text: text left, the visual right, on every split (SR-8)",
+   "fix": "put the text in the left column and the visual in the right, on every split",
+   "widths": [
+    1440
+   ],
+   "from": "consistency",
+   "ids": [
+    "split-pair"
+   ],
+   "wheres": [
+    "section#zapytanie > div.wrap > div.grid.grid--top \"Zapytanie ofertowe Firma Wpisz nazwę fir\""
+   ]
+  },
+  {
+   "check": "overlap-text",
+   "where": "section#zapytanie > div.wrap > div.grid.grid--top > div.frame.frame--photo",
+   "msg": "lies over the text \"Pytania o charakterystykę energetyczną\" (h2#pytania-h)",
+   "fix": "move the box off the text (or the text off the box)",
+   "widths": [
+    390
+   ],
+   "from": "consistency",
+   "ids": [
+    "overlap-text"
+   ],
+   "wheres": [
+    "section#zapytanie > div.wrap > div.grid.grid--top > div.frame.frame--photo"
+   ]
+  },
+  {
+   "check": "collide",
+   "where": "section#uslugi > div.wrap > div.grid.grid--top > div.frame.frame--photo",
+   "msg": "the words \"Podejście\" and the card div.grid.grid--top > div.frame.frame--photo of another section lie in one place: the card runs out of its section, which is shorter than what it holds",
+   "fix": "on a phone nothing lies on anything else: let the section grow with its content (min-height for its screens, never a fixed height; --hm: 2 when it needs two) or cut what it holds; keep pictures and cards off the buttons; pad the page under a fixed bar by the bar's height (top: the first section; end: the footer)",
+   "widths": [
+    320
+   ],
+   "from": "consistency",
+   "ids": [
+    "collide"
+   ],
+   "wheres": [
+    "section#uslugi > div.wrap > div.grid.grid--top > div.frame.frame--photo"
+   ]
+  },
+  {
+   "check": "screen-height",
+   "where": "#zapytanie section.section.g2 \"Pytania o charakterystykę energe\"",
+   "msg": "2532px, 3.00 screens; a section is exactly one or two (--h), or on a phone at least one that its content fills",
+   "fix": "make the section exactly one or two screens (--h: 1 or 2)",
+   "widths": [
+    390
+   ],
+   "from": "layout",
+   "ids": [
+    "screen-height"
+   ],
+   "wheres": [
+    "#zapytanie section.section.g2 \"Pytania o charakterystykę energe\""
+   ]
+  }
+ ],
+ "waived": [],
+ "warnCount": 25,
+ "at": "2026-11-13T08:35:32.235Z",
+ "openTold": true
+}
