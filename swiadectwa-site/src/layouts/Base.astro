@@ -1,79 +1,134 @@
 ---
-import '@fontsource-variable/plus-jakarta-sans';
 import '../styles/global.css';
-interface Props { title: string; description?: string }
-const { title, description = 'Projektowa charakterystyka energetyczna i świadectwa energetyczne dla biur projektowych, deweloperów i architektów w całej Polsce.' } = Astro.props;
-const ld = {
-  '@context': 'https://schema.org', '@type': 'ProfessionalService', name: 'swiadectwa.net',
-  url: 'https://swiadectwa.net', telephone: '+48694460538', email: 'biuro@swiadectwa.net',
-  description: 'Projektowa charakterystyka energetyczna i świadectwa energetyczne dla biur projektowych, deweloperów i architektów.',
-  areaServed: 'PL', address: [
-    { '@type': 'PostalAddress', streetAddress: 'Al. Jana Pawła II 1D/26', addressLocality: 'Gdańsk', addressCountry: 'PL' },
-    { '@type': 'PostalAddress', streetAddress: 'Chopina 2A/D19', addressLocality: 'Starogard Gdański', addressCountry: 'PL' },
-  ],
+import Logo from '../components/Logo.astro';
+import { site, nav, CTA, mailto } from '../data/site';
+
+interface Crumb { name: string; path: string }
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  breadcrumbs?: Crumb[];
+  noindex?: boolean;
+  jsonLd?: object[];
+}
+const { title, description, path, breadcrumbs = [], noindex = false, jsonLd = [] } = Astro.props;
+const canonical = new URL(path, site.url).href;
+const ogImage = `${site.url}/og.png`;
+const current = path;
+
+const org = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  '@id': `${site.url}/#organization`,
+  name: site.name,
+  legalName: site.owner,
+  url: `${site.url}/`,
+  email: site.email,
+  telephone: site.phone,
+  foundingDate: String(site.since),
+  address: { '@type': 'PostalAddress', streetAddress: site.street, postalCode: site.postal, addressLocality: site.city, addressCountry: 'PL' },
+  areaServed: { '@type': 'Country', name: 'Polska' },
+  description: site.description,
+  taxID: site.nip,
+  knowsAbout: ['projektowana charakterystyka energetyczna', 'świadectwa charakterystyki energetycznej', 'OZC', 'analizy OZE'],
 };
-const nav = [
-  { href: '/oferta', label: 'Oferta' },
-  { href: '/#dla-kogo', label: 'Dla kogo' },
-  { href: '/o-nas', label: 'O nas' },
-  { href: '/#proces', label: 'Jak pracujemy' },
-  { href: '/kontakt', label: 'Kontakt' },
-];
+const crumbLd = breadcrumbs.length
+  ? { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [{ name: 'Strona główna', path: '/' }, ...breadcrumbs].map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name, item: new URL(c.path, site.url).href })) }
+  : null;
+const graph = [org, ...(crumbLd ? [crumbLd] : []), ...jsonLd];
 ---
 <!doctype html>
 <html lang="pl">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:locale" content="pl_PL" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content={new URL('/og.png', Astro.site)} />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="theme-color" content="#176974" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <script type="application/ld+json" set:html={JSON.stringify(ld)} />
-  </head>
-  <body>
-    <div class="topbar"><div class="wrap">
-      <span>Analizy energetyczne dla inwestycji w całej Polsce</span>
-      <span><a href="tel:+48694460538">+48 694 460 538</a> · <a href="mailto:biuro@swiadectwa.net">biuro@swiadectwa.net</a></span>
-    </div></div>
-    <header class="site"><div class="wrap">
-      <a href="/"><img src="/logo.png" alt="swiadectwa.net" /></a>
-      <button class="menu-toggle" aria-label="Menu" onclick="document.getElementById('nav').classList.toggle('open')">☰</button>
-      <nav class="main" id="nav">
-        {nav.map(n => <a href={n.href}>{n.label}</a>)}
-        <a class="btn btn-mint sm" href="/kontakt#wycena">Zapytaj o wycenę</a>
+<head>
+  <meta charset="utf-8" />
+  <script is:inline>document.documentElement.classList.add('js')</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  {(noindex || import.meta.env.PUBLIC_PREVIEW) && <meta name="robots" content="noindex, nofollow" />}
+  <meta name="theme-color" content="#0b434b" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="pl_PL" />
+  <meta property="og:site_name" content={site.name} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImage} />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="preload" href="/fonts/sora-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/red-hat-text-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+  {graph.map((g) => <script type="application/ld+json" set:html={JSON.stringify(g)} />)}
+</head>
+<body>
+  <a class="skip" href="#tresc">Przejdź do treści</a>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header id="hd" class="dk">
+    <div class="wrap hd-in">
+      <a class="brand" href="/" aria-label="świadectwa.net, strona główna"><Logo /></a>
+      <button class="tg" id="tg" type="button" aria-expanded="false" aria-controls="nv" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="nv" aria-label="Główna nawigacja">
+        {nav.map((n) => (
+          <a href={n.href} title={n.full} aria-current={current === n.href ? 'page' : undefined}>{n.label}</a>
+        ))}
+        <a class="btn btn-mint" href={mailto('Zapytanie ze strony świadectwa.net')}>Zapytaj o wycenę <span class="ar" aria-hidden="true">→</span></a>
       </nav>
-    </div></header>
-    <main><slot /></main>
-    <div class="mbar"><a class="call" href="tel:+48694460538">Zadzwoń</a><a class="quote" href="/kontakt#wycena">Zapytaj o wycenę</a></div>
-    <footer class="site"><div class="wrap">
-      <div class="cols">
+    </div>
+  </header>
+
+  <main id="tresc">
+    <slot />
+  </main>
+
+  <footer class="ft dk">
+    <div class="wrap">
+      <div class="ft-cols">
         <div>
-          <img src="/logo.png" alt="swiadectwa.net" style="height:30px;margin-bottom:14px" />
-          <p>Eksperci w zakresie analiz energetycznych. Obsługujemy biura projektowe, deweloperów i architektów.</p>
+          <Logo tagline class="ft-logo" />
+          <p class="ft-lede">Dokumentacja energetyczna budynków dla projektantów, firm, deweloperów i zarządców nieruchomości.</p>
         </div>
         <div>
-          <h4>Oferta</h4>
-          <a href="/oferta/projektowa-charakterystyka-energetyczna">Projektowa charakterystyka energetyczna</a>
-          <a href="/oferta/swiadectwa-energetyczne">Świadectwa energetyczne</a>
-          <a href="/oferta">Wszystkie usługi</a>
+          <h2 class="ft-h">Usługi</h2>
+          <a href="/projektowana-charakterystyka/">Projektowana charakterystyka energetyczna</a>
+          <a href="/swiadectwa-energetyczne/">Świadectwa charakterystyki energetycznej</a>
+          <a href="/dla-biur-projektowych/">Stała współpraca z biurami projektowymi</a>
+          <a href="/dla-deweloperow-i-zarzadcow/">Dla deweloperów i zarządców</a>
         </div>
         <div>
-          <h4>Kontakt</h4>
-          <a href="mailto:biuro@swiadectwa.net">biuro@swiadectwa.net</a>
-          <a href="tel:+48694460538">+48 694 460 538</a>
-          <span>Al. Jana Pawła II 1D/26, Gdańsk</span>
+          <h2 class="ft-h">Firma</h2>
+          <a href="/o-firmie/">O firmie</a>
+          <a href="/kontakt/">Kontakt i wycena</a>
+          <a href="/dane-rejestrowe/">Dane rejestrowe</a>
+          <a href="/polityka-prywatnosci/">Polityka prywatności</a>
+        </div>
+        <div>
+          <h2 class="ft-h">Dane firmy</h2>
+          <p class="ft-data">{site.owner}<br />NIP: {site.nip}<br />REGON: {site.regon}</p>
+          <a href={`tel:${site.phoneHref}`}>{site.phone}</a>
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+          <p class="ft-data">Gdańsk / {site.city}<br />Obsługa zdalna: cała Polska</p>
         </div>
       </div>
-      <div class="copy">© {new Date().getFullYear()} swiadectwa.net · Wszelkie prawa zastrzeżone · <a href="/polityka-prywatnosci" style="display:inline">Polityka prywatności</a></div>
-    </div></footer>
-  </body>
+      <div class="ft-copy">
+        <span>© {new Date().getFullYear()} {site.name}</span>
+        <a href="/zrodla-zdjec/">Źródła zdjęć</a>
+      </div>
+    </div>
+  </footer>
+
+  <div class="bar-m" role="group" aria-label="Szybki kontakt">
+    <a class="a" href={`tel:${site.phoneHref}`}>Zadzwoń</a>
+    <a class="b" href={mailto('Zapytanie ze strony świadectwa.net')}>Zapytaj o wycenę</a>
+  </div>
+
+  <script>
+    import '../scripts/site.js';
+  </script>
+</body>
 </html>

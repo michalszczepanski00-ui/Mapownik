@@ -1,0 +1,115 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, pickFaq } from '../data/site';
+
+const faq = pickFaq('packages', 'incomplete', 'area', 'poland', 'halls');
+const ld = [{ '@context': 'https://schema.org', '@type': 'Service', name: 'Świadectwa energetyczne dla deweloperów i zarządców nieruchomości', serviceType: 'Pakiety świadectw charakterystyki energetycznej', provider: { '@id': `${site.url}/#organization` }, areaServed: { '@type': 'Country', name: 'Polska' }, audience: { '@type': 'BusinessAudience', name: 'Deweloperzy, zarządcy nieruchomości, firmy z portfelem budynków' }, url: `${site.url}/dla-deweloperow-i-zarzadcow/`, description: 'Świadectwa energetyczne i dokumentacja energetyczna dla deweloperów, zarządców nieruchomości i firm posiadających portfel budynków.' }];
+---
+<Base
+  title="Dla deweloperów i zarządców | świadectwa.net"
+  description="Świadectwa energetyczne i dokumentacja energetyczna dla deweloperów, zarządców nieruchomości i firm posiadających portfel budynków."
+  path="/dla-deweloperow-i-zarzadcow/"
+  breadcrumbs={[{ name: 'Dla deweloperów i zarządców', path: '/dla-deweloperow-i-zarzadcow/' }]}
+  jsonLd={ld}
+>
+  <PageHero
+    tag="Dla deweloperów i zarządców"
+    title='Świadectwa energetyczne <span class="grad">dla inwestycji i portfeli nieruchomości</span>'
+    lead={['Obsługujemy deweloperów, zarządców nieruchomości i firmy, które potrzebują świadectw charakterystyki energetycznej dla budynków, lokali lub większej liczby obiektów.']}
+    crumbs={[{ name: 'Dla deweloperów i zarządców', path: '/dla-deweloperow-i-zarzadcow/' }]}
+    art="blocks"
+    mail={{ subject: 'Zapytanie dla dewelopera lub zarządcy', label: 'Wyślij zapytanie' }}
+    secondary={{ href: '#zakres-obslugi', label: 'Zobacz zakres' }}
+  />
+
+  <section class="pad" aria-labelledby="potrzeby-h">
+    <div class="wrap two lw">
+      <div>
+        <span class="tag rv"><i></i>Najczęstsze potrzeby</span>
+        <h2 id="potrzeby-h" class="rv d1" style="margin:22px 0 18px">Z czym <span class="grad">najczęściej przychodzą klienci</span></h2>
+        <p class="lede rv d2">Wycena powstaje po analizie zakresu i liczby obiektów, dlatego warto opisać zlecenie możliwie konkretnie.</p>
+      </div>
+      <div class="card flow mint-bg rv d2"><span class="kick">Najczęstsze potrzeby</span><h3>Zakres zapytań</h3>
+        <ul class="check"><li>pakiety świadectw dla lokali,</li><li>świadectwa dla budynków komercyjnych,</li><li>dokumentacja przy sprzedaży lub najmie,</li><li>obsługa portfela nieruchomości,</li><li>wycena po analizie zakresu i liczby obiektów.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="pad band-soft" id="zakres-obslugi" aria-labelledby="obsluga-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Zakres obsługi</span>
+        <h2 id="obsluga-h" class="rv d1">Dokumentacja energetyczna dla klientów <span class="grad">z więcej niż jednym lokalem lub obiektem</span></h2>
+        <p class="rv d2">Współpraca może dotyczyć pojedynczego budynku, pakietu lokali albo stałej obsługi portfela nieruchomości.</p>
+      </div>
+      <div class="cols-3">
+        <div class="card flow rv"><span class="kick">Deweloperzy</span><h3>Lokale, budynki i etapy inwestycji</h3><p>Świadectwa charakterystyki energetycznej dla lokali, budynków lub etapów inwestycji przekazywanych do sprzedaży, najmu albo użytkowania.</p></div>
+        <div class="card flow rv d1"><span class="kick">Zarządcy nieruchomości</span><h3>Obsługa portfela</h3><p>Obsługa budynków i lokali w portfelu nieruchomości, w tym przygotowanie większej liczby świadectw w uporządkowanym procesie.</p></div>
+        <div class="card flow mint-bg rv d2"><span class="kick">Firmy i właściciele obiektów</span><h3>Biura, hale, magazyny</h3><p>Świadectwa dla biur, lokali usługowych, hal, magazynów, obiektów przemysłowych i budynków użyteczności publicznej.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad" aria-labelledby="otrzymujesz-h">
+    <div class="wrap two">
+      <div>
+        <span class="tag rv"><i></i>Co otrzymujesz</span>
+        <h2 id="otrzymujesz-h" class="rv d1" style="margin:22px 0 18px">Dokument gotowy do wykorzystania <span class="grad">w sprzedaży, najmie lub zarządzaniu budynkiem</span></h2>
+        <p class="lede rv d2">Zakres prac jest ustalany przed rozpoczęciem zlecenia. Dzięki temu można określić, jakie dane są potrzebne, ile dokumentów należy przygotować i jaki będzie sposób przekazania opracowań.</p>
+      </div>
+      <div class="card flow rv d2"><span class="kick">Standardowy efekt współpracy</span><h3>Co obejmuje zlecenie</h3>
+        <ul class="check"><li>analiza danych budynku lub lokalu,</li><li>informacja o brakujących materiałach,</li><li>indywidualna wycena przed rozpoczęciem prac,</li><li>przygotowanie świadectwa charakterystyki energetycznej,</li><li>możliwość obsługi większej liczby dokumentów.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="pad band-soft" aria-labelledby="scenariusze-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Scenariusze współpracy</span>
+        <h2 id="scenariusze-h" class="rv d1">Typowe sytuacje, <span class="grad">w których możemy pomóc</span></h2>
+      </div>
+      <div class="rail r3">
+        <div class="fill"></div>
+        <div class="step rv"><span class="num" aria-hidden="true">01</span><h3>Pakiet lokali</h3><p>Deweloper potrzebuje świadectw dla większej liczby lokali w ramach jednej inwestycji.</p></div>
+        <div class="step rv d1"><span class="num" aria-hidden="true">02</span><h3>Budynek komercyjny</h3><p>Firma przygotowuje dokumentację dla biura, hali, magazynu albo lokalu usługowego.</p></div>
+        <div class="step rv d2"><span class="num" aria-hidden="true">03</span><h3>Portfel nieruchomości</h3><p>Zarządca porządkuje dokumentację energetyczną dla kilku budynków lub lokali.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad" id="wycena" aria-labelledby="wycena-h">
+    <div class="wrap two">
+      <div>
+        <span class="tag rv"><i></i>Wycena</span>
+        <h2 id="wycena-h" class="rv d1" style="margin:22px 0 18px">Wycena po analizie <span class="grad">liczby obiektów i zakresu danych</span></h2>
+        <p class="lede rv d2">Przy większych pakietach najważniejsze są: liczba lokali lub budynków, typ obiektów, dostępność dokumentacji, termin realizacji oraz sposób przekazania danych.</p>
+      </div>
+      <div class="note rv d2"><span class="kick">Zapytanie e-mail</span><h3>Wyślij zapytanie e-mail</h3>
+        <p>W wiadomości podaj liczbę lokali lub budynków, typ obiektów, lokalizację, cel przygotowania świadectw i oczekiwany termin.</p>
+        <a class="btn btn-teal" href={`mailto:${site.email}?subject=${encodeURIComponent('Pakiet świadectw energetycznych')}`}>{site.email} <span class="ar" aria-hidden="true">→</span></a></div>
+    </div>
+  </section>
+
+  <section class="pad band-soft" aria-labelledby="przekazanie-h">
+    <div class="wrap">
+      <div class="note rv">
+        <span class="kick">Etap przekazania</span>
+        <h2 id="przekazanie-h">Świadectwa jako kontynuacja dokumentacji projektowej</h2>
+        <p>W przypadku inwestycji deweloperskich i komercyjnych świadectwa energetyczne mogą być naturalnym etapem po zakończeniu projektu i przygotowaniu budynku lub lokali do przekazania.</p>
+        <p>Zakres jest ustalany indywidualnie, zwłaszcza przy większej liczbie lokali, budynków lub obiektów w portfelu nieruchomości.</p>
+        <a class="link-arrow" href="/projektowana-charakterystyka/">Zobacz projektowaną charakterystykę</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad" id="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="sec-head center"><span class="tag rv"><i></i>FAQ</span><h2 id="faq-h" class="rv d1">Najczęstsze pytania <span class="grad">przed zleceniem opracowania</span></h2></div>
+      <Faq items={faq} />
+    </div>
+  </section>
+
+  <CtaBand usluga="Pakiet świadectw" title="Wyślij zapytanie" text="Podaj liczbę lokali lub budynków, typ obiektów, lokalizację, cel przygotowania świadectw i oczekiwany termin." />
+</Base>

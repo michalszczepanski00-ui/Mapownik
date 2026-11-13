@@ -1,9 +1,0 @@
----
-// Podwójna pastylka jak w Doctor2: pierwsze słowo ciemne, reszta miętowa.
-interface Props { t: string; dark?: boolean }
-const { t, dark = false } = Astro.props;
-const i = t.indexOf(' ');
-const a = i === -1 ? t : t.slice(0, i);
-const b = i === -1 ? '' : t.slice(i + 1);
----
-<div class={`tag${dark ? ' on-dark' : ''}`}><span class="t1">{a}</span>{b && <span class="t2">{b}</span>}</div>

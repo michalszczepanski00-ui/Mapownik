@@ -1,0 +1,101 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import WorkStandard from '../components/WorkStandard.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, pickFaq } from '../data/site';
+
+const faq = pickFaq('remote', 'stage', 'halls', 'incomplete', 'area', 'poland', 'regular');
+const ld = [{ '@context': 'https://schema.org', '@type': 'Service', name: 'Projektowana charakterystyka energetyczna budynku', serviceType: 'Projektowana charakterystyka energetyczna', provider: { '@id': `${site.url}/#organization` }, areaServed: { '@type': 'Country', name: 'Polska' }, audience: { '@type': 'BusinessAudience', name: 'Biura projektowe, architekci, generalni projektanci, deweloperzy' }, description: 'Opracowanie projektowanej charakterystyki energetycznej do dokumentacji projektowej budynku.', url: `${site.url}/projektowana-charakterystyka/` }];
+---
+<Base
+  title="Projektowana charakterystyka energetyczna budynku | świadectwa.net"
+  description="Projektowana charakterystyka energetyczna do projektu budowlanego dla biur projektowych, architektów i generalnych projektantów."
+  path="/projektowana-charakterystyka/"
+  breadcrumbs={[{ name: 'Projektowana charakterystyka', path: '/projektowana-charakterystyka/' }]}
+  jsonLd={ld}
+>
+  <PageHero
+    tag="Główna usługa"
+    title='Projektowana charakterystyka <span class="grad">energetyczna</span>'
+    lead={['Opracowanie do dokumentacji projektowej budynku dla biur architektonicznych, biur projektowych i generalnych projektantów.']}
+    crumbs={[{ name: 'Projektowana charakterystyka', path: '/projektowana-charakterystyka/' }]}
+    art="plan"
+    mail={{ subject: 'Zapytanie o projektowaną charakterystykę' }}
+    secondary={{ href: '#zakres-opracowania', label: 'Zobacz zakres' }}
+  />
+
+  <section class="pad" aria-labelledby="czym-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>O opracowaniu</span>
+        <h2 id="czym-h" class="rv d1">Element <span class="grad">dokumentacji projektowej</span></h2>
+        <p class="rv d2">Projektowana charakterystyka energetyczna jest elementem dokumentacji projektowej. Określa projektowane zapotrzebowanie budynku na energię i pozwala potwierdzić, że przyjęte rozwiązania spełniają wymagania dotyczące charakterystyki energetycznej.</p>
+      </div>
+      <div class="cols-3">
+        <div class="card flow rv"><span class="kick">Czym jest</span><h3>Czym jest opracowanie</h3><p>Projektowana charakterystyka energetyczna określa parametry energetyczne projektowanego budynku i stanowi element dokumentacji projektowej.</p></div>
+        <div class="card flow rv d1"><span class="kick">Odbiorcy</span><h3>Dla kogo pracujemy</h3><p>Opracowania wykonujemy dla biur architektonicznych, biur projektowych, generalnych projektantów, deweloperów i inwestorów realizujących większe budynki.</p></div>
+        <div class="card flow mint-bg rv d2"><span class="kick">Etap projektu</span><h3>Na jakim etapie projektu</h3><p>Najkorzystniej włączyć nas na etapie koncepcji albo projektu architektoniczno-budowlanego. Pozwala to wcześniej uporządkować założenia energetyczne.</p></div>
+      </div>
+      <h3 class="rv" style="margin:56px 0 0;font-size:1.3rem">Obsługiwane budynki</h3>
+      <ul class="chips rv" role="list">
+        <li class="chip">budynki mieszkalne wielorodzinne</li><li class="chip">budynki biurowe</li><li class="chip">budynki usługowe</li><li class="chip">hale i magazyny</li><li class="chip">obiekty przemysłowe</li>
+      </ul>
+    </div>
+  </section>
+
+  <WorkStandard />
+
+  <section class="pad" id="zakres-opracowania" aria-labelledby="zakres-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Zakres opracowania</span>
+        <h2 id="zakres-h" class="rv d1">Co zawiera <span class="grad">projektowana charakterystyka</span></h2>
+      </div>
+      <div class="cols-2">
+        <div class="card flow rv"><span class="kick">Zakres podstawowy</span><h3>Analiza i dokument</h3>
+          <ul class="check"><li>analiza dokumentacji projektowej,</li><li>określenie parametrów energetycznych budynku,</li><li>sprawdzenie przyjętych rozwiązań energetycznych,</li><li>przygotowanie dokumentu do wykorzystania w projekcie.</li></ul></div>
+        <div class="card flow rv d1"><span class="kick">Uzgodnienia</span><h3>Uzgodnienia i dane wejściowe</h3>
+          <ul class="check"><li>wskazanie brakujących informacji, jeżeli są potrzebne,</li><li>weryfikacja danych dotyczących przegród i instalacji,</li><li>praca na dokumentacji przekazanej przez biuro projektowe,</li><li>przekazanie gotowego opracowania w uzgodnionej formie.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad band-soft" aria-labelledby="zaplecze-h">
+    <div class="wrap two">
+      <div class="card flow dk rv" style="background:linear-gradient(135deg,#0f5a63,#0a3d45);border-color:transparent">
+        <span class="kick">Zaplecze analiz energetycznych</span>
+        <h2 id="zaplecze-h">Wsparcie techniczne przy trudniejszych projektach</h2>
+        <p style="color:#c2dedb">W zależności od zakresu projektu opracowanie może być uzupełnione o analizę zapotrzebowania na energię, bilans energetyczny, ocenę założeń instalacyjnych lub analizę rozwiązań OZE.</p>
+      </div>
+      <div class="note rv d1">
+        <span class="kick">Dodatkowo</span>
+        <h3>Wsparcie przy wariantach i zmianach projektowych</h3>
+        <p>Jeżeli projekt tego wymaga, opracowanie może być uzupełnione o weryfikację zgodności energetycznej, analizę wariantową, OZC, konsultację koncepcji albo aktualizację charakterystyki po zmianach projektowych.</p>
+        <p>Te elementy traktujemy jako wsparcie dodatkowe, a nie odrębne główne usługi.</p>
+        <a class="btn btn-teal" href="/dla-biur-projektowych/#zakres-uzupelniajacy">Zobacz wsparcie biura projektowego <span class="ar" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad" aria-labelledby="stala-h">
+    <div class="wrap two">
+      <div>
+        <span class="tag rv"><i></i>Stała współpraca</span>
+        <h2 id="stala-h" class="rv d1" style="margin:22px 0 18px">Wsparcie <span class="grad">dla biur projektowych</span></h2>
+        <p class="lede rv d2">Możemy pełnić funkcję zewnętrznego partnera w zakresie dokumentacji energetycznej. Dzięki temu biuro projektowe utrzymuje powtarzalny sposób przekazywania danych i realizacji kolejnych opracowań.</p>
+      </div>
+      <div class="card flow mint-bg rv d2"><span class="kick">Efekt dla biura</span><h3>Mniej organizacji, jaśniejszy zakres</h3><p>Mniej organizacji po stronie projektanta, jaśniejszy zakres prac i gotowy dokument do wykorzystania w dokumentacji projektowej.</p><a class="link-arrow" href="/dla-biur-projektowych/">Oferta dla biur projektowych</a></div>
+    </div>
+  </section>
+
+  <section class="pad band-soft" id="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="sec-head center"><span class="tag rv"><i></i>FAQ</span><h2 id="faq-h" class="rv d1">Najczęstsze pytania <span class="grad">przed zleceniem opracowania</span></h2></div>
+      <Faq items={faq} />
+    </div>
+  </section>
+
+  <CtaBand usluga="Projektowana charakterystyka energetyczna" text="Do zapytania możesz dołączyć projekt, opis budynku i oczekiwany termin realizacji." />
+</Base>

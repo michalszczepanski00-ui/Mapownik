@@ -1,87 +1,81 @@
 ---
 import Base from '../layouts/Base.astro';
-const key = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
+import PageHero from '../components/PageHero.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, mailto } from '../data/site';
+const steps = [
+  ['Rodzaj opracowania', 'Napisz, czy chodzi o projektowaną charakterystykę, świadectwo energetyczne, pakiet świadectw albo stałą współpracę.'],
+  ['Typ budynku', 'Podaj, czy jest to budynek wielorodzinny, biurowy, usługowy, hala, magazyn, lokal albo inny obiekt.'],
+  ['Lokalizacja', 'Wskaż miejscowość lub lokalizację inwestycji, jeżeli ma znaczenie dla dokumentacji lub zakresu danych.'],
+  ['Dostępna dokumentacja', 'Dodaj informację, czy posiadasz projekt, rzuty, opis techniczny, dane instalacji albo wcześniejsze opracowania.'],
+  ['Liczba obiektów', 'Przy pakietach wskaż liczbę lokali, budynków lub świadectw, które mają zostać przygotowane.'],
+  ['Termin', 'Podaj oczekiwany termin realizacji, jeżeli jest istotny dla inwestycji, sprzedaży, najmu lub zamknięcia dokumentacji.'],
+];
 ---
-<Base title="Kontakt i wycena | swiadectwa.net">
-  <div class="page-head"><div class="wrap">
-    <h1>Kontakt i wycena</h1>
-    <p>Opisz inwestycję. Wycenę przygotowujemy indywidualnie, a termin ustalamy na początku zlecenia.</p>
-  </div></div>
+<Base
+  title="Kontakt i wycena | świadectwa.net"
+  description="Kontakt w sprawie projektowanych charakterystyk energetycznych, świadectw energetycznych, pakietów świadectw i stałej współpracy B2B."
+  path="/kontakt/"
+  breadcrumbs={[{ name: 'Kontakt', path: '/kontakt/' }]}
+>
+  <PageHero
+    tag="Kontakt i wycena"
+    title='Wyślij zapytanie <span class="grad">o dokumentację energetyczną</span>'
+    lead={['Najlepszą formą kontaktu jest e-mail z krótkim opisem budynku, zakresem potrzebnego opracowania i dostępną dokumentacją. Po analizie przygotujemy indywidualną wycenę.']}
+    crumbs={[{ name: 'Kontakt', path: '/kontakt/' }]}
+    mail={{ subject: 'Zapytanie o dokumentację energetyczną', label: site.email }}
+  />
 
-  <section id="wycena"><div class="wrap two-col">
-    <div>
-      <h2>Dane kontaktowe</h2>
-      <p>Obsługujemy klientów biznesowych w całej Polsce.</p>
-      <p><strong>E-mail:</strong> <a href="mailto:biuro@swiadectwa.net">biuro@swiadectwa.net</a><br />
-         <strong>Telefon:</strong> <a href="tel:+48694460538">+48 694 460 538</a></p>
-      <p><strong>Gdańsk:</strong> Al. Jana Pawła II 1D/26<br /><strong>Starogard Gdański:</strong> Chopina 2A/D19</p>
+  <section class="pad" aria-labelledby="kontakt-h">
+    <div class="wrap two">
+      <div>
+        <span class="tag rv"><i></i>Kontakt</span>
+        <h2 id="kontakt-h" class="rv d1" style="margin:22px 0 18px">Kontakt <span class="grad">e-mailowy</span></h2>
+        <p class="lede rv d2">Kontakt prowadzimy przede wszystkim e-mailowo, co ułatwia przekazanie dokumentacji i zachowanie historii ustaleń.</p>
+      </div>
+      <dl class="kv rv d2">
+        <dt>E-mail</dt><dd><a href={`mailto:${site.email}`}>{site.email}</a></dd>
+        <dt>Telefon</dt><dd><a href={`tel:${site.phoneHref}`}>{site.phone}</a></dd>
+        <dt>Obszar działania</dt><dd>Pracujemy zdalnie z klientami z całej Polski. Lokalnie firma jest związana z Gdańskiem i Starogardem Gdańskim.</dd>
+        <dt>Lokalizacje</dt><dd>Gdańsk / Starogard Gdański</dd>
+        <dt>Dokumenty formalne</dt><dd><a href="/dane-rejestrowe/">Dane rejestrowe</a><br /><a href="/polityka-prywatnosci/">Polityka prywatności</a></dd>
+      </dl>
     </div>
-    <form class="quote" id="quote" data-key={key} novalidate>
-      <h2 style="margin:0">Zapytanie ofertowe</h2>
-      <div class="row">
-        <label>Firma <input name="firma" required /></label>
-        <label>NIP <input name="nip" inputmode="numeric" pattern="[0-9\- ]{10,13}" required /></label>
+  </section>
+
+  <section class="pad band-soft" aria-labelledby="przygotuj-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Jak przygotować zapytanie</span>
+        <h2 id="przygotuj-h" class="rv d1">Co warto podać <span class="grad">w wiadomości</span></h2>
+        <p class="rv d2">Nie musisz przygotowywać długiego opisu. Wystarczy kilka informacji, które pozwolą ocenić zakres i przygotować wycenę.</p>
       </div>
-      <div class="row">
-        <label>Imię i nazwisko <input name="osoba" required /></label>
-        <label>Telefon <input name="telefon" type="tel" /></label>
+      <div class="cols-3">
+        {steps.map(([t, d], i) => (
+          <div class={`card flow rv d${i % 3}`}><span class="kick">{String(i + 1).padStart(2, '0')}</span><h3>{t}</h3><p>{d}</p></div>
+        ))}
       </div>
-      <label>E-mail <input name="email" type="email" required /></label>
-      <div class="row">
-        <label>Rodzaj usługi
-          <select name="usluga" required>
-            <option value="">Wybierz…</option>
-            <option>Projektowa charakterystyka energetyczna</option>
-            <option>Świadectwa energetyczne</option>
-            <option>Inne / nie wiem</option>
-          </select>
-        </label>
-        <label>Typ inwestycji
-          <select name="inwestycja">
-            <option value="">Wybierz…</option>
-            <option>Budynek jednorodzinny (seria)</option>
-            <option>Budynek wielorodzinny</option>
-            <option>Budynek usługowy / biurowy</option>
-            <option>Inny</option>
-          </select>
-        </label>
+    </div>
+  </section>
+
+  <section class="pad" aria-labelledby="pomoc-h">
+    <div class="wrap two">
+      <div>
+        <span class="tag rv"><i></i>Najczęstsze zapytania</span>
+        <h2 id="pomoc-h" class="rv d1" style="margin:22px 0 18px">W czym <span class="grad">możemy pomóc</span></h2>
+        <ul class="check rv d2">
+          <li>projektowana charakterystyka energetyczna do projektu budowlanego,</li>
+          <li>świadectwo charakterystyki energetycznej dla budynku komercyjnego,</li>
+          <li>pakiet świadectw dla lokali lub budynków,</li>
+          <li>stała współpraca z biurem projektowym,</li>
+          <li>weryfikacja zakresu danych potrzebnych do opracowania.</li>
+        </ul>
       </div>
-      <label>Opis inwestycji <textarea name="opis" rows="5" placeholder="Lokalizacja, liczba budynków/lokali, etap projektu, oczekiwany termin"></textarea></label>
-      <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
-      <p class="small">Dokumentację projektową (rzuty, projekt) prześlesz w odpowiedzi na nasz e-mail. Wysyłając formularz, zgadzasz się na kontakt w sprawie oferty. Obsługujemy wyłącznie klientów biznesowych. <a href="/polityka-prywatnosci">Polityka prywatności</a>.</p>
-      <div id="form-msg" role="status" aria-live="polite"></div>
-      <button class="btn btn-teal" type="submit">Wyślij zapytanie</button>
-    </form>
-  </div></section>
-<script>
-  const form = document.getElementById('quote') as HTMLFormElement;
-  const msg = document.getElementById('form-msg') as HTMLElement;
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!form.reportValidity()) return;
-    const data = Object.fromEntries(new FormData(form).entries());
-    if (data.website) return; // honeypot
-    const key = form.dataset.key;
-    const lines = Object.entries(data).filter(([k]) => k !== 'website').map(([k, v]) => `${k}: ${v}`).join('\n');
-    const mailto = () => {
-      location.href = 'mailto:biuro@swiadectwa.net?subject=' + encodeURIComponent('Zapytanie ofertowe – ' + (data.firma || '')) + '&body=' + encodeURIComponent(lines);
-    };
-    if (!key) { mailto(); return; }
-    const btn = form.querySelector('button[type=submit]') as HTMLButtonElement;
-    btn.disabled = true; msg.className = ''; msg.textContent = 'Wysyłanie…';
-    try {
-      const r = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ access_key: key, subject: 'Zapytanie ofertowe – ' + data.firma, from_name: 'swiadectwa.net', replyto: data.email, ...data }),
-      });
-      const j = await r.json();
-      if (!j.success) throw new Error();
-      form.reset(); msg.className = 'form-ok';
-      msg.textContent = 'Dziękujemy. Zapytanie zostało wysłane. Odpowiemy na podany adres e-mail.';
-    } catch {
-      msg.className = 'form-err';
-      msg.innerHTML = 'Nie udało się wysłać formularza. Napisz na <a href="mailto:biuro@swiadectwa.net">biuro@swiadectwa.net</a> lub zadzwoń: <a href="tel:+48694460538">+48 694 460 538</a>.';
-    } finally { btn.disabled = false; }
-  });
-</script>
+      <div class="note rv d2"><span class="kick">Najprostszy sposób rozpoczęcia</span><h3>Wyślij wiadomość z krótkim opisem</h3>
+        <p>Jeżeli do wyceny będą potrzebne dodatkowe dane, wskażemy je po wstępnej analizie.</p>
+        <a class="btn btn-teal" href={mailto('Zapytanie ze strony świadectwa.net')}>Wyślij e-mail <span class="ar" aria-hidden="true">→</span></a></div>
+    </div>
+  </section>
+
+  <CtaBand title="Przygotuj zapytanie" text="Wypełnij kilka pól, a przygotujemy treść wiadomości do wysłania z Twojego programu pocztowego." />
 </Base>

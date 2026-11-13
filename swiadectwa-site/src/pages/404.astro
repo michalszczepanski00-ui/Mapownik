@@ -1,10 +1,19 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { site, mailto } from '../data/site';
 ---
-<Base title="Nie znaleziono strony | swiadectwa.net">
-  <section class="center"><div class="wrap" style="max-width:640px">
-    <h1>Nie ma takiej strony</h1>
-    <p class="lead">Adres mógł się zmienić lub zawiera literówkę. Wróć na stronę główną albo zapytaj o wycenę.</p>
-    <p><a class="btn btn-teal" href="/">Strona główna</a></p>
-  </div></section>
+<Base title="Nie znaleziono strony | świadectwa.net" description="Nie znaleziono strony. Wróć na stronę główną lub skontaktuj się ze świadectwa.net." path="/404/" noindex>
+  <section class="phero dk solo" style="min-height:80vh;display:flex;align-items:center">
+    <div class="bg-grid"></div><div class="orb o1"></div><div class="orb o2"></div>
+    <div class="wrap">
+      <div>
+        <span class="tag"><i></i>404</span>
+        <h1 style="margin:20px 0 18px">Nie znaleziono <span class="grad">strony</span></h1>
+        <p class="lead">Adres, którego szukasz, nie istnieje albo został zmieniony.</p>
+        <div class="acts" style="margin-top:30px"><a class="btn btn-mint" href="/">Wróć na stronę główną <span class="ar" aria-hidden="true">→</span></a><a class="btn btn-ghost" href="/kontakt/">Przejdź do kontaktu</a></div>
+        <p class="lead" style="margin-top:34px">Potrzebujesz dokumentacji energetycznej? Wyślij zapytanie e-mail z opisem budynku lub inwestycji: <a href={mailto('Zapytanie ze strony świadectwa.net')} style="color:#fff">{site.email}</a></p>
+      </div>
+    </div>
+  </section>
 </Base>

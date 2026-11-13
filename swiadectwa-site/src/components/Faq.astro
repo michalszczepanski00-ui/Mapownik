@@ -1,0 +1,12 @@
+---
+import type { Faq } from '../data/site';
+interface Props { items: Faq[]; }
+const { items } = Astro.props;
+const ld = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: items.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) };
+---
+<div class="faq">
+  {items.map((f) => (
+    <details class="rv"><summary>{f.q}</summary><p>{f.a}</p></details>
+  ))}
+</div>
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />

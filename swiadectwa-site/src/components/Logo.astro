@@ -1,0 +1,14 @@
+---
+// Znak z logo klienta (domek w obrysie) przekolorowany na motyw strony. Kolory sterowane zmiennymi CSS,
+// dzięki czemu ten sam SVG działa na ciemnym nagłówku i na jasnym, przewiniętym.
+interface Props { tagline?: boolean; class?: string }
+const { tagline = false, class: cls = '' } = Astro.props;
+const h = tagline ? 64 : 56;
+---
+<svg class={`logo ${cls}`} viewBox={`0 0 300 ${h}`} role="img" aria-label="świadectwa.net" xmlns="http://www.w3.org/2000/svg">
+  <g fill="none" stroke="var(--logo-mark, currentColor)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M6 52V18L32 2l26 16v34"/><path d="M17 52V25l15-9 15 9v27"/><path d="M28 52V35l4-3 4 3v17"/><path d="M20 41h24"/>
+  </g>
+  <text x="74" y="33" fill="var(--logo-ink, currentColor)" font-family="Sora, system-ui, sans-serif" font-size="25" font-weight="700" letter-spacing="-.5">świadectwa.net</text>
+  {tagline && <text x="75" y="54" fill="var(--logo-sub, currentColor)" font-family="'Red Hat Text', system-ui, sans-serif" font-size="8.5" letter-spacing=".9" opacity=".75">DOKUMENTACJA ENERGETYCZNA BUDYNKÓW</text>}
+</svg>

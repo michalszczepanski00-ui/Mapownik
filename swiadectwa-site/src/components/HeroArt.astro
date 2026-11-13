@@ -1,19 +1,46 @@
 ---
-// Ilustracja główna: budynek w przekroju z panelami PV i klasami energetycznymi.
+// Ilustracje do nagłówków stron: rysowane linią, w motywie strony (bez zdjęć stockowych).
+interface Props { kind: 'plan' | 'cert' | 'docs' | 'blocks' }
+const { kind } = Astro.props;
+const classes: [string, number, string][] = [['A+', 100, '#2de2d0'], ['A', 86, '#5fe6d8'], ['B', 72, '#8fd9d0'], ['C', 58, '#3a9aa0'], ['D', 44, '#2a7e88']];
 ---
-<svg viewBox="0 0 560 480" role="img" aria-label="Ilustracja budynku z panelami fotowoltaicznymi i klasami energetycznymi" xmlns="http://www.w3.org/2000/svg" font-family="Plus Jakarta Sans Variable, system-ui, sans-serif">
-  <rect x="10" y="10" width="540" height="460" rx="44" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.22)"/>
-  <circle cx="470" cy="96" r="26" fill="#daffee"/>
-  <g stroke="#daffee" stroke-width="3" stroke-linecap="round"><path d="M470 52v-10M470 150v-10M426 96h-10M524 96h-10M439 65l-7-7M508 134l-7-7M501 65l7-7M432 134l7-7"/></g>
-  <path d="M60 408H500" stroke="#bff2e9" stroke-width="2" stroke-linecap="round"/>
-  <rect x="170" y="140" width="170" height="268" rx="8" fill="rgba(11,80,90,.55)" stroke="#bff2e9" stroke-width="2"/>
-  <rect x="338" y="246" width="116" height="162" rx="8" fill="rgba(11,80,90,.55)" stroke="#bff2e9" stroke-width="2"/>
-  <rect x="190" y="166" width="34" height="28" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="240" y="166" width="34" height="28" rx="3" fill="rgba(218,255,238,.85)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="290" y="166" width="34" height="28" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="190" y="212" width="34" height="28" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="240" y="212" width="34" height="28" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="290" y="212" width="34" height="28" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="190" y="258" width="34" height="28" rx="3" fill="rgba(218,255,238,.85)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="240" y="258" width="34" height="28" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="290" y="258" width="34" height="28" rx="3" fill="rgba(218,255,238,.85)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="190" y="304" width="34" height="28" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="240" y="304" width="34" height="28" rx="3" fill="rgba(218,255,238,.85)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="290" y="304" width="34" height="28" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="190" y="350" width="34" height="28" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="240" y="350" width="34" height="28" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="290" y="350" width="34" height="28" rx="3" fill="rgba(218,255,238,.85)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="358" y="268" width="32" height="26" rx="3" fill="rgba(218,255,238,.85)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="406" y="268" width="32" height="26" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="358" y="310" width="32" height="26" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="406" y="310" width="32" height="26" rx="3" fill="rgba(218,255,238,.85)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="358" y="352" width="32" height="26" rx="3" fill="rgba(218,255,238,.85)" stroke="#bff2e9" stroke-opacity=".5"/><rect x="406" y="352" width="32" height="26" rx="3" fill="rgba(218,255,238,.14)" stroke="#bff2e9" stroke-opacity=".5"/>
-  <g fill="#daffee" stroke="#176974" stroke-width="2"><path d="M346 246l22-28h72l14 28z"/></g>
-  <path d="M362 238h86M370 226h66" stroke="#176974" stroke-width="2"/>
-  <rect x="224" y="352" width="44" height="56" rx="6" fill="#daffee"/>
-  <path d="M110 220c30-30 30 30 60 0" stroke="#bff2e9" stroke-width="2.5" stroke-dasharray="3 7" stroke-linecap="round" fill="none"/>
-  <path d="M110 290c30-30 30 30 60 0" stroke="#bff2e9" stroke-width="2.5" stroke-dasharray="3 7" stroke-linecap="round" fill="none"/>
-  <rect x="64" y="150" width="70" height="30" rx="10" fill="#daffee"/><text x="99" y="171" text-anchor="middle" font-size="15" font-weight="700" fill="#176974">A+</text><rect x="64" y="190" width="70" height="30" rx="10" fill="rgba(191,242,233,.22)"/><text x="99" y="211" text-anchor="middle" font-size="15" font-weight="700" fill="#d9efec">A</text><rect x="64" y="230" width="70" height="30" rx="10" fill="rgba(191,242,233,.22)"/><text x="99" y="251" text-anchor="middle" font-size="15" font-weight="700" fill="#d9efec">B</text><rect x="64" y="270" width="70" height="30" rx="10" fill="rgba(191,242,233,.22)"/><text x="99" y="291" text-anchor="middle" font-size="15" font-weight="700" fill="#d9efec">C</text>
-  <text x="64" y="130" font-size="13" fill="#d9efec" opacity=".85">Klasa energetyczna</text>
-</svg>
+<div class="art rv" aria-hidden="true">
+  {kind === 'plan' && (
+    <svg viewBox="0 0 440 360" class="art-svg art-plan">
+      <rect x="10" y="10" width="420" height="340" rx="36" fill="rgba(255,255,255,.05)" stroke="rgba(190,242,233,.25)" style="stroke-dasharray:none;stroke-dashoffset:0"/>
+      <rect x="70" y="120" width="150" height="190"/><rect x="220" y="190" width="120" height="120"/>
+      <path d="M70 120 L145 70 L220 120"/><path d="M220 190 L280 150 L340 190"/><line x1="40" y1="310" x2="400" y2="310"/>
+      <rect x="92" y="146" width="30" height="30"/><rect x="138" y="146" width="30" height="30"/><rect x="92" y="204" width="30" height="30"/><rect x="138" y="204" width="30" height="30"/>
+      <rect x="244" y="214" width="28" height="28"/><rect x="288" y="214" width="28" height="28"/>
+      <path d="M345 70 h50 M345 90 h34 M345 110 h42" />
+      <circle cx="372" cy="46" r="0"/>
+    </svg>
+  )}
+  {kind === 'cert' && (
+    <div class="cert-art">
+      <div class="cert-card">
+        <b>Świadectwo charakterystyki energetycznej</b>
+        <div class="scale">
+          {classes.map(([l, w, c]) => (<div class="srow"><span>{l}</span><i style={`--w:${w}%;background:${c}`}></i></div>))}
+        </div>
+        <div class="lines"><s></s><s></s><s></s></div>
+      </div>
+      <div class="cert-badge">Budynek · Lokal · Pakiet</div>
+    </div>
+  )}
+  {kind === 'docs' && (
+    <div class="docs-art">
+      <div class="doc doc-1"><b>Dokumentacja projektowa</b><s></s><s></s><s></s></div>
+      <div class="doc doc-2"><b>Dane wejściowe</b><s></s><s></s><s></s></div>
+      <div class="doc doc-3"><b>Projektowana charakterystyka</b><s></s><s></s><em>✓ gotowe do projektu</em></div>
+    </div>
+  )}
+  {kind === 'blocks' && (
+    <svg viewBox="0 0 440 360" class="art-svg art-blocks">
+      <rect x="10" y="10" width="420" height="340" rx="36" fill="rgba(255,255,255,.05)" stroke="rgba(190,242,233,.25)" style="stroke-dasharray:none;stroke-dashoffset:0"/>
+      <line x1="40" y1="310" x2="400" y2="310"/>
+      <rect x="50" y="170" width="70" height="140"/><rect x="130" y="110" width="80" height="200"/><rect x="220" y="150" width="70" height="160"/><rect x="300" y="200" width="90" height="110"/>
+      <path d="M62 196h12M86 196h12M62 226h12M86 226h12M62 256h12M86 256h12M146 140h14M170 140h14M146 176h14M170 176h14M146 212h14M170 212h14M146 248h14M170 248h14M234 180h12M258 180h12M234 214h12M258 214h12M234 248h12M258 248h12M316 226h14M344 226h14M316 262h14M344 262h14"/>
+    </svg>
+  )}
+</div>

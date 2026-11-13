@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import credits from '../data/credits.json';
+---
+<Base
+  title="Źródła zdjęć | świadectwa.net"
+  description="Autorzy i licencje zdjęć wykorzystanych w serwisie świadectwa.net."
+  path="/zrodla-zdjec/"
+  breadcrumbs={[{ name: 'Źródła zdjęć', path: '/zrodla-zdjec/' }]}
+  noindex
+>
+  <PageHero tag="Licencje" title='Źródła <span class="grad">zdjęć</span>' lead={['Zdjęcia na stronie pochodzą z Wikimedia Commons i są udostępnione na wolnych licencjach. Poniżej lista autorów, licencji i źródeł.']} crumbs={[{ name: 'Źródła zdjęć', path: '/zrodla-zdjec/' }]} />
+  <section class="pad">
+    <div class="wrap"><div class="prose">
+      <table class="tbl">
+        <thead><tr><th>Plik</th><th>Autor</th><th>Licencja</th></tr></thead>
+        <tbody>
+          {credits.map((c) => (
+            <tr><td><a href={c.page} rel="noopener">{decodeURIComponent(c.title)}</a></td><td>{c.by}</td><td><a href={c.licenceUrl} rel="noopener">{c.licence}</a></td></tr>
+          ))}
+        </tbody>
+      </table>
+      <p>Zdjęcia zostały przetworzone graficznie (kadrowanie i stylizacja kolorystyczna).</p>
+    </div></div>
+  </section>
+</Base>

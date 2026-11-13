@@ -1,0 +1,78 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site } from '../data/site';
+---
+<Base
+  title="O firmie | świadectwa.net"
+  description="świadectwa.net: dokumentacja energetyczna budynków dla projektantów, firm, deweloperów i zarządców nieruchomości."
+  path="/o-firmie/"
+  breadcrumbs={[{ name: 'O firmie', path: '/o-firmie/' }]}
+>
+  <PageHero
+    tag="O firmie"
+    title='Dokumentacja energetyczna <span class="grad">budynków</span>'
+    lead={['świadectwa.net specjalizuje się w dokumentacji energetycznej dla projektów, firm, deweloperów i zarządców nieruchomości.']}
+    crumbs={[{ name: 'O firmie', path: '/o-firmie/' }]}
+    mail={{ subject: 'Zapytanie o dokumentację energetyczną', label: 'Wyślij zapytanie e-mail' }}
+  />
+
+  <section class="pad" aria-labelledby="spec-h">
+    <div class="wrap">
+      <div class="cols-2">
+        <div class="card flow rv"><span class="kick">Specjalizacja</span><h2 id="spec-h" style="font-size:1.7rem;margin-bottom:12px">Główny obszar działalności</h2><p>Głównym obszarem działalności są projektowane charakterystyki energetyczne budynków oraz świadectwa charakterystyki energetycznej.</p></div>
+        <div class="card flow mint-bg rv d1"><span class="kick">Obszar działania</span><h2 style="font-size:1.7rem;margin-bottom:12px">Cała Polska, zdalnie</h2><p>Pracujemy zdalnie na terenie całej Polski. Lokalnie firma jest powiązana z Gdańskiem i Starogardem Gdańskim.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad band-soft" aria-labelledby="zaplecze-h">
+    <div class="wrap two lw">
+      <div>
+        <span class="tag rv"><i></i>Zaplecze techniczne</span>
+        <h2 id="zaplecze-h" class="rv d1" style="margin:22px 0 18px">Dokumentacja energetyczna <span class="grad">oparta na praktyce analiz budynków</span></h2>
+        <p class="lede rv d2">{site.name} wywodzi się z praktyki analiz energetycznych, efektywności energetycznej i dokumentacji budynków. Dzięki temu projektowana charakterystyka energetyczna nie jest traktowana wyłącznie jako formalny załącznik, ale jako techniczny element dokumentacji projektowej.</p>
+        <p class="lede rv d3" style="margin-top:16px">W zależności od zakresu zlecenia opracowanie może być wspierane analizą zapotrzebowania na energię, oceną przyjętych rozwiązań instalacyjnych, bilansem energetycznym, analizą OZE lub wnioskami wynikającymi z doświadczenia w termowizji i efektywności energetycznej.</p>
+      </div>
+      <div class="card flow rv d2"><span class="kick">Zakres zaplecza eksperckiego</span><h3>Czym się zajmujemy</h3>
+        <ul class="check"><li>projektowane charakterystyki energetyczne,</li><li>świadectwa charakterystyki energetycznej,</li><li>OZC i bilanse zapotrzebowania na energię,</li><li>weryfikacja założeń instalacyjnych,</li><li>analizy OZE i efektywności energetycznej.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="pad" aria-labelledby="dosw-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Doświadczenie</span>
+        <h2 id="dosw-h" class="rv d1">Kilkaset opracowań <span class="grad">i analiz energetycznych</span></h2>
+        <p class="rv d2">Doświadczenie obejmuje kilkaset opracowań i analiz energetycznych dla różnych typów budynków: mieszkalnych, usługowych, komercyjnych i technicznych. Ten zakres pozwala sprawnie pracować zarówno z biurami projektowymi, jak i z firmami, deweloperami oraz zarządcami nieruchomości.</p>
+      </div>
+      <div class="stat-grid">
+        <div class="stat rv"><b>od {site.since} roku</b><span>doświadczenie w branży</span></div>
+        <div class="stat rv d1"><b data-count="600" data-suffix="+">600+</b><span>wykonanych analiz</span></div>
+        <div class="stat rv d2"><b>cała Polska</b><span>obsługa zdalna</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad band-soft" aria-labelledby="transp-h">
+    <div class="wrap two lw">
+      <div>
+        <span class="tag rv"><i></i>Transparentność</span>
+        <h2 id="transp-h" class="rv d1" style="margin:22px 0 18px">Dane firmy dostępne <span class="grad">przed rozpoczęciem współpracy</span></h2>
+        <p class="lede rv d2">Współpraca z klientami B2B wymaga przejrzystości. Dane rejestrowe, kontaktowe i polityka prywatności są dostępne bezpośrednio na stronie.</p>
+        <div class="acts rv d3" style="margin-top:28px"><a class="btn btn-teal" href="/dane-rejestrowe/">Dane rejestrowe <span class="ar" aria-hidden="true">→</span></a><a class="btn btn-line" href="/polityka-prywatnosci/">Polityka prywatności</a></div>
+      </div>
+      <dl class="kv rv d2">
+        <dt>Firma</dt><dd>{site.owner}</dd>
+        <dt>Nazwa handlowa</dt><dd>{site.name}</dd>
+        <dt>Adres</dt><dd>{site.street}, {site.postal} {site.city}</dd>
+        <dt>NIP</dt><dd>{site.nip}</dd>
+        <dt>REGON</dt><dd>{site.regon}</dd>
+        <dt>Kontakt</dt><dd><a href={`mailto:${site.email}`}>{site.email}</a><br /><a href={`tel:${site.phoneHref}`}>{site.phone}</a></dd>
+      </dl>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>

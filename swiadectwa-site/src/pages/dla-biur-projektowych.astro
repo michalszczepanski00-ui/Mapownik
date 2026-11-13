@@ -1,0 +1,144 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import WorkStandard from '../components/WorkStandard.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, pickFaq } from '../data/site';
+
+const faq = pickFaq('remote', 'stage', 'halls', 'incomplete', 'area', 'poland', 'regular');
+const modules = [
+  { when: 'Przed zamknięciem projektu', t: 'Weryfikacja zgodności energetycznej projektu', d: 'Analiza, czy przyjęte rozwiązania projektowe pozwalają spełnić wymagania dotyczące charakterystyki energetycznej budynku.', l: ['przegrody i parametry cieplne,', 'źródła energii i instalacje,', 'ryzyka przed zamknięciem dokumentacji.'] },
+  { when: 'Decyzje projektowe', t: 'Analiza wariantowa rozwiązań energetycznych', d: 'Porównanie wybranych wariantów technicznych pod kątem wpływu na charakterystykę energetyczną budynku.', l: ['źródło ciepła, wentylacja, OZE,', 'różne parametry przegród,', 'porównanie konsekwencji projektowych.'] },
+  { when: 'Bilans energetyczny', t: 'OZC i bilans zapotrzebowania na ciepło', d: 'Obliczenia zapotrzebowania na ciepło jako wsparcie dla dokumentacji energetycznej i decyzji instalacyjnych.', l: ['zapotrzebowanie na moc cieplną,', 'zapotrzebowanie na energię użytkową,', 'dane pomocnicze dla instalacji.'] },
+  { when: 'Zmiany w projekcie', t: 'Aktualizacja charakterystyki po zmianach projektowych', d: 'Weryfikacja albo aktualizacja opracowania po zmianie źródła ciepła, przegród, wentylacji, funkcji lub powierzchni budynku.', l: ['analiza wpływu zmian,', 'aktualizacja danych wejściowych,', 'korekta opracowania.'] },
+  { when: 'Etap przekazania', t: 'Świadectwa na etapie przekazania budynku lub lokali', d: 'Naturalne przedłużenie współpracy po etapie projektu, szczególnie przy inwestycjach deweloperskich i komercyjnych.', l: ['budynki i lokale,', 'pakiety świadectw,', 'współpraca z deweloperem lub zarządcą.'] },
+  { when: 'Wczesny etap', t: 'Konsultacja energetyczna koncepcji', d: 'Krótka analiza koncepcji budynku przed rozwinięciem projektu, pozwalająca wcześnie wychwycić ryzyka energetyczne.', l: ['wstępna ocena założeń,', 'identyfikacja ryzyk,', 'lista danych do dalszego projektowania.'] },
+];
+const ld = [{ '@context': 'https://schema.org', '@type': 'Service', name: 'Wsparcie biura projektowego w dokumentacji energetycznej', serviceType: 'Projektowana charakterystyka energetyczna i analizy uzupełniające', provider: { '@id': `${site.url}/#organization` }, areaServed: { '@type': 'Country', name: 'Polska' }, audience: { '@type': 'BusinessAudience', name: 'Biura projektowe i architektoniczne' }, url: `${site.url}/dla-biur-projektowych/`, description: 'Projektowana charakterystyka energetyczna oraz uzupełniające analizy energetyczne dla dokumentacji projektowej.' }];
+---
+<Base
+  title="Profesjonalne wsparcie biura projektowego | świadectwa.net"
+  description="Profesjonalne wsparcie biura projektowego: projektowana charakterystyka energetyczna oraz uzupełniające analizy energetyczne dla dokumentacji projektowej."
+  path="/dla-biur-projektowych/"
+  breadcrumbs={[{ name: 'Dla biur projektowych', path: '/dla-biur-projektowych/' }]}
+  jsonLd={ld}
+>
+  <PageHero
+    tag="Współpraca B2B"
+    title='Profesjonalne wsparcie <span class="grad">biura projektowego</span>'
+    lead={['Wyspecjalizowane wsparcie przy dokumentacji energetycznej budynków: od pojedynczych opracowań po stałą obsługę kolejnych projektów.', 'Nie zastępujemy projektanta. Przejmujemy wyspecjalizowaną część dokumentacji energetycznej, aby biuro mogło sprawniej zamykać projekty i ograniczyć liczbę uzupełnień po stronie zespołu projektowego.']}
+    crumbs={[{ name: 'Dla biur projektowych', path: '/dla-biur-projektowych/' }]}
+    art="docs"
+    mail={{ subject: 'Zapytanie o dokumentację energetyczną', label: 'Zapytaj o stałą współpracę' }}
+    secondary={{ href: '#zakres-uzupelniajacy', label: 'Zobacz zakres' }}
+  />
+
+  <section class="pad" aria-labelledby="odciazenie-h">
+    <div class="wrap two lw">
+      <div>
+        <span class="tag rv"><i></i>Odciążenie biura</span>
+        <h2 id="odciazenie-h" class="rv d1" style="margin:22px 0 18px">Odciążenie <span class="grad">biura projektowego</span></h2>
+        <p class="lede rv d2">Przejmujemy przygotowanie części energetycznej dokumentacji, aby biuro projektowe mogło sprawniej zamknąć projekt i ograniczyć liczbę dodatkowych uzgodnień po swojej stronie.</p>
+        <p class="lede rv d3" style="margin-top:16px">Celem jest prosty obieg informacji, jasny zakres prac i dokument gotowy do wykorzystania w projekcie.</p>
+      </div>
+      <div class="card flow mint-bg rv d2"><span class="kick">Korzyści</span><h3>Co zyskuje biuro</h3>
+        <ul class="check"><li>jeden kontakt do kolejnych opracowań,</li><li>mniej pracy organizacyjnej,</li><li>stały sposób przekazywania dokumentacji,</li><li>możliwość współpracy przy kolejnych inwestycjach.</li></ul></div>
+    </div>
+  </section>
+
+  <WorkStandard />
+
+  <section class="pad" aria-labelledby="model-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Model</span>
+        <h2 id="model-h" class="rv d1">Współpraca <span class="grad">bez zbędnej procedury</span></h2>
+      </div>
+      <div class="rail r3">
+        <div class="fill"></div>
+        <div class="step rv"><span class="num" aria-hidden="true">01</span><h3>Ustalenie zakresu</h3><p>Określamy, jakie opracowania biuro chce przekazywać zewnętrznie.</p></div>
+        <div class="step rv d1"><span class="num" aria-hidden="true">02</span><h3>Stały sposób pracy</h3><p>Ustalamy format przekazywania dokumentacji i informacji wejściowych.</p></div>
+        <div class="step rv d2"><span class="num" aria-hidden="true">03</span><h3>Kolejne projekty</h3><p>Realizujemy opracowania według powtarzalnego modelu współpracy.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad band-soft" aria-labelledby="modele-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Specjalistyczna część dokumentacji</span>
+        <h2 id="modele-h" class="rv d1">Specjalistyczna część dokumentacji <span class="grad">po naszej stronie</span></h2>
+        <p class="rv d2">Wspieramy biura projektowe w zakresie projektowanej charakterystyki energetycznej i dokumentacji energetycznej budynków. Celem jest prosty model współpracy, jasny zakres odpowiedzialności i dokument gotowy do wykorzystania w projekcie.</p>
+      </div>
+      <div class="cols-2">
+        <div class="card flow rv"><span class="kick">Dla jednego projektu</span><h3>Model jednorazowy</h3><p>Dla biur, które potrzebują wsparcia przy konkretnym projekcie budynku.</p>
+          <ul class="check"><li>analiza przekazanej dokumentacji,</li><li>wskazanie brakujących danych,</li><li>przygotowanie projektowanej charakterystyki,</li><li>przekazanie gotowego opracowania.</li></ul></div>
+        <div class="card flow dk rv d1" style="background:linear-gradient(135deg,#0f5a63,#0a3d45);border-color:transparent"><span class="kick">Dla kolejnych inwestycji</span><h3>Model stałej współpracy</h3><p style="color:#c2dedb">Dla biur projektowych, które cyklicznie potrzebują wsparcia przy kolejnych inwestycjach.</p>
+          <ul class="check"><li>stały sposób przekazywania danych,</li><li>powtarzalny standard opracowań,</li><li>sprawna komunikacja e-mailowa,</li><li>możliwość obsługi różnych typów budynków.</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad" aria-labelledby="kontrola-h">
+    <div class="wrap two">
+      <div>
+        <span class="tag rv"><i></i>Korzyść dla zespołu projektowego</span>
+        <h2 id="kontrola-h" class="rv d1" style="margin:22px 0 18px">Mniej organizacji po stronie biura, <span class="grad">więcej kontroli nad zakresem</span></h2>
+        <p class="lede rv d2">Przejmujemy część energetyczną, ale pracujemy na danych i założeniach projektowych przekazanych przez biuro. Dzięki temu projektant zachowuje kontrolę nad projektem, a specjalistyczne opracowanie powstaje w uporządkowanym procesie.</p>
+      </div>
+      <div class="card flow rv d2"><span class="kick">Jak pracujemy</span><h3>Zasady współpracy</h3>
+        <ul class="check"><li>ustalamy zakres opracowania przed rozpoczęciem prac,</li><li>pracujemy na dokumentacji projektowej,</li><li>wskazujemy brakujące dane zamiast zgadywać założenia,</li><li>prowadzimy korespondencję e-mailowo,</li><li>przekazujemy dokument do wykorzystania w dokumentacji projektowej.</li></ul></div>
+    </div>
+  </section>
+
+  <section class="pad band-soft" aria-labelledby="sytuacje-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Typowe sytuacje</span>
+        <h2 id="sytuacje-h" class="rv d1">Kiedy biuro projektowe <span class="grad">zyskuje najwięcej</span></h2>
+      </div>
+      <div class="cols-4">
+        <div class="card flow rv"><h3>Projekt wymaga szybkiego domknięcia dokumentacji</h3><p>Pomagamy uporządkować część energetyczną i przygotować opracowanie do dalszego wykorzystania w projekcie.</p></div>
+        <div class="card flow rv d1"><h3>Dokumentacja wejściowa wymaga uzupełnienia</h3><p>Po analizie wskazujemy, jakich danych brakuje: przegród, instalacji, źródła ciepła, wentylacji albo innych parametrów.</p></div>
+        <div class="card flow rv d2"><h3>Biuro obsługuje różne typy budynków</h3><p>Pracujemy przy budynkach wielorodzinnych, usługowych, biurowych, halach, magazynach i obiektach technicznych.</p></div>
+        <div class="card flow rv d3"><h3>Potrzebny jest stały partner do kolejnych projektów</h3><p>Możliwy jest powtarzalny model współpracy, który ogranicza liczbę każdorazowych ustaleń organizacyjnych.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad" id="zakres-uzupelniajacy" aria-labelledby="uzup-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Zakres uzupełniający</span>
+        <h2 id="uzup-h" class="rv d1">Dodatkowe wsparcie <span class="grad">biura projektowego</span></h2>
+        <p class="rv d2">Główną usługą pozostaje projektowana charakterystyka energetyczna. Poniższe elementy są modułami pomocniczymi, które można wykorzystać wtedy, gdy projekt wymaga wcześniejszej weryfikacji, wariantowania, aktualizacji albo przygotowania dokumentów dla etapu przekazania budynku.</p>
+      </div>
+      <div class="cols-3">
+        {modules.map((m, i) => (
+          <div class={`card flow mod rv d${i % 3}`}><span class="when">{m.when}</span><h3>{m.t}</h3><p>{m.d}</p>
+            <ul class="check">{m.l.map((x) => <li>{x}</li>)}</ul></div>
+        ))}
+      </div>
+      <div class="note rv" style="margin-top:28px">
+        <span class="kick">Logika oferty</span>
+        <h3>Dodatki uruchamiane tylko wtedy, gdy projekt tego wymaga</h3>
+        <ul class="check">
+          <li>główna usługa: projektowana charakterystyka energetyczna,</li>
+          <li>główna grupa odbiorców: biura projektowe i projektanci,</li>
+          <li>zakres uzupełniający: weryfikacje, warianty, OZC, aktualizacje i świadectwa po projekcie,</li>
+          <li>cel: mniej niejasności w dokumentacji i sprawniejsze domykanie projektu.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad band-soft" id="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="sec-head center"><span class="tag rv"><i></i>FAQ</span><h2 id="faq-h" class="rv d1">Najczęstsze pytania <span class="grad">przed zleceniem opracowania</span></h2></div>
+      <Faq items={faq} />
+    </div>
+  </section>
+
+  <CtaBand usluga="Stała współpraca z biurem projektowym" title="Zapytaj o stałą współpracę" text="Opisz, jakie opracowania biuro chce przekazywać zewnętrznie. Po analizie przygotujemy indywidualną ofertę." />
+</Base>

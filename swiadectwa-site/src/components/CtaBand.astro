@@ -1,0 +1,51 @@
+---
+import { site } from '../data/site';
+interface Props { title?: string; text?: string; usluga?: string; }
+const { title = 'Wyślij dokumentację do wyceny', text = 'Prześlij projekt, opis budynku albo krótką informację o zakresie opracowania. Po analizie przygotujemy indywidualną ofertę.', usluga = '' } = Astro.props;
+const uslugi = ['Projektowana charakterystyka energetyczna', 'Świadectwo charakterystyki energetycznej', 'Pakiet świadectw', 'Stała współpraca z biurem projektowym', 'Inne / nie wiem, czego potrzebuję'];
+const budynki = ['Budynek wielorodzinny', 'Budynek biurowy', 'Budynek usługowy', 'Hala lub magazyn', 'Obiekt przemysłowy', 'Lokal', 'Inny obiekt'];
+---
+<section class="cta" id="zapytanie" aria-labelledby="cta-h">
+  <div class="wrap">
+    <div class="box dk rv">
+      <div class="duo"><img src="/img/photo-f87827466.webp" alt="" width="1280" height="684" loading="lazy" decoding="async" /></div>
+      <div class="grid">
+        <div>
+          <span class="tag"><i></i>Wycena indywidualna</span>
+          <h2 id="cta-h" style="margin-top:22px">{title}</h2>
+          <p>{text}</p>
+          <div class="contact-lines">
+            <span>Najprostszy sposób: e-mail z krótkim opisem.</span>
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+            <a href={`tel:${site.phoneHref}`}>{site.phone}</a>
+          </div>
+        </div>
+        <form class="lt" data-mailform data-to={site.email} novalidate aria-label="Zapytanie o wycenę">
+          <label>Rodzaj opracowania
+            <select name="usluga" required>
+              <option value="">Wybierz…</option>
+              {uslugi.map((u) => <option selected={u === usluga}>{u}</option>)}
+            </select>
+          </label>
+          <div class="f2">
+            <label>Typ budynku
+              <select name="budynek"><option value="">Wybierz…</option>{budynki.map((b) => <option>{b}</option>)}</select>
+            </label>
+            <label>Lokalizacja<input name="lokalizacja" autocomplete="off" placeholder="np. Gdańsk" /></label>
+          </div>
+          <div class="f2">
+            <label>Liczba obiektów<input name="liczba" inputmode="numeric" autocomplete="off" placeholder="np. 24 lokale" /></label>
+            <label>Oczekiwany termin<input name="termin" autocomplete="off" placeholder="np. do końca marca" /></label>
+          </div>
+          <label>Firma<input name="firma" autocomplete="organization" /></label>
+          <label>Krótki opis<textarea name="opis" rows="3"></textarea></label>
+          <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <button class="btn btn-teal" type="submit" style="justify-content:center">Przygotuj e-mail z zapytaniem <span class="ar" aria-hidden="true">→</span></button>
+          <p class="status" data-status role="status" aria-live="polite"></p>
+          <button class="btn-copy" type="button" data-copy hidden>Skopiuj treść zapytania</button>
+          <p class="small">Formularz nie wysyła danych na serwer. Przygotowuje wiadomość w Twoim programie pocztowym; dokumentację dołączysz jako załącznik.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

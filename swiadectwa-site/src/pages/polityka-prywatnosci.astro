@@ -1,19 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import polityka from '../data/polityka.html?raw';
 ---
-<Base title="Polityka prywatności | swiadectwa.net">
-  <div class="page-head"><div class="wrap"><h1>Polityka prywatności</h1></div></div>
-  <section><div class="wrap" style="max-width:780px">
-    <!-- TODO: uzupełnić pełne dane administratora (nazwa firmy, NIP, adres) i zweryfikować treść z prawnikiem -->
-    <h2>1. Administrator danych</h2>
-    <p>Administratorem danych osobowych jest właściciel serwisu swiadectwa.net. Kontakt: <a href="mailto:biuro@swiadectwa.net">biuro@swiadectwa.net</a>.</p>
-    <h2>2. Cel i podstawa przetwarzania</h2>
-    <p>Dane przekazane w formularzu zapytania (firma, NIP, imię i nazwisko, telefon, e-mail, opis inwestycji) przetwarzamy w celu przygotowania odpowiedzi i oferty (art. 6 ust. 1 lit. b i f RODO).</p>
-    <h2>3. Odbiorcy i okres przechowywania</h2>
-    <p>Dane nie są sprzedawane. Mogą być powierzone dostawcom usług niezbędnych do działania serwisu (hosting, poczta, obsługa formularza kontaktowego). Przechowujemy je przez czas potrzebny do realizacji zapytania i zlecenia oraz dochodzenia roszczeń.</p>
-    <h2>4. Twoje prawa</h2>
-    <p>Masz prawo dostępu do danych, ich sprostowania, usunięcia, ograniczenia przetwarzania, sprzeciwu oraz skargi do Prezesa UODO.</p>
-    <h2>5. Pliki cookies</h2>
-    <p>Serwis nie stosuje plików cookies marketingowych ani analitycznych wymagających zgody. Do statystyk odwiedzin może służyć analityka niewykorzystująca plików cookies.</p>
-  </div></section>
+<Base
+  title="Polityka prywatności | świadectwa.net"
+  description="Polityka prywatności serwisu świadectwa.net. Informacje o przetwarzaniu danych, cookies i prawach użytkowników."
+  path="/polityka-prywatnosci/"
+  breadcrumbs={[{ name: 'Polityka prywatności', path: '/polityka-prywatnosci/' }]}
+>
+  <PageHero tag="Dokument prawny" title='Polityka <span class="grad">prywatności</span>' lead={['Informacje o zasadach przetwarzania danych osobowych, wykorzystaniu plików cookies oraz prawach osób kontaktujących się przez serwis świadectwa.net.']} crumbs={[{ name: 'Polityka prywatności', path: '/polityka-prywatnosci/' }]} />
+  <section class="pad">
+    <div class="wrap"><div class="prose" set:html={polityka} /></div>
+  </section>
 </Base>

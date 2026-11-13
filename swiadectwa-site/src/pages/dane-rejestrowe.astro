@@ -1,0 +1,32 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import { site } from '../data/site';
+---
+<Base
+  title="Dane rejestrowe | świadectwa.net"
+  description="Dane rejestrowe firmy prowadzącej serwis świadectwa.net."
+  path="/dane-rejestrowe/"
+  breadcrumbs={[{ name: 'Dane rejestrowe', path: '/dane-rejestrowe/' }]}
+>
+  <PageHero tag="Informacje formalne" title='Dane <span class="grad">rejestrowe</span>' lead={['Podstawowe dane identyfikacyjne firmy prowadzącej serwis świadectwa.net.']} crumbs={[{ name: 'Dane rejestrowe', path: '/dane-rejestrowe/' }]} />
+  <section class="pad" aria-labelledby="form-h">
+    <div class="wrap two lw">
+      <div>
+        <span class="tag rv"><i></i>Transparentność danych</span>
+        <h2 id="form-h" class="rv d1" style="margin:22px 0 18px">Informacje formalne <span class="grad">w jednym miejscu</span></h2>
+        <p class="lede rv d2">Dane rejestrowe są dostępne publicznie, aby klient przed wysłaniem dokumentacji lub rozpoczęciem współpracy mógł łatwo zweryfikować podmiot świadczący usługę.</p>
+      </div>
+      <dl class="kv rv d2">
+        <dt>Nazwa firmy</dt><dd>{site.owner}</dd>
+        <dt>Nazwa handlowa</dt><dd>{site.name}</dd>
+        <dt>Adres</dt><dd>{site.street}<br />{site.postal} {site.city}</dd>
+        <dt>NIP</dt><dd>{site.nip}</dd>
+        <dt>REGON</dt><dd>{site.regon}</dd>
+        <dt>E-mail</dt><dd><a href={`mailto:${site.email}`}>{site.email}</a></dd>
+        <dt>Telefon</dt><dd><a href={`tel:${site.phoneHref}`}>{site.phone}</a></dd>
+        <dt>Obszar działania</dt><dd>Cała Polska, współpraca zdalna w zakresie dokumentacji energetycznej budynków.</dd>
+      </dl>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,39 @@
+---
+import HeroArt from './HeroArt.astro';
+import { CTA, mailto } from '../data/site';
+interface Props {
+  tag: string;
+  title: string; // dopuszcza <span class="grad">
+  lead: string[];
+  crumbs?: { name: string; path: string }[];
+  art?: 'plan' | 'cert' | 'docs' | 'blocks';
+  mail?: { subject: string; label?: string };
+  secondary?: { href: string; label: string };
+}
+const { tag, title, lead, crumbs = [], art, mail, secondary } = Astro.props;
+---
+<section class={`phero dk${art ? '' : ' solo'}`}>
+  <div class="bg-grid"></div><div class="orb o1"></div><div class="orb o2"></div>
+  <div class="wrap">
+    <div>
+      {crumbs.length > 0 && (
+        <nav aria-label="Ścieżka nawigacji">
+          <ol class="crumbs">
+            <li><a href="/">Strona główna</a></li>
+            {crumbs.map((c, i) => (<li>{i === crumbs.length - 1 ? <span aria-current="page">{c.name}</span> : <a href={c.path}>{c.name}</a>}</li>))}
+          </ol>
+        </nav>
+      )}
+      <span class="tag rv"><i></i>{tag}</span>
+      <h1 class="rv d1" set:html={title} />
+      {lead.map((p, i) => <p class={`lead rv d2`}>{p}</p>)}
+      {(mail || secondary) && (
+        <div class="acts rv d3">
+          {mail && <a class="btn btn-mint" href={mailto(mail.subject)}>{mail.label ?? CTA} <span class="ar" aria-hidden="true">→</span></a>}
+          {secondary && <a class="btn btn-ghost" href={secondary.href}>{secondary.label}</a>}
+        </div>
+      )}
+    </div>
+    {art && <HeroArt kind={art} />}
+  </div>
+</section>

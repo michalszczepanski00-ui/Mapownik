@@ -1,116 +1,279 @@
 ---
 import Base from '../layouts/Base.astro';
-import Tag from '../components/Tag.astro';
-import Icon from '../components/Icon.astro';
-import HeroArt from '../components/HeroArt.astro';
-import { audiences } from '../data/audiences.js';
-import { services as allServices } from '../data/services.js';
-const services = allServices.slice(0, 3);
-const why = [
-  { i: 'clock', t: 'Termin na starcie', d: 'Czas realizacji ustalamy na początku zlecenia, więc możesz zaplanować kolejne etapy projektu.' },
-  { i: 'wallet', t: 'Płatność po dostawie', d: 'Płacisz dopiero po otrzymaniu gotowego dokumentu.' },
-  { i: 'tool', t: 'Profesjonalne narzędzia', d: 'Pracujemy na profesjonalnym oprogramowaniu i sprzęcie pomiarowym.' },
-  { i: 'map', t: 'Cała Polska', d: 'Obsługujemy inwestycje zdalnie, bez względu na lokalizację.' },
-];
-const steps = [
-  { t: 'Zapytanie', d: 'Wysyłasz dane inwestycji i dokumentację projektową przez formularz.' },
-  { t: 'Wycena i termin', d: 'Przygotowujemy indywidualną ofertę. Termin realizacji ustalamy na początku zlecenia.' },
-  { t: 'Opracowanie', d: 'Wykonujemy analizę na profesjonalnym oprogramowaniu i konsultujemy ewentualne korekty.' },
-  { t: 'Dokumenty', d: 'Przekazujemy gotowe opracowanie. Płatność dopiero po dostarczeniu dokumentu.' },
-];
-const faq = [
-  { q: 'Dla kogo jest oferta?', a: 'Dla firm z branży budowlanej: biur projektowych, deweloperów i architektów. Nie obsługujemy klientów indywidualnych.' },
-  { q: 'Jak wyceniacie zlecenia?', a: 'Każde zlecenie wyceniamy indywidualnie na podstawie dokumentacji projektowej i zakresu opracowania.' },
-  { q: 'Ile trwa realizacja?', a: 'Termin ustalamy zawsze na początku zlecenia, po zapoznaniu się z dokumentacją.' },
-  { q: 'Kiedy płacę?', a: 'Płatność następuje po dostarczeniu gotowego dokumentu.' },
-  { q: 'Czy pracujecie poza Pomorzem?', a: 'Tak, obsługujemy inwestycje w całej Polsce, zdalnie.' },
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, CTA, mailto, pickFaq } from '../data/site';
+
+const faq = pickFaq('remote', 'stage', 'packages', 'noprice', 'poland', 'regular');
+const mailMain = mailto('Zapytanie o dokumentację energetyczną');
+const ld = [
+  { '@context': 'https://schema.org', '@type': 'WebSite', '@id': `${site.url}/#website`, url: `${site.url}/`, name: site.name, inLanguage: 'pl-PL', publisher: { '@id': `${site.url}/#organization` } },
+  { '@context': 'https://schema.org', '@type': 'ItemList', name: 'Usługi świadectwa.net', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Projektowana charakterystyka energetyczna', url: `${site.url}/projektowana-charakterystyka/` },
+    { '@type': 'ListItem', position: 2, name: 'Świadectwa charakterystyki energetycznej', url: `${site.url}/swiadectwa-energetyczne/` },
+    { '@type': 'ListItem', position: 3, name: 'Stała współpraca z biurami projektowymi', url: `${site.url}/dla-biur-projektowych/` },
+    { '@type': 'ListItem', position: 4, name: 'Dla deweloperów i zarządców', url: `${site.url}/dla-deweloperow-i-zarzadcow/` },
+  ] },
 ];
 ---
-<Base title="swiadectwa.net – charakterystyka energetyczna dla biur projektowych i deweloperów">
-  <section class="hero">
+<Base
+  title="Dokumentacja energetyczna budynków | świadectwa.net"
+  description="Projektowane charakterystyki energetyczne i świadectwa charakterystyki energetycznej dla biur projektowych, firm, deweloperów i zarządców. Obsługa zdalna w całej Polsce."
+  path="/"
+  jsonLd={ld}
+>
+  <!-- 1. Nagłówek -->
+  <section class="hero dk">
+    <div class="bg-grid"></div><div class="orb o1"></div><div class="orb o2"></div>
     <div class="wrap">
       <div>
-        <div class="badge"><i></i>Analizy energetyczne dla branży budowlanej</div>
-        <h1>Charakterystyka energetyczna <em>bez opóźnień.</em></h1>
-        <p class="lead">Wspieramy biura projektowe, deweloperów i architektów w całej Polsce. Opracowania do projektów budowlanych i świadectwa energetyczne, z terminem uzgodnionym na starcie.</p>
-        <div class="actions">
-          <a class="btn btn-mint" href="/kontakt#wycena">Zapytaj o wycenę</a>
-          <a class="btn btn-glass" href="/oferta">Zobacz ofertę</a>
+        <span class="tag rv"><i></i>Dokumentacja energetyczna budynków</span>
+        <h1 class="rv d1">Projektowane charakterystyki energetyczne <span class="grad">dla biur projektowych</span></h1>
+        <p class="lead rv d2">Wspieramy projektantów, deweloperów i firmy w przygotowaniu dokumentacji energetycznej budynków. Główna specjalizacja to projektowane charakterystyki energetyczne do projektów budowlanych. Świadectwa energetyczne realizujemy jako usługę dla klientów biznesowych.</p>
+        <div class="acts rv d3">
+          <a class="btn btn-mint" href={mailMain}>{CTA} <span class="ar" aria-hidden="true">→</span></a>
+          <a class="btn btn-ghost" href="#zakres">Zobacz zakres</a>
+        </div>
+        <div class="mini rv d4">
+          <div><b>od {site.since} roku</b><span>doświadczenie w branży</span></div>
+          <div><b data-count="600" data-suffix="+">600+</b><span>wykonanych analiz</span></div>
+          <div><b>cała Polska</b><span>obsługa zdalna</span></div>
         </div>
       </div>
-      <div class="hero-art"><HeroArt /></div>
+      <div class="vis rv d2" id="vis">
+        <div class="frame duo" id="frame">
+          <img src="/img/photo-f120614863-1280.webp" srcset="/img/photo-f120614863-960.webp 960w, /img/photo-f120614863-1280.webp 1280w" sizes="(max-width:1000px) 100vw, 900px" width="1280" height="857" alt="Nowe budynki mieszkalne z balkonami pod błękitnym niebem" fetchpriority="high" />
+        </div>
+        <div class="glass g2"><div class="ok"><i aria-hidden="true">✓</i>Wycena indywidualna<br />po analizie dokumentacji</div></div>
+        <div class="glass g1 scale" id="scale" aria-hidden="true">
+          <h4>Klasa energetyczna</h4>
+          <div class="bars">
+            <div class="bar hi">A+<s style="--w:100%"></s></div>
+            <div class="bar hi">A<s style="--w:86%"></s></div>
+            <div class="bar">B<s style="--w:72%"></s></div>
+            <div class="bar">C<s style="--w:58%"></s></div>
+            <div class="bar">D<s style="--w:44%"></s></div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
-  <section class="stats"><div class="wrap"><div class="grid">
-    <div class="stat"><b>600+</b><span>wykonanych analiz energetycznych</span></div>
-    <div class="stat"><b>Cała Polska</b><span>obsługa zdalna inwestycji</span></div>
-    <div class="stat"><b>Po dostawie</b><span>płatność po odbiorze dokumentu</span></div>
-  </div></div></section>
+  <div class="marq"><ul class="track" aria-label="Zakres usług">
+    <li><span>Projektowana charakterystyka energetyczna</span></li><li><span>Świadectwa charakterystyki energetycznej</span></li><li><span>OZC i bilanse zapotrzebowania na energię</span></li><li><span>Analizy OZE</span></li><li><span>Stała współpraca z biurami projektowymi</span></li>
+  </ul></div>
 
-  <section>
+  <!-- 2. Cztery obszary oferty -->
+  <section class="pad" id="zakres" aria-labelledby="zakres-h">
     <div class="wrap">
-      <Tag t="Nasza oferta" />
-      <h2 style="max-width:18ch">Specjalizacja: projektowa charakterystyka energetyczna</h2>
-      <p class="lead">Kluczowe usługi dla inwestycji budowlanych, w jednym miejscu i z jednym wykonawcą.</p>
-      <div class="grid-3">
-        {services.map(s => (
-          <a class="card" href={`/oferta/${s.slug}`} style="text-decoration:none"><div class="ico"><Icon name={s.icon} /></div><h3>{s.name}</h3><p>{s.short}</p><div class="go"><i>→</i></div></a>
-        ))}
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Zakres usług</span>
+        <h2 id="zakres-h" class="rv d1">Jedna specjalizacja. <span class="grad">Trzy sposoby współpracy.</span></h2>
+        <p class="rv d2">Hierarchia oferty jest prosta: główna usługa to projektowana charakterystyka energetyczna, a świadectwa i stała obsługa porządkują resztę dokumentacji.</p>
+      </div>
+      <div class="paths">
+        <a class="card p1 dk rv" href="/projektowana-charakterystyka/">
+          <svg class="draw" viewBox="0 0 400 260" aria-hidden="true"><rect x="40" y="70" width="150" height="170"/><rect x="190" y="130" width="110" height="110"/><line x1="20" y1="240" x2="380" y2="240"/><path d="M40 70 L115 20 L190 70"/><path d="M190 130 L245 90 L300 130"/><rect x="62" y="96" width="30" height="30"/><rect x="108" y="96" width="30" height="30"/><rect x="62" y="150" width="30" height="30"/><rect x="108" y="150" width="30" height="30"/><rect x="212" y="156" width="28" height="28"/><rect x="254" y="156" width="28" height="28"/></svg>
+          <span class="kick">Główna usługa</span>
+          <h3>Projektowana charakterystyka</h3>
+          <p>Opracowanie do projektu budowlanego dla biura architektonicznego, projektowego lub generalnego projektanta.</p>
+          <span class="go">Zobacz usługę</span>
+        </a>
+        <a class="card p2 mint-bg rv d1" href="/swiadectwa-energetyczne/">
+          <div class="cert" aria-hidden="true"><b>Świadectwo charakterystyki energetycznej</b><i style="width:40%;background:#2de2d0"></i><i style="width:52%;background:#5fd4c8"></i><i style="width:64%;background:#8fd9d0"></i><i style="width:76%;background:#3a9aa0"></i><i style="width:90%;background:#176974"></i></div>
+          <span class="kick">Klienci biznesowi</span>
+          <h3>Świadectwa energetyczne</h3>
+          <p>Świadectwa dla budynków komercyjnych, biurowych, usługowych, hal, magazynów i większych pakietów zleceń.</p>
+          <span class="go">Zobacz usługę</span>
+        </a>
+        <a class="card p3 rv" href="/dla-biur-projektowych/">
+          <span class="kick">Dla biur projektowych</span>
+          <h3>Stała współpraca</h3>
+          <p>Powtarzalny model obsługi dla biur projektowych, które chcą zlecać część energetyczną jednemu partnerowi.</p>
+          <span class="go">Oferta dla biur</span>
+        </a>
+        <a class="card p4 rv d1" href="/dla-deweloperow-i-zarzadcow/">
+          <span class="kick">Pakiety i portfele</span>
+          <h3>Deweloperzy i zarządcy</h3>
+          <p>Dedykowana obsługa pakietów świadectw, budynków komercyjnych i portfeli nieruchomości.</p>
+          <span class="go">Oferta dla deweloperów</span>
+        </a>
       </div>
     </div>
   </section>
 
-  <section class="soft" id="dla-kogo">
+  <!-- 3. Ścieżki współpracy -->
+  <section class="pad band-soft" id="sciezki" aria-labelledby="sciezki-h">
     <div class="wrap">
-      <Tag t="Dla kogo" />
-      <h2 style="max-width:20ch">Pracujemy z firmami z branży budowlanej</h2>
-      <p class="lead">Jesteśmy partnerem dla profesjonalistów. Obsługujemy wyłącznie klientów biznesowych.</p>
-      <div class="grid-3">
-        {audiences.map(a => (
-          <a class="card mint" href={`/dla-kogo/${a.slug}`} style="text-decoration:none"><div class="ico"><Icon name={a.icon} size={34} /></div><h3 style="font-size:1.5rem">{a.name}</h3><p>{a.short}</p><div class="go"><i>→</i></div></a>
-        ))}
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Ścieżki współpracy</span>
+        <h2 id="sciezki-h" class="rv d1">Wybierz ścieżkę <span class="grad">właściwą dla Twojego zlecenia</span></h2>
+        <p class="rv d2">Strona została uporządkowana według najczęstszych potrzeb klientów: biur projektowych, deweloperów i zarządców oraz firm posiadających własne budynki.</p>
+      </div>
+      <div class="panels">
+        <a class="panel dk rv" href="/dla-biur-projektowych/">
+          <div class="duo"><img src="/img/photo-f105502290.webp" alt="" width="1280" height="773" loading="lazy" decoding="async" /></div>
+          <span class="n">Biuro projektowe / architekt</span>
+          <div class="tx"><h3>Projektowana charakterystyka do dokumentacji projektowej</h3><p>Gdy potrzebujesz wyspecjalizowanego wsparcia przy części energetycznej projektu i chcesz sprawnie zamknąć dokumentację.</p><span class="go-l">Przejdź do oferty dla biur →</span></div>
+        </a>
+        <a class="panel dk rv d1" href="/dla-deweloperow-i-zarzadcow/">
+          <div class="duo"><img src="/img/photo-f4029391.webp" alt="" width="1280" height="960" loading="lazy" decoding="async" /></div>
+          <span class="n">Deweloper / zarządca</span>
+          <div class="tx"><h3>Świadectwa dla budynków, lokali i większych pakietów</h3><p>Gdy potrzebujesz świadectw energetycznych dla portfela nieruchomości, przekazań lokali albo budynków komercyjnych.</p><span class="go-l">Przejdź do oferty B2B →</span></div>
+        </a>
+        <a class="panel dk rv d2" href="/swiadectwa-energetyczne/">
+          <div class="duo"><img src="/img/photo-f71413859.webp" alt="" width="1280" height="842" loading="lazy" decoding="async" /></div>
+          <span class="n">Firma z budynkiem</span>
+          <div class="tx"><h3>Dokumentacja dla biura, hali, magazynu lub lokalu usługowego</h3><p>Gdy potrzebujesz dokumentu dla własnego obiektu komercyjnego albo chcesz uporządkować dokumentację energetyczną budynku.</p><span class="go-l">Zobacz świadectwa dla firm →</span></div>
+        </a>
       </div>
     </div>
   </section>
 
-  <section>
+  <!-- 4. Hasło -->
+  <section class="say" aria-label="Podejście">
     <div class="wrap">
-      <Tag t="Dlaczego my" />
-      <h2>Współpraca bez niespodzianek</h2>
-      <div class="grid-3" style="grid-template-columns:repeat(auto-fit,minmax(230px,1fr))">
-        {why.map(w => (<div class="card"><div class="ico"><Icon name={w.i} /></div><h3>{w.t}</h3><p>{w.d}</p></div>))}
+      <p id="say" data-keys="techniczny,element,dokumentacji">Projektowana charakterystyka energetyczna nie jest traktowana wyłącznie jako formalny załącznik, ale jako techniczny element dokumentacji projektowej.</p>
+    </div>
+  </section>
+
+  <!-- 5. Doświadczenie -->
+  <section class="pad" id="doswiadczenie" aria-labelledby="dosw-h">
+    <div class="wrap two lw">
+      <div>
+        <span class="tag rv"><i></i>Doświadczenie</span>
+        <h2 id="dosw-h" class="rv d1" style="margin:22px 0 18px">Kilkaset opracowań <span class="grad">i analiz energetycznych</span></h2>
+        <p class="lede rv d2">Doświadczenie obejmuje kilkaset opracowań i analiz energetycznych dla różnych typów budynków: mieszkalnych, usługowych, komercyjnych i technicznych. Ten zakres pozwala sprawnie pracować zarówno z biurami projektowymi, jak i z firmami, deweloperami oraz zarządcami nieruchomości.</p>
+        <p class="lede rv d3" style="margin-top:18px">{site.name} wywodzi się z praktyki analiz energetycznych, efektywności energetycznej i dokumentacji budynków. W zależności od zakresu zlecenia opracowanie może być wspierane analizą zapotrzebowania na energię, oceną przyjętych rozwiązań instalacyjnych, bilansem energetycznym, analizą OZE lub wnioskami wynikającymi z doświadczenia w termowizji i efektywności energetycznej.</p>
+      </div>
+      <div class="card flow rv d2">
+        <span class="kick">Zaplecze eksperckie</span>
+        <h3>Zakres zaplecza technicznego</h3>
+        <ul class="check">
+          <li>projektowane charakterystyki energetyczne,</li>
+          <li>świadectwa charakterystyki energetycznej,</li>
+          <li>OZC i bilanse zapotrzebowania na energię,</li>
+          <li>weryfikacja założeń instalacyjnych,</li>
+          <li>analizy OZE i efektywności energetycznej.</li>
+        </ul>
       </div>
     </div>
   </section>
 
-  <section class="soft" id="proces">
+  <!-- 6. Zakres opracowania -->
+  <section class="pad band-soft" id="opracowanie" aria-labelledby="opr-h">
     <div class="wrap">
-      <Tag t="Jak pracujemy" />
-      <h2>Prosty proces, przewidywalny wynik</h2>
-      <div class="steps">
-        {steps.map(s => (<div class="step"><h3>{s.t}</h3><p>{s.d}</p></div>))}
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Zakres opracowania</span>
+        <h2 id="opr-h" class="rv d1">Co zawiera <span class="grad">opracowanie</span></h2>
+        <p class="rv d2">Zakres jest każdorazowo dopasowany do rodzaju budynku, celu dokumentu i dostępnych materiałów.</p>
+      </div>
+      <div class="cols-2">
+        <div class="card flow rv">
+          <span class="kick">Do dokumentacji projektowej</span>
+          <h3>Projektowana charakterystyka energetyczna</h3>
+          <p>Opracowanie przygotowywane do wykorzystania w dokumentacji projektowej budynku.</p>
+          <ul class="check">
+            <li>analiza przekazanej dokumentacji,</li>
+            <li>określenie parametrów energetycznych budynku,</li>
+            <li>sprawdzenie przyjętych rozwiązań pod kątem charakterystyki energetycznej,</li>
+            <li>wskazanie brakujących danych, jeżeli są potrzebne,</li>
+            <li>przekazanie gotowego opracowania do dokumentacji projektowej.</li>
+          </ul>
+          <a class="link-arrow" href="/projektowana-charakterystyka/">Zobacz usługę</a>
+        </div>
+        <div class="card flow rv d1">
+          <span class="kick">Dla budynku lub lokalu</span>
+          <h3>Świadectwo charakterystyki energetycznej</h3>
+          <p>Dokument przygotowywany dla budynku lub lokalu, zwykle na potrzeby sprzedaży, najmu, przekazania lub dokumentacji nieruchomości.</p>
+          <ul class="check">
+            <li>analiza danych budynku lub lokalu,</li>
+            <li>obliczenia charakterystyki energetycznej,</li>
+            <li>przygotowanie świadectwa,</li>
+            <li>przekazanie dokumentu w uzgodnionej formie,</li>
+            <li>możliwość obsługi większej liczby świadectw.</li>
+          </ul>
+          <a class="link-arrow" href="/swiadectwa-energetyczne/">Zobacz usługę</a>
+        </div>
       </div>
     </div>
   </section>
 
-  <section>
-    <div class="wrap" style="max-width:860px">
-      <div class="center"><Tag t="Częste pytania" /><h2>FAQ</h2></div>
-      <div style="margin-top:36px">
-        {faq.map(f => (<details class="faq"><summary>{f.q}</summary><p>{f.a}</p></details>))}
-      </div>
-    </div>
-  </section>
-
-  <section class="cta center">
+  <!-- 7. Proces -->
+  <section class="pad" id="proces" aria-labelledby="proces-h">
     <div class="wrap">
-      <div class="glass">
-        <Tag t="Zapytaj teraz" />
-        <h2>Masz projekt do opracowania?</h2>
-        <p class="lead">Prześlij zapytanie. Przygotujemy indywidualną wycenę i zaproponujemy termin.</p>
-        <a class="btn btn-teal" href="/kontakt#wycena">Zapytaj o wycenę</a>
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Proces</span>
+        <h2 id="proces-h" class="rv d1">Prosta współpraca <span class="grad">od zapytania do gotowego opracowania</span></h2>
+      </div>
+      <div class="rail r3" id="rail">
+        <div class="fill"></div>
+        <div class="step rv"><span class="num" aria-hidden="true">01</span><h3>Dokumentacja</h3><p>Przesyłasz projekt, opis budynku albo informację o potrzebnym zakresie.</p></div>
+        <div class="step rv d1"><span class="num" aria-hidden="true">02</span><h3>Analiza i wycena</h3><p>Sprawdzamy zakres prac i przygotowujemy ofertę dopasowaną do konkretnego zlecenia.</p></div>
+        <div class="step rv d2"><span class="num" aria-hidden="true">03</span><h3>Opracowanie</h3><p>Po akceptacji przygotowujemy dokument i przekazujemy go do dalszego wykorzystania.</p></div>
       </div>
     </div>
   </section>
+
+  <!-- 8. Co przesłać + zakres uzupełniający -->
+  <section class="pad band-soft" id="co-przeslac" aria-labelledby="przeslac-h">
+    <div class="wrap two">
+      <div>
+        <span class="tag rv"><i></i>Zapytanie</span>
+        <h2 id="przeslac-h" class="rv d1" style="margin:22px 0 18px">Co przesłać <span class="grad">do wyceny</span></h2>
+        <p class="lede rv d2">Do wstępnej wyceny wystarczą podstawowe informacje. Nie trzeba przygotowywać rozbudowanego opisu. Po analizie wskażemy, czy potrzebne są dodatkowe dane.</p>
+        <ul class="check rv d3">
+          <li>krótki opis budynku lub inwestycji,</li>
+          <li>informacja, jakiego opracowania dotyczy zapytanie,</li>
+          <li>dokumentacja projektowa, jeżeli jest dostępna,</li>
+          <li>liczba budynków, lokali lub świadectw,</li>
+          <li>oczekiwany termin realizacji, jeżeli ma znaczenie.</li>
+        </ul>
+      </div>
+      <div class="note rv d2">
+        <span class="kick">Zakres uzupełniający</span>
+        <h3>Dodatkowe wsparcie przy dokumentacji energetycznej</h3>
+        <p>Poza główną usługą, czyli projektowaną charakterystyką energetyczną, możliwe jest uzupełniające wsparcie biura projektowego przy decyzjach energetycznych, zmianach projektowych i przygotowaniu dokumentacji dla etapu przekazania budynku.</p>
+        <p>Ten zakres nie zastępuje głównej oferty. Jest dodatkiem dla projektów, które wymagają wcześniejszej weryfikacji, porównania wariantów albo aktualizacji danych po zmianach.</p>
+        <a class="btn btn-teal" href="/dla-biur-projektowych/#zakres-uzupelniajacy">Zobacz moduły dodatkowe <span class="ar" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. FAQ -->
+  <section class="pad" id="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="sec-head center">
+        <span class="tag rv"><i></i>FAQ</span>
+        <h2 id="faq-h" class="rv d1">Najczęstsze pytania <span class="grad">przed zleceniem</span></h2>
+        <p class="rv d2">Krótko odpowiadamy na pytania, które najczęściej pojawiają się przed wyceną.</p>
+      </div>
+      <Faq items={faq} />
+    </div>
+  </section>
+
+  <!-- 10. Transparentność -->
+  <section class="pad band-soft" id="transparentnosc" aria-labelledby="transp-h">
+    <div class="wrap two lw">
+      <div>
+        <span class="tag rv"><i></i>Transparentność</span>
+        <h2 id="transp-h" class="rv d1" style="margin:22px 0 18px">Dane firmy dostępne <span class="grad">przed rozpoczęciem współpracy</span></h2>
+        <p class="lede rv d2">Współpraca z klientami B2B wymaga przejrzystości. Dane rejestrowe, kontaktowe i polityka prywatności są dostępne bezpośrednio na stronie.</p>
+        <div class="acts rv d3" style="margin-top:28px">
+          <a class="btn btn-teal" href="/dane-rejestrowe/">Dane rejestrowe <span class="ar" aria-hidden="true">→</span></a>
+          <a class="btn btn-line" href="/polityka-prywatnosci/">Polityka prywatności</a>
+        </div>
+      </div>
+      <dl class="kv rv d2">
+        <dt>Firma</dt><dd>{site.owner}</dd>
+        <dt>Nazwa handlowa</dt><dd>{site.name}</dd>
+        <dt>Adres</dt><dd>{site.street}, {site.postal} {site.city}</dd>
+        <dt>NIP</dt><dd>{site.nip}</dd>
+        <dt>REGON</dt><dd>{site.regon}</dd>
+        <dt>Kontakt</dt><dd><a href={`mailto:${site.email}`}>{site.email}</a><br /><a href={`tel:${site.phoneHref}`}>{site.phone}</a></dd>
+      </dl>
+    </div>
+  </section>
+
+  <CtaBand />
 </Base>

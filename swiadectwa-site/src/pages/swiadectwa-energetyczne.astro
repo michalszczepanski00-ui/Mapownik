@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Faq from '../components/Faq.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, pickFaq } from '../data/site';
+
+const faq = pickFaq('packages', 'halls', 'incomplete', 'area', 'poland', 'regular');
+const ld = [{ '@context': 'https://schema.org', '@type': 'Service', name: 'Świadectwa charakterystyki energetycznej dla budynków komercyjnych', serviceType: 'Świadectwo charakterystyki energetycznej', provider: { '@id': `${site.url}/#organization` }, areaServed: { '@type': 'Country', name: 'Polska' }, audience: { '@type': 'BusinessAudience', name: 'Firmy, deweloperzy, zarządcy nieruchomości, właściciele budynków komercyjnych' }, description: 'Świadectwa charakterystyki energetycznej dla firm, deweloperów, zarządców oraz właścicieli budynków komercyjnych.', url: `${site.url}/swiadectwa-energetyczne/` }];
+---
+<Base
+  title="Świadectwa energetyczne dla firm i budynków komercyjnych | świadectwa.net"
+  description="Świadectwa charakterystyki energetycznej dla firm, deweloperów, zarządców oraz właścicieli budynków komercyjnych."
+  path="/swiadectwa-energetyczne/"
+  breadcrumbs={[{ name: 'Świadectwa energetyczne', path: '/swiadectwa-energetyczne/' }]}
+  jsonLd={ld}
+>
+  <PageHero
+    tag="Firmy, deweloperzy i zarządcy"
+    title='Świadectwa energetyczne <span class="grad">dla budynków komercyjnych</span>'
+    lead={['Sporządzamy świadectwa charakterystyki energetycznej dla firm, deweloperów, zarządców i właścicieli budynków.']}
+    crumbs={[{ name: 'Świadectwa energetyczne', path: '/swiadectwa-energetyczne/' }]}
+    art="cert"
+    mail={{ subject: 'Zapytanie o świadectwo energetyczne', label: 'Zapytaj o świadectwo dla budynku' }}
+    secondary={{ href: '#zakres-swiadectwa', label: 'Zobacz zakres' }}
+  />
+
+  <section class="pad" aria-labelledby="czym-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>O dokumencie</span>
+        <h2 id="czym-h" class="rv d1">Zapotrzebowanie budynku <span class="grad">na energię w jednym dokumencie</span></h2>
+        <p class="rv d2">Świadectwo charakterystyki energetycznej określa zapotrzebowanie budynku lub lokalu na energię związaną z jego użytkowaniem, w tym ogrzewaniem, wentylacją, przygotowaniem ciepłej wody, chłodzeniem i oświetleniem.</p>
+      </div>
+      <div class="cols-2">
+        <div class="card flow rv"><span class="kick">Odbiorcy</span><h3>Dla kogo</h3><p>Usługa jest kierowana do klientów biznesowych i instytucjonalnych, którzy potrzebują świadectwa przy sprzedaży, najmie, przekazaniu budynku lub porządkowaniu dokumentacji.</p></div>
+        <div class="card flow mint-bg rv d1"><span class="kick">Pakiety</span><h3>Obsługa większych zleceń</h3><p>Realizujemy również pakiety świadectw dla deweloperów, zarządców nieruchomości i firm posiadających portfel lokali lub budynków.</p><a class="link-arrow" href="/dla-deweloperow-i-zarzadcow/">Oferta dla deweloperów i zarządców</a></div>
+      </div>
+      <h3 class="rv" style="margin:56px 0 0;font-size:1.3rem">Typy obiektów</h3>
+      <ul class="chips rv" role="list">
+        <li class="chip">lokale usługowe</li><li class="chip">budynki biurowe</li><li class="chip">hale i magazyny</li><li class="chip">budynki przemysłowe</li><li class="chip">budynki użyteczności publicznej</li><li class="chip">większe pakiety lokali lub budynków</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="pad band-soft" id="zakres-swiadectwa" aria-labelledby="zakres-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="tag rv"><i></i>Zakres opracowania</span>
+        <h2 id="zakres-h" class="rv d1">Co zawiera <span class="grad">świadectwo</span></h2>
+      </div>
+      <div class="cols-2">
+        <div class="card flow rv"><span class="kick">Zakres podstawowy</span><h3>Analiza i dokument</h3>
+          <ul class="check"><li>analiza danych budynku lub lokalu,</li><li>obliczenia charakterystyki energetycznej,</li><li>przygotowanie świadectwa,</li><li>przekazanie dokumentu w uzgodnionej formie.</li></ul></div>
+        <div class="card flow rv d1"><span class="kick">Obsługa B2B</span><h3>Dla firm i większych zleceń</h3>
+          <ul class="check"><li>świadectwa dla budynków komercyjnych,</li><li>świadectwa dla lokali usługowych,</li><li>pakiety świadectw dla deweloperów i zarządców,</li><li>wycena po analizie liczby obiektów i zakresu danych.</li></ul></div>
+      </div>
+      <div class="note rv" style="margin-top:28px">
+        <h3>Zapytaj o świadectwo dla budynku</h3>
+        <p>Prześlij informację o budynku, lokalu albo liczbie świadectw do przygotowania.</p>
+        <a class="btn btn-teal" href="#zapytanie">Przejdź do zapytania <span class="ar" aria-hidden="true">→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="pad" id="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="sec-head center"><span class="tag rv"><i></i>FAQ</span><h2 id="faq-h" class="rv d1">Najczęstsze pytania <span class="grad">przed zleceniem opracowania</span></h2></div>
+      <Faq items={faq} />
+    </div>
+  </section>
+
+  <CtaBand usluga="Świadectwo charakterystyki energetycznej" title="Zapytaj o świadectwo dla budynku" text="Prześlij informację o budynku, lokalu albo liczbie świadectw do przygotowania." />
+</Base>
