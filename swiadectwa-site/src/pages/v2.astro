@@ -1,0 +1,131 @@
+---
+import '@fontsource-variable/plus-jakarta-sans';
+import '../styles/v2.css';
+import Icon from '../components/Icon.astro';
+import { services } from '../data/services.js';
+import { audiences } from '../data/audiences.js';
+const scale = [['A+',34,'#daffee'],['A',46,'#bff2e9'],['B',58,'#8fd9d0'],['C',70,'#5fb9b6'],['D',82,'#3a9aa0'],['E',92,'#2a7e88'],['F',100,'#176974']];
+const steps = [
+  ['Zapytanie','Wysyłasz dane inwestycji i dokumentację projektową.'],
+  ['Wycena i termin','Indywidualna oferta. Termin ustalamy na początku zlecenia.'],
+  ['Opracowanie','Analiza na profesjonalnym oprogramowaniu, konsultacje korekt.'],
+  ['Dokumenty','Odbierasz gotowe opracowanie i dopiero wtedy płacisz.'],
+];
+const faq = [
+  ['Dla kogo jest oferta?','Dla firm z branży budowlanej: biur projektowych, deweloperów i architektów. Nie obsługujemy klientów indywidualnych.'],
+  ['Jak wyceniacie zlecenia?','Każde zlecenie wyceniamy indywidualnie na podstawie dokumentacji projektowej i zakresu opracowania.'],
+  ['Ile trwa realizacja?','Termin ustalamy zawsze na początku zlecenia, po zapoznaniu się z dokumentacją.'],
+  ['Kiedy płacę?','Płatność następuje po dostarczeniu gotowego dokumentu.'],
+  ['Czy pracujecie poza Pomorzem?','Tak, obsługujemy inwestycje w całej Polsce, zdalnie.'],
+];
+const [s1, s2, ...rest] = services;
+---
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>swiadectwa.net – propozycja układu v2</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+</head>
+<body class="v2">
+  <div class="hero2">
+    <header class="hdr"><div class="wrap">
+      <a href="/v2"><img src="/logo.png" alt="swiadectwa.net" /></a>
+      <button class="tg" aria-label="Menu" onclick="document.getElementById('n2').classList.toggle('open')">☰</button>
+      <nav class="nav2" id="n2">
+        <a href="/oferta">Oferta</a><a href="#klienci">Dla kogo</a><a href="#proces">Proces</a><a href="/o-nas">O nas</a><a href="/kontakt">Kontakt</a>
+        <a class="cta-s" href="/kontakt#wycena">Zapytaj o wycenę</a>
+      </nav>
+    </div></header>
+    <div class="wrap hero-in">
+      <div>
+        <div class="label"><b>Analizy energetyczne</b>dla budownictwa</div>
+        <h1>Dokumenty energetyczne, które <span>nie wstrzymują</span> Twojej inwestycji.</h1>
+        <p class="sub">Projektowa charakterystyka energetyczna i świadectwa dla biur projektowych, deweloperów i architektów. W całej Polsce, z terminem ustalonym na starcie.</p>
+        <div class="acts"><a class="b-mint" href="/kontakt#wycena">Zapytaj o wycenę</a><a class="lnk" href="#oferta">Zobacz zakres usług</a></div>
+      </div>
+      <div class="cert" aria-hidden="true">
+        <div class="ct"><div><b>Świadectwo charakterystyki energetycznej</b><br /><small>Budynek · Lokal</small></div><div class="seal">A+</div></div>
+        <div class="scale2">
+          {scale.map(([l,w,c]) => (<div class="sr"><i style={`width:${w}%;background:${c}`}>{l}</i>{l==='A' && <em>◄</em>}</div>))}
+        </div>
+        <div class="lines"><span></span><span></span><span></span></div>
+        <div class="float">Termin ustalony na starcie</div>
+      </div>
+    </div>
+  </div>
+
+  <section class="trust"><div class="wrap">
+    <div class="tr"><b>600+</b><span>wykonanych analiz energetycznych</span></div>
+    <div class="tr"><b>Cała Polska</b><span>obsługa zdalna inwestycji</span></div>
+    <div class="tr"><b>Termin na starcie</b><span>znasz datę przed rozpoczęciem</span></div>
+    <div class="tr"><b>Płatność po</b><span>odbiorze gotowego dokumentu</span></div>
+  </div></section>
+
+  <section class="prob"><div class="wrap">
+    <div class="label"><b>01</b>Dlaczego my</div>
+    <h2>Projekt stoi, bo brakuje jednego dokumentu?</h2>
+    <div class="cmp">
+      <div class="bad"><h3>Typowo</h3><ul>
+        <li>Szukanie wykonawcy przy każdym kolejnym projekcie</li>
+        <li>Niejasny termin, ustalany dopiero w trakcie</li>
+        <li>Poprawki dokumentów po złożeniu wniosku</li>
+        <li>Płatność z góry, zanim zobaczysz efekt</li>
+      </ul></div>
+      <div class="good"><h3>Ze swiadectwa.net</h3><ul>
+        <li>Jeden stały wykonawca dla całego portfela projektów</li>
+        <li>Termin realizacji ustalony na początku zlecenia</li>
+        <li>Weryfikacja wskaźników już na etapie koncepcji</li>
+        <li>Płatność dopiero po dostarczeniu dokumentu</li>
+      </ul></div>
+    </div>
+  </div></section>
+
+  <section class="offer" id="oferta"><div class="wrap">
+    <div class="label"><b>02</b>Oferta</div>
+    <h2>Dwie usługi główne. Trzy uzupełniające.</h2>
+    <div class="bento">
+      <a class="bt b1" href={`/oferta/${s1.slug}`}><div class="ic"><Icon name={s1.icon} size={36} /></div><h3>{s1.name}</h3><p>{s1.short}</p><span class="go">Zobacz zakres</span></a>
+      <a class="bt b2" href={`/oferta/${s2.slug}`}><div class="ic"><Icon name={s2.icon} size={30} /></div><h3>{s2.name}</h3><p>{s2.short}</p><span class="go">Zobacz zakres</span></a>
+      {rest.map(s => (<a class="bt bs" href={`/oferta/${s.slug}`}><div class="ic"><Icon name={s.icon} size={28} /></div><h3>{s.name}</h3><p>{s.short}</p><span class="go">Więcej</span></a>))}
+    </div>
+  </div></section>
+
+  <section class="who" id="klienci"><div class="wrap">
+    <div class="label"><b>03</b>Dla kogo</div>
+    <h2>Pracujemy wyłącznie z firmami z branży budowlanej.</h2>
+    <div class="rows">
+      {audiences.map((a,i) => (<a class="row" href={`/dla-kogo/${a.slug}`}><span>0{i+1}</span><h3>{a.name}</h3><p>{a.short}</p><i>→</i></a>))}
+    </div>
+  </div></section>
+
+  <section class="flow dark" id="proces"><div class="wrap">
+    <div class="label"><b>04</b>Proces</div>
+    <h2>Od zapytania do dokumentu w czterech krokach.</h2>
+    <div class="tl">
+      {steps.map(([t,d],i) => (<div class="st"><i>{i+1}</i><h3>{t}</h3><p>{d}</p></div>))}
+    </div>
+  </div></section>
+
+  <section class="faq2"><div class="wrap">
+    <div><div class="label"><b>05</b>FAQ</div><h2>Najczęstsze pytania</h2></div>
+    <div>{faq.map(([q,a]) => (<details><summary>{q}</summary><p>{a}</p></details>))}</div>
+  </div></section>
+
+  <section class="cta2"><div class="wrap">
+    <div><h2>Masz projekt do opracowania?</h2><a class="b-dark" href="/kontakt#wycena">Zapytaj o wycenę</a></div>
+    <div class="contact"><span>Albo zadzwoń lub napisz:</span><a href="tel:+48694460538">+48 694 460 538</a><a href="mailto:biuro@swiadectwa.net">biuro@swiadectwa.net</a></div>
+  </div></section>
+
+  <footer class="ft"><div class="wrap">
+    <div class="cols">
+      <div><img src="/logo.png" alt="swiadectwa.net" style="height:30px;margin-bottom:16px" /><p>Eksperci w zakresie analiz energetycznych. Obsługujemy biura projektowe, deweloperów i architektów.</p></div>
+      <div><h4>Oferta</h4><a href="/oferta/projektowa-charakterystyka-energetyczna">Projektowa charakterystyka</a><a href="/oferta/swiadectwa-energetyczne">Świadectwa energetyczne</a><a href="/oferta">Wszystkie usługi</a></div>
+      <div><h4>Kontakt</h4><a href="mailto:biuro@swiadectwa.net">biuro@swiadectwa.net</a><a href="tel:+48694460538">+48 694 460 538</a><span>Al. Jana Pawła II 1D/26, Gdańsk</span></div>
+    </div>
+    <div class="copy">© 2026 swiadectwa.net · <a href="/polityka-prywatnosci" style="display:inline">Polityka prywatności</a></div>
+  </div></footer>
+  <div class="mb"><a class="c" href="tel:+48694460538">Zadzwoń</a><a class="q" href="/kontakt#wycena">Zapytaj o wycenę</a></div>
+</body>
+</html>
