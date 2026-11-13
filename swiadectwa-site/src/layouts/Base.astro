@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/themes.css';
 import Logo from '../components/Logo.astro';
 import { site, nav, CTA, mailto } from '../data/site';
 
@@ -39,7 +40,7 @@ const crumbLd = breadcrumbs.length
 const graph = [org, ...(crumbLd ? [crumbLd] : []), ...jsonLd];
 ---
 <!doctype html>
-<html lang="pl">
+<html lang="pl" data-theme={import.meta.env.PUBLIC_THEME || "teal"}>
 <head>
   <meta charset="utf-8" />
   <script is:inline>document.documentElement.classList.add('js')</script>
@@ -68,6 +69,10 @@ const graph = [org, ...(crumbLd ? [crumbLd] : []), ...jsonLd];
   <div class="noise" aria-hidden="true"></div>
 
   <header id="hd" class="dk">
+    <div class="topbar"><div class="wrap">
+      <span class="tb-l"><a href={`tel:${site.phoneHref}`}>{site.phone}</a><a href={`mailto:${site.email}`}>{site.email}</a><span>Gdańsk / {site.city}</span></span>
+      <span class="tb-r">Obsługa zdalna: cała Polska</span>
+    </div></div>
     <div class="wrap hd-in">
       <a class="brand" href="/" aria-label="świadectwa.net, strona główna"><Logo /></a>
       <button class="tg" id="tg" type="button" aria-expanded="false" aria-controls="nv" aria-label="Menu">

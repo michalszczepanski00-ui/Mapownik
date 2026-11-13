@@ -11,7 +11,7 @@ async function* walk(dir) {
 }
 const fix = (text) => text.replace(/(^|[\s(>„"])([aiouwzAIOUWZ])[ \t]+(?=[^\s<])/g, '$1$2 ');
 let n = 0;
-for await (const file of walk('dist')) {
+for await (const file of walk(process.argv[2] || 'dist')) {
   const html = await readFile(file, 'utf8');
   // przetwarzamy tylko tekst poza tagami, <script> i <style>
   const out = html.replace(/(<(script|style|textarea)\b[\s\S]*?<\/\2>)|(<[^>]*>)|([^<]+)/g, (m, skip, _t, tag, text) => (text ? fix(text) : m));

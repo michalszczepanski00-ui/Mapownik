@@ -1,0 +1,378 @@
+/* =====================================================================
+   Motywy kolorystyczne. Domyślny ("teal") jest zdefiniowany w global.css.
+   Wybór: PUBLIC_THEME=pasibus | spokojny | avada przy budowaniu.
+   ===================================================================== */
+@font-face{font-family:"Open Sans";font-weight:300 800;font-display:swap;src:url(/fonts/open-sans-latin-ext-wght-normal.woff2) format("woff2-variations");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Open Sans";font-weight:300 800;font-display:swap;src:url(/fonts/open-sans-latin-wght-normal.woff2) format("woff2-variations");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+.topbar{display:none}
+
+/* =====================================================================
+   A. PASIBUS – kremowe tło, czerń, mocna zieleń i żółć, „naklejkowa" odwaga
+   ===================================================================== */
+html[data-theme=pasibus]{
+  --c-deep:#0b7a37;--c-text:#08692e;--c-accent:#0b9a40;--c-glow:#ffd21f;--c-soft:#ffd21f;--c-soft2:#fff0a8;
+  --h1:#0d8a3d;--h2:#0a6e31;--h3:#075324;--c-band:#fff3cc;--c-footer:#0d0d0d;--c-night:#0d0d0d;--c-night2:#0d0d0d;
+  --c-on-soft:#0d0d0d;--c-ink:#0d0d0d;--c-muted-lt:#35332a;--c-soft-text:#1a1a12;--c-page:#fcf4e2;--c-tint:#fff3cc;
+  --bg:#fcf4e2;--ink:#0d0d0d;--muted:#35332a;--line:rgba(13,13,13,.2);--glass:#fff;--glass2:#fff;
+  --mint:#ffd21f;--mint2:#fff0a8;--teal:#0b7a37;--teal-d:#0b7a37;--glow:#ffd21f;--r:22px;
+  --display:"Sora",system-ui,sans-serif;
+}
+html[data-theme=pasibus] .dk{--ink:#fff;--muted:#e7f5ea;--line:rgba(255,255,255,.28);--glass:rgba(255,255,255,.12);--glass2:rgba(255,255,255,.18)}
+html[data-theme=pasibus] .lt{--ink:#0d0d0d;--muted:#35332a;--line:rgba(13,13,13,.2)}
+html[data-theme=pasibus] body{background:#fcf4e2}
+html[data-theme=pasibus] .noise,html[data-theme=pasibus] .bg-grid,html[data-theme=pasibus] .orb,html[data-theme=pasibus] .hero::after,html[data-theme=pasibus] .phero::after{display:none}
+html[data-theme=pasibus] h1,html[data-theme=pasibus] h2,html[data-theme=pasibus] h3{font-weight:800;letter-spacing:-.045em}
+/* nagłówek: czarny pasek */
+html[data-theme=pasibus] header,html[data-theme=pasibus] header.solid{background:#0d0d0d;border-bottom:0;backdrop-filter:none}
+html[data-theme=pasibus] header .brand .logo,html[data-theme=pasibus] header.solid .brand .logo{--logo-mark:#ffd21f;--logo-ink:#fff}
+html[data-theme=pasibus] header nav a:not(.btn),html[data-theme=pasibus] header.solid nav a:not(.btn){color:#fff;font-weight:600}
+html[data-theme=pasibus] header nav a:not(.btn):hover{color:#ffd21f}
+html[data-theme=pasibus] header nav a:not(.btn)::after{background:#ffd21f;height:3px}
+html[data-theme=pasibus] header.solid .tg,html[data-theme=pasibus] .tg{color:#fff}
+/* przyciski: pigułki z grubym obrysem i twardym cieniem */
+html[data-theme=pasibus] .btn{font-weight:800;border:2px solid #0d0d0d;box-shadow:4px 4px 0 #0d0d0d;border-radius:999px;transition:transform .15s,box-shadow .15s,background .15s}
+html[data-theme=pasibus] .btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 #0d0d0d}
+html[data-theme=pasibus] .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #0d0d0d}
+html[data-theme=pasibus] .btn-mint,html[data-theme=pasibus] header.solid .btn-mint{background:#ffd21f;color:#0d0d0d}
+html[data-theme=pasibus] header .btn-mint{box-shadow:3px 3px 0 #fff;border-color:#0d0d0d}
+html[data-theme=pasibus] header .btn-mint:hover{box-shadow:5px 5px 0 #fff}
+html[data-theme=pasibus] .btn-teal{background:#0b9a40;color:#fff}
+html[data-theme=pasibus] .btn-teal:hover{background:#08832f}
+html[data-theme=pasibus] .btn-ghost{background:#fff;color:#0d0d0d;border-color:#0d0d0d;backdrop-filter:none}
+html[data-theme=pasibus] .btn-line{background:#fff;color:#0d0d0d;border:2px solid #0d0d0d}
+/* nagłówek strony: zieleń ze skośnym dołem */
+html[data-theme=pasibus] .hero{background:linear-gradient(160deg,#0f9443 0%,#0a6e31 100%);clip-path:polygon(0 0,100% 0,100% calc(100% - 5vw),0 100%);padding-bottom:calc(96px + 5vw);margin-bottom:-2vw}
+html[data-theme=pasibus] .phero{background:linear-gradient(160deg,#0f9443 0%,#0a6e31 100%);clip-path:polygon(0 0,100% 0,100% calc(100% - 3vw),0 100%);padding-bottom:calc(72px + 3vw);margin-bottom:-1.5vw}
+html[data-theme=pasibus] .hero .lead,html[data-theme=pasibus] .phero .lead{color:#effaf1}
+html[data-theme=pasibus] .hero h1,html[data-theme=pasibus] .phero h1{font-weight:800;color:#fff;text-shadow:3px 3px 0 rgba(0,0,0,.35)}
+html[data-theme=pasibus] .dk .grad{background:none;-webkit-text-fill-color:#ffd21f;color:#ffd21f}
+html[data-theme=pasibus] .grad{background:linear-gradient(transparent 58%,#ffd21f 58%);-webkit-text-fill-color:currentColor;color:inherit}
+html[data-theme=pasibus] .tag{background:#ffd21f;color:#0d0d0d;border:2px solid #0d0d0d;box-shadow:3px 3px 0 #0d0d0d;transform:rotate(-1.5deg);font-weight:800;letter-spacing:.08em;backdrop-filter:none}
+html[data-theme=pasibus] .tag i{display:none}
+html[data-theme=pasibus] .mini div{border-left:4px solid #ffd21f}
+html[data-theme=pasibus] .mini div b{color:#fff}
+html[data-theme=pasibus] .crumbs,html[data-theme=pasibus] .crumbs a{color:#fff}
+/* zdjęcie w hero: zielony duoton, gruba ramka, twardy cień */
+html[data-theme=pasibus] .vis .frame{border:3px solid #0d0d0d;border-radius:28px;box-shadow:10px 10px 0 #0d0d0d}
+html[data-theme=pasibus] .duo{background:#073d1a}
+html[data-theme=pasibus] .duo::before{background:linear-gradient(160deg,rgba(15,148,67,.75),rgba(7,60,26,.55));mix-blend-mode:color}
+html[data-theme=pasibus] .glass{background:#fff;color:#0d0d0d;border:2px solid #0d0d0d;box-shadow:5px 5px 0 #0d0d0d;backdrop-filter:none;border-radius:18px}
+html[data-theme=pasibus] .glass h4{color:#0a6e31}
+html[data-theme=pasibus] .bar{color:#0d0d0d}html[data-theme=pasibus] .bar s{background:#0b9a40;border:1.5px solid #0d0d0d}
+html[data-theme=pasibus] .bar:nth-child(n+3) s{background:#8fd3a8;opacity:1}
+html[data-theme=pasibus] .bar.hi{color:#0a6e31}
+html[data-theme=pasibus] .ok i{background:#ffd21f;color:#0d0d0d;border:2px solid #0d0d0d}
+/* pasek: skośny zielony baner */
+html[data-theme=pasibus] .marq{background:#0b9a40;transform:rotate(-1.2deg);margin:-3vw -3% 0;padding:20px 0;position:relative;z-index:3;border:0;box-shadow:0 6px 0 #0d0d0d}
+html[data-theme=pasibus] .marq span{color:#ffd21f;font-weight:800;text-transform:uppercase;letter-spacing:-.01em;font-size:1.05rem}
+html[data-theme=pasibus] .marq li::before{background:#ffd21f}
+/* sekcje: skośne pasy zamiast gradientów */
+html[data-theme=pasibus] .band-soft{background:#fff3cc;clip-path:polygon(0 3vw,100% 0,100% calc(100% - 3vw),0 100%);margin:-2vw 0;padding:calc(104px + 3vw) 0}
+@media(max-width:700px){html[data-theme=pasibus] .band-soft{padding:calc(72px + 3vw) 0}}
+html[data-theme=pasibus] .proc{background:none}
+html[data-theme=pasibus] .say .w.key.on{background:linear-gradient(transparent 55%,#ffd21f 55%);color:#0d0d0d}
+html[data-theme=pasibus] .say .w{opacity:.22}
+html[data-theme=pasibus] .say .w.on{opacity:1}
+/* karty: biel, czarny obrys, twardy cień */
+html[data-theme=pasibus] .card,html[data-theme=pasibus] .stat,html[data-theme=pasibus] .step,html[data-theme=pasibus] details,html[data-theme=pasibus] .kv,html[data-theme=pasibus] .tbl{background:#fff;border:2px solid #0d0d0d;border-radius:22px;box-shadow:6px 6px 0 #0d0d0d}
+html[data-theme=pasibus] .card::before{display:none}
+html[data-theme=pasibus] .card:hover,html[data-theme=pasibus] .step:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 #0d0d0d;border-color:#0d0d0d}
+html[data-theme=pasibus] .card.mint-bg,html[data-theme=pasibus] .paths .p2{background:#ffd21f;border:2px solid #0d0d0d}
+html[data-theme=pasibus] .card.mint-bg p,html[data-theme=pasibus] .paths .p2 p{color:#1a1a12}
+html[data-theme=pasibus] .paths .p1,html[data-theme=pasibus] .card.dk{background:#0b7a37;border:2px solid #0d0d0d}
+html[data-theme=pasibus] .paths .p1 p{color:#effaf1}
+html[data-theme=pasibus] .paths .p1 .go,html[data-theme=pasibus] .paths .p1 .kick{color:#ffd21f}
+html[data-theme=pasibus] .card .go,html[data-theme=pasibus] .link-arrow{color:#0d0d0d;font-weight:800}
+html[data-theme=pasibus] .card .kick,html[data-theme=pasibus] .note .kick,html[data-theme=pasibus] .mod .when{color:#0a6e31;font-weight:800}
+html[data-theme=pasibus] .stat b{color:#0a6e31}
+html[data-theme=pasibus] .stat::after{display:none}
+html[data-theme=pasibus] .cert{border:2px solid #0d0d0d;box-shadow:4px 4px 0 #0d0d0d;border-radius:12px}
+html[data-theme=pasibus] .panel{border:2px solid #0d0d0d;border-radius:22px;box-shadow:6px 6px 0 #0d0d0d}
+html[data-theme=pasibus] .panel .n{background:#ffd21f;color:#0d0d0d;border:2px solid #0d0d0d;backdrop-filter:none;font-weight:800}
+html[data-theme=pasibus] .panel .go-l{color:#ffd21f}
+html[data-theme=pasibus] .step .num{color:#ffd21f;-webkit-text-stroke:2px #0d0d0d}
+html[data-theme=pasibus] .step::before{background:#ffd21f;border:2px solid #0d0d0d;box-shadow:none}
+html[data-theme=pasibus] .rail::before{background:#0d0d0d;height:3px}
+html[data-theme=pasibus] .rail .fill{background:#0b9a40;box-shadow:none;height:3px}
+html[data-theme=pasibus] details[open]{background:#ffd21f}
+html[data-theme=pasibus] details p{color:#1a1a12}
+html[data-theme=pasibus] summary::after{color:#0d0d0d}
+html[data-theme=pasibus] .note{background:#ffe566;border:2px solid #0d0d0d;border-radius:22px;box-shadow:6px 6px 0 #0d0d0d}
+html[data-theme=pasibus] .note p{color:#1a1a12}
+html[data-theme=pasibus] .chip{background:#fff;border:2px solid #0d0d0d;color:#0d0d0d;font-weight:700}
+html[data-theme=pasibus] .kv dt{background:#fff3cc;color:#0d0d0d}
+html[data-theme=pasibus] .kv a,html[data-theme=pasibus] .prose a{color:#0a6e31}
+html[data-theme=pasibus] .tbl th{background:#fff3cc;color:#0d0d0d}
+html[data-theme=pasibus] .check li::before{background:#ffd21f url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2.5 6.2l2.4 2.3 4.6-5' fill='none' stroke='%230d0d0d' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/12px no-repeat;border:2px solid #0d0d0d}
+html[data-theme=pasibus] .dk .check li::before{background-color:#ffd21f}
+html[data-theme=pasibus] .cta .box{background:#0b7a37;border:3px solid #0d0d0d;box-shadow:10px 10px 0 #0d0d0d;border-radius:30px}
+html[data-theme=pasibus] .cta .box::before,html[data-theme=pasibus] .cta .box .duo{display:none}
+html[data-theme=pasibus] .cta p,html[data-theme=pasibus] .cta .contact-lines{color:#effaf1}
+html[data-theme=pasibus] form{background:#fff;border:2px solid #0d0d0d;box-shadow:6px 6px 0 #0d0d0d;border-radius:22px}
+html[data-theme=pasibus] input,html[data-theme=pasibus] select,html[data-theme=pasibus] textarea{background:#fff8e6;border:2px solid #0d0d0d;border-radius:14px;color:#0d0d0d}
+html[data-theme=pasibus] label{color:#0d0d0d;font-weight:700}
+html[data-theme=pasibus] .cta form .btn-teal{background:#0b9a40;color:#fff;box-shadow:4px 4px 0 #0d0d0d}
+html[data-theme=pasibus] .ft{background:#0d0d0d;color:#e9e4d3}
+html[data-theme=pasibus] .ft-h{color:#ffd21f}
+html[data-theme=pasibus] .ft a{color:#e9e4d3}html[data-theme=pasibus] .ft a:hover{color:#ffd21f}
+html[data-theme=pasibus] .ft-logo{--logo-mark:#ffd21f;--logo-ink:#fff;--logo-sub:#ffd21f}
+html[data-theme=pasibus] .bar-m{background:#0d0d0d;border:0}
+html[data-theme=pasibus] .bar-m .b{background:#ffd21f;color:#0d0d0d}
+html[data-theme=pasibus] .bar-m .a{background:#fff;color:#0d0d0d}
+
+/* =====================================================================
+   B. SPOKOJNY – jasny, stonowany, profesjonalny (granat i błękit z archiwum klienta)
+   ===================================================================== */
+html[data-theme=spokojny]{
+  --c-deep:#1f5b99;--c-text:#1c5189;--c-accent:#2f78c4;--c-glow:#5b9bd5;--c-soft:#e8f0f8;--c-soft2:#d3e3f3;
+  --h1:#ffffff;--h2:#f4f7fb;--h3:#e8eff7;--c-band:#eef3f9;--c-footer:#0f2c4c;--c-night:#0b1f36;--c-night2:#0b1f36;
+  --c-on-soft:#0f2c4c;--c-ink:#14202b;--c-muted-lt:#44556a;--c-soft-text:#2b3f55;--c-page:#f6f8fb;--c-tint:#eef3f9;
+  --bg:#f6f8fb;--ink:#14202b;--muted:#44556a;--line:rgba(20,32,43,.12);--glass:#fff;--glass2:#fff;
+  --mint:#e8f0f8;--mint2:#d3e3f3;--teal:#1f5b99;--teal-d:#1f5b99;--glow:#5b9bd5;--r:16px;
+}
+html[data-theme=spokojny] .dk{--ink:#eef3f9;--muted:#b6c6d8;--line:rgba(255,255,255,.2);--glass:rgba(255,255,255,.08);--glass2:rgba(255,255,255,.12)}
+html[data-theme=spokojny] body{background:#f6f8fb}
+html[data-theme=spokojny] .noise{display:none}
+html[data-theme=spokojny] h1,html[data-theme=spokojny] h2,html[data-theme=spokojny] h3{font-weight:600;letter-spacing:-.025em}
+/* nagłówek: biały od początku */
+html[data-theme=spokojny] header,html[data-theme=spokojny] header.solid{background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+html[data-theme=spokojny] header.dk{--ink:#14202b;--muted:#44556a;--line:rgba(20,32,43,.12)}
+html[data-theme=spokojny] header .brand .logo{--logo-mark:#1f5b99;--logo-ink:#0f2c4c}
+html[data-theme=spokojny] header nav a:not(.btn){color:#2b3f55;font-weight:500}
+html[data-theme=spokojny] header nav a:not(.btn):hover,html[data-theme=spokojny] header nav a[aria-current=page]{color:#1f5b99}
+html[data-theme=spokojny] header nav a:not(.btn)::after{background:#1f5b99;height:2px}
+html[data-theme=spokojny] .tg,html[data-theme=spokojny] header.solid .tg{color:#14202b}
+@media(max-width:1120px){html[data-theme=spokojny] header nav{background:#fff;border-bottom:1px solid var(--line)}html[data-theme=spokojny] header nav a:not(.btn),html[data-theme=spokojny] header.solid nav a:not(.btn){color:#14202b}}
+/* przyciski: granat, stonowane */
+html[data-theme=spokojny] .btn{border-radius:10px;box-shadow:none;font-weight:600}
+html[data-theme=spokojny] .btn-mint,html[data-theme=spokojny] header.solid .btn-mint,html[data-theme=spokojny] .btn-teal{background:#1f5b99;color:#fff;box-shadow:0 1px 2px rgba(15,44,76,.2)}
+html[data-theme=spokojny] .btn-mint:hover,html[data-theme=spokojny] .btn-teal:hover{background:#174a7e;transform:translateY(-1px);box-shadow:0 6px 16px -6px rgba(15,44,76,.45)}
+html[data-theme=spokojny] .btn-ghost,html[data-theme=spokojny] .btn-line{background:#fff;color:#1f5b99;border:1px solid rgba(31,91,153,.35);backdrop-filter:none}
+html[data-theme=spokojny] .btn-ghost:hover,html[data-theme=spokojny] .btn-line:hover{border-color:#1f5b99;background:#f4f8fc;transform:translateY(-1px)}
+@media(max-width:1120px){html[data-theme=spokojny] header nav .btn,html[data-theme=spokojny] header.solid nav .btn-mint{background:#1f5b99;color:#fff}}
+/* nagłówek strony: jasny, spokojny */
+html[data-theme=spokojny] .hero,html[data-theme=spokojny] .phero{background:linear-gradient(180deg,#fff 0%,#eef3f9 100%);border-bottom:1px solid var(--line)}
+html[data-theme=spokojny] .hero.dk,html[data-theme=spokojny] .phero.dk{--ink:#14202b;--muted:#44556a;--line:rgba(20,32,43,.12);--glass:#fff;--glass2:#fff;color:#14202b}
+html[data-theme=spokojny] .hero::after,html[data-theme=spokojny] .phero::after{display:none}
+html[data-theme=spokojny] .bg-grid{opacity:.35;mask-image:radial-gradient(ellipse 80% 80% at 70% 30%,#000 10%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse 80% 80% at 70% 30%,#000 10%,transparent 70%)}
+html[data-theme=spokojny] .orb{opacity:.28}
+html[data-theme=spokojny] .hero .orb.o1,html[data-theme=spokojny] .phero .orb.o1{background:#9cc3ec;opacity:.3}
+html[data-theme=spokojny] .hero .orb.o2,html[data-theme=spokojny] .phero .orb.o2{background:#d3e3f3;opacity:.5}
+html[data-theme=spokojny] .hero h1,html[data-theme=spokojny] .phero h1{color:#0f2c4c}
+html[data-theme=spokojny] .hero .lead,html[data-theme=spokojny] .phero .lead{color:#44556a}
+html[data-theme=spokojny] .grad,html[data-theme=spokojny] .dk .grad{background:none;-webkit-text-fill-color:#1f5b99;color:#1f5b99}
+html[data-theme=spokojny] .tag,html[data-theme=spokojny] .dk .tag{background:#fff;color:#1c5189;border:1px solid var(--line);backdrop-filter:none;font-weight:600}
+html[data-theme=spokojny] .tag i{background:#2f78c4;animation:none;box-shadow:none}
+html[data-theme=spokojny] .mini div{border-left:2px solid #2f78c4}
+html[data-theme=spokojny] .mini div b{color:#0f2c4c}
+html[data-theme=spokojny] .crumbs,html[data-theme=spokojny] .crumbs a{color:#44556a}
+html[data-theme=spokojny] .crumbs a{text-decoration-color:rgba(68,85,106,.4)}
+/* zdjęcia: naturalne */
+html[data-theme=spokojny] .duo{background:#dfe7f0}
+html[data-theme=spokojny] .duo img{filter:none;mix-blend-mode:normal;opacity:1}
+html[data-theme=spokojny] .duo::before{display:none}
+html[data-theme=spokojny] .vis .frame{border-radius:20px;box-shadow:0 30px 60px -34px rgba(15,44,76,.45);border:1px solid var(--line)}
+html[data-theme=spokojny] .duo::after{background:linear-gradient(to top,rgba(11,31,54,.35),transparent 45%)}
+html[data-theme=spokojny] .glass{background:#fff;color:#14202b;border:1px solid var(--line);box-shadow:0 18px 40px -20px rgba(15,44,76,.35);backdrop-filter:none;border-radius:14px}
+html[data-theme=spokojny] .glass h4{color:#1c5189}
+html[data-theme=spokojny] .bar{color:#14202b}html[data-theme=spokojny] .bar s{background:linear-gradient(90deg,#2f78c4,#5b9bd5)}
+html[data-theme=spokojny] .bar:nth-child(n+3) s{background:#b9cfe6;opacity:1}
+html[data-theme=spokojny] .bar.hi{color:#1c5189}
+html[data-theme=spokojny] .ok i{background:#e8f0f8;color:#1f5b99}
+html[data-theme=spokojny] .marq{background:#e8f0f8;border-block:1px solid var(--line)}
+html[data-theme=spokojny] .marq span{color:#1c5189;font-weight:600;font-size:1.05rem}
+html[data-theme=spokojny] .marq li::before{background:#2f78c4}
+html[data-theme=spokojny] .band-soft,html[data-theme=spokojny] .proc{background:#eef3f9}
+html[data-theme=spokojny] .say .w.key.on{color:#1f5b99}
+/* karty: biel, cienka ramka */
+html[data-theme=spokojny] .card,html[data-theme=spokojny] .stat,html[data-theme=spokojny] .step,html[data-theme=spokojny] details,html[data-theme=spokojny] .kv,html[data-theme=spokojny] .tbl{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(20,32,43,.04),0 12px 30px -24px rgba(15,44,76,.35)}
+html[data-theme=spokojny] .card::before{background:radial-gradient(420px circle at var(--mx) var(--my),rgba(47,120,196,.08),transparent 60%)}
+html[data-theme=spokojny] .card:hover,html[data-theme=spokojny] .step:hover{border-color:rgba(31,91,153,.45);transform:translateY(-3px)}
+html[data-theme=spokojny] .card.mint-bg,html[data-theme=spokojny] .paths .p2{background:#e8f0f8;border-color:transparent}
+html[data-theme=spokojny] .paths .p1,html[data-theme=spokojny] .card.dk{background:linear-gradient(135deg,#1c4f86,#0f2c4c);border-color:transparent}
+html[data-theme=spokojny] .paths .p1 .go,html[data-theme=spokojny] .paths .p1 .kick{color:#a9cdf2}
+html[data-theme=spokojny] .stat::after{display:none}
+html[data-theme=spokojny] .card .go,html[data-theme=spokojny] .link-arrow,html[data-theme=spokojny] .kv a,html[data-theme=spokojny] .prose a{color:#1c5189}
+html[data-theme=spokojny] .card .kick,html[data-theme=spokojny] .note .kick,html[data-theme=spokojny] .mod .when{color:#1c5189}
+html[data-theme=spokojny] .dk .kick,html[data-theme=spokojny] .paths .p1 .kick{color:#a9cdf2}
+html[data-theme=spokojny] .stat b{color:#0f2c4c}
+html[data-theme=spokojny] .panel{border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 50px -34px rgba(15,44,76,.5)}
+html[data-theme=spokojny] .panel .duo::after{background:linear-gradient(to top,rgba(11,31,54,.92) 0%,rgba(11,31,54,.6) 40%,rgba(11,31,54,.05) 75%)}
+html[data-theme=spokojny] .panel .n{background:rgba(255,255,255,.92);color:#0f2c4c;border:0;backdrop-filter:none}
+html[data-theme=spokojny] .panel .go-l{color:#a9cdf2}
+html[data-theme=spokojny] .step .num{-webkit-text-stroke:1.2px rgba(31,91,153,.5)}
+html[data-theme=spokojny] .step::before{background:#fff;border-color:#2f78c4;box-shadow:none}
+html[data-theme=spokojny] .rail .fill{background:#2f78c4;box-shadow:none}
+html[data-theme=spokojny] details[open]{background:#f4f8fc;border-color:rgba(31,91,153,.35)}
+html[data-theme=spokojny] summary::after{color:#1f5b99}
+html[data-theme=spokojny] .note{background:#eef3f9;border:1px solid rgba(31,91,153,.2);border-radius:16px}
+html[data-theme=spokojny] .note p{color:#2b3f55}
+html[data-theme=spokojny] .chip{background:#fff;color:#1c5189}
+html[data-theme=spokojny] .kv dt,html[data-theme=spokojny] .tbl th{background:#eef3f9;color:#1c5189}
+html[data-theme=spokojny] .check li::before{background-color:#2f78c4}
+html[data-theme=spokojny] .cta .box{background:#0f2c4c;border:0;border-radius:20px}
+html[data-theme=spokojny] .cta .box::before,html[data-theme=spokojny] .cta .box .duo{display:none}
+html[data-theme=spokojny] .cta p,html[data-theme=spokojny] .cta .contact-lines{color:#c6d6e8}
+html[data-theme=spokojny] form{border-radius:16px;box-shadow:0 30px 60px -30px rgba(0,0,0,.5)}
+html[data-theme=spokojny] input,html[data-theme=spokojny] select,html[data-theme=spokojny] textarea{background:#f6f8fb;border:1px solid rgba(20,32,43,.18);border-radius:10px}
+html[data-theme=spokojny] label{color:#1c5189}
+html[data-theme=spokojny] .ft{background:#0f2c4c}
+html[data-theme=spokojny] .ft-logo{--logo-mark:#a9cdf2;--logo-ink:#fff;--logo-sub:#a9cdf2}
+html[data-theme=spokojny] .bar-m{background:rgba(255,255,255,.96);border:1px solid var(--line)}
+html[data-theme=spokojny] .bar-m .a{background:#eef3f9;color:#1c5189}
+html[data-theme=spokojny] .bar-m .b{background:#1f5b99;color:#fff}
+
+/* =====================================================================
+   C. AVADA – klasyczny motyw korporacyjny: pasek kontaktowy, białe menu, hero na zdjęciu,
+      wyśrodkowane nagłówki z kreską, prostokątne przyciski, niebiesko-zielone akcenty
+   ===================================================================== */
+html[data-theme=avada]{
+  --c-deep:#1a80b6;--c-text:#13688f;--c-accent:#65bc7b;--c-glow:#65bc7b;--c-soft:#e8f3f9;--c-soft2:#cfe6f2;
+  --h1:#2b3744;--h2:#212934;--h3:#1a212a;--c-band:#f6f6f6;--c-footer:#212934;--c-night:#161c24;--c-night2:#212934;
+  --c-on-soft:#212934;--c-ink:#212934;--c-muted-lt:#5a636d;--c-soft-text:#33404c;--c-page:#ffffff;--c-tint:#f6f6f6;
+  --bg:#ffffff;--ink:#212934;--muted:#5a636d;--line:rgba(33,41,52,.12);--glass:#fff;--glass2:#fff;
+  --mint:#e8f3f9;--mint2:#cfe6f2;--teal:#1a80b6;--teal-d:#1a80b6;--glow:#65bc7b;--r:4px;
+  --display:"Open Sans",system-ui,sans-serif;--text:"Open Sans",system-ui,sans-serif;
+}
+html[data-theme=avada] .dk{--ink:#fff;--muted:#dfe6ee;--line:rgba(255,255,255,.25);--glass:rgba(255,255,255,.1);--glass2:rgba(255,255,255,.16)}
+html[data-theme=avada] body{background:#fff;font-size:16px}
+html[data-theme=avada] .noise,html[data-theme=avada] .bg-grid,html[data-theme=avada] .orb,html[data-theme=avada] .hero::after,html[data-theme=avada] .phero::after{display:none}
+html[data-theme=avada] h1,html[data-theme=avada] h2,html[data-theme=avada] h3{font-weight:700;letter-spacing:-.01em;line-height:1.15}
+/* pasek kontaktowy + białe menu */
+html[data-theme=avada] .topbar{display:block;background:#212934;color:#dfe6ee;font-size:.82rem}
+html[data-theme=avada] .topbar .wrap{display:flex;justify-content:space-between;gap:16px;padding-top:9px;padding-bottom:9px;flex-wrap:wrap}
+html[data-theme=avada] .topbar .tb-l{display:flex;gap:22px;flex-wrap:wrap}
+html[data-theme=avada] .topbar a{color:#fff;text-decoration:none}
+html[data-theme=avada] .topbar a:hover{color:#65bc7b}
+@media(max-width:700px){html[data-theme=avada] .topbar .tb-r{display:none}html[data-theme=avada] .topbar .tb-l span{display:none}}
+html[data-theme=avada] header,html[data-theme=avada] header.solid{background:#fff;border-bottom:1px solid #e6e6e6;backdrop-filter:none;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+html[data-theme=avada] header.dk{--ink:#212934;--muted:#5a636d;--line:rgba(33,41,52,.12)}
+html[data-theme=avada] header .brand .logo{--logo-mark:#1a80b6;--logo-ink:#212934}
+html[data-theme=avada] .hd-in,html[data-theme=avada] header.solid .hd-in{height:74px}
+html[data-theme=avada] header nav a:not(.btn){color:#212934;font-weight:600;font-size:.9rem}
+html[data-theme=avada] header nav a:not(.btn):hover,html[data-theme=avada] header nav a[aria-current=page]{color:#1a80b6}
+html[data-theme=avada] header nav a:not(.btn)::after{background:#1a80b6;height:3px;bottom:-26px}
+html[data-theme=avada] .tg,html[data-theme=avada] header.solid .tg{color:#212934}
+@media(max-width:1120px){html[data-theme=avada] header nav{background:#fff;border-bottom:1px solid #e6e6e6}html[data-theme=avada] header nav a:not(.btn),html[data-theme=avada] header.solid nav a:not(.btn){color:#212934}html[data-theme=avada] header nav a:not(.btn)::after{display:none}}
+/* przyciski: prostokątne, wersaliki */
+html[data-theme=avada] .btn{border-radius:3px;box-shadow:none;font-family:var(--text);font-weight:700;font-size:.8rem;letter-spacing:.09em;text-transform:uppercase;padding:16px 26px}
+html[data-theme=avada] .btn .ar{display:none}
+html[data-theme=avada] .btn-mint,html[data-theme=avada] header.solid .btn-mint,html[data-theme=avada] .btn-teal{background:#1a80b6;color:#fff;box-shadow:none}
+html[data-theme=avada] .btn-mint:hover,html[data-theme=avada] .btn-teal:hover{background:#65bc7b;color:#fff;transform:none;box-shadow:none}
+html[data-theme=avada] .btn-ghost{background:transparent;color:#fff;border:2px solid #fff;backdrop-filter:none}
+html[data-theme=avada] .btn-ghost:hover{background:#fff;color:#212934;transform:none}
+html[data-theme=avada] .btn-line{background:#fff;color:#1a80b6;border:2px solid #1a80b6}
+html[data-theme=avada] .btn-line:hover{background:#1a80b6;color:#fff;transform:none}
+@media(max-width:1120px){html[data-theme=avada] header nav .btn,html[data-theme=avada] header.solid nav .btn-mint{background:#1a80b6;color:#fff}}
+/* hero: zdjęcie na całą szerokość, ciemna nakładka, wyśrodkowany tekst */
+html[data-theme=avada] .hero{background:#212934;padding:230px 0 110px;text-align:center}
+html[data-theme=avada] .hero .wrap{grid-template-columns:1fr;justify-items:center}
+html[data-theme=avada] .hero .vis{position:static;perspective:none}
+html[data-theme=avada] .hero .vis .frame{position:absolute;inset:0;aspect-ratio:auto;border-radius:0;box-shadow:none;transform:none!important;z-index:0}
+html[data-theme=avada] .hero .duo img{filter:grayscale(.15);mix-blend-mode:normal;opacity:1}
+html[data-theme=avada] .hero .duo::before{display:none}
+html[data-theme=avada] .hero .duo::after{background:linear-gradient(rgba(21,28,38,.78),rgba(21,28,38,.86))}
+html[data-theme=avada] .hero .wrap>div:first-child{position:relative;z-index:3;max-width:900px}
+html[data-theme=avada] .hero .glass{display:none}
+html[data-theme=avada] .hero h1{font-size:clamp(2.2rem,4.6vw,3.8rem);font-weight:800;color:#fff;margin:18px 0 20px;max-width:none}
+html[data-theme=avada] .hero .lead{margin-inline:auto;color:#e5ebf2;font-size:1.1rem}
+html[data-theme=avada] .hero .acts{justify-content:center}
+html[data-theme=avada] .hero .mini{justify-content:center;gap:0;margin-top:56px;border-top:1px solid rgba(255,255,255,.22);padding-top:30px;width:100%}
+html[data-theme=avada] .hero .mini div{border-left:0;padding:0 34px;border-right:1px solid rgba(255,255,255,.22)}
+html[data-theme=avada] .hero .mini div:last-child{border-right:0}
+html[data-theme=avada] .hero .mini div b{color:#fff}
+html[data-theme=avada] .hero .mini div span{color:#dfe6ee}
+@media(max-width:700px){html[data-theme=avada] .hero{padding:190px 0 70px}html[data-theme=avada] .hero .mini div{padding:10px 18px;border-right:0}}
+html[data-theme=avada] .dk .grad,html[data-theme=avada] .grad{background:none;-webkit-text-fill-color:currentColor;color:#65bc7b}
+html[data-theme=avada] .hero .grad{color:#65bc7b}
+html[data-theme=avada] .tag,html[data-theme=avada] .dk .tag{background:none;border:0;padding:0;color:#1a80b6;font-weight:700;letter-spacing:.16em;font-size:.78rem;backdrop-filter:none}
+html[data-theme=avada] .hero .tag,html[data-theme=avada] .phero .tag{color:#65bc7b}
+html[data-theme=avada] .tag i{display:none}
+/* strony podrzędne: jasny pasek tytułu */
+html[data-theme=avada] .phero{background:#f6f6f6;border-bottom:1px solid #e6e6e6;padding:200px 0 56px}
+html[data-theme=avada] .phero.dk{--ink:#212934;--muted:#5a636d;--line:rgba(33,41,52,.12);color:#212934}
+html[data-theme=avada] .phero .wrap{grid-template-columns:1fr}
+html[data-theme=avada] .phero .art{display:none}
+html[data-theme=avada] .phero h1{color:#212934;font-size:clamp(1.9rem,3.6vw,2.8rem);margin:10px 0 14px;max-width:none}
+html[data-theme=avada] .phero .lead{color:#5a636d;font-size:1.05rem}
+html[data-theme=avada] .phero .tag{color:#1a80b6}
+html[data-theme=avada] .crumbs,html[data-theme=avada] .crumbs a{color:#5a636d}
+html[data-theme=avada] .crumbs a{text-decoration-color:rgba(90,99,109,.4)}
+html[data-theme=avada] .phero .btn-ghost{color:#1a80b6;border-color:#1a80b6}
+html[data-theme=avada] .phero .btn-ghost:hover{background:#1a80b6;color:#fff}
+@media(max-width:700px){html[data-theme=avada] .phero{padding:170px 0 44px}}
+/* pasek usług */
+html[data-theme=avada] .marq{background:#1a80b6;border:0}
+html[data-theme=avada] .marq span{color:#fff;font-weight:700;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase}
+html[data-theme=avada] .marq li::before{background:#65bc7b}
+/* wyśrodkowane nagłówki z zieloną kreską */
+html[data-theme=avada] .sec-head{margin-inline:auto;text-align:center;max-width:820px}
+html[data-theme=avada] .sec-head h2,html[data-theme=avada] .sec-head p{margin-inline:auto}
+html[data-theme=avada] main h2{font-size:clamp(1.7rem,3vw,2.5rem);color:#212934}
+html[data-theme=avada] main h2::after{content:'';display:block;width:64px;height:3px;background:#65bc7b;margin:18px 0 0}
+html[data-theme=avada] .sec-head h2::after{margin:18px auto 0}
+html[data-theme=avada] .cta h2::after,html[data-theme=avada] .note h2::after,html[data-theme=avada] .card h2::after{display:none}
+html[data-theme=avada] .cta h2{color:#fff}
+html[data-theme=avada] .sec-head .tag{justify-content:center;margin-bottom:12px}
+html[data-theme=avada] .sec-head.center{text-align:center}
+html[data-theme=avada] .band-soft,html[data-theme=avada] .proc{background:#f6f6f6}
+html[data-theme=avada] .say p{font-weight:700;color:#212934;font-size:clamp(1.6rem,3.2vw,2.6rem);max-width:30em;margin:0 auto;text-align:center}
+html[data-theme=avada] .say .w.key.on{color:#1a80b6}
+/* karty */
+html[data-theme=avada] .card,html[data-theme=avada] .stat,html[data-theme=avada] .step,html[data-theme=avada] details,html[data-theme=avada] .kv,html[data-theme=avada] .tbl{background:#fff;border:1px solid #e6e6e6;border-radius:4px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+html[data-theme=avada] .card.flow{border-top:3px solid #1a80b6}
+html[data-theme=avada] .card::before{display:none}
+html[data-theme=avada] .card:hover,html[data-theme=avada] .step:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,.1);border-color:#e6e6e6}
+html[data-theme=avada] .card.mint-bg,html[data-theme=avada] .paths .p2{background:#1a80b6;border-color:#1a80b6;color:#fff}
+html[data-theme=avada] .card.mint-bg,html[data-theme=avada] .card.mint-bg h3,html[data-theme=avada] .card.mint-bg p,html[data-theme=avada] .card.mint-bg li,html[data-theme=avada] .paths .p2 h3,html[data-theme=avada] .paths .p2 p{color:#fff}
+html[data-theme=avada] .card.mint-bg .kick,html[data-theme=avada] .paths .p2 .kick,html[data-theme=avada] .paths .p2 .go,html[data-theme=avada] .card.mint-bg .link-arrow{color:#fff}
+html[data-theme=avada] .card.mint-bg .check li::before{background-color:#65bc7b}
+html[data-theme=avada] .paths .p1,html[data-theme=avada] .card.dk{background:#212934;border-color:#212934}
+html[data-theme=avada] .paths .p1 p{color:#dfe6ee}
+html[data-theme=avada] .paths .p1 .go,html[data-theme=avada] .paths .p1 .kick{color:#65bc7b}
+html[data-theme=avada] .card .go,html[data-theme=avada] .link-arrow{color:#1a80b6;font-weight:700}
+html[data-theme=avada] .card .kick,html[data-theme=avada] .note .kick,html[data-theme=avada] .mod .when{color:#13688f}
+html[data-theme=avada] .stat b{color:#1a80b6}
+html[data-theme=avada] .stat::after{display:none}
+html[data-theme=avada] .cert{border-radius:3px}
+html[data-theme=avada] .panel{border:0;border-radius:4px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+html[data-theme=avada] .duo img{filter:grayscale(.2)}
+html[data-theme=avada] .panel .duo::before{display:block;background:rgba(26,128,182,.35);mix-blend-mode:normal}
+html[data-theme=avada] .panel .duo::after{background:linear-gradient(to top,rgba(21,28,38,.95) 0%,rgba(21,28,38,.65) 45%,rgba(21,28,38,.15) 80%)}
+html[data-theme=avada] .panel .n{background:#65bc7b;color:#fff;border:0;backdrop-filter:none;border-radius:3px;font-weight:700}
+html[data-theme=avada] .panel .go-l{color:#65bc7b}
+html[data-theme=avada] .step .num{-webkit-text-stroke:0;color:#1a80b6;font-size:2.6rem}
+html[data-theme=avada] .step::before{background:#fff;border:3px solid #1a80b6;box-shadow:none}
+html[data-theme=avada] .rail::before{background:#e1e1e1}
+html[data-theme=avada] .rail .fill{background:#1a80b6;box-shadow:none}
+html[data-theme=avada] details[open]{border-left:3px solid #65bc7b;background:#fff}
+html[data-theme=avada] summary::after{color:#1a80b6}
+html[data-theme=avada] details p{color:#5a636d}
+html[data-theme=avada] .note{background:#f6f6f6;border:1px solid #e6e6e6;border-left:4px solid #65bc7b;border-radius:4px}
+html[data-theme=avada] .note p{color:#33404c}
+html[data-theme=avada] .chip{background:#fff;border:1px solid #e6e6e6;border-radius:3px;color:#212934}
+html[data-theme=avada] .kv dt,html[data-theme=avada] .tbl th{background:#f6f6f6;color:#212934}
+html[data-theme=avada] .kv a,html[data-theme=avada] .prose a{color:#13688f}
+html[data-theme=avada] .check li::before{background-color:#65bc7b}
+html[data-theme=avada] .cta .box{background:#212934;border:0;border-radius:4px}
+html[data-theme=avada] .cta .box::before{display:none}
+html[data-theme=avada] .cta .box .duo img{filter:grayscale(1) brightness(.45)}
+html[data-theme=avada] .cta .box .duo::before{display:none}
+html[data-theme=avada] .cta .box .duo::after{background:rgba(26,128,182,.55)}
+html[data-theme=avada] .cta p,html[data-theme=avada] .cta .contact-lines{color:#eaf2f8}
+html[data-theme=avada] form{border-radius:4px;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+html[data-theme=avada] input,html[data-theme=avada] select,html[data-theme=avada] textarea{background:#f6f6f6;border:1px solid #dcdcdc;border-radius:3px}
+html[data-theme=avada] label{color:#212934}
+html[data-theme=avada] .cta form .btn-teal{background:#1a80b6}
+html[data-theme=avada] .ft{background:#212934}
+html[data-theme=avada] .ft-h{text-transform:uppercase;letter-spacing:.08em;font-size:.85rem;position:relative;padding-bottom:12px}
+html[data-theme=avada] .ft-h::after{content:'';position:absolute;left:0;bottom:0;width:36px;height:2px;background:#65bc7b}
+html[data-theme=avada] .ft-logo{--logo-mark:#65bc7b;--logo-ink:#fff;--logo-sub:#a9b6c4}
+html[data-theme=avada] .bar-m{background:#fff;border:1px solid #e6e6e6;border-radius:6px}
+html[data-theme=avada] .bar-m .a{background:#f6f6f6;color:#212934;border-radius:3px}
+html[data-theme=avada] .bar-m .b{background:#1a80b6;color:#fff;border-radius:3px}
+html[data-theme=avada] .hero .wrap{position:static}
+html[data-theme=avada] .hero .wrap>div:first-child{position:relative}
+html[data-theme=avada] .hero .vis{opacity:1!important;transform:none!important;width:0;height:0}
+html[data-theme=pasibus] main,html[data-theme=pasibus] body{overflow-x:clip}
