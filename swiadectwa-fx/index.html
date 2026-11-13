@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>swiadectwa.net: charakterystyka energetyczna dla biur projektowych i deweloperów</title>
+<meta name="description" content="Projektowa charakterystyka energetyczna i świadectwa energetyczne dla biur projektowych, deweloperów i architektów w całej Polsce. Termin ustalamy na początku zlecenia.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#04161a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="swiadectwa.net: charakterystyka energetyczna dla biur projektowych i deweloperów">
+<meta property="og:description" content="Projektowa charakterystyka i świadectwa energetyczne w całej Polsce. Termin ustalamy na początku zlecenia.">
+<meta property="og:image" content="og.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+@font-face{font-family:"Sora";font-weight:100 800;font-display:swap;src:url(assets/fonts/sora-latin-ext-wght-normal.woff2) format("woff2-variations");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Sora";font-weight:100 800;font-display:swap;src:url(assets/fonts/sora-latin-wght-normal.woff2) format("woff2-variations");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Red Hat Text";font-weight:400 700;font-display:swap;src:url(assets/fonts/red-hat-text-latin-ext-wght-normal.woff2) format("woff2-variations");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Red Hat Text";font-weight:400 700;font-display:swap;src:url(assets/fonts/red-hat-text-latin-wght-normal.woff2) format("woff2-variations");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+:root{
+  --bg:#04161a; --bg2:#072a30; --bg3:#0b3a41;
+  --teal:#12a8a0; --glow:#2de2d0; --mint:#daffee; --mint2:#bff2e9;
+  --ink:#eaf7f4; --muted:#8fb4b1; --line:rgba(190,242,233,.14);
+  --glass:rgba(255,255,255,.05); --glass2:rgba(255,255,255,.09);
+  --r:28px; --max:1240px;
+  --display:"Sora",system-ui,sans-serif; --text:"Red Hat Text",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--text);font-size:17px;line-height:1.65;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
+section{position:relative}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.035em;line-height:1.04}
+.grad{background:linear-gradient(100deg,var(--mint) 0%,var(--glow) 45%,#6fb7ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{display:inline-flex;align-items:center;gap:10px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mint2);background:var(--glass);backdrop-filter:blur(8px)}
+.tag i{width:8px;height:8px;border-radius:50%;background:var(--glow);box-shadow:0 0 0 0 rgba(45,226,208,.7);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 12px rgba(45,226,208,0)}100%{box-shadow:0 0 0 0 rgba(45,226,208,0)}}
+
+/* tło */
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 70% 60% at 65% 35%,#000 20%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse 70% 60% at 65% 35%,#000 20%,transparent 75%);opacity:.7}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;opacity:.55;animation:float 14s ease-in-out infinite}
+.orb.o1{width:560px;height:560px;background:#0e8d92;top:-160px;right:-120px}
+.orb.o2{width:420px;height:420px;background:#1a5fd1;opacity:.28;bottom:-120px;left:-140px;animation-delay:-6s}
+@keyframes float{50%{transform:translate(-40px,50px) scale(1.12)}}
+.noise{position:fixed;inset:0;pointer-events:none;z-index:90;opacity:.06;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+
+/* nagłówek */
+header{position:fixed;top:0;left:0;right:0;z-index:80;transition:.3s}
+header.solid{background:rgba(4,22,26,.78);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;justify-content:space-between;height:84px}
+header.solid .wrap{height:68px}
+header img{height:32px;width:auto}
+nav{display:flex;gap:34px;align-items:center}
+nav a{text-decoration:none;font-size:.95rem;color:#c8e3df;position:relative}
+nav a:not(.btn)::after{content:'';position:absolute;left:0;bottom:-6px;height:2px;width:0;background:var(--glow);transition:.3s}
+nav a:not(.btn):hover{color:#fff}nav a:not(.btn):hover::after{width:100%}
+.btn{display:inline-flex;align-items:center;gap:12px;padding:16px 28px;border-radius:999px;font-weight:700;text-decoration:none;font-family:var(--display);font-size:.95rem;border:0;cursor:pointer;transition:.25s;position:relative;isolation:isolate}
+.btn-mint{background:var(--mint);color:#032226;box-shadow:0 0 0 0 rgba(45,226,208,.5),0 10px 40px -10px rgba(45,226,208,.7)}
+.btn-mint:hover{transform:translateY(-3px);box-shadow:0 0 0 6px rgba(45,226,208,.18),0 18px 50px -10px rgba(45,226,208,.9)}
+.btn-ghost{border:1px solid var(--line);color:#fff;background:var(--glass);backdrop-filter:blur(8px)}
+.btn-ghost:hover{background:var(--glass2);transform:translateY(-3px)}
+.btn .ar{transition:.25s}.btn:hover .ar{transform:translateX(5px)}
+.tg{display:none;background:none;border:0;color:#fff;font-size:1.9rem}
+@media(max-width:920px){.tg{display:block} nav{display:none;position:absolute;top:100%;left:0;right:0;background:rgba(4,22,26,.96);backdrop-filter:blur(16px);flex-direction:column;align-items:stretch;padding:24px 28px;gap:20px;border-bottom:1px solid var(--line)} nav.open{display:flex}}
+
+/* hero */
+.hero{min-height:100svh;display:flex;align-items:center;padding:150px 0 90px;overflow:hidden}
+.hero .wrap{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+@media(max-width:1000px){.hero .wrap{grid-template-columns:1fr}}
+.hero h1{font-size:clamp(2.6rem,6.2vw,5.4rem);margin:26px 0 24px}
+.hero p.lead{font-size:1.2rem;color:#b9d6d2;max-width:34em;margin-bottom:38px}
+.acts{display:flex;gap:16px;flex-wrap:wrap}
+.mini{display:flex;gap:40px;margin-top:54px;flex-wrap:wrap}
+.mini div b{display:block;font-family:var(--display);font-size:2rem;letter-spacing:-.03em;color:#fff}
+.mini div span{font-size:.85rem;color:var(--muted)}
+.mini div{padding-left:18px;border-left:2px solid var(--glow)}
+
+.vis{position:relative;perspective:1200px}
+.vis .frame{position:relative;border-radius:36px;overflow:hidden;aspect-ratio:4/5;transform-style:preserve-3d;transition:transform .2s ease-out;box-shadow:0 50px 100px -30px rgba(0,0,0,.8),0 0 0 1px var(--line)}
+.duo{position:relative;background:#06262b;overflow:hidden}
+.duo img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.18) brightness(.95);mix-blend-mode:luminosity;opacity:.95;transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.duo::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(160deg,rgba(18,168,160,.75),rgba(10,60,110,.55) 70%);mix-blend-mode:color}
+.duo::after{content:'';position:absolute;inset:0;z-index:2;background:linear-gradient(to top,rgba(4,22,26,.92),rgba(4,22,26,.05) 55%)}
+.glass{position:absolute;z-index:5;background:rgba(7,32,38,.62);backdrop-filter:blur(18px);border:1px solid rgba(190,242,233,.22);border-radius:22px;padding:20px 22px;box-shadow:0 30px 60px -20px rgba(0,0,0,.7)}
+.g1{left:-34px;bottom:70px;width:290px;animation:bob 6s ease-in-out infinite}
+.g2{right:-24px;top:54px;animation:bob 7s ease-in-out infinite -2s}
+@keyframes bob{50%{transform:translateY(-14px)}}
+@media(max-width:1000px){.g1{left:10px;bottom:20px}.g2{right:10px;top:16px}}
+.glass h4{font-family:var(--display);font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mint2);margin-bottom:14px;font-weight:600}
+.bars{display:grid;gap:7px}
+.bar{display:grid;grid-template-columns:30px 1fr;align-items:center;gap:10px;font-size:.78rem;font-weight:700;font-family:var(--display)}
+.bar s{display:block;height:15px;border-radius:5px;background:linear-gradient(90deg,var(--glow),var(--mint));width:0;transition:width 1.4s cubic-bezier(.2,.8,.2,1);text-decoration:none}
+.bar:nth-child(n+3) s{background:linear-gradient(90deg,#127d86,#3aa6b0);opacity:.8}
+.bar.hi{color:var(--glow)}
+.in .bar s{width:var(--w)}
+.ok{display:flex;gap:12px;align-items:center;font-weight:600;font-size:.95rem}
+.ok i{width:34px;height:34px;border-radius:50%;background:var(--mint);color:#032226;display:grid;place-items:center;font-style:normal;font-weight:800}
+
+/* marquee */
+.marq{border-block:1px solid var(--line);background:linear-gradient(90deg,var(--bg2),var(--bg),var(--bg2));overflow:hidden;padding:22px 0}
+.marq .track{display:flex;gap:56px;width:max-content;animation:slide 38s linear infinite}
+.marq span{font-family:var(--display);font-size:1.5rem;font-weight:600;color:#6ea2a2;white-space:nowrap;display:flex;align-items:center;gap:56px;letter-spacing:-.02em}
+.marq span::after{content:'✦';color:var(--glow);font-size:1rem}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+/* statystyki */
+.stats{padding:110px 0 40px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+@media(max-width:860px){.stat-grid{grid-template-columns:1fr}}
+.stat{padding:38px;border-radius:var(--r);background:linear-gradient(160deg,var(--glass2),var(--glass));border:1px solid var(--line);position:relative;overflow:hidden}
+.stat b{font-family:var(--display);font-size:clamp(2.6rem,5vw,4.2rem);letter-spacing:-.045em;line-height:1;display:block;margin-bottom:10px}
+.stat span{color:var(--muted)}
+.stat::after{content:'';position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(45,226,208,.35),transparent 70%)}
+
+/* hasło */
+.say{padding:150px 0}
+.say p{font-family:var(--display);font-weight:600;font-size:clamp(1.9rem,4.4vw,3.8rem);line-height:1.12;letter-spacing:-.035em;max-width:20em}
+.say .w{opacity:.18;transition:opacity .3s,color .3s}
+.say .w.on{opacity:1}
+.say .w.key.on{color:var(--glow)}
+
+/* sekcje */
+.sec-head{max-width:760px;margin-bottom:64px}
+.sec-head h2{font-size:clamp(2.2rem,4.6vw,3.9rem);margin:22px 0 18px}
+.sec-head p{color:var(--muted);font-size:1.1rem}
+.pad{padding:110px 0}
+
+/* bento */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:20px}
+.card{position:relative;border-radius:var(--r);padding:36px;background:var(--glass);border:1px solid var(--line);overflow:hidden;text-decoration:none;display:flex;flex-direction:column;transition:transform .35s,border-color .35s;--mx:50%;--my:50%}
+.card::before{content:'';position:absolute;inset:0;background:radial-gradient(420px circle at var(--mx) var(--my),rgba(45,226,208,.22),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover{transform:translateY(-6px);border-color:rgba(45,226,208,.55)}
+.card:hover::before{opacity:1}
+.card h3{font-size:1.55rem;margin:auto 0 10px;position:relative}
+.card p{color:var(--muted);font-size:.98rem;position:relative;max-width:34em}
+.card .go{margin-top:22px;font-family:var(--display);font-weight:600;font-size:.9rem;color:var(--glow);position:relative}
+.card .go::after{content:' →';transition:.25s;display:inline-block}.card:hover .go::after{transform:translateX(6px)}
+.c1{grid-column:span 4;min-height:420px;background:linear-gradient(135deg,#0a3b42,#06232a)}
+.c1 h3{font-size:clamp(1.9rem,3.2vw,2.8rem);max-width:12em}
+.c1 p{max-width:30em}
+.c2{grid-column:span 2;min-height:420px;background:linear-gradient(160deg,#0f4a50,#0a2e34)}
+.c3,.c4,.c5{grid-column:span 2;min-height:300px}
+@media(max-width:980px){.c1,.c2{grid-column:span 6}.c3,.c4,.c5{grid-column:span 3}.c5{grid-column:span 6}}
+@media(max-width:600px){.c3,.c4{grid-column:span 6}.card{padding:28px}}
+.draw{position:absolute;right:26px;top:22px;width:44%;opacity:.8}
+.draw path,.draw rect,.draw line{fill:none;stroke:var(--glow);stroke-width:1.5;stroke-dasharray:600;stroke-dashoffset:600;transition:stroke-dashoffset 2.8s ease}
+.in .draw path,.in .draw rect,.in .draw line{stroke-dashoffset:0}
+.cert{position:absolute;right:22px;top:22px;width:150px;background:#fff;border-radius:14px;padding:14px;transform:rotate(5deg);box-shadow:0 20px 40px -10px rgba(0,0,0,.6);color:#052a30}
+.cert b{display:block;font-family:var(--display);font-size:.62rem;line-height:1.2;margin-bottom:8px}
+.cert i{display:block;height:9px;border-radius:2px 6px 6px 2px;margin-bottom:4px}
+.heat{position:absolute;right:-30px;top:-30px;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#fff6a8,#ffb23a 25%,#ff5a3c 50%,#7a1fa2 75%,transparent 80%);filter:blur(8px);opacity:.9;animation:breathe 5s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.15)}}
+.sun{position:absolute;right:30px;top:30px;width:86px;height:86px;border-radius:50%;background:radial-gradient(circle,#fff 0 22%,#ffe27a 24% 40%,transparent 42%);box-shadow:0 0 70px 14px rgba(255,214,90,.5);animation:breathe 4s ease-in-out infinite}
+.pump{position:absolute;right:28px;top:26px;width:92px;height:92px;border-radius:50%;border:2px solid var(--glow);display:grid;place-items:center}
+.pump::before{content:'';width:62px;height:62px;border-radius:50%;background:conic-gradient(from 0deg,var(--glow),transparent 25%,var(--glow) 50%,transparent 75%,var(--glow));animation:spin 3s linear infinite;mask:radial-gradient(circle,transparent 30%,#000 32%);-webkit-mask:radial-gradient(circle,transparent 30%,#000 32%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* klienci */
+.panels{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:900px){.panels{grid-template-columns:1fr}}
+.panel{position:relative;border-radius:var(--r);overflow:hidden;min-height:560px;display:flex;align-items:flex-end;text-decoration:none;isolation:isolate;border:1px solid var(--line)}
+.panel .duo{position:absolute;inset:0;z-index:-1}
+.panel:hover .duo img{transform:scale(1.08)}
+.panel .tx{padding:34px;transform:translateY(40px);transition:transform .45s cubic-bezier(.2,.8,.2,1);position:relative;z-index:3}
+.panel:hover .tx{transform:none}
+.panel h3{font-size:2rem;margin-bottom:12px}
+.panel p{color:#c7e1de;max-width:24em;opacity:.0;transition:opacity .45s .05s}
+.panel:hover p{opacity:1}
+@media(hover:none){.panel p{opacity:1}.panel .tx{transform:none}}
+.panel .n{position:absolute;top:26px;left:30px;z-index:3;font-family:var(--display);font-weight:700;font-size:.9rem;color:var(--mint2);letter-spacing:.1em}
+
+/* proces */
+.proc{background:linear-gradient(180deg,transparent,rgba(11,58,65,.45),transparent)}
+.rail{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:26px;padding-top:44px}
+@media(max-width:900px){.rail{grid-template-columns:1fr;padding:0 0 0 48px}}
+.rail::before{content:'';position:absolute;left:0;right:0;top:12px;height:2px;background:var(--line)}
+.rail .fill{position:absolute;left:0;top:12px;height:2px;width:0;background:linear-gradient(90deg,var(--teal),var(--glow));box-shadow:0 0 14px var(--glow)}
+@media(max-width:900px){.rail::before{left:12px;right:auto;top:0;bottom:0;width:2px;height:auto}.rail .fill{left:12px;top:0;width:2px;height:0}}
+.step{position:relative;padding:28px;border-radius:24px;background:var(--glass);border:1px solid var(--line);transition:.3s}
+.step:hover{border-color:rgba(45,226,208,.5);transform:translateY(-4px)}
+.step::before{content:'';position:absolute;left:28px;top:-44px;width:24px;height:24px;border-radius:50%;background:var(--bg);border:2px solid var(--glow);box-shadow:0 0 16px var(--glow)}
+@media(max-width:900px){.step::before{left:-48px;top:30px}}
+.step .num{font-family:var(--display);font-weight:800;font-size:3.4rem;line-height:1;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:1.5px rgba(190,242,233,.5);margin-bottom:18px;display:block}
+.step h3{font-size:1.25rem;margin-bottom:8px}
+.step p{color:var(--muted);font-size:.96rem}
+
+/* faq */
+.faq{max-width:860px;margin:0 auto}
+details{border:1px solid var(--line);border-radius:22px;padding:24px 28px;margin-bottom:14px;background:var(--glass);transition:.3s}
+details[open]{background:linear-gradient(160deg,rgba(18,168,160,.22),var(--glass));border-color:rgba(45,226,208,.4)}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:20px;font-family:var(--display);font-weight:600;font-size:1.1rem}
+summary::-webkit-details-marker{display:none}
+summary::after{content:'+';font-size:1.6rem;line-height:1;color:var(--glow);transition:.3s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{color:#b9d6d2;margin-top:14px}
+
+/* cta */
+.cta{padding:60px 0 120px}
+.cta .box{position:relative;border-radius:44px;overflow:hidden;padding:80px 60px;isolation:isolate;border:1px solid rgba(190,242,233,.25)}
+.cta .box .duo{position:absolute;inset:0;z-index:-2}
+.cta .box .duo img{filter:grayscale(1) contrast(1.1) brightness(.5)}
+.cta .box .duo::after{background:linear-gradient(120deg,rgba(4,22,26,.85),rgba(4,22,26,.35))}
+.cta .box::before{content:'';position:absolute;inset:-40%;z-index:-1;background:conic-gradient(from 0deg,rgba(45,226,208,.4),rgba(26,95,209,.35),rgba(218,255,238,.25),rgba(45,226,208,.4));filter:blur(70px);animation:spin 22s linear infinite;opacity:.8}
+.cta .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+@media(max-width:900px){.cta .grid{grid-template-columns:1fr}.cta .box{padding:48px 28px}}
+.cta h2{font-size:clamp(2.3rem,5vw,4.2rem);margin-bottom:18px}
+.cta p{color:#c7e1de;font-size:1.1rem}
+form{display:grid;gap:14px;background:rgba(4,22,26,.7);backdrop-filter:blur(20px);padding:34px;border-radius:30px;border:1px solid rgba(190,242,233,.22)}
+label{display:grid;gap:6px;font-size:.85rem;color:var(--mint2);font-weight:600}
+input,select{font:inherit;color:#fff;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:1rem;width:100%}
+input:focus,select:focus{outline:2px solid var(--glow);border-color:transparent}
+select option{color:#000}
+.hp{position:absolute;left:-9999px}
+.small{font-size:.82rem;color:var(--muted)}
+
+footer{border-top:1px solid var(--line);padding:56px 0 40px;color:var(--muted);font-size:.95rem}
+footer .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px}
+@media(max-width:760px){footer .cols{grid-template-columns:1fr}}
+footer h4{color:#fff;margin-bottom:12px;font-family:var(--display)}
+footer a,footer .cols span{display:block;text-decoration:none;margin-bottom:8px}footer a:hover{color:#fff}
+footer .copy{margin-top:40px;padding-top:22px;border-top:1px solid var(--line);font-size:.82rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+footer .copy a{display:inline}
+
+/* ujawnianie */
+.rv{opacity:0;transform:translateY(34px);transition:opacity .9s cubic-bezier(.2,.8,.2,1),transform .9s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+
+.bar-m{display:none}
+@media(max-width:900px){.bar-m{display:grid;grid-template-columns:1fr 1.5fr;gap:10px;position:fixed;left:12px;right:12px;bottom:12px;z-index:85;padding:10px;border-radius:22px;background:rgba(4,22,26,.85);backdrop-filter:blur(16px);border:1px solid var(--line)}.bar-m a{text-align:center;padding:14px;border-radius:14px;font-family:var(--display);font-weight:700;text-decoration:none;font-size:.92rem}.bar-m .a{background:var(--glass2)}.bar-m .b{background:var(--mint);color:#032226}body{padding-bottom:84px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.say .w{opacity:1}.bar s{width:var(--w)}.draw path,.draw rect,.draw line{stroke-dashoffset:0}.marq .track{animation:none}}
+</style>
+</head>
+<body>
+<div class="noise" aria-hidden="true"></div>
+
+<header id="hd">
+  <div class="wrap">
+    <a href="#top"><img src="logo.png" alt="swiadectwa.net"></a>
+    <button class="tg" aria-label="Menu" onclick="document.getElementById('nv').classList.toggle('open')">☰</button>
+    <nav id="nv">
+      <a href="#oferta">Usługi</a><a href="#klienci">Dla kogo</a><a href="#proces">Jak pracujemy</a><a href="#faq">Pytania</a>
+      <a class="btn btn-mint" href="#zapytanie">Zapytaj o wycenę <span class="ar">→</span></a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="bg-grid"></div><div class="orb o1"></div><div class="orb o2"></div>
+  <div class="wrap">
+    <div>
+      <span class="tag rv"><i></i>Analizy energetyczne dla branży budowlanej</span>
+      <h1 class="rv d1">Charakterystyka energetyczna <span class="grad">bez opóźnień.</span></h1>
+      <p class="lead rv d2">Projektowa charakterystyka i świadectwa energetyczne dla biur projektowych, deweloperów i architektów w całej Polsce. Termin ustalamy na początku zlecenia.</p>
+      <div class="acts rv d3">
+        <a class="btn btn-mint" href="#zapytanie">Zapytaj o wycenę <span class="ar">→</span></a>
+        <a class="btn btn-ghost" href="#oferta">Zobacz usługi</a>
+      </div>
+      <div class="mini rv d4">
+        <div><b data-count="600" data-suffix="+">600+</b><span>wykonanych analiz</span></div>
+        <div><b>Cała Polska</b><span>praca zdalna</span></div>
+        <div><b>Po odbiorze</b><span>płatność za dokument</span></div>
+      </div>
+    </div>
+    <div class="vis rv d2" id="vis">
+      <div class="frame duo" id="frame">
+        <img src="assets/img/photo-f120614863-1280.webp" srcset="assets/img/photo-f120614863-960.webp 960w, assets/img/photo-f120614863-1280.webp 1280w" sizes="(max-width:1000px) 100vw, 520px" alt="Nowe budynki mieszkalne z balkonami pod błękitnym niebem" fetchpriority="high">
+      </div>
+      <div class="glass g2"><div class="ok"><i>✓</i>Termin ustalony<br>na starcie</div></div>
+      <div class="glass g1" id="scale">
+        <h4>Klasa energetyczna</h4>
+        <div class="bars">
+          <div class="bar hi">A+<s style="--w:100%"></s></div>
+          <div class="bar hi">A<s style="--w:86%"></s></div>
+          <div class="bar">B<s style="--w:72%"></s></div>
+          <div class="bar">C<s style="--w:58%"></s></div>
+          <div class="bar">D<s style="--w:44%"></s></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="marq" aria-hidden="true"><div class="track">
+  <span>Projektowa charakterystyka energetyczna</span><span>Świadectwa energetyczne</span><span>OZC i pompy ciepła</span><span>Odnawialne źródła energii</span><span>Badania termowizyjne</span>
+  <span>Projektowa charakterystyka energetyczna</span><span>Świadectwa energetyczne</span><span>OZC i pompy ciepła</span><span>Odnawialne źródła energii</span><span>Badania termowizyjne</span>
+</div></div>
+
+<section class="stats">
+  <div class="wrap stat-grid">
+    <div class="stat rv"><b data-count="600" data-suffix="+">600+</b><span>wykonanych analiz energetycznych</span></div>
+    <div class="stat rv d1"><b>Cała Polska</b><span>obsługujemy inwestycje zdalnie</span></div>
+    <div class="stat rv d2"><b>Termin na starcie</b><span>znasz datę, zanim zaczniemy</span></div>
+  </div>
+</section>
+
+<section class="say"><div class="wrap">
+  <p id="say">Projekt stoi, bo brakuje jednego dokumentu. Dlatego ustalamy termin na początku zlecenia, a płacisz dopiero po odbiorze gotowego opracowania.</p>
+</div></section>
+
+<section class="pad" id="oferta"><div class="wrap">
+  <div class="sec-head">
+    <span class="tag rv"><i></i>Oferta</span>
+    <h2 class="rv d1">Dwie usługi główne. <span class="grad">Trzy uzupełniające.</span></h2>
+    <p class="rv d2">Każde zlecenie wyceniamy indywidualnie na podstawie dokumentacji projektowej.</p>
+  </div>
+  <div class="bento">
+    <a class="card c1 rv" href="#zapytanie">
+      <svg class="draw" viewBox="0 0 400 260" aria-hidden="true"><rect x="40" y="70" width="150" height="170"/><rect x="190" y="130" width="110" height="110"/><line x1="20" y1="240" x2="380" y2="240"/><path d="M40 70 L115 20 L190 70"/><path d="M190 130 L245 90 L300 130"/><rect x="62" y="96" width="30" height="30"/><rect x="108" y="96" width="30" height="30"/><rect x="62" y="150" width="30" height="30"/><rect x="108" y="150" width="30" height="30"/><rect x="212" y="156" width="28" height="28"/><rect x="254" y="156" width="28" height="28"/></svg>
+      <h3>Projektowa charakterystyka energetyczna</h3>
+      <p>Opracowanie do projektu budowlanego: obliczenia EP, EK i EU, zestawienie przegród i wnioski o spełnieniu wymagań warunków technicznych.</p>
+      <span class="go">Zapytaj o wycenę</span>
+    </a>
+    <a class="card c2 rv d1" href="#zapytanie">
+      <div class="cert" aria-hidden="true"><b>Świadectwo charakterystyki energetycznej</b><i style="width:40%;background:#2de2d0"></i><i style="width:52%;background:#5fd4c8"></i><i style="width:64%;background:#8fd9d0"></i><i style="width:76%;background:#3a9aa0"></i><i style="width:90%;background:#176974"></i></div>
+      <h3>Świadectwa energetyczne</h3>
+      <p>Dla budynków i lokali, także seryjnie dla całych inwestycji.</p>
+      <span class="go">Zapytaj o wycenę</span>
+    </a>
+    <a class="card c3 rv" href="#zapytanie"><div class="pump" aria-hidden="true"></div><h3>OZC i dobór pomp ciepła</h3><p>Moc cieplna budynku i dobór źródła ciepła.</p></a>
+    <a class="card c4 rv d1" href="#zapytanie"><div class="sun" aria-hidden="true"></div><h3>Odnawialne źródła energii</h3><p>Fotowoltaika, magazyny energii i biogaz.</p></a>
+    <a class="card c5 rv d2" href="#zapytanie"><div class="heat" aria-hidden="true"></div><h3>Badania termowizyjne</h3><p>Mostki termiczne i nieszczelności, z raportem zdjęciowym.</p></a>
+  </div>
+</div></section>
+
+<section class="pad" id="klienci"><div class="wrap">
+  <div class="sec-head">
+    <span class="tag rv"><i></i>Dla kogo</span>
+    <h2 class="rv d1">Pracujemy wyłącznie z <span class="grad">firmami z branży budowlanej.</span></h2>
+  </div>
+  <div class="panels">
+    <a class="panel rv" href="#zapytanie"><div class="duo"><img src="assets/img/photo-f105502290.webp" alt="Rysunek budowlany elewacji i przekrojów na niebieskim papierze" loading="lazy"></div><span class="n">01</span><div class="tx"><h3>Biura projektowe</h3><p>Stały wykonawca branży energetycznej. Terminy, które da się wpisać w harmonogram projektu.</p></div></a>
+    <a class="panel rv d1" href="#zapytanie"><div class="duo"><img src="assets/img/photo-f4029391.webp" alt="Blok mieszkalny z zaokrąglonymi balkonami i jasną elewacją" loading="lazy"></div><span class="n">02</span><div class="tx"><h3>Deweloperzy</h3><p>Świadectwa dla wszystkich lokali inwestycji w jednym procesie, także w ramach umowy ramowej.</p></div></a>
+    <a class="panel rv d2" href="#zapytanie"><div class="duo"><img src="assets/img/photo-f31221591.webp" alt="Modernistyczny budynek z zaokrąglonym narożnikiem i pasmami okien" loading="lazy"></div><span class="n">03</span><div class="tx"><h3>Architekci</h3><p>Weryfikacja wskaźników na etapie koncepcji, zanim bryła trafi do kolejnych branż.</p></div></a>
+  </div>
+</div></section>
+
+<section class="pad proc" id="proces"><div class="wrap">
+  <div class="sec-head">
+    <span class="tag rv"><i></i>Jak pracujemy</span>
+    <h2 class="rv d1">Od zapytania do dokumentu <span class="grad">w czterech krokach.</span></h2>
+  </div>
+  <div class="rail" id="rail">
+    <div class="fill" id="fill"></div>
+    <div class="step rv"><span class="num">01</span><h3>Zapytanie</h3><p>Wysyłasz dane inwestycji i dokumentację projektową.</p></div>
+    <div class="step rv d1"><span class="num">02</span><h3>Wycena i termin</h3><p>Indywidualna oferta. Termin ustalamy na początku zlecenia.</p></div>
+    <div class="step rv d2"><span class="num">03</span><h3>Opracowanie</h3><p>Analiza na profesjonalnym oprogramowaniu, konsultacje korekt.</p></div>
+    <div class="step rv d3"><span class="num">04</span><h3>Dokumenty</h3><p>Odbierasz gotowe opracowanie i dopiero wtedy płacisz.</p></div>
+  </div>
+</div></section>
+
+<section class="pad" id="faq"><div class="wrap">
+  <div class="sec-head" style="margin-inline:auto;text-align:center">
+    <span class="tag rv"><i></i>FAQ</span>
+    <h2 class="rv d1">Najczęstsze pytania</h2>
+  </div>
+  <div class="faq">
+    <details class="rv"><summary>Czy obsługujecie klientów indywidualnych?</summary><p>Nie. Pracujemy wyłącznie dla firm z branży budowlanej: biur projektowych, deweloperów i architektów.</p></details>
+    <details class="rv"><summary>Jak wyceniacie zlecenia?</summary><p>Indywidualnie, na podstawie dokumentacji projektowej i zakresu opracowania. Wycenę dostajesz przed rozpoczęciem prac.</p></details>
+    <details class="rv"><summary>Ile trwa realizacja?</summary><p>Termin ustalamy zawsze na początku zlecenia, po zapoznaniu się z dokumentacją.</p></details>
+    <details class="rv"><summary>Kiedy płacę?</summary><p>Po dostarczeniu gotowego dokumentu.</p></details>
+    <details class="rv"><summary>Czy pracujecie poza Pomorzem?</summary><p>Tak. Obsługujemy inwestycje w całej Polsce, zdalnie.</p></details>
+  </div>
+</div></section>
+
+<section class="cta" id="zapytanie"><div class="wrap">
+  <div class="box rv">
+    <div class="duo"><img src="assets/img/photo-f87827466.webp" alt="" loading="lazy"></div>
+    <div class="grid">
+      <div>
+        <span class="tag"><i></i>Zapytaj teraz</span>
+        <h2 style="margin-top:22px">Masz projekt do opracowania?</h2>
+        <p>Opisz inwestycję. Odpowiemy z wyceną i proponowanym terminem w ciągu jednego dnia roboczego.</p>
+      </div>
+      <form id="qf" novalidate>
+        <label>Firma<input name="firma" autocomplete="organization" required></label>
+        <label>E-mail<input name="email" type="email" autocomplete="email" required></label>
+        <label>Rodzaj usługi
+          <select name="usluga" required>
+            <option value="">Wybierz…</option>
+            <option>Projektowa charakterystyka energetyczna</option>
+            <option>Świadectwa energetyczne</option>
+            <option>OZC i dobór pomp ciepła</option>
+            <option>Odnawialne źródła energii</option>
+            <option>Badania termowizyjne</option>
+          </select>
+        </label>
+        <label>Lokalizacja inwestycji<input name="miejsce" required></label>
+        <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button class="btn btn-mint" type="submit" style="justify-content:center">Zapytaj o wycenę <span class="ar">→</span></button>
+        <p class="small" id="fmsg" role="status">Obsługujemy wyłącznie klientów biznesowych. Dokumentację prześlesz w odpowiedzi na nasz e-mail.</p>
+      </form>
+    </div>
+  </div>
+</div></section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div><img src="logo.png" alt="swiadectwa.net" style="height:30px;margin-bottom:16px"><p>Eksperci w zakresie analiz energetycznych. Biura projektowe, deweloperzy, architekci.</p></div>
+      <div><h4>Usługi</h4><a href="#oferta">Projektowa charakterystyka</a><a href="#oferta">Świadectwa energetyczne</a><a href="#oferta">OZC, OZE, termowizja</a></div>
+      <div><h4>Kontakt</h4><a href="mailto:biuro@swiadectwa.net">biuro@swiadectwa.net</a><span>Gdańsk, Al. Jana Pawła II</span><span>Starogard Gdański, ul. Chopina</span></div>
+    </div>
+    <div class="copy"><span>© 2026 swiadectwa.net</span><a href="credits.html">Zdjęcia: Wikimedia Commons</a></div>
+  </div>
+</footer>
+
+<div class="bar-m"><a class="a" href="mailto:biuro@swiadectwa.net">Napisz</a><a class="b" href="#zapytanie">Zapytaj o wycenę</a></div>
+
+<script>
+(function(){
+  var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hd=document.getElementById('hd');
+  function onScroll(){
+    hd.classList.toggle('solid',window.scrollY>30);
+    // słowa hasła
+    var ws=document.querySelectorAll('#say .w');
+    if(ws.length){
+      var r=document.getElementById('say').getBoundingClientRect(),vh=window.innerHeight;
+      var p=Math.min(1,Math.max(0,(vh*0.85-r.top)/(r.height+vh*0.35)));
+      var n=Math.round(p*ws.length*1.15);
+      ws.forEach(function(w,i){w.classList.toggle('on',i<n)});
+    }
+    // oś procesu
+    var rail=document.getElementById('rail'),fill=document.getElementById('fill');
+    if(rail){
+      var b=rail.getBoundingClientRect(),vh2=window.innerHeight;
+      var q=Math.min(1,Math.max(0,(vh2*0.7-b.top)/b.height));
+      var horiz=window.matchMedia('(min-width:901px)').matches;
+      if(horiz){fill.style.width=(q*100)+'%';fill.style.height='2px'}else{fill.style.height=(q*100)+'%';fill.style.width='2px'}
+    }
+  }
+  // rozbij hasło na słowa
+  var say=document.getElementById('say');
+  if(say){
+    var keys=['termin','płacisz'];
+    say.innerHTML=say.textContent.split(' ').map(function(w){
+      var k=keys.some(function(x){return w.toLowerCase().indexOf(x)===0});
+      return '<span class="w'+(k?' key':'')+'">'+w+'</span>';
+    }).join(' ');
+    if(rm)say.querySelectorAll('.w').forEach(function(w){w.classList.add('on')});
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  // ujawnianie + liczniki
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);e.target.querySelectorAll('[data-count]').forEach(count);if(e.target.hasAttribute&&e.target.hasAttribute('data-count'))count(e.target)}})},{threshold:.15});
+  document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
+  document.getElementById('scale').classList.add('in');
+  setTimeout(function(){document.getElementById('scale').classList.add('in')},400);
+  function count(el){
+    if(el.dataset.done)return;el.dataset.done=1;
+    var to=+el.dataset.count,suf=el.dataset.suffix||'';
+    if(rm){el.textContent=to+suf;return}
+    var t0=null;function step(t){if(!t0)t0=t;var p=Math.min(1,(t-t0)/1600);var e=1-Math.pow(1-p,3);el.textContent=Math.round(to*e)+suf;if(p<1)requestAnimationFrame(step)}
+    requestAnimationFrame(step);
+  }
+
+  // blask kart pod kursorem
+  document.querySelectorAll('.card').forEach(function(c){
+    c.addEventListener('pointermove',function(e){var r=c.getBoundingClientRect();c.style.setProperty('--mx',(e.clientX-r.left)+'px');c.style.setProperty('--my',(e.clientY-r.top)+'px')});
+  });
+
+  // pochylenie zdjęcia w hero
+  var vis=document.getElementById('vis'),fr=document.getElementById('frame');
+  if(vis&&!rm&&window.matchMedia('(hover:hover)').matches){
+    vis.addEventListener('pointermove',function(e){var r=vis.getBoundingClientRect();var x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;fr.style.transform='rotateY('+(x*10)+'deg) rotateX('+(-y*10)+'deg)'});
+    vis.addEventListener('pointerleave',function(){fr.style.transform=''});
+  }
+
+  // formularz: wiadomość e-mail
+  document.getElementById('qf').addEventListener('submit',function(e){
+    e.preventDefault();var f=e.target;
+    if(f.website.value)return;
+    if(!f.firma.value||!f.email.value||!f.usluga.value||!f.miejsce.value||!/.+@.+\..+/.test(f.email.value)){document.getElementById('fmsg').textContent='Uzupełnij wszystkie pola i wpisz poprawny adres e-mail.';return}
+    var body='Firma: '+f.firma.value+'\nE-mail: '+f.email.value+'\nUsługa: '+f.usluga.value+'\nLokalizacja: '+f.miejsce.value;
+    location.href='mailto:biuro@swiadectwa.net?subject='+encodeURIComponent('Zapytanie ofertowe – '+f.firma.value)+'&body='+encodeURIComponent(body);
+  });
+  // pasek mobilny znika przy formularzu
+  var bm=document.querySelector('.bar-m'),zq=document.getElementById('zapytanie');
+  if(bm&&zq){new IntersectionObserver(function(es){bm.style.display=es[0].isIntersecting?'none':''},{threshold:.25}).observe(zq)}
+  // menu mobilne zamykane po kliknięciu
+  document.querySelectorAll('#nv a').forEach(function(a){a.addEventListener('click',function(){document.getElementById('nv').classList.remove('open')})});
+})();
+</script>
+</body>
+</html>
