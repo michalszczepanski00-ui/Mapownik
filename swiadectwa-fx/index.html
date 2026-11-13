@@ -232,14 +232,79 @@ footer .copy a{display:inline}
 .bar-m{display:none}
 @media(max-width:900px){.bar-m{display:grid;grid-template-columns:1fr 1.5fr;gap:10px;position:fixed;left:12px;right:12px;bottom:12px;z-index:85;padding:10px;border-radius:22px;background:rgba(4,22,26,.85);backdrop-filter:blur(16px);border:1px solid var(--line)}.bar-m a{text-align:center;padding:14px;border-radius:14px;font-family:var(--display);font-weight:700;text-decoration:none;font-size:.92rem}.bar-m .a{background:var(--glass2)}.bar-m .b{background:var(--mint);color:#032226}body{padding-bottom:84px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.say .w{opacity:1}.bar s{width:var(--w)}.draw path,.draw rect,.draw line{stroke-dashoffset:0}.marq .track{animation:none}}
+
+/* ===== motyw jasny (nagłówek, blok formularza i stopka zostają ciemne) ===== */
+:root{--bg:#f3faf8;--ink:#0f2a2e;--muted:#58737a;--line:rgba(23,105,116,.16);--glass:#fff;--glass2:#fff;--teal-d:#0f5257}
+.dk{--ink:#eaf7f4;--muted:#9bbfbc;--line:rgba(190,242,233,.16);--glass:rgba(255,255,255,.06);--glass2:rgba(255,255,255,.1);color:var(--ink)}
+.lt{--ink:#0f2a2e;--muted:#58737a;--line:rgba(23,105,116,.16);color:var(--ink)}
+body{background:var(--bg);color:var(--ink)}
+.noise{opacity:.03}
+header.solid{background:rgba(255,255,255,.88);border-bottom:1px solid var(--line)}
+header nav a:not(.btn){color:#cfe6e2}
+header.solid nav a:not(.btn){color:#2b4a50}
+header.solid nav a:not(.btn):hover{color:#0f5257}
+header.solid nav a:not(.btn)::after{background:#12a8a0}
+header.solid .btn-mint{background:#0f5257;color:#fff;box-shadow:0 10px 30px -10px rgba(15,82,87,.6)}
+header.solid .tg{color:#0f2a2e}
+@media(max-width:920px){header.solid nav a:not(.btn){color:#cfe6e2}header.solid nav a:not(.btn):hover{color:#fff}}
+.hero{background:linear-gradient(160deg,#0f5a63 0%,#0b434b 55%,#082f35 100%)}
+.hero .orb.o1{background:#2de2d0;opacity:.32}
+.hero .orb.o2{background:#2a7fe0;opacity:.25}
+.tag{background:#fff;border-color:var(--line);color:#0f5257;backdrop-filter:none}
+.dk .tag{background:rgba(255,255,255,.07);color:var(--mint2);border-color:var(--line)}
+.grad{background:linear-gradient(100deg,#0f5257,#12a8a0 55%,#1a6fd1);-webkit-background-clip:text;background-clip:text;color:transparent}
+.dk .grad{background:linear-gradient(100deg,var(--mint) 0%,var(--glow) 45%,#6fb7ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.marq{background:var(--mint);border-block:0}
+.marq span{color:#2c7f86}
+.marq span::after{color:#0f5257}
+.stat{background:#fff;border:1px solid var(--line);box-shadow:0 24px 60px -34px rgba(15,82,87,.4)}
+.stat b{color:#0f5257}
+.stat::after{background:radial-gradient(circle,rgba(18,168,160,.2),transparent 70%)}
+.say .w.key.on{color:#0e8d92}
+.card{background:#fff;box-shadow:0 24px 60px -34px rgba(15,82,87,.4)}
+.card::before{background:radial-gradient(420px circle at var(--mx) var(--my),rgba(18,168,160,.15),transparent 60%)}
+.card:hover{border-color:rgba(18,168,160,.65)}
+.card .go{color:#0e8d92}
+.c1{background:linear-gradient(135deg,#0f5a63,#0a3d45);border-color:transparent}
+.c1::before{background:radial-gradient(420px circle at var(--mx) var(--my),rgba(45,226,208,.25),transparent 60%)}
+.c1 .go{color:var(--glow)}
+.c2{background:linear-gradient(160deg,#daffee,#bff2e9);border-color:transparent}
+.c2 p{color:#2c5a5e}.c2 .go{color:#0f5257}
+.sun{background:radial-gradient(circle,#fff3c0 0 22%,#ffc933 24% 46%,transparent 48%);box-shadow:0 0 60px 10px rgba(255,190,60,.45)}
+.pump{border-color:#12a8a0}
+.pump::before{background:conic-gradient(from 0deg,#12a8a0,transparent 25%,#12a8a0 50%,transparent 75%,#12a8a0)}
+.panel{border-color:rgba(23,105,116,.25);box-shadow:0 30px 70px -40px rgba(15,82,87,.6)}
+.panel h3{color:#fff}.panel p{color:#d9efec}
+.proc{background:linear-gradient(180deg,transparent,#e1f4ef 40%,#e1f4ef 60%,transparent)}
+.step{background:#fff;box-shadow:0 20px 50px -34px rgba(15,82,87,.45)}
+.step:hover{border-color:rgba(18,168,160,.6)}
+.step::before{background:#fff;border-color:#12a8a0;box-shadow:0 0 14px rgba(18,168,160,.55)}
+.step .num{-webkit-text-stroke:1.5px rgba(15,82,87,.5)}
+.rail .fill{background:linear-gradient(90deg,#12a8a0,#2de2d0);box-shadow:0 0 14px rgba(18,168,160,.6)}
+details{background:#fff;box-shadow:0 16px 40px -30px rgba(15,82,87,.4)}
+details[open]{background:linear-gradient(160deg,#daffee,#fff);border-color:rgba(18,168,160,.5)}
+details p{color:var(--muted)}
+summary::after{color:#0e8d92}
+.cta .box .duo img{filter:grayscale(1) contrast(1.1) brightness(.55)}
+form{background:#fff;backdrop-filter:none;border:0;box-shadow:0 40px 80px -30px rgba(0,0,0,.5)}
+label{color:#0f5257}
+input,select{color:#0f2a2e;background:#f3faf8;border:1px solid rgba(23,105,116,.22)}
+input:focus,select:focus{outline:2px solid #12a8a0}
+.cta form .btn-mint{background:#0f5257;color:#fff;box-shadow:0 14px 34px -12px rgba(15,82,87,.7)}
+.small{color:var(--muted)}
+footer{background:#0b3a41;border-top:0;color:#9bbfbc}
+footer h4{color:#fff}
+.bar-m .a{background:rgba(255,255,255,.12);color:#fff}
+.cta form .small{color:#58737a;font-size:.85rem}
+.stat b{font-size:clamp(2rem,3.4vw,2.9rem);line-height:1.1}
 </style>
 </head>
 <body>
 <div class="noise" aria-hidden="true"></div>
 
-<header id="hd">
+<header id="hd" class="dk">
   <div class="wrap">
-    <a href="#top"><img src="logo.png" alt="swiadectwa.net"></a>
+    <a href="#top"><img id="logo" src="logo.png" alt="swiadectwa.net"></a>
     <button class="tg" aria-label="Menu" onclick="document.getElementById('nv').classList.toggle('open')">☰</button>
     <nav id="nv">
       <a href="#oferta">Usługi</a><a href="#klienci">Dla kogo</a><a href="#proces">Jak pracujemy</a><a href="#faq">Pytania</a>
@@ -249,7 +314,7 @@ footer .copy a{display:inline}
 </header>
 
 <main id="top">
-<section class="hero">
+<section class="hero dk">
   <div class="bg-grid"></div><div class="orb o1"></div><div class="orb o2"></div>
   <div class="wrap">
     <div>
@@ -309,7 +374,7 @@ footer .copy a{display:inline}
     <p class="rv d2">Każde zlecenie wyceniamy indywidualnie na podstawie dokumentacji projektowej.</p>
   </div>
   <div class="bento">
-    <a class="card c1 rv" href="#zapytanie">
+    <a class="card c1 dk rv" href="#zapytanie">
       <svg class="draw" viewBox="0 0 400 260" aria-hidden="true"><rect x="40" y="70" width="150" height="170"/><rect x="190" y="130" width="110" height="110"/><line x1="20" y1="240" x2="380" y2="240"/><path d="M40 70 L115 20 L190 70"/><path d="M190 130 L245 90 L300 130"/><rect x="62" y="96" width="30" height="30"/><rect x="108" y="96" width="30" height="30"/><rect x="62" y="150" width="30" height="30"/><rect x="108" y="150" width="30" height="30"/><rect x="212" y="156" width="28" height="28"/><rect x="254" y="156" width="28" height="28"/></svg>
       <h3>Projektowa charakterystyka energetyczna</h3>
       <p>Opracowanie do projektu budowlanego: obliczenia EP, EK i EU, zestawienie przegród i wnioski o spełnieniu wymagań warunków technicznych.</p>
@@ -333,9 +398,9 @@ footer .copy a{display:inline}
     <h2 class="rv d1">Pracujemy wyłącznie z <span class="grad">firmami z branży budowlanej.</span></h2>
   </div>
   <div class="panels">
-    <a class="panel rv" href="#zapytanie"><div class="duo"><img src="assets/img/photo-f105502290.webp" alt="Rysunek budowlany elewacji i przekrojów na niebieskim papierze" loading="lazy"></div><span class="n">01</span><div class="tx"><h3>Biura projektowe</h3><p>Stały wykonawca branży energetycznej. Terminy, które da się wpisać w harmonogram projektu.</p></div></a>
-    <a class="panel rv d1" href="#zapytanie"><div class="duo"><img src="assets/img/photo-f4029391.webp" alt="Blok mieszkalny z zaokrąglonymi balkonami i jasną elewacją" loading="lazy"></div><span class="n">02</span><div class="tx"><h3>Deweloperzy</h3><p>Świadectwa dla wszystkich lokali inwestycji w jednym procesie, także w ramach umowy ramowej.</p></div></a>
-    <a class="panel rv d2" href="#zapytanie"><div class="duo"><img src="assets/img/photo-f31221591.webp" alt="Modernistyczny budynek z zaokrąglonym narożnikiem i pasmami okien" loading="lazy"></div><span class="n">03</span><div class="tx"><h3>Architekci</h3><p>Weryfikacja wskaźników na etapie koncepcji, zanim bryła trafi do kolejnych branż.</p></div></a>
+    <a class="panel dk rv" href="#zapytanie"><div class="duo"><img src="assets/img/photo-f105502290.webp" alt="Rysunek budowlany elewacji i przekrojów na niebieskim papierze" loading="lazy"></div><span class="n">01</span><div class="tx"><h3>Biura projektowe</h3><p>Stały wykonawca branży energetycznej. Terminy, które da się wpisać w harmonogram projektu.</p></div></a>
+    <a class="panel dk rv d1" href="#zapytanie"><div class="duo"><img src="assets/img/photo-f4029391.webp" alt="Blok mieszkalny z zaokrąglonymi balkonami i jasną elewacją" loading="lazy"></div><span class="n">02</span><div class="tx"><h3>Deweloperzy</h3><p>Świadectwa dla wszystkich lokali inwestycji w jednym procesie, także w ramach umowy ramowej.</p></div></a>
+    <a class="panel dk rv d2" href="#zapytanie"><div class="duo"><img src="assets/img/photo-f31221591.webp" alt="Modernistyczny budynek z zaokrąglonym narożnikiem i pasmami okien" loading="lazy"></div><span class="n">03</span><div class="tx"><h3>Architekci</h3><p>Weryfikacja wskaźników na etapie koncepcji, zanim bryła trafi do kolejnych branż.</p></div></a>
   </div>
 </div></section>
 
@@ -368,7 +433,7 @@ footer .copy a{display:inline}
 </div></section>
 
 <section class="cta" id="zapytanie"><div class="wrap">
-  <div class="box rv">
+  <div class="box dk rv">
     <div class="duo"><img src="assets/img/photo-f87827466.webp" alt="" loading="lazy"></div>
     <div class="grid">
       <div>
@@ -376,7 +441,7 @@ footer .copy a{display:inline}
         <h2 style="margin-top:22px">Masz projekt do opracowania?</h2>
         <p>Opisz inwestycję. Odpowiemy z wyceną i proponowanym terminem w ciągu jednego dnia roboczego.</p>
       </div>
-      <form id="qf" novalidate>
+      <form id="qf" class="lt" novalidate>
         <label>Firma<input name="firma" autocomplete="organization" required></label>
         <label>E-mail<input name="email" type="email" autocomplete="email" required></label>
         <label>Rodzaj usługi
@@ -399,7 +464,7 @@ footer .copy a{display:inline}
 </div></section>
 </main>
 
-<footer>
+<footer class="dk">
   <div class="wrap">
     <div class="cols">
       <div><img src="logo.png" alt="swiadectwa.net" style="height:30px;margin-bottom:16px"><p>Eksperci w zakresie analiz energetycznych. Biura projektowe, deweloperzy, architekci.</p></div>
@@ -417,7 +482,7 @@ footer .copy a{display:inline}
   var rm=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var hd=document.getElementById('hd');
   function onScroll(){
-    hd.classList.toggle('solid',window.scrollY>30);
+    var sd=window.scrollY>30;hd.classList.toggle('solid',sd);var lg=document.getElementById('logo');var want=sd?'logo-dark.png':'logo.png';if(lg.getAttribute('src')!==want)lg.setAttribute('src',want);
     // słowa hasła
     var ws=document.querySelectorAll('#say .w');
     if(ws.length){
