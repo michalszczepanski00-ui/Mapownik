@@ -3,7 +3,7 @@ import React from 'react';
 import { recordError } from '../../diagnostics/errorLog.js';
 import { t } from '../../i18n/index.js';
 
-const VERSION = '19.49.0';
+const VERSION = '19.50.0';
 /**
  * Final UI safety net. A runtime exception should never leave a blank page.
  * The detailed error stays visible locally so startup problems can be diagnosed.

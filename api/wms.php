@@ -164,6 +164,18 @@ $requestVariant = static function (array $variant, int $timeout) use ($source, $
         }
     }
 
+    // 19.50.0: wariant „eksport ArcGIS” (zapas EEA dla form ochrony przyrody) — ten sam obraz
+    // (BBOX, rozmiar, układ), ale zapytanie REST `export` zamiast WMS GetMap.
+    if (($variant['kind'] ?? '') === 'arcgis_export') {
+        $sr = substr($crsInput, 5);
+        $params = [
+            'bbox' => $bbox, 'bboxSR' => $sr, 'imageSR' => $sr, 'size' => $width . ',' . $height, 'dpi' => '96',
+            'layers' => $layers, 'format' => 'png32', 'transparent' => 'true', 'f' => 'image',
+        ];
+        if (!empty($variant['layer_defs'])) $params['layerDefs'] = (string)$variant['layer_defs'];
+        if (!empty($variant['dynamic_layers'])) $params['dynamicLayers'] = (string)$variant['dynamic_layers'];
+        $version = 'arcgis-export';
+    } else {
     $params = [
         'SERVICE' => 'WMS',
         'VERSION' => $version,
@@ -182,6 +194,7 @@ $requestVariant = static function (array $variant, int $timeout) use ($source, $
     }
     $params[$version === '1.3.0' ? 'CRS' : 'SRS'] = $crsInput;
     if ($time !== null) $params['TIME'] = $time;
+    }
     ksort($params);
     $query = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
     $url = $upstreamUrl . '?' . $query;

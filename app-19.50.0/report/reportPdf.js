@@ -642,6 +642,8 @@ function sectionPrzyroda(L, ctx) {
         L.image(ctx.maps.srodowisko, { minAfter: 8 });
         L.legend([['Natura 2000', '#b33749'], ['Formy ochrony', '#4daf49'], ['Zagrożenie powodziowe (ISOK)', '#3b82f6'], ['Lasy (BDOT10k)', '#2f6b2f'], ['Wody (BDOT10k)', '#38bdf8'], ['Teren', '#e8432e']]);
     }
+    // 19.50.0: źródło zapasowe (EEA), gdy GDOŚ nie odpowiedział.
+    for (const note of p.data.notes ?? []) L.note(note);
     const sh = p.data.share ?? {};
     L.kv([['Natura 2000 — udział powierzchni', shareText(sh.natura)], ['Inne formy ochrony — udział powierzchni', shareText(sh.other)]], { cols: 2, labelW: 44 });
     if (ctx.maps.przyroda) {

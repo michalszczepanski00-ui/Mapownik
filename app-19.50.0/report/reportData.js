@@ -321,6 +321,8 @@ const collectors = {
         for (const [key, source] of [['natura', 'natura2000'], ['other', 'gdos_protection']]) {
             try {
                 const r = await identify(source, ctx.center, ctx.signal);
+                // 19.50.0: GDOŚ nie odpowiedział — wynik z danych zapasowych EEA (opis do raportu).
+                if (r.fallback === 'eea' && r.fallbackNote) (out.notes ??= []).push(r.fallbackNote);
                 const objs = r.found ? parseIdentifyText(r.text) : [];
                 out[key] = objs.map((o) => o.nazwa || o.NAZWA || o.Nazwa || o.name || o.kod || o.KOD || Object.values(o)[0]).filter(Boolean);
             } catch (error) { out.errors.push(`${source === 'natura2000' ? 'Natura 2000' : 'inne formy ochrony'}: ${error.message}`); }

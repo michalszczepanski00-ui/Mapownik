@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""msportal 19.49.0-b — Content-Security-Policy dla index.html (audyt B5).
+"""msportal 19.50.0-b — Content-Security-Policy dla index.html (audyt B5).
 
 Strona ma trzy skrypty wbudowane (wersja, importmap, start aplikacji). CSP dopuszcza je po sumie
 sha256 treści, więc KAŻDA zmiana takiego skryptu (także numer wersji z tools/bump_version.py)

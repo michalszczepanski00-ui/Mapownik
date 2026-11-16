@@ -76,6 +76,16 @@ const IDENTIFY_SOURCES = [
             ['layers' => 'NZ.Fluvial', 'query_layers' => 'NZ.Fluvial'],
         ],
     ],
+    // 19.50.0: hałas — główne drogi, koleje, lotniska i aglomeracje jednym zapytaniem (mapy strategiczne 2017).
+    'noise_all' => [
+        'url' => 'https://iip.ekoportal.gov.pl/geoserver/wms',
+        'layers' => 'DF4_8_MRoad2017Lden:PL_a_Mroad_Lden,DF4_8_MRail2017Lden:PL_a_Mrail_2017_Lden,DF4_8_Mair2017:PL_a_Mair_Maps2017_Lden,DF4_8_AggRoad2017Lden:PL_a_AggRoad2017_Lden_polygon,DF4_8_AggRail2017Lden:PL_a_AggRail2017_Lden_Polygon,DF4_8_AggInd2017Lden:PL_a_AggInd2017_Lden_Polygon,DF4_8_AggAir2017Lden:PL_a_Aggair2017_Lden',
+        'query_layers' => 'DF4_8_MRoad2017Lden:PL_a_Mroad_Lden,DF4_8_MRail2017Lden:PL_a_Mrail_2017_Lden,DF4_8_Mair2017:PL_a_Mair_Maps2017_Lden,DF4_8_AggRoad2017Lden:PL_a_AggRoad2017_Lden_polygon,DF4_8_AggRail2017Lden:PL_a_AggRail2017_Lden_Polygon,DF4_8_AggInd2017Lden:PL_a_AggInd2017_Lden_Polygon,DF4_8_AggAir2017Lden:PL_a_Aggair2017_Lden',
+        'version' => '1.1.1',
+        // GeoJSON niesie całą geometrię izofony (setki punktów) — tekst jest lżejszy; serwer odpowiada w ok. 7 s.
+        'info_formats' => ['text/plain'],
+        'identify_timeout' => 14,
+    ],
     'nid_immovable' => [
         'url' => 'https://usluga.zabytek.gov.pl/INSPIRE_IMD/service.svc/get',
         'layers' => 'Immovable_Monuments', 'query_layers' => 'Immovable_Monuments', 'version' => '1.3.0',
@@ -201,6 +211,32 @@ const IDENTIFY_SOURCES = [
     ],
 ];
 
+/**
+ * 19.50.0: opis z map hałasu (GeoServer, text/plain) — źródło hałasu i przedział LDWN zamiast surowych pól.
+ */
+function identify_noise_text(string $body): ?string {
+    $kinds = ['Mroad' => 'główna droga', 'Mrail' => 'główna linia kolejowa', 'Mair' => 'lotnisko',
+        'AggRoad' => 'ruch drogowy (aglomeracja)', 'AggRail' => 'ruch kolejowy (aglomeracja)',
+        'AggInd' => 'przemysł (aglomeracja)', 'Aggair' => 'ruch lotniczy (aglomeracja)'];
+    $blocks = [];
+    foreach (preg_split("/Results for FeatureType/", $body) ?: [] as $part) {
+        if (!preg_match("/PL_a_(Mroad|Mrail|Mair|AggRoad|AggRail|AggInd|Aggair)/i", $part, $m)) continue;
+        $kind = '';
+        foreach ($kinds as $k => $label) if (strcasecmp($k, $m[1]) === 0) $kind = $label;
+        foreach (preg_split("/-{10,}/", $part) ?: [] as $feature) {
+            $low = preg_match("/\\bdb_low\\s*=\\s*(\\d+)/", $feature, $a) ? $a[1] : null;
+            $high = preg_match("/\\bdb_high\\s*=\\s*(\\d+)/", $feature, $b) ? $b[1] : null;
+            if ($low === null && $high === null) continue;
+            $lines = ['Źródło hałasu: ' . $kind, 'LDWN: ' . ($low ?? '?') . '–' . ($high ?? '?') . ' dB'];
+            if (preg_match("/\\bicaocode\\s*=\\s*(\\w+)/", $feature, $c)) $lines[] = 'Lotnisko: ' . $c[1];
+            if (preg_match("/\\bagglomerat\\s*=\\s*([^\\r\\n]+)/", $feature, $d)) $lines[] = 'Aglomeracja: ' . trim($d[1]);
+            $lines[] = 'Dane: strategiczne mapy hałasu, 2017 r.';
+            $blocks[] = implode("\n", $lines);
+        }
+    }
+    return $blocks ? implode("\n\n", $blocks) : null;
+}
+
 function identify_fail(string $message, int $status = 502, string $code = 'error'): never {
     http_response_code($status);
     // 18.18.0: kod błędu dla interfejsu (komunikat po polsku po stronie klienta),
@@ -274,7 +310,9 @@ $candidates = $uniqueCandidates;
 // trzymało proces PHP do ~60 s (warianty × formaty × 10 s), a wszystkie
 // źródła dzieliły jeden bezpiecznik na adres usługi.
 $requestBudget = 16.0;
-$upstreamTimeout = 7;
+$upstreamTimeout = (int)($source['identify_timeout'] ?? 7);
+// 19.50.0: wolne źródło (hałas, ekoportal ~7 s) dostaje dłuższy limit i budżet — nadal poniżej 30 s po stronie przeglądarki.
+if (isset($source['identify_timeout'])) $requestBudget = 24.0;
 $circuitKey = 'identify:' . $key;
 // 19.8.6: tryb „merge” (plany ogólne: GUGiK + Rejestr Urbanistyczny). Pusty wynik jednego
 // źródła nie przesądza o braku planu, dopóki nie odpowie źródło z innego hosta — żadne
@@ -373,6 +411,7 @@ foreach ($candidates as $candidate) {
         $structured = in_array($result['basis'], ['json', 'gml', 'xml'], true);
         if ($result['state'] === 'found') {
             $remember($candidate, $infoFormat);
+            if ($key === 'noise_all') $result['text'] = identify_noise_text($body) ?? $result['text'];
             echo json_encode([
                 'ok' => true,
                 'found' => true,
@@ -465,6 +504,18 @@ if ($validEmptyResponse) {
     }
     echo json_encode(['ok' => true, 'found' => false, 'text' => null, 'count' => 0, 'basis' => $emptyBasis], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
+}
+
+// 19.50.0: GDOŚ odmówił (403 z zapory Incapsula) albo nie odpowiedział — formy ochrony z zapasowego
+// źródła EEA. Pusta odpowiedź GDOŚ (wyżej) rozstrzyga i tu nie dochodzi.
+require_once __DIR__ . '/_eea_protected.php';
+$eeaDef = eea_protected_fallback($key);
+if ($eeaDef !== null) {
+    $eea = eea_protected_identify($eeaDef, $x, $y);
+    if ($eea !== null) {
+        echo json_encode($eea, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
 }
 
 if ($layerRejected && $stopReason === '') {

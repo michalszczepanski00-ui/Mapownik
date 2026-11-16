@@ -11,6 +11,7 @@ import { objectStyleFeature } from './builtin/objectStyleFeature.js';
 import { editingFeature } from './builtin/editingFeature.js';
 import { measurementFeature } from './builtin/measurementFeature.js';
 import { bufferFeature } from './builtin/bufferFeature.js';
+import { wzAreaFeature } from './builtin/wzAreaFeature.js';
 import { informationFeature } from './builtin/informationFeature.js';
 import { terrainFeature } from './builtin/terrainFeature.js';
 import { layersFeature } from './builtin/layersFeature.js';
@@ -27,6 +28,7 @@ export const BUILTIN_FEATURES = Object.freeze([
     editingFeature,
     measurementFeature,
     bufferFeature,
+    wzAreaFeature,
     informationFeature,
     terrainFeature,
     layersFeature,

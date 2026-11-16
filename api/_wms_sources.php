@@ -350,4 +350,13 @@ foreach ($sources as $wmsProfileKey => &$wmsProfileValue) {
     if (str_starts_with($wmsProfileKey, 'kiut_')) { unset($wmsProfileValue['variants']); $wmsProfileValue['error_mode'] = 'http'; }
 }
 unset($wmsProfileValue, $wmsProfileKey);
+// 19.50.0: formy ochrony przyrody — gdy GDOŚ odmówi (403 Incapsula) albo nie odpowie, obraz z EEA.
+require_once __DIR__ . '/_eea_protected.php';
+foreach ($sources as $wmsKey => &$wmsSource) {
+    $eeaDef = eea_protected_fallback($wmsKey);
+    if ($eeaDef === null) continue;
+    $primary = ['url' => $wmsSource['url'], 'layers' => $wmsSource['layers'], 'version' => $wmsSource['version'] ?? '1.1.1'];
+    $wmsSource['variants'] = [$primary, eea_protected_wms_variant($eeaDef)];
+}
+unset($wmsSource, $wmsKey);
 return $sources;

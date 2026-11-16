@@ -23,7 +23,15 @@ const PARCEL_PLUS_TARGETS = [
     // 19.37.0: „Czyj las” — Bank Danych o Lasach (api/forest.php).
     { id: 'parcelplus.forest', title: 'Las — własność (BDL)', sourceKey: 'bdl_forest', url: './api/forest.php', section: 'environment' },
     { id: 'parcelplus.classes', title: t('identify.klasyGruntowEgib'), sourceKey: 'egib_classes', section: 'grunts' },
-    // 19.23.0: „Zasób KOWR” usunięty z karty działki — usługa nie zwraca danych (patrz dataCatalog.js).
+    // 19.50.0: odpowiedzi na częste pytania o działkę — zabytek, powódź (obszar zagrożenia i strefa ryzyka),
+    // wody podziemne, hałas, zasób KOWR (usługa rysuje dane — wcześniejsza diagnoza „pusta” była błędna) i pompa ciepła.
+    { id: 'parcelplus.monument', title: 'Zabytek — rejestr (NID)', sourceKey: 'nid_immovable', section: 'environment' },
+    { id: 'parcelplus.flood', title: 'Powódź — obszar zagrożenia', sourceKey: 'flood_mzpmrp', section: 'environment' },
+    { id: 'parcelplus.flood-risk', title: 'Powódź — strefa ryzyka', sourceKey: 'flood_risk', section: 'environment' },
+    { id: 'parcelplus.gzwp', title: 'Główny Zbiornik Wód Podziemnych', sourceKey: 'gzwp', section: 'environment' },
+    { id: 'parcelplus.noise', title: 'Hałas — mapy strategiczne (2017)', sourceKey: 'noise_all', section: 'environment' },
+    { id: 'parcelplus.kowr', title: 'Zasób KOWR', sourceKey: 'kowr', section: 'geology' },
+    { id: 'parcelplus.geothermal', title: 'Pompa ciepła — odwierty (PIG)', sourceKey: 'geothermal_bhe', section: 'utilities' },
     { id: 'parcelplus.deposit', title: t('identify.zlozeKopalin'), sourceKey: 'pgi_deposits', section: 'geology' },
     { id: 'parcelplus.mining', title: t('identify.obszarGorniczy'), sourceKey: 'pgi_miningareas', section: 'geology' },
 ];
@@ -428,6 +436,10 @@ export class IdentifyManager {
                 // w JSON/GML/XML, 'text' = rozpoznane z opisu HTML/tekst).
                 count: Number.isFinite(payload.count) ? payload.count : null,
                 basis: payload.basis ?? null,
+                // 19.50.0: wynik z zapasowego źródła (EEA zamiast GDOŚ) — z opisem i informacją o niepełnym zakresie.
+                fallback: payload.fallback ?? null,
+                fallbackNote: payload.fallbackNote ?? null,
+                partial: Boolean(payload.partial),
                 error: null,
             };
         }));

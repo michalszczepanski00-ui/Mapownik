@@ -83,6 +83,9 @@ const VERDICT = [
     // 19.48.0: `show` dla każdego wiersza — warstwa na mapie, którą włącza oko (kolumna oka zawsze wyrównana).
     { key: 'natura2000', labelKey: 'identify.verdict.natura', ready: ['identify.verdict.inside', 'warning'], empty: ['identify.verdict.outside', 'ok'], show: ['overlay.gdos.birds', 'overlay.gdos.habitats'] },
     { key: 'gdos_protection', labelKey: 'identify.verdict.protection', ready: ['identify.verdict.inside', 'warning'], empty: ['identify.verdict.outside', 'ok'], show: ['overlay.gdos.national', 'overlay.gdos.landscape', 'overlay.gdos.reserves', 'overlay.gdos.protected', 'overlay.gdos.ecological', 'overlay.gdos.complexes'] },
+    // 19.50.0: zabytek (rejestr NID) i powódź (obszar zagrożenia albo strefa ryzyka).
+    { key: 'nid_immovable', labelKey: 'identify.verdict.monument', ready: ['identify.verdict.monument.yes', 'warning'], empty: ['identify.verdict.monument.no', 'ok'], show: ['overlay.nid.immovable'] },
+    { key: 'flood_mzpmrp', keys: ['flood_mzpmrp', 'flood_risk'], labelKey: 'identify.verdict.flood', ready: ['identify.verdict.flood.hazard', 'warning'], empty: ['identify.verdict.flood.none', 'ok'], show: ['overlay.flood_river', 'overlay.flood_risk'] },
     { key: 'egib_classes', labelKey: 'identify.verdict.soil', ready: ['identify.verdict.read', 'info'], empty: ['identify.verdict.none', 'neutral'], show: ['overlay.egib.arable-classes'] },
     // 19.37.0: „Czyj las” (Bank Danych o Lasach).
     { key: 'bdl_forest', labelKey: 'identify.verdict.forest', ready: ['identify.verdict.read', 'info'], empty: ['identify.verdict.forest.none', 'neutral'], show: ['overlay.forest.ownership'] },
@@ -98,6 +101,16 @@ function zoneSymbol(text) {
  * Wcześniej liczył się tylko uchwalony, więc przy projekcie w opracowaniu u góry było „brak planu”,
  * a niżej w sekcji Planowanie — projekt ze strefą.
  */
+/** 19.50.0: powódź — obszar zagrożenia (MZP) ma pierwszeństwo przed samą strefą ryzyka (MRP). */
+export function floodVerdict(bySource) {
+    const hazard = bySource.get('flood_mzpmrp'); const risk = bySource.get('flood_risk');
+    const all = [hazard, risk].filter(Boolean);
+    if (hazard?.status === 'ready') return [t('identify.verdict.flood.hazard'), 'warning', false, t('identify.verdict.ready.title')];
+    if (risk?.status === 'ready') return [t('identify.verdict.flood.risk'), 'warning', false, t('identify.verdict.flood.risk.title')];
+    if (all.some((l) => l.status === 'loading')) return ['…', 'loading'];
+    if (all.some((l) => l.status === 'error')) return [t('identify.verdict.unknown'), 'warning', false, t('identify.verdict.unknown.title')];
+    return [t('identify.verdict.flood.none'), 'ok', false, t('identify.verdict.flood.none.title')];
+}
 export function pogVerdict(bySource) {
     const adopted = bySource.get('pog_adopted'); const draft = bySource.get('pog_draft'); const zones = bySource.get('pog_zones');
     const all = [adopted, draft, zones].filter(Boolean);
@@ -121,6 +134,12 @@ export function normalizeLayer(layer) {
     if (layer?.sourceKey === 'egib_classes' && layer.status === 'ready' && !soilClass(layer.text)) return { ...layer, status: 'empty', noClass: true };
     return layer;
 }
+/** 19.50.0: wynik z danych zapasowych EEA (GDOŚ nie odpowiedział) — dopisek i opis w dymku. */
+function withFallback(layer, value) {
+    if (layer?.fallback !== 'eea') return value;
+    const [text, tone, named, title] = value;
+    return [`${text} · dane EEA`, tone, named, layer.fallbackNote || title];
+}
 function verdictValue(item, layer) {
     if (!layer || layer.status === 'loading') return ['…', 'loading'];
     if (item.key === 'egib_classes' && layer.noClass) return [t('identify.verdict.soil.noClass'), 'neutral', false, t('identify.verdict.soil.noClass.title')];
@@ -142,9 +161,9 @@ function verdictValue(item, layer) {
     // 18.18.3: przy obszarach chronionych pokazujemy, W KTÓRYM obszarze jest punkt.
     if (layer.status === 'ready' && (item.key === 'natura2000' || item.key === 'gdos_protection')) {
         const name = protectedAreaName(layer.text);
-        if (name) return [`${t(text)}: ${name}`, tone, true];
+        if (name) return withFallback(layer, [`${t(text)}: ${name}`, tone, true]);
     }
-    return [t(text), tone, false, hint];
+    return withFallback(layer, [t(text), tone, false, hint]);
 }
 /** 19.37.0: krótka nazwa własności lasu z odpowiedzi api/forest.php („Własność: …”). */
 export function forestOwner(text) {
@@ -228,7 +247,7 @@ export function Nearby({ center }) {
  *  oraz loading w trakcie odczytu. Wcześniej „brak w usłudze” miał ikonę jak „poza”, a „nie sprawdzono” — ostrzeżenie.
  */
 export function verdictState(item, bySource) {
-    const states = (item.key === 'pog_adopted' ? ['pog_adopted', 'pog_draft', 'pog_zones'] : [item.key]).map((key) => bySource.get(key)).filter(Boolean);
+    const states = (item.key === 'pog_adopted' ? ['pog_adopted', 'pog_draft', 'pog_zones'] : (item.keys ?? [item.key])).map((key) => bySource.get(key)).filter(Boolean);
     if (!states.length) return 'loading';
     if (states.some((layer) => layer.status === 'ready' && !layer.noClass)) return 'yes';
     if (states.some((layer) => layer.status === 'loading')) return 'loading';
@@ -244,7 +263,7 @@ export function Verdict({ layers }) {
     if (!items.length) return null;
     return h('section', { className: 'identify-verdict', 'aria-label': t('identify.verdict.title'), title: t('identify.verdict.legend') },
         items.map((item) => {
-            const [value, , wide, hint] = item.key === 'pog_adopted' ? pogVerdict(bySource) : verdictValue(item, bySource.get(item.key));
+            const [value, , wide, hint] = item.key === 'pog_adopted' ? pogVerdict(bySource) : item.key === 'flood_mzpmrp' ? floodVerdict(bySource) : verdictValue(item, bySource.get(item.key));
             const state = verdictState(item, bySource);
             // 19.48.0: oko przy każdym wierszu z warstwą (poza sprawdzaniem) — także „poza” da się sprawdzić na mapie.
             const found = state !== 'loading';

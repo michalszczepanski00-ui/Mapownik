@@ -1,5 +1,5 @@
 {
-  "//": "msportal 19.49.0 — TypeScript. Kod aplikacji to na razie JavaScript (allowJs); nowe moduły i testy można pisać w .ts, a istniejące pliki przenosić stopniowo (zmiana rozszerzenia .js → .ts, Vite obsługuje oba). npm run typecheck sprawdza pliki .ts i pliki JS z komentarzem // @ts-check. Ścieżkę @app/* aktualizuje tools/bump_version.py.",
+  "//": "msportal 19.50.0 — TypeScript. Kod aplikacji to na razie JavaScript (allowJs); nowe moduły i testy można pisać w .ts, a istniejące pliki przenosić stopniowo (zmiana rozszerzenia .js → .ts, Vite obsługuje oba). npm run typecheck sprawdza pliki .ts i pliki JS z komentarzem // @ts-check. Ścieżkę @app/* aktualizuje tools/bump_version.py.",
   "compilerOptions": {
     "target": "es2022",
     "module": "esnext",
@@ -13,7 +13,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "types": ["vitest/globals"],
-    "paths": { "@app/*": ["./app-19.49.0/*"] }
+    "paths": { "@app/*": ["./app-19.50.0/*"] }
   },
-  "include": ["tests/**/*.ts", "app-19.49.0/**/*.ts"]
+  "include": ["tests/**/*.ts", "app-19.50.0/**/*.ts"]
 }

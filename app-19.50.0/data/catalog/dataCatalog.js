@@ -155,7 +155,7 @@ const rawDataCatalog = {
                 transparent: true,
                 tiled: true,
                 tileSize: 512,
-                legendUrl: './assets/legend/las-wlasnosc.svg?v=19.49.0',
+                legendUrl: './assets/legend/las-wlasnosc.svg?v=19.50.0',
                 identifyUrl: './api/forest.php',
             },
         },
@@ -881,7 +881,7 @@ const rawDataCatalog = {
  */
 /** Grupy rozwinięte w panelu Warstwy przy pierwszym uruchomieniu. */
 export const DEFAULT_EXPANDED_GROUPS = Object.freeze(['Działki i grunty', 'Planowanie przestrzenne']);
-const OVERLAY_GROUP_ORDER_ALL = ['Działki i grunty','Planowanie przestrzenne','Uzbrojenie terenu','Energetyka','Środowisko i wody','Geologia i górnictwo','Rzeźba i wysokości','Dane pomocnicze','Archiwum'];
+const OVERLAY_GROUP_ORDER_ALL = ['Działki i grunty','Planowanie przestrzenne','Uzbrojenie terenu','Energetyka','Środowisko i wody','Uciążliwości i hałas','Dziedzictwo','Geologia i górnictwo','Rzeźba i wysokości','Dane pomocnicze','Archiwum'];
 
 rawDataCatalog.catalogVersion = 15;
 for (const layer of rawDataCatalog.layers) {
@@ -899,10 +899,15 @@ for (const [key, profile] of Object.entries(sourceProfiles)) {
     if (profile.map_layer === false) continue;
     let layer = rawDataCatalog.layers.find(item => item.source.url === './api/wms.php?source=' + key);
     // 19.47.0: jedna zasada drogi zapytań — przez serwer pośredniczący (pamięć podręczna), przeglądarka awaryjnie.
+    // 19.50.0: `client_transport` w profilu (ekoportal GIOŚ: tylko serwer — przeglądarka dostaje odpowiedź blokowaną przez ORB).
+    // 19.50.0: wyjątek — GDOŚ (zapora Incapsula odrzuca serwery, 403): najpierw przeglądarka, potem serwer,
+    // który przy odmowie GDOŚ rysuje te same formy ochrony z danych EEA (api/_eea_protected.php).
     // Warstwy planistyczne (napisy uchwał, symbole stref) jako jeden obraz na widok: bez ucinania napisów na
     // krawędziach kafli, bez powtarzania symbolu strefy na każdym kaflu, jedno zapytanie zamiast kilkunastu.
     const planning = profile.group === 'Planowanie przestrzenne';
-    const source = { kind:'wms', url:'./api/wms.php?source='+key, directUrl:profile.url, transport:'proxy-then-direct', layers:profile.layers, version:profile.version, format:profile.format, transparent:profile.transparent, tiled: !planning && !key.startsWith('kiut_') && key !== 'egib_classes', ...(planning ? { ratio: 1.2 } : {}), tileSize:512, preload:0, transition:0, ...(planning ? {} : { gutter: 64 }), directTimeoutMs:8000, proxyTimeoutMs:12000, ...(profile.projection ? {projection:profile.projection} : {}) };
+    // 19.50.0: `single_image` — jeden obraz na widok także poza planowaniem (hipsometria NMT: kafel 6–27 s, cały widok ok. 6 s).
+    const single = planning || profile.single_image === true;
+    const source = { kind:'wms', url:'./api/wms.php?source='+key, directUrl:profile.url, transport: profile.client_transport ?? (key.startsWith('gdos_') ? 'direct-then-proxy' : 'proxy-then-direct'), layers:profile.layers, version:profile.version, format:profile.format, transparent:profile.transparent, tiled: !single && !key.startsWith('kiut_') && key !== 'egib_classes', ...(single ? { ratio: 1.2 } : {}), tileSize:512, preload:0, transition:0, ...(single ? {} : { gutter: 64 }), directTimeoutMs: key.startsWith('gdos_') ? 6000 : 8000, proxyTimeoutMs: profile.client_timeout_ms ?? 12000, ...(profile.projection ? {projection:profile.projection} : {}) };
     if (!layer) {
         layer = { id:profile.layer_id, role:'overlay', visible:false, opacity:0.65, capabilities:{ identify:profile.identify !== false, selectable:false, editable:false } };
         rawDataCatalog.layers.push(layer);

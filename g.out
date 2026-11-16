@@ -1,0 +1,28 @@
+Results for FeatureType 'http://inspire.ekoportal.gov.pl/dataset/PL.ZIPOS.6672:PL_a_Mroad_Lden':
+--------------------------------------------
+geom = [GEOMETRY (Polygon) with 443 points]
+objectid = 117802
+db_high = 59
+db_low = 55
+repentuncd = a
+ctryid = PL
+--------------------------------------------
+Results for FeatureType 'http://inspire.ekoportal.gov.pl/dataset/PL.ZIPOS.6635:PL_a_Mair_Maps2017_Lden':
+--------------------------------------------
+geom = [GEOMETRY (Polygon) with 1048 points]
+ctry_cd = PL
+rpent_cd = b
+icaocode = EPWA
+db_low = 50
+db_high = 55
+--------------------------------------------
+Results for FeatureType 'http://inspire.ekoportal.gov.pl/dataset/PL.ZIPOS.6663:PL_a_AggRoad2017_Lden_polygon':
+--------------------------------------------
+geom = [GEOMETRY (Polygon) with 788 points]
+objectid = 2
+ctryid = PL
+agglomerat = Warszawa
+db_low = 60
+db_high = 64
+unaggid = PL_a_ag1465
+--------------------------------------------

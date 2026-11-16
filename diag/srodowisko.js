@@ -1,4 +1,4 @@
-// msportal 19.49.0 — środowisko diagnostyki budowanej przez Vite (drugie wejście obok index.html).
+// msportal 19.50.0 — środowisko diagnostyki budowanej przez Vite (drugie wejście obok index.html).
 //
 // 1. diagFetch: zapytania o pliki źródłowe (app-<wersja>/…, assets/css/…) obsługuje z tekstów dołączonych
 //    w budowaniu (diag/zrodla.js); wszystko inne idzie do serwera bez zmian. Diagnostyka zastępuje nim

@@ -22,6 +22,10 @@ import { useLayerCoverage } from './layerCoverage.js';
  * stan źródła, legenda), ale wszystkie napisy biorą z katalogu.
  */
 const ARCHIVE_GROUP = 'Archiwum';
+// 19.50.0: zestawy zbiorcze GDOŚ (Natura 2000 i formy ochrony jednym obrazem) dublowały 10 osobnych warstw GDOŚ.
+// Zostają w katalogu (raport PDF, analiza otoczenia, zapisane projekty), ale nie ma ich na liście —
+// chyba że są włączone (np. z projektu zapisanego wcześniej).
+const PANEL_HIDDEN = new Set(['overlay.natura2000', 'overlay.gdos.protection']);
 const ARCHIVE_PREF = 'mapownik:layers-show-archive';
 const EMPTY_SNAPSHOT = Object.freeze({ catalogVersion: 0, issues: [], layers: [] });
 const PREFS_KEY = 'mapownik:layers-ui-v16.3';
@@ -175,7 +179,7 @@ export function LayersPanel() {
             setDragId(null);
         },
     }), [manager]);
-    const overlayLayers = useMemo(() => snapshot.layers.filter((layer) => layer.role === 'overlay'), [snapshot.layers]);
+    const overlayLayers = useMemo(() => snapshot.layers.filter((layer) => layer.role === 'overlay' && (!PANEL_HIDDEN.has(layer.id) || layer.visible)), [snapshot.layers]);
     const activeLayers = useMemo(() => overlayLayers.filter((layer) => layer.visible), [overlayLayers]);
     const favoriteCount = useMemo(() => overlayLayers.reduce((count, layer) => count + Number(favorites.has(layer.id)), 0), [overlayLayers, favorites]);
     const normalizedQuery = query.trim().toLocaleLowerCase('pl-PL');

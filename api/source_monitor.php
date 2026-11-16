@@ -118,7 +118,12 @@ const MONITOR_REFERENCE_POINTS = [
     'prg_boundaries' => [567046, 244169],
     'pse' => [523017, 377642],
     'ru_mpzp_prawniewiazacylubrealizowany' => [637371, 486679],
-    'sopo' => [654734, 205523]
+    'sopo' => [654734, 205523],
+    // 19.50.0: nowe źródła
+    'nid_immovable' => [477451, 720600],
+    'flood_risk' => [490854, 696194],
+    'gzwp' => [638534, 489047],
+    'noise_main' => [636048, 480078]
 ];
 $referencePoint = false;
 if (((string)($_GET['point'] ?? '')) === 'ref' && isset(MONITOR_REFERENCE_POINTS[$key])) { [$x, $y] = MONITOR_REFERENCE_POINTS[$key]; $referencePoint = true; }

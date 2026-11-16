@@ -25,7 +25,7 @@ export const TOOL_GROUPS = Object.freeze([
     group({
         id: 'measurement', title: 'Mierz', icon: 'measure-line', defaultTool: 'core.measure.line',
         sections: [
-            { title: 'Pomiar', caption: 'Pomiar', tools: ['core.measure.line', 'core.measure.area', 'core.buffer'] },
+            { title: 'Pomiar', caption: 'Pomiar', tools: ['core.measure.line', 'core.measure.area', 'core.buffer', 'core.wz.area'] },
             { title: 'Teren', caption: 'Teren', tools: ['core.terrain.profile', 'core.terrain.area', 'core.terrain.3d'] },
         ],
     }),
@@ -37,7 +37,7 @@ export const DOCK_LABELS = Object.freeze({
     'core.draw.point': 'Punkt', 'core.draw.line': 'Linia', 'core.draw.polygon': 'Poligon', 'core.draw.rectangle': 'Prostokąt',
     'core.draw.circle': 'Okrąg', 'core.parcel.pick': 'Działka', 'core.draw.text': 'Tekst', 'core.draw.arrow': 'Strzałka',
     'core.draw.callout': 'Etykieta', 'core.draw.road': 'Przejazd', 'core.select': 'Edytuj',
-    'core.measure.line': 'Odległość', 'core.measure.area': 'Powierzchnia', 'core.buffer': 'Bufor',
+    'core.measure.line': 'Odległość', 'core.measure.area': 'Powierzchnia', 'core.buffer': 'Bufor', 'core.wz.area': 'Obszar WZ',
     'core.terrain.profile': 'Profil', 'core.terrain.area': 'Wysokości', 'core.terrain.3d': 'Teren 3D',
 });
 

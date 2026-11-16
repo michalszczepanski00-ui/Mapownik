@@ -7,7 +7,7 @@ function mapownik_source_profiles(): array {
     if (!is_array($data['sources'] ?? null)) throw new RuntimeException('Brak rejestru źródeł.');
     $profiles = [];
     foreach ($data['sources'] as $key => $value) {
-        $profiles[$key] = array_diff_key($value, array_flip(['title','layer_id','group','description','min_zoom','max_zoom','opacity','z_index','provider','provider_url','identify','transport','projection','verified_at','hidden','hidden_reason']));
+        $profiles[$key] = array_diff_key($value, array_flip(['title','layer_id','group','description','min_zoom','max_zoom','opacity','z_index','provider','provider_url','identify','transport','client_transport','single_image','client_timeout_ms','projection','verified_at','hidden','hidden_reason']));
     }
     return $profiles;
 }
