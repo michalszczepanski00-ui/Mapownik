@@ -13,7 +13,7 @@ Bez Node.js — ręcznie w przeglądarce. Zamień `ADRES` na adres portalu, np. 
   - wersję `…-server` zgodną z `VERSION.txt`;
   - `true` dla `curl`, `gd`, `zip`, `pdo_sqlite`, `cache_writable` i `ca_bundle`.
 - [ ] W tym samym `ADRES/api/health.php`: `cache_maintenance_age_s` jest liczbą mniejszą niż 172800 (2 doby).
-  - **Jeśli jest `null`:** ustaw w panelu OVH (Hosting → Zaplanowane zadania) codzienne `php tools/maintain_cache.php`.
+  - **Jeśli jest `null`:** ustaw w panelu OVH (Hosting → Zaplanowane zadania) codzienne zadanie z poleceniem `www/<katalog portalu>/tools/maintain_cache.php` (sama ścieżka, bez `php`) — szczegóły w `README_CRON_OVH.txt`.
 
 ## 2. Bezpieczeństwo — te adresy muszą zwracać 403 albo 404
 - [ ] `ADRES/README_WGRAJ_NA_SERWER.txt`

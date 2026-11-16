@@ -32,12 +32,13 @@ PEŁNA PACZKA 19.41.4 — AKTUALIZACJA DZIAŁAJĄCEGO PORTALU (np. /test22/ z 19
    cache kafli, ewentualne bazy). Paczka ich nie nadpisuje poza plikami
    data/source-profiles.json i data/kowr/.
 3. Sprawdź verify-deployment.php oraz działanie portalu. Zachowaj kopię poprzedniego wydania poza katalogiem WWW. Opcjonalne sprzątanie po odbiorze: php aktualizuj-19.41.4.php --sprzatanie (wyłącznie CLI). Bez CLI usuń stare aktualizatory przez FTP.
-   Konserwacja cache: raz dziennie uruchom php tools/maintain_cache.php z katalogu portalu.
+   Konserwacja cache: zadanie cron w panelu OVH — instrukcja krok po kroku: README_CRON_OVH.txt
+   (polecenie to sama ścieżka, np. www/test25/tools/maintain_cache.php, bez „php”).
 3a. Dane pozwoleń na budowę: rozpakuj dane_rwdz_2026-10.zip i wgraj data/rwdz/rwdz.sqlite
     (osobna paczka, ok. 210 MB). Od 19.35.0 bazę odświeża sam serwer — patrz 3b.
 3b. Automatyczna aktualizacja pozwoleń (19.35.0): panel OVH → Hosting → Zaplanowane zadania (Cron)
-    → Dodaj zaplanowane zadanie: polecenie  www/test22/cron/rwdz_update.php  (ścieżka do katalogu
-    portalu), język PHP 8.x, częstotliwość codziennie (np. 3:00), włączony. Skrypt w sekundę sprawdza
+    → Dodaj zaplanowane zadanie: polecenie  www/test25/cron/rwdz_update.php  (ścieżka do katalogu
+    portalu od katalogu głównego FTP — patrz README_CRON_OVH.txt), język PHP 8.1+, codziennie (np. 3:00), włączony. Skrypt w sekundę sprawdza
     dane.gov.pl; gdy GUNB opublikuje nowe dane (zwykle raz w miesiącu), buduje nową bazę w tle
     (kilka–kilkanaście minut, wznawia się przy kolejnym uruchomieniu) i podmienia plik.
     Wymaga ok. 500 MB wolnego miejsca na czas budowy. Stan: diagnostyka.html (test 19.35.0)

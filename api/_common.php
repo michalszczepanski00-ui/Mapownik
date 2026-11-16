@@ -788,6 +788,15 @@ function maintain_map_cache(): array {
     return ['removed' => $removed, 'removed_bytes' => $removedBytes, 'remaining_bytes' => max(0, $remainingTotal)];
 }
 
+/**
+ * 19.50.0: uruchomienie z crona, a nie z przeglądarki. Cron na hostingu OVH może wywoływać PHP jako CGI
+ * (PHP_SAPI = 'cgi-fcgi'), a nie CLI — wtedy samo PHP_SAPI === 'cli' blokowało skrypty crona.
+ * Zapytanie z przeglądarki zawsze ma REQUEST_METHOD i HTTP_HOST.
+ */
+function mapownik_is_cli(): bool {
+    return PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || (!isset($_SERVER['REQUEST_METHOD']) && !isset($_SERVER['HTTP_HOST']));
+}
+
 // A cron-driven run (tools/maintain_cache.php) is expected daily. A request
 // served over HTTP only falls back to running maintenance itself when cron
 // has clearly not run for a while, so normal traffic doesn't pay for it.
@@ -797,7 +806,7 @@ function maybe_maintain_map_cache(): void {
     $root = cache_root();
     if (!ensure_dir($root)) return;
     $marker = $root . '/.maintenance-18.18.0';
-    $interval = PHP_SAPI === 'cli' ? MAPOWNIK_TILE_CACHE_MAINTENANCE_INTERVAL : MAPOWNIK_TILE_CACHE_HTTP_FALLBACK_INTERVAL;
+    $interval = mapownik_is_cli() ? MAPOWNIK_TILE_CACHE_MAINTENANCE_INTERVAL : MAPOWNIK_TILE_CACHE_HTTP_FALLBACK_INTERVAL;
     if (is_fresh($marker, $interval)) return;
 
     $lockPath = $root . '/.maintenance-18.18.0.lock';

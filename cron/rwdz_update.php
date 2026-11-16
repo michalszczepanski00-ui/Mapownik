@@ -3,9 +3,9 @@
  * 19.35.0 — automatyczna aktualizacja bazy pozwoleń na budowę (RWDZ, GUNB) dla narzędzia „Budowy i pozwolenia”.
  *
  * Uruchamianie: panel OVH → Hosting → Zaplanowane zadania (Cron) → Dodaj:
- *   skrypt:    www/<katalog portalu>/cron/rwdz_update.php     (np. www/test22/cron/rwdz_update.php)
- *   język:     PHP 8.x, częstotliwość: codziennie (np. 03:xx)
- * Skrypt działa tylko z wiersza poleceń (cron); z przeglądarki katalog cron/ jest zablokowany (.htaccess).
+ *   skrypt:    www/<katalog portalu>/cron/rwdz_update.php     (np. www/test25/cron/rwdz_update.php; bez „php” i argumentów)
+ *   język:     PHP 8.1+, częstotliwość: codziennie (np. 03:xx) — instrukcja: README_CRON_OVH.txt
+ * Skrypt działa tylko z crona (CLI albo CGI bez zapytania HTTP); z przeglądarki katalog cron/ jest zablokowany (.htaccess).
  *
  * Co robi przy każdym uruchomieniu:
  *   1. pyta dane.gov.pl (zbiór 3467) o datę danych GUNB; gdy nie ma nowszych niż w data/rwdz/rwdz.sqlite — kończy w sekundę;
@@ -22,7 +22,8 @@
  */
 declare(strict_types=1);
 
-if (PHP_SAPI !== 'cli') { http_response_code(403); exit("Tylko z crona (CLI).\n"); }
+// 19.50.0: cron OVH może uruchamiać PHP jako CGI (nie CLI) — rozpoznajemy brak zapytania HTTP, nie samo PHP_SAPI.
+if (!(PHP_SAPI === 'cli' || PHP_SAPI === 'phpdbg' || (!isset($_SERVER['REQUEST_METHOD']) && !isset($_SERVER['HTTP_HOST'])))) { http_response_code(403); exit("Tylko z crona.\n"); }
 @ini_set('memory_limit', '512M');
 @set_time_limit(0);
 
@@ -34,7 +35,8 @@ $workDir = $root . '/cache/rwdz';
 $statePath = $workDir . '/update-state.json';
 $statusPath = $workDir . '/update-status.json';
 $logPath = $workDir . '/update.log';
-$opts = getopt('', ['budget::', 'years::', 'force', 'cache::']);
+// 19.50.0: bez argumentów (cron OVH, tryb CGI) getopt() potrafi zwrócić false — wtedy array_key_exists() kończył skrypt błędem.
+$opts = getopt('', ['budget::', 'years::', 'force', 'cache::']) ?: [];
 $budgetS = max(60, (int)(($opts['budget'] ?? 20)) * 60);
 $years = max(1, min(5, (int)($opts['years'] ?? 3)));
 $force = array_key_exists('force', $opts);
