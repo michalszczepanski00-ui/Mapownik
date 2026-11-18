@@ -48,7 +48,7 @@ export function AppBar() {
 
     return h('div', { className: 'app-bar' },
         h('div', { className: 'brand', 'aria-label': 'Mapownik' },
-            h('img', { className: 'brand-logo-image', src: './assets/mapownik-logo-icon.png?v=19.50.0', alt: '', 'aria-hidden': true }),
+            h('img', { className: 'brand-logo-image', src: './assets/mapownik-logo-icon.png?v=19.51.0', alt: '', 'aria-hidden': true }),
             h('div', { className: 'brand-copy' }, h('strong', null, 'Mapownik'))),
 
         h(ProjectMenu, null),
@@ -93,7 +93,7 @@ export function MapTopBar() {
     return h('div', { className: 'map-topbar' },
         h('div', { className: 'map-topbar-start' },
             h(IconButton, { className: 'map-brand-button', label: 'Mapownik — polecenia (Ctrl+K)', tooltipSide: 'bottom', onClick: () => dispatch(openOverlay('palette')) },
-                h('img', { src: './assets/mapownik-logo-icon.png?v=19.50.0', alt: '', 'aria-hidden': true })),
+                h('img', { src: './assets/mapownik-logo-icon.png?v=19.51.0', alt: '', 'aria-hidden': true })),
             h(SearchToolbar, { manager: searchManager })),
         h('div', { className: 'map-topbar-end', role: 'toolbar', 'aria-label': 'Projekt i widok' },
             // 19.49.0 (M2, Etap 2): przyciąganie, cofnij i ponów przeniesione do paska kontekstowego (MapContextBar).

@@ -155,7 +155,7 @@ const rawDataCatalog = {
                 transparent: true,
                 tiled: true,
                 tileSize: 512,
-                legendUrl: './assets/legend/las-wlasnosc.svg?v=19.50.0',
+                legendUrl: './assets/legend/las-wlasnosc.svg?v=19.51.0',
                 identifyUrl: './api/forest.php',
             },
         },

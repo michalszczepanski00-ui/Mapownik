@@ -1,9 +1,9 @@
 # Etap 0 — Rozpoznanie (bez zmian w kodzie)
 
-**Wersja bazowa:** test22 = 19.47.0 (`api/health.php` → `19.50.0-server`), w repozytorium commit `813b2a1`, katalog kodu `app-19.50.0/`.
+**Wersja bazowa:** test22 = 19.47.0 (`api/health.php` → `19.51.0-server`), w repozytorium commit `813b2a1`, katalog kodu `app-19.51.0/`.
 **Zmienione pliki:** brak (sam raport). Paczki nie budowałem.
 
-Ścieżki poniżej są względne do `app-19.50.0/`; numery linii według commita `813b2a1`.
+Ścieżki poniżej są względne do `app-19.51.0/`; numery linii według commita `813b2a1`.
 
 ## 1. Główne komponenty układu
 

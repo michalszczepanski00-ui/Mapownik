@@ -1,4 +1,4 @@
-// msportal 19.50.0 — scenariusze w przeglądarce na zbudowanej paczce.
+// msportal 19.51.0 — scenariusze w przeglądarce na zbudowanej paczce.
 import { test, expect } from '@playwright/test';
 
 /** Zbiera błędy konsoli, wyjątki i naruszenia CSP strony. */
@@ -168,7 +168,9 @@ test('„Wysokości” w karcie działki liczy od razu, pasek stylu nie zasłani
   await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
   await page.fill('#map-search-input', '220408_2.0006.210/2');
   await page.getByRole('option').first().click();
-  await page.getByRole('button', { name: 'Wysokości', exact: true }).click({ timeout: 60_000 });
+  // 19.51.0: narzędzia działki w menu „Analizy ▾” karty działki.
+  await page.getByRole('button', { name: 'Analizy działki' }).click({ timeout: 60_000 });
+  await page.getByRole('menuitem', { name: /Wysokości i nachylenie/ }).click();
   await expect(page.getByText('deniwelacja').first()).toBeVisible({ timeout: 90_000 });
   await expect(page.locator('.object-style-bar')).toHaveCount(0);
 });

@@ -44,7 +44,7 @@ export const analysisFeature = defineFeature({
             collapsible: true,
             // 19.11.0: zakładka „Analizy” karty miejsca (App.js: PlaceCardTabs).
             placeCard: true,
-            placeCardLabel: 'Analizy',
+            placeCardLabel: 'Otoczenie działki',
             floatGroup: 'place-card',
             defaultWidth: 336,
             minWidth: 300,

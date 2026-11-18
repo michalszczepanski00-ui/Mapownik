@@ -1,0 +1,34 @@
+import { describe, expect, it } from 'vitest';
+import { shortArea, noiseLevel, itemState, shortProtectedName, shortForestOwner, RESTRICTIONS } from '@app/app/components/ParcelCard.js';
+
+describe('karta działki 19.51.0 — krótkie wartości', () => {
+  it('powierzchnia: ha z dwoma miejscami, poniżej 1 ha w m²', () => {
+    expect(shortArea(218541)).toBe('21,85 ha');
+    expect(shortArea(349)).toBe('349 m²');
+    expect(shortArea(null)).toBeNull();
+  });
+  it('hałas: najwyższy przedział LDWN', () => {
+    expect(noiseLevel('LDWN: 50–55 dB\n\nLDWN: 60–64 dB\n\nLDWN: 55–59 dB')).toBe('60–64 dB');
+    expect(noiseLevel('')).toBe('w zasięgu');
+  });
+  it('formy ochrony i las — skróty', () => {
+    expect(shortProtectedName('Kampinoski Park Narodowy')).toBe('Kampinoski PN');
+    expect(shortProtectedName('Dłubniański Park Krajobrazowy')).toBe('Dłubniański PK');
+    expect(shortForestOwner('sp w zarządzie parków narodowych, poza LP')).toBe('park narodowy');
+    expect(shortForestOwner('prywatny, poza LP')).toBe('prywatny');
+  });
+});
+
+describe('karta działki 19.51.0 — grupowanie ograniczeń', () => {
+  const L = (status: string, extra = {}) => ({ status, ...extra });
+  it('stan pozycji z kilku źródeł', () => {
+    expect(itemState([])).toBe('none');
+    expect(itemState([L('empty'), L('ready')])).toBe('yes');
+    expect(itemState([L('empty'), L('loading')])).toBe('loading');
+    expect(itemState([L('empty'), L('error')])).toBe('unknown');
+    expect(itemState([L('empty'), L('empty')])).toBe('no');
+  });
+  it('każde źródło ograniczeń ma nazwę do linii „Brak: …” i warstwę na mapie', () => {
+    for (const r of RESTRICTIONS) { expect(r.short.length).toBeGreaterThan(1); expect(r.show.length).toBeGreaterThan(0); }
+  });
+});

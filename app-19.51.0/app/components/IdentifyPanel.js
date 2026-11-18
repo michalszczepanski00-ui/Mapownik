@@ -14,9 +14,10 @@ import { PanelHeaderActions } from './PanelHeaderActions.js';
 import { openPanel, useAppDispatch } from '../../store/index.js';
 import { t, tn } from '../../i18n/index.js';
 import { formatParcelArea } from '../../core/units.js';
+import { ParcelCard } from './ParcelCard.js';
 
 const formatArea = (value) => formatParcelArea(value);
-function Fact({ label, value, wide = false, copy = false }) {
+export function Fact({ label, value, wide = false, copy = false }) {
     const [copied, setCopied] = useState(false);
     const valid = value !== '—' && value !== '…' && value != null;
     const copyValue = async () => {
@@ -54,7 +55,7 @@ export function errorShort(layer) {
     if (layer.code === 'unavailable') return t('identify.err.unavailable');
     return t('identify.err.generic');
 }
-function SummaryRow({ layer, onRetry }) {
+export function SummaryRow({ layer, onRetry }) {
     const preview = layer.status === 'ready' ? layer.text
         : layer.status === 'error' ? errorShort(layer)
             : layer.status === 'loading' ? t('identify.loading') : null;
@@ -400,6 +401,9 @@ export const IdentifyPanel = memo(function IdentifyPanel({ snapshot, manager, to
             h(IconButton, { label: t('identify.close'), tooltipSide: 'bottom', onClick: () => manager?.close() }, h(X, { size: 16 }))),
         footer: snapshot.zoneOnly ? t('identify.footer.zone') : t('identify.footer.parcel'),
     },
+        // 19.51.0: na komputerze (karta z narzędziami) uproszczona karta działki — propozycje P1–P10.
+        // Telefon (bez narzędzi) zachowuje dotychczasowy układ poniżej.
+        onScreening ? h('div', { className: 'identify-panel-body identify-panel-body--card' }, h(ParcelCard, { snapshot, manager, layers, onScreening })) :
         h('div', { className: 'identify-panel-body' },
             // 19.39.0: zwięzły nagłówek działki zamiast tabeli 5 wierszy — numer i obręb, gmina z powierzchnią,
             // identyfikator do skopiowania. Ta sama treść, ok. 90 px mniej (na 1366×768 „W okolicy” mieści się bez przewijania).

@@ -67,15 +67,13 @@ export function WorkspaceCard() {
     };
     const pick = (id) => { dispatch(openPanel(id)); };
     const close = () => { if (PANEL_DEFS[openId]?.controlledBy==='identify') identifyManager?.close(); else if(openId) dispatch(closePanel(openId)); };
-    const tabKeys=(event,id)=>{
-        const index=IDS.indexOf(id);
-        const next=event.key==='Home'?0:event.key==='End'?IDS.length-1:event.key==='ArrowRight'?(index+1)%IDS.length:event.key==='ArrowLeft'?(index-1+IDS.length)%IDS.length:-1;
-        if(next<0)return;event.preventDefault();pick(IDS[next]);document.getElementById(`place-tab-${IDS[next]}`)?.focus();
-    };
-    const tabs = h('div',{className:'workspace-place-tabs',role:'tablist','aria-label':'Karta miejsca'},IDS.map((id)=>h('button',{
-        key:id,id:`place-tab-${id}`,type:'button',role:'tab','aria-selected':openId===id,'aria-controls':`place-panel-${id}`,tabIndex:openId===id||(!openId&&id===IDS[0])?0:-1,
-        className:`workspace-place-tab${openId===id?' is-active':''}`,onClick:()=>pick(id),onKeyDown:(event)=>tabKeys(event,id),
-    },PANEL_DEFS[id].placeCardLabel??PANEL_DEFS[id].title)));
+    // 19.51.0 (P9): bez zakładek Działka / Raport / Analizy. Widoki „Analiza działki (serwer)” i „Otoczenie” otwiera menu
+    // Analizy w karcie działki; nad nimi przycisk powrotu do karty działki.
+    const parcelLabel = identify.open ? (identify.parcel?.parcel ? `Działka ${identify.parcel.parcel}` : 'Wynik wskazania') : null;
+    const back = openId && openId !== 'identify' && parcelLabel
+        ? h('button', { type: 'button', className: 'workspace-back', onClick: () => pick('identify') }, h(ChevronLeft, { size: 15, 'aria-hidden': true }), h('span', null, parcelLabel))
+        : null;
+    const headTitle = openId === 'identify' ? null : openId ? (PANEL_DEFS[openId].placeCardLabel ?? PANEL_DEFS[openId].title) : 'Działka i narzędzia';
     const focusSearch = () => { const input = document.getElementById('map-search-input'); input?.focus(); input?.select?.(); };
     const start = h('div', { className: 'workspace-start' },
         h('p', { className: 'workspace-start-title' }, 'Wybierz działkę, aby zobaczyć plan, ochronę i raport:'),
@@ -83,20 +81,20 @@ export function WorkspaceCard() {
         h('div', { className: 'workspace-start-item is-static' }, h(MousePointer2, { size: 15, 'aria-hidden': true }), h('span', null, 'albo kliknij działkę na mapie')),
         h('button', { type: 'button', className: 'workspace-start-item', onClick: () => dispatch(openPanel('layers')) }, h(Layers3, { size: 15, 'aria-hidden': true }), h('span', null, 'Warstwy: plany, uzbrojenie, środowisko')));
     return h('aside',{ref:rootRef,className:`workspace-card${collapsed?' is-collapsed':''}${sketch.active?' is-sketching':''}`,style:{'--work-card-width':`${width}px`},'aria-label':'Działka i narzędzia'},
-        h('div',{className:'workspace-card-head'},
+        h('div',{className:`workspace-card-head${!collapsed&&!headTitle?' is-bare':''}`},
             // 19.24.0: właściwości obiektu są w pasku stylu nad dokiem narzędzi i w oknie „Zaawansowane”.
-            !collapsed&&h('strong',null,'Działka i narzędzia'),
+            !collapsed&&headTitle&&h('strong',null,headTitle),
             h(IconButton,{label:collapsed?'Rozwiń kartę działki i narzędzi':'Zwiń kartę działki i narzędzi',className:'workspace-card-toggle','aria-expanded':!collapsed,'aria-controls':'workspace-card-body',onClick:toggle},h(collapsed?ChevronRight:ChevronLeft,{size:17})),
             !collapsed&&openId&&PANEL_DEFS[openId].controlledBy==='identify'&&h(IconButton,{label:identify.pinned?'Odepnij wynik':'Przypnij wynik','aria-pressed':Boolean(identify.pinned),onClick:()=>identifyManager?.togglePinned()},h(Pin,{size:14})),
             !collapsed&&openId&&h(IconButton,{label:'Zamknij wynik miejsca',onClick:close},h(X,{size:15}))),
         h('div',{id:'workspace-card-body',className:'workspace-card-body',hidden:collapsed},
             // 19.49.0 (M1, Etap 2): opcje narzędzi są w pasku kontekstowym u góry mapy. Karta pokazuje wyłącznie
             // wynik wskazania — włączenie narzędzia Rysuj / Mierz nie zmienia jej zawartości.
-            h('div',{className:'workspace-place'},tabs,
+            h('div',{className:'workspace-place'},back,
                 !openId&&start,
                 [...new Set([...visited,...(openId?[openId]:[])])].map((id)=>{
                     const entry=getPanel(id);
-                    return entry?h('div',{key:id,id:`place-panel-${id}`,role:'tabpanel','aria-labelledby':`place-tab-${id}`,hidden:openId!==id,className:'workspace-place-content'},h(PanelView,{entry})):null;
+                    return entry?h('div',{key:id,id:`place-panel-${id}`,role:'region','aria-label':PANEL_DEFS[id].placeCardLabel??PANEL_DEFS[id].title,hidden:openId!==id,className:'workspace-place-content'},h(PanelView,{entry})):null;
                 }))),
         !collapsed&&h('div',{className:'workspace-card-resizer',role:'separator',tabIndex:0,'aria-orientation':'vertical','aria-label':'Szerokość karty działki i narzędzi','aria-valuemin':WORK_CARD_MIN_WIDTH,'aria-valuemax':Math.min(WORK_CARD_MAX_WIDTH,clampWorkCardWidth(WORK_CARD_MAX_WIDTH,viewport)),'aria-valuenow':width,onPointerDown:resizeStart,onKeyDown:(event)=>{
             if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();changeWidth(event.key==='Home'?WORK_CARD_MIN_WIDTH:event.key==='End'?WORK_CARD_MAX_WIDTH:width+(event.key==='ArrowRight'?20:-20));
