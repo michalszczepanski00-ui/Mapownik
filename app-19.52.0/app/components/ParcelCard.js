@@ -50,16 +50,6 @@ export function shortForestOwner(owner) {
     if (/parków narodowych/i.test(v)) return 'park narodowy';
     return v.replace(/,\s*poza LP$/, '');
 }
-/** Najwyższy przedział LDWN z opisu map hałasu („LDWN: 55–59 dB”). */
-export function noiseLevel(text) {
-    let best = null;
-    for (const m of String(text ?? '').matchAll(/LDWN:\s*(\d+)[–-](\d+)\s*dB/g)) {
-        const hi = Number(m[2]);
-        if (!best || hi > best.hi) best = { lo: Number(m[1]), hi };
-    }
-    return best ? `${best.lo}–${best.hi} dB` : 'w zasięgu';
-}
-
 /**
  * Ograniczenia: `keys` — źródła identyfikacji; `value` — krótka wartość przy trafieniu; `short` — nazwa w linii „Brak: …”.
  * Kolejność = kolejność wierszy.
@@ -76,13 +66,12 @@ export const RESTRICTIONS = [
     { id: 'forest', keys: ['bdl_forest'], label: 'Las', short: 'las', show: ['overlay.forest.ownership'], value: (l) => shortForestOwner(forestOwner(l[0]?.text)) },
     { id: 'gzwp', keys: ['gzwp'], label: 'Wody podziemne', short: 'GZWP', show: ['overlay.pgi.gzwp'],
         value: (l) => { const nr = firstField(l[0]?.text, ['Nr GZWP', 'NrGZWP']); return nr ? `GZWP ${nr}` : 'GZWP'; } },
-    { id: 'noise', keys: ['noise_all'], label: 'Hałas (2017)', short: 'hałas', show: ['overlay.noise.main', 'overlay.noise.agglomeration'], value: (l) => noiseLevel(l[0]?.text) },
     { id: 'deposit', keys: ['pgi_deposits'], label: 'Złoże kopalin', short: 'złoże', show: ['overlay.pgi.deposits'], value: () => 'w złożu' },
     { id: 'mining', keys: ['pgi_miningareas'], label: 'Obszar górniczy', short: 'obszar górniczy', show: ['overlay.pgi.miningareas'], value: () => 'w obszarze' },
 ];
 const RESTRICTION_KEYS = new Set(RESTRICTIONS.flatMap((r) => r.keys));
 const PLANNING_KEYS = new Set(['mpzp', 'pog_adopted', 'pog_draft', 'pog_zones']);
-const GROUND_KEYS = new Set(['egib_classes', 'kowr', 'geothermal_bhe']);
+const GROUND_KEYS = new Set(['egib_classes', 'kowr']);
 
 /** Stan pozycji z kilku źródeł: yes / no / unknown / loading (jak verdictState). */
 export function itemState(layers) {
@@ -188,12 +177,10 @@ export function ParcelCard({ snapshot, manager, layers, onScreening }) {
     const loading = restrictions.filter((r) => r.state === 'loading');
     const absentEea = absent.some((r) => eeaOf(r.layers));
 
-    // --- Grunt
+    // --- Grunt (19.52.0: bez pompy ciepła)
     const soil = bySource.get('egib_classes');
     const soilValue = soil?.status === 'ready' && !soil.noClass ? soilClass(soil.text) : null;
     const kowr = bySource.get('kowr');
-    const geo = bySource.get('geothermal_bhe');
-    const geoValue = geo?.status === 'ready' ? (firstField(geo.text, ['Ocena', 'Opisklasy']) ?? 'opis w szczegółach').replace(/^instalacja\s+/i, '') : null;
 
     // --- Pozostałe trafienia (np. włączone warstwy) — wcześniej sekcja „Pozostałe dane”
     const known = new Set([...PLANNING_KEYS, ...RESTRICTION_KEYS, ...GROUND_KEYS, 'bdl_forest']);
@@ -254,13 +241,12 @@ export function ParcelCard({ snapshot, manager, layers, onScreening }) {
                 h('span', null, 'Brak: ', absent.map((r, i) => [i ? ', ' : '', r.short, eeaOf(r.layers) ? h('sup', { key: `e${r.id}`, className: 'pc-eea' }, 'EEA') : null]))) : null,
             loading.length ? h('div', { className: 'pc-absent pc-absent--loading' }, h('span', { className: 'pc-skel pc-skel--dot', 'aria-hidden': true }), h('span', null, `Sprawdzam: ${loading.map((r) => r.short).join(', ')}`)) : null) : null,
         // Grunt
-        soil || (kowr && kowr.status === 'ready') || geoValue ? h('section', { className: 'pc-group', 'aria-label': 'Grunt' },
+        soil || (kowr && kowr.status === 'ready') ? h('section', { className: 'pc-group', 'aria-label': 'Grunt' },
             h('h3', { className: 'pc-group-title' }, 'Grunt'),
             soil ? h(ResultRow, { label: 'Klasa gruntu', value: soil.status === 'loading' ? '' : soilValue ?? (soil.status === 'error' ? 'nie sprawdzono' : 'brak w usłudze'),
                 state: soil.status === 'loading' ? 'loading' : soilValue ? 'info' : 'unknown', details: [detailOf(soil)].filter(Boolean), show: ['overlay.egib.arable-classes'],
                 title: soilValue ? null : 'Ewidencja nie podała klasy w tym punkcie (zależy od publikacji powiatu).', onRetry: soil.status === 'error' ? () => retry([soil.id]) : null }) : null,
-            kowr?.status === 'ready' ? h(ResultRow, { label: 'Zasób KOWR', value: 'w zasobie', state: 'warn', details: [detailOf(kowr)].filter(Boolean), show: ['overlay.kowr.parcels'] }) : null,
-            geoValue ? h(ResultRow, { label: 'Pompa ciepła', value: geoValue, state: 'info', details: [detailOf(geo)].filter(Boolean), show: ['overlay.pgi.geothermal'] }) : null) : null,
+            kowr?.status === 'ready' ? h(ResultRow, { label: 'Zasób KOWR', value: 'w zasobie', state: 'warn', details: [detailOf(kowr)].filter(Boolean), show: ['overlay.kowr.parcels'] }) : null) : null,
         others.length ? h('section', { className: 'pc-group', 'aria-label': 'Włączone warstwy' },
             h('h3', { className: 'pc-group-title' }, 'Włączone warstwy'),
             others.map((l) => h(ResultRow, { key: l.id, label: l.title, value: 'jest', state: 'info', details: [detailOf(l)].filter(Boolean) }))) : null,

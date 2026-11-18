@@ -24,14 +24,13 @@ const PARCEL_PLUS_TARGETS = [
     { id: 'parcelplus.forest', title: 'Las — własność (BDL)', sourceKey: 'bdl_forest', url: './api/forest.php', section: 'environment' },
     { id: 'parcelplus.classes', title: t('identify.klasyGruntowEgib'), sourceKey: 'egib_classes', section: 'grunts' },
     // 19.50.0: odpowiedzi na częste pytania o działkę — zabytek, powódź (obszar zagrożenia i strefa ryzyka),
-    // wody podziemne, hałas, zasób KOWR (usługa rysuje dane — wcześniejsza diagnoza „pusta” była błędna) i pompa ciepła.
+    // wody podziemne i zasób KOWR (usługa rysuje dane — wcześniejsza diagnoza „pusta” była błędna).
+    // 19.52.0: hałas i pompa ciepła (geotermia płytka) usunięte na życzenie właściciela.
     { id: 'parcelplus.monument', title: 'Zabytek — rejestr (NID)', sourceKey: 'nid_immovable', section: 'environment' },
     { id: 'parcelplus.flood', title: 'Powódź — obszar zagrożenia', sourceKey: 'flood_mzpmrp', section: 'environment' },
     { id: 'parcelplus.flood-risk', title: 'Powódź — strefa ryzyka', sourceKey: 'flood_risk', section: 'environment' },
     { id: 'parcelplus.gzwp', title: 'Główny Zbiornik Wód Podziemnych', sourceKey: 'gzwp', section: 'environment' },
-    { id: 'parcelplus.noise', title: 'Hałas — mapy strategiczne (2017)', sourceKey: 'noise_all', section: 'environment' },
     { id: 'parcelplus.kowr', title: 'Zasób KOWR', sourceKey: 'kowr', section: 'geology' },
-    { id: 'parcelplus.geothermal', title: 'Pompa ciepła — odwierty (PIG)', sourceKey: 'geothermal_bhe', section: 'utilities' },
     { id: 'parcelplus.deposit', title: t('identify.zlozeKopalin'), sourceKey: 'pgi_deposits', section: 'geology' },
     { id: 'parcelplus.mining', title: t('identify.obszarGorniczy'), sourceKey: 'pgi_miningareas', section: 'geology' },
 ];

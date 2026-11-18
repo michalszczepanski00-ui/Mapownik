@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * msportal 19.51.0 — kontrola wgranego portalu (lista kontrolna wdrożenia jako skrypt).
+ * msportal 19.52.0 — kontrola wgranego portalu (lista kontrolna wdrożenia jako skrypt).
  *
  *   node tools/check_deploy.mjs https://mapownik.example.pl/test22            # pełna kontrola po wgraniu
  *   node tools/check_deploy.mjs https://… --monitor                           # krótka kontrola dostępności (monitoring)

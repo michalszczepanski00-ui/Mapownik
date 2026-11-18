@@ -155,7 +155,7 @@ const rawDataCatalog = {
                 transparent: true,
                 tiled: true,
                 tileSize: 512,
-                legendUrl: './assets/legend/las-wlasnosc.svg?v=19.51.0',
+                legendUrl: './assets/legend/las-wlasnosc.svg?v=19.52.0',
                 identifyUrl: './api/forest.php',
             },
         },
@@ -881,7 +881,7 @@ const rawDataCatalog = {
  */
 /** Grupy rozwinięte w panelu Warstwy przy pierwszym uruchomieniu. */
 export const DEFAULT_EXPANDED_GROUPS = Object.freeze(['Działki i grunty', 'Planowanie przestrzenne']);
-const OVERLAY_GROUP_ORDER_ALL = ['Działki i grunty','Planowanie przestrzenne','Uzbrojenie terenu','Energetyka','Środowisko i wody','Uciążliwości i hałas','Dziedzictwo','Geologia i górnictwo','Rzeźba i wysokości','Dane pomocnicze','Archiwum'];
+const OVERLAY_GROUP_ORDER_ALL = ['Działki i grunty','Planowanie przestrzenne','Uzbrojenie terenu','Energetyka','Środowisko i wody','Uciążliwości','Dziedzictwo','Geologia i górnictwo','Rzeźba i wysokości','Dane pomocnicze','Archiwum'];
 
 rawDataCatalog.catalogVersion = 15;
 for (const layer of rawDataCatalog.layers) {

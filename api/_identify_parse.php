@@ -34,7 +34,7 @@ function identify_skip_field(string $name): bool {
     // 19.8.6: „Identyfikator” — to samo pole w odpowiedziach Rejestru Urbanistycznego.
     if (in_array($n, ['identifier', 'identyfikator', 'przestrzennazw', 'lokalnyid', 'wersjaid', 'poczatekwersjiobiektu', 'koniecwersjiobiektu', 'modyfikacja'], true)) return true;
     // 19.50.0: identyfikatory INSPIRE i pola techniczne nowych źródeł (NID, ISOK, PIG).
-    if (in_array($n, ['inspireid', 'ifcid', 'id_namespace', 'hazardcategory_cl', 'shape.starea', 'shape.stlength', 'percentageunderdesignation', 'siteprotectionclassification', 'repentuncd', 'rpent_cd', 'ctryid', 'ctry_cd'], true)) return true;
+    if (in_array($n, ['inspireid', 'ifcid', 'id_namespace', 'hazardcategory_cl', 'shape.starea', 'shape.stlength', 'percentageunderdesignation', 'siteprotectionclassification'], true)) return true;
     if (in_array($n, ['kod qr', 'informacje dodatkowe o działce', 'informacje o pochodzeniu danych', 'data publikacji danych'], true)) return true;
     if (in_array($n, ['the_geom', 'geom', 'geometry', 'shape', 'boundedby', 'msgeometry', 'objectid', 'fid', 'gml_id', 'shape.area', 'shape.len', 'shape_area', 'shape_length', 'shape.starea()', 'shape.stlength()', 'coordinates', 'poslist', 'pos', 'x', 'y', 'lowercorner', 'uppercorner'], true)) return true;
     return false;
@@ -70,7 +70,7 @@ const IDENTIFY_FIELD_LABELS = [
     'typplanu' => 'Rodzaj planu', 'poziomhierarchii' => 'Poziom', 'tytulalternatywny' => 'Nazwa skrócona',
     'profilpodstawowy' => 'Profil podstawowy', 'profildodatkowy' => 'Profil dodatkowy',
     'charakterustalenia' => 'Charakter ustalenia', 'dataprzyjecia' => 'Data przyjęcia', 'datauchwalenia' => 'Data uchwalenia',
-    // 19.50.0: zabytki (NID), ryzyko powodziowe (ISOK), GZWP i geotermia (PIG-PIB).
+    // 19.50.0: zabytki (NID), ryzyko powodziowe (ISOK), GZWP (PIG-PIB).
     'sitename' => 'Nazwa', 'legalfoundationdate' => 'Data wpisu do rejestru', 'legalfoundationdocument' => 'Wpis do rejestru (nr i data)',
     'nationalmonumentsrecord' => 'Rodzaj obiektu (INSPIRE)',
     'hazardcategory' => 'Rodzaj zagrożenia', 'validityperiod_start' => 'Mapa ważna od', 'validityperiod_end' => 'Mapa ważna do',
@@ -79,8 +79,6 @@ const IDENTIFY_FIELD_LABELS = [
     'stanudokumentowania' => 'Stan udokumentowania', 'stratygrafia' => 'Stratygrafia', 'typośrodka' => 'Typ ośrodka',
     'głębokośćodm' => 'Głębokość od (m)', 'głębokośćdom' => 'Głębokość do (m)', 'głębokośćśredniam' => 'Głębokość średnia (m)',
     'rokudokumentowania' => 'Rok udokumentowania', 'rokreambulacji' => 'Rok reambulacji', 'tytułdokumentacji' => 'Dokumentacja',
-    'db_low' => 'Poziom hałasu od (dB)', 'db_high' => 'Poziom hałasu do (dB)', 'icaocode' => 'Lotnisko (kod ICAO)',
-    'opisklasy' => 'Ocena', 'etykietakryteriumprzeciwwskazańśrodowiskowych' => 'Uwarunkowania środowiskowe',
 ];
 
 /** 19.46.0: nieznane pola w zapisie camelCase („rodzajObszaru”) → „Rodzaj obszaru”. */

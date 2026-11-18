@@ -1,15 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { shortArea, noiseLevel, itemState, shortProtectedName, shortForestOwner, RESTRICTIONS } from '@app/app/components/ParcelCard.js';
+import { shortArea, itemState, shortProtectedName, shortForestOwner, RESTRICTIONS } from '@app/app/components/ParcelCard.js';
 
 describe('karta działki 19.51.0 — krótkie wartości', () => {
   it('powierzchnia: ha z dwoma miejscami, poniżej 1 ha w m²', () => {
     expect(shortArea(218541)).toBe('21,85 ha');
     expect(shortArea(349)).toBe('349 m²');
     expect(shortArea(null)).toBeNull();
-  });
-  it('hałas: najwyższy przedział LDWN', () => {
-    expect(noiseLevel('LDWN: 50–55 dB\n\nLDWN: 60–64 dB\n\nLDWN: 55–59 dB')).toBe('60–64 dB');
-    expect(noiseLevel('')).toBe('w zasięgu');
   });
   it('formy ochrony i las — skróty', () => {
     expect(shortProtectedName('Kampinoski Park Narodowy')).toBe('Kampinoski PN');
