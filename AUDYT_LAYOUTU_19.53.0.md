@@ -13,7 +13,7 @@ Audyt samego układu i warstwy wizualnej, bez zmian w kodzie. Rama: zasady proje
 - pomiary z przeglądarki (położenie i wymiary elementów, czcionki, promienie, cienie, fokus);
 - przegląd 21 plików CSS.
 
-Oznaczone zrzuty i surowe pomiary są w `audyt/layout-19.53.0/`.
+Oznaczone zrzuty i surowe pomiary są w `propozycje/audyt-layoutu-19.53.0/`.
 
 ## Wniosek w trzech zdaniach
 
