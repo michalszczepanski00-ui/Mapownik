@@ -39,8 +39,10 @@ function BackToGroup({ id }) {
     const dispatch = useAppDispatch();
     const group = PANEL_DEFS[id]?.railGroup;
     if (!group || !PANEL_DEFS[group]) return null;
-    return h('button', { type: 'button', className: 'panel-back-button', title: `Wróć do listy: ${PANEL_DEFS[group].title}`, onClick: () => dispatch(openPanel(group)) },
-        h(ChevronLeft, { size: 15, 'aria-hidden': true }), PANEL_DEFS[group].title);
+    // 19.54.0 (audyt L3): sama strzałka — ikona grupy w kolumnie jest podświetlona, a tytuł widoku mieści się w doku 250 px.
+    const label = `Wróć do listy: ${PANEL_DEFS[group].title}`;
+    return h('button', { type: 'button', className: 'panel-back-button icon-button', title: label, 'aria-label': label, onClick: () => dispatch(openPanel(group)) },
+        h(ChevronLeft, { size: 17, 'aria-hidden': true }));
 }
 export function PanelHeaderActions({ id, onClose, menuItems = null }) {
     const { docked, close, collapse, undock, dock } = usePanel(id);

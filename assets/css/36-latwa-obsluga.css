@@ -94,9 +94,6 @@ button.workspace-start-item:focus-visible { outline: 2px solid var(--accent); ou
 .rcn-head { display: grid; gap: 1px; }
 .rcn-head > strong { font-size: 12.5px; }
 .rcn-head > small, .rcn-note { color: var(--text-muted); font-size: 11px; line-height: 1.35; }
-.rcn-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; padding: 2px; border-radius: 6px; background: var(--surface-raised); }
-.rcn-kind { min-width: 0; padding: 5px 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 0; border-radius: 6px; background: transparent; color: var(--text); font: inherit; font-size: 11px; cursor: pointer; }
-.rcn-kind.is-active { background: var(--accent); color: var(--on-accent); font-weight: 600; }
 .rcn-kind:focus-visible, .rcn-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .rcn-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 .rcn-select { display: grid; gap: 2px; min-width: 0; font-size: 11px; color: var(--text-muted); }

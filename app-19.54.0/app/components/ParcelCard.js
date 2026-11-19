@@ -1,4 +1,4 @@
-import { createElement as h, useMemo } from 'react';
+import { createElement as h, Fragment, useMemo } from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Check, ChevronDown, ChevronRight, Eye, RotateCw } from 'lucide-react';
 import { useService, useServiceSnapshot } from '../services/AppServicesContext.js';
@@ -182,13 +182,27 @@ export function ParcelCard({ snapshot, manager, layers, onScreening = null, head
     // Obręb bez nazwy (sam numer, np. „089”) — z dopiskiem „obręb”.
     const region = parcel?.region ? (/^\d+$/.test(parcel.region) ? `obręb ${parcel.region}` : parcel.region) : null;
     const sub = [area, region, parcel?.commune ? `gm. ${parcel.commune}` : null].filter(Boolean).join(' · ');
+    // 19.54.0: „Janowo, gm. Starogard Gdański” — położenie w osobnej linii (dawniej ucinane po kropkach).
+    const place = [region, parcel?.commune ? `gm. ${parcel.commune}` : null].filter(Boolean).join(', ');
+    const fraction = !snapshot.zoneOnly && parcel?.parcel && /^[^/\s]+\/[^/\s]+$/.test(String(parcel.parcel)) ? String(parcel.parcel).split('/') : null;
 
     const note = !snapshot.zoneOnly && !parcel && !snapshot.parcelBusy ? h('p', { className: 'pc-note' }, snapshot.parcelError ? 'Nie udało się odczytać działki — wyniki dotyczą samego punktu.' : 'W tym punkcie nie odczytano działki — wyniki dotyczą samego punktu.') : null;
     return h('div', { className: `parcel-card${headless ? ' parcel-card--headless' : ''}` },
         // P1 + P2
         headless ? note : h('header', { className: 'pc-head' },
-            h('h2', { className: 'pc-title' }, titleText),
-            sub ? h('div', { className: 'pc-sub', title: snapshot.parcelAreaSqm ? formatParcelArea(snapshot.parcelAreaSqm) : sub }, sub) : null,
+            // 19.54.0 (audyt, „jeden wyrazisty element”): numer działki zapisany jak na mapie ewidencyjnej —
+            // ułamkiem (27 nad kreską, 1 pod nią); obok powierzchnia i położenie w dwóch liniach, bez skracania.
+            fraction
+                ? h('div', { className: 'pc-ident' },
+                    h('h2', { className: 'pc-title pc-title--fraction' },
+                        h('span', { className: 'visually-hidden' }, titleText),
+                        h('span', { className: 'pc-num', 'aria-hidden': true }, h('span', { className: 'pc-num-top' }, fraction[0]), h('span', { className: 'pc-num-bot' }, fraction[1]))),
+                    h('div', { className: 'pc-place' },
+                        area ? h('div', { className: 'pc-area', title: snapshot.parcelAreaSqm ? formatParcelArea(snapshot.parcelAreaSqm) : null }, area) : null,
+                        place ? h('div', { className: 'pc-where' }, place) : null))
+                : h(Fragment, null,
+                    h('h2', { className: 'pc-title' }, titleText),
+                    sub ? h('div', { className: 'pc-sub', title: snapshot.parcelAreaSqm ? formatParcelArea(snapshot.parcelAreaSqm) : sub }, sub) : null),
             note,
             !snapshot.zoneOnly && parcel?.wkt ? h('div', { className: 'pc-actions' },
                 zone('inspector.primary').map((action) => actionButton(action, true)),

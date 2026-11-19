@@ -249,14 +249,17 @@ function AppShell() {
                 h('div', { className: 'map-area', ref: mapAreaRef },
                     h(MapStage, { focusMap: exportSelectionMode, mapOnly }),
                     mapOnly && !exportSelectionMode && h('button', { ref: restoreButtonRef, type: 'button', className: 'map-only-exit', 'aria-label': t('mapOnly.exit'), title: t('mapOnly.exitHint'), onClick: () => dispatch(setMapOnly(false)) }, h(Focus, { size: 16 }), h('span', null, t('mapOnly.exit'))),
+                    // 19.54.0 (audyt A2): kolejność w drzewie = kolejność Tab, jak na ekranie: górny pasek, pasek
+                    // kontekstowy, karta działki, okna pływające, tryby, podkłady, legenda (dalej prawy dok i kolumna ikon).
+                    // Położenie i warstwy na ekranie wynikają z CSS (z-index), nie z tej kolejności.
                     chrome && !mobile && h(MapTopBar, null),
-                    chrome && !mobile && h(ToolDock, null),
                     // 19.49.0: pasek kontekstowy (dawny baner podpowiedzi) — narzędzie, opcje, przyciąganie, historia, Esc.
                     chrome && !mobile && h(MapContextBar, null),
-                    chrome && !mobile && h(BasemapSwitcher, null),
-                    chrome && !mobile && h(MapLegend, null),
                     chrome && !mobile && h(WorkspaceCard, null),
                     chrome && !mobile && h(FloatingPanels, { excludePlaceCards: true }),
+                    chrome && !mobile && h(ToolDock, null),
+                    chrome && !mobile && h(BasemapSwitcher, null),
+                    chrome && !mobile && h(MapLegend, null),
                     chrome && mobile && h(MobileShell, null)),
                 chrome && h(Dock, { id: 'bottom' })),
             // Szyna modułów pozostaje przy prawej krawędzi; karta pojawia się

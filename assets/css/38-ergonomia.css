@@ -202,10 +202,6 @@ details[open] > summary .pc-chev { transform: rotate(90deg); }
 .panel-back-button { display: inline-flex; align-items: center; gap: 2px; margin-right: 2px; padding: 3px 6px 3px 2px; border: 0; border-radius: 6px; background: none;
   color: var(--accent); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .panel-back-button:hover { background: var(--accent-soft); }
-.market-scope { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 8px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
-.market-scope-option { padding: 6px 4px; border: 0; background: var(--surface-solid); color: var(--text); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
-.market-scope-option + .market-scope-option { border-left: 1px solid var(--border); }
-.market-scope-option.is-active { background: var(--accent); color: var(--on-accent, #fff); }
 .layer-group-title--static { padding: 6px 8px; font-weight: 600; font-size: 12.5px; color: var(--text-muted); }
 .layer-group-title--static small { margin-left: 6px; }
 

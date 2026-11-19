@@ -1,6 +1,6 @@
 /* 19.20.0 — two independent desktop panels; existing mobile shell remains in use. */
 .app-shell.is-workspace-1c .workspace-card {
-  position: absolute; z-index: var(--z-dock-overlay); left: 8px; top: 56px;
+  position: absolute; z-index: var(--z-dock-overlay); left: 8px; top: 52px; /* 19.54.0 (L2): wspólna linia drugiego rzędu z dokiem i kolumną ikon */
   width: var(--work-card-width, 260px); max-height: calc(100% - 164px);
   display: flex; flex-direction: column; min-height: 40px; min-width: 0;
   background: var(--surface-solid); color: var(--text); border: 1px solid var(--border);
@@ -50,7 +50,7 @@
 .workspace-context .context-object-label { font-size: 11px; }
 .workspace-context .context-tool-help { margin-left: auto; }
 /* The right dock stays independent of result/tool changes on the left. */
-.app-shell.is-workspace-1c .dock--right-panel { width: var(--dock-panel-width, 250px); max-width: min(420px, 42vw); top: 56px; max-height: calc(100% - 164px); }
+.app-shell.is-workspace-1c .dock--right-panel { width: var(--dock-panel-width, 250px); max-width: min(420px, 42vw); top: 52px; max-height: calc(100% - 164px); }
 .app-shell.is-workspace-1c .dock--right-panel .ui-panel { min-width: 0; max-width: 100%; }
 .app-shell.is-workspace-1c .layers-panel--v2 .layer-row-main { padding-left: 7px; }
 .app-shell.is-workspace-1c .layers-panel--v2 .layer-row-titleline strong { font-size: 11px; }
