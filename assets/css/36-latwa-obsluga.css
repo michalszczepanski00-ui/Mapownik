@@ -15,10 +15,7 @@
 :is(.ui-panel, .workspace-card) .ui-button-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .workspace-card-body { overflow-x: hidden; }
 
-/* A5: filtry warstw — licznik pod nazwą (mała plakietka), cztery filtry mieszczą się w 250 px. */
-.layers-panel .layers-filter-bar { display: grid !important; grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 1fr)); gap: 3px; }
-.layers-panel .layers-filter { min-width: 0; width: auto !important; padding: 3px 2px !important; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.15; white-space: nowrap; overflow: hidden; font-size: 11px; }
-.layers-panel .layers-filter > small { position: static !important; margin: 0 !important; transform: none !important; min-width: 18px; padding: 0 5px; border-radius: 8px; font-size: 10.5px; line-height: 14px; }
+/* A5: filtry warstw — od 19.54.0 jeden przełącznik segmentowy w 40-system-las.css. */
 
 /* A6: karta działki — fakty w wierszach „etykieta … wartość”, identyfikator w pełnej szerokości. */
 /* Werdykt: ikona · nazwa · wynik · (oko) w jednym wierszu. */

@@ -34,7 +34,7 @@ $check('pusty inwestor → null', permits_public_investor('') === null && permit
 // --- B3: projekt udostępniany
 $ring = static fn(float $x, float $y, float $s): array => [[$x, $y], [$x + $s, $y], [$x + $s, $y + $s], [$x, $y + $s], [$x, $y]];
 $project = [
-    'format' => 'mapownik-project', 'formatVersion' => 1, 'app' => ['name' => 'msportal', 'version' => '19.53.0'],
+    'format' => 'mapownik-project', 'formatVersion' => 1, 'app' => ['name' => 'msportal', 'version' => '19.54.0'],
     'exportedAt' => '2026-11-08T12:00:00Z', 'crs' => 'EPSG:2180', 'project' => ['name' => 'Test', 'schemaVersion' => 2], 'state' => null,
     'objects' => [
         ['id' => 'a', 'name' => 'Poligon', 'properties' => new stdClass(), 'geometry' => ['type' => 'Polygon', 'coordinates' => [$ring(471000, 698000, 100), $ring(471030, 698030, 20)]]],

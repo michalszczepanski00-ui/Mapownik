@@ -40,7 +40,7 @@ export const analysisFeature = defineFeature({
             railLabel: 'Analizy',
             title: 'Analizy',
             subtitle: 'Otoczenie, ceny, budowy, analiza działki',
-            icon: 'analysis',
+            icon: 'analyses',
             dock: 'right',
             order: 25,
             collapsible: true,

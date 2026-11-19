@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * msportal 19.53.0 — budowanie paczki serwerowej: npm run build
+ * msportal 19.54.0 — budowanie paczki serwerowej: npm run build
  *
  * 1. Vite buduje frontend (index.html + assets/build/*) do build/www/.
  * 2. Skrypt dokłada pliki serwera, które wgrywa się przez FTP jak dotąd (api/, PHP, konfiguracja, dane,

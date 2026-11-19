@@ -1,0 +1,55 @@
+/* 19.54.0 — system „Las”: tokeny i wspólne komponenty po audycie layoutu (AUDYT_LAYOUTU_19.53.0.md).
+   Arkusz bez warstwy (@layer), wczytywany po wszystkich innych — ustala jedną wersję komponentów,
+   które wcześniej miały kilka nadpisań w plikach 21–38. Nowe poprawki wyglądu trafiają tutaj,
+   a nie jako kolejne nadpisanie w starszych plikach. */
+
+/* ------------------------------------------------------------------ L1 górny pasek: jedna wysokość 36 px */
+.map-topbar { align-items: flex-start; }
+.map-brand-button.icon-button { width: 36px; height: 36px; flex: 0 0 36px; }
+.map-topbar .map-search-place,
+.map-topbar .map-search-parcel { height: 36px; }
+.map-topbar-end > .icon-button,
+.map-topbar-end > .topbar-primary-action,
+.map-topbar-end > .quick-help > .icon-button { width: 36px; height: 36px; flex: 0 0 36px; margin: 0; border-radius: 10px; }
+
+/* ------------------------------------------------------------------ L5 pasek trybów: środek okna, nie widocznej mapy */
+@media (min-width: 1151px) {
+  .app-shell.is-workspace-1c .tool-dock { left: 280px; right: 280px; }
+}
+
+/* ------------------------------------------------------------------ L6 zwinięta karta z nazwą */
+.workspace-card-toggle--named {
+  display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px 0 12px;
+  border: 0; border-radius: 10px; background: none; color: var(--text); font: inherit; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.workspace-card-toggle--named:hover { background: var(--accent-soft); }
+.workspace-card-toggle--named:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ------------------------------------------------------------------ K1 jeden przełącznik segmentowy
+   Filtry Warstw, „Wokół działki | W widoku mapy”, „Grunty | Domy | Mieszkania”. */
+.layers-filter-bar,
+.market-scope,
+.rcn-kinds {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); grid-template-columns: none;
+  gap: 1px; padding: 2px; margin: 6px 8px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface-solid); overflow: visible;
+}
+.market-scope, .rcn-kinds { margin: 0 0 8px; }
+.layers-filter,
+.market-scope-option,
+.market-scope-option + .market-scope-option,
+.rcn-kind {
+  display: inline-flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px;
+  min-width: 0; width: auto; height: 26px; min-height: 26px; padding: 0 4px; border: 0; border-radius: 6px;
+  background: none; color: var(--text-muted); font: inherit; font-size: 12.5px; font-weight: 400; line-height: 1;
+  white-space: nowrap; cursor: pointer;
+}
+.layers-filter:hover, .market-scope-option:hover, .rcn-kind:hover { background: var(--surface-hover, #eef3ef); color: var(--text); }
+.layers-filter.is-active, .market-scope-option.is-active, .rcn-kind.is-active {
+  background: var(--accent-soft); color: var(--accent); font-weight: 600; box-shadow: none; border: 0;
+}
+.layers-filter small {
+  display: inline; min-width: 0; padding: 0; border: 0; border-radius: 0; background: none;
+  color: inherit; opacity: .75; font-size: 11px; font-weight: 400; line-height: 1;
+}
+.layers-filter:focus-visible, .market-scope-option:focus-visible, .rcn-kind:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }

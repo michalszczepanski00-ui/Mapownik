@@ -86,7 +86,7 @@ export const parcelActionsFeature = defineFeature({
             run: (ctx) => import('../../terrain3d/terrain3dTool.js').then((m) => m.openParcel3D(cardParcel(ctx))) }),
 
         // --- Dok Analizy (Etap 5): lista narzędzi analiz
-        { id: 'analyses.screening', zone: 'dock:analyses', order: 50, icon: 'analysis', label: 'Otoczenie działki', paletteTitle: 'Analizy: Otoczenie działki',
+        { id: 'analyses.screening', zone: 'dock:analyses', order: 50, icon: 'screening', label: 'Otoczenie działki', paletteTitle: 'Analizy: Otoczenie działki',
             description: 'Ochrona przyrody, plany, ograniczenia wokół działki (usługi WMS).',
             run: (ctx) => { ctx.get('analysis')?.setPanelMode?.('screening'); openPanel(ctx, 'analysis'); } },
         { id: 'analyses.prices', zone: 'dock:analyses', order: 51, icon: 'market-prices', label: 'Ceny transakcyjne', paletteTitle: 'Analizy: Ceny transakcyjne',

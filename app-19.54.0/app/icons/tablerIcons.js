@@ -238,6 +238,9 @@ const BY_SLOT = {
     'building-permits': 'crane',
     'objects': 'list-details',
     'analysis': 'area-search',
+    // 19.54.0 (audyt K3): dok Analizy i Otoczenie działki mają własne kształty (wcześniej trzy razy ta sama lupa).
+    'analyses': 'analyze',
+    'screening': 'circle-dot',
     'parcel-report': 'file-analytics',
     'export': 'download',
     'terrain': 'chart-area-line',

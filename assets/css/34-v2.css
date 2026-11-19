@@ -503,10 +503,6 @@
   vertical-align: 1px;
 }
 .layers-panel--v2 .layer-status-chip[data-coverage="no"] { opacity: .65; }
-.app-shell .layers-panel--v2 .layers-filter-bar { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; }
-.app-shell .layers-panel--v2 .layers-filter { min-width: 0; padding: 0 3px; gap: 4px; white-space: nowrap; font-size: 11.5px; }
-/* Liczba wszystkich warstw jest stała (i jest w nagłówku panelu) — w zakładce zbędna. */
-.app-shell .layers-panel--v2 .layers-filter:first-child small { display: none; }
 
 /* ------------------------------ 19.15.0: zaznaczony obiekt w panelu Obiekty — zwarto */
 .object-inspector.object-inspector--compact { padding: 6px 8px; }

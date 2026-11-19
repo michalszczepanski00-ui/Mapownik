@@ -6,7 +6,7 @@
   background: var(--surface-solid); color: var(--text); border: 1px solid var(--border);
   border-radius: 10px; box-shadow: var(--v2-float-shadow);
 }
-.app-shell.is-workspace-1c .workspace-card.is-collapsed { width: 44px; max-height: 44px; }
+.app-shell.is-workspace-1c .workspace-card.is-collapsed { width: auto; max-height: 44px; } /* 19.54.0 (L6): przycisk z nazwą działki */
 .workspace-card-head { display: flex; align-items: center; gap: 2px; min-height: 38px; padding: 3px 5px 3px 10px; border-bottom: 1px solid var(--border); flex: none; }
 .workspace-card-head > strong { flex: 1; min-width: 0; font-size: 12px; font-weight: 650; }
 .workspace-card-head .icon-button { width: 28px; height: 28px; flex: 0 0 28px; }

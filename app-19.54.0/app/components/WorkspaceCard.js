@@ -88,7 +88,10 @@ export function WorkspaceCard() {
         h('div',{className:`workspace-card-head${!collapsed&&!headTitle?' is-bare':''}`},
             // 19.24.0: właściwości obiektu są w pasku stylu nad dokiem narzędzi i w oknie „Zaawansowane”.
             !collapsed&&headTitle&&h('strong',null,headTitle),
-            h(IconButton,{label:collapsed?'Rozwiń kartę działki i narzędzi':'Zwiń kartę działki i narzędzi',className:'workspace-card-toggle','aria-expanded':!collapsed,'aria-controls':'workspace-card-body',onClick:toggle},h(collapsed?ChevronRight:ChevronLeft,{size:17})),
+            // 19.54.0 (audyt L6): zwinięta karta pokazuje, co kryje („Działka 27/1 ›”), a nie sam szewron.
+            collapsed
+                ?h('button',{type:'button',className:'workspace-card-toggle workspace-card-toggle--named',title:'Rozwiń kartę działki i narzędzi','aria-expanded':false,'aria-controls':'workspace-card-body',onClick:toggle},h('span',null,parcelLabel??'Działka i narzędzia'),h(ChevronRight,{size:15,'aria-hidden':true}))
+                :h(IconButton,{label:'Zwiń kartę działki i narzędzi',className:'workspace-card-toggle','aria-expanded':true,'aria-controls':'workspace-card-body',onClick:toggle},h(ChevronLeft,{size:17})),
             !collapsed&&openId&&PANEL_DEFS[openId].controlledBy==='identify'&&h(IconButton,{label:identify.pinned?'Odepnij wynik':'Przypnij wynik','aria-pressed':Boolean(identify.pinned),onClick:()=>identifyManager?.togglePinned()},h(Pin,{size:14})),
             !collapsed&&openId&&h(IconButton,{label:'Zamknij wynik miejsca',onClick:close},h(X,{size:15}))),
         h('div',{id:'workspace-card-body',className:'workspace-card-body',hidden:collapsed},
