@@ -11,7 +11,6 @@ import { useService, useServiceSnapshot } from '../services/AppServicesContext.j
 import { useAppSelector } from '../../store/index.js';
 import { PanelHeaderActions } from './PanelHeaderActions.js';
 import { PanelIcon } from './PanelIcon.js';
-import { RcnPrices } from './RcnPrices.js';
 import { Button, Message, PanelMinimized, PanelShell } from '../ui/index.js';
 import { reportDialog } from './reportDialogStore.js';
 
@@ -197,25 +196,8 @@ export function VpsDataPanel(){
   };
 
   if(!panel.open)return null;
-  const title='Działka i otoczenie';
+  const title='Analiza działki (serwer)';
   if(panel.collapsed&&!panel.docked)return h(PanelMinimized,{title,icon:h(PanelIcon,{name:'analysis'}),style:panel.style,onRestore:panel.restore});
-  // Środek dla cen RCN: działka z raportu (środek obrysu) → działka z karty → brak.
-  const rcnCenter=(()=>{
-    const geometry=parcelReport?.parcel?.geometry;
-    if(geometry?.coordinates){
-      const flat=JSON.stringify(geometry.coordinates).match(/-?\d+(\.\d+)?/g)?.map(Number)||[];
-      let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
-      for(let i=0;i+1<flat.length;i+=2){minX=Math.min(minX,flat[i]);maxX=Math.max(maxX,flat[i]);minY=Math.min(minY,flat[i+1]);maxY=Math.max(maxY,flat[i+1]);}
-      if(Number.isFinite(minX))return[(minX+maxX)/2,(minY+maxY)/2];
-    }
-    if(Array.isArray(identifySnapshot.coordinateLonLat))return identifySnapshot.coordinateLonLat;
-    // 19.29.0: bez działki — środek mapy przy zbliżeniu (np. na telefonie, gdy karta jest zamknięta).
-    // Zaokrąglenie (~100 m), żeby drobne przesunięcia mapy nie pobierały cen od nowa.
-    if(view.ready&&Number(view.zoom)>=14&&Array.isArray(view.centerLonLat))return view.centerLonLat.map(v=>Math.round(v*1000)/1000);
-    return null;
-  })();
-  const rcnId=parcelReport?.parcel?.id||identified;
-  const rcnLabel=rcnId?'dz. '+String(rcnId).split('.').pop():(rcnCenter&&!Array.isArray(identifySnapshot.coordinateLonLat)?'środek mapy':'');
   const isReady=Boolean(status?.ok && status?.ready);
   // 19.23.0: funkcje BDOT widoczne dopiero, gdy baza na serwerze ma rekordy BDOT.
   const bdotReady=isReady&&status?.datasets?.bdot>0;
@@ -281,8 +263,7 @@ export function VpsDataPanel(){
             option('500','500 m'),option('1000','1000 m'),option('2000','2000 m')]),
           h(Button,{variant:'primary',disabled:parcelPending||!isReady||(!parcelId.trim()&&!view.ready),
             onClick:()=>void runParcel()},parcelPending?'Tworzenie raportu…':'Utwórz raport działki')),
-      // 19.29.0: ceny transakcyjne RCN wokół działki z raportu albo z karty (bez uruchamiania raportu).
-      h(RcnPrices,{center:rcnCenter,centerLabel:rcnLabel,defaultRadius:parcelRadius}),
+      // 19.53.0: ceny wokół działki są w doku Analizy → Ceny transakcyjne („Wokół działki”) — nazwa widoku odpowiada zawartości.
       parcelError&&h(Message,{tone:'danger'},parcelError),
       parcelReport&&h('div',{className:'vps-parcel-report'},
         h('div',{className:'vps-stats'},

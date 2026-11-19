@@ -2,7 +2,7 @@ import { createElement as h, useCallback } from 'react';
 import { IconButton } from './IconButton.js';
 import { PanelIcon } from './PanelIcon.js';
 import { t } from '../../i18n/index.js';
-import { selectRailItems, togglePanel, useAppDispatch, useAppSelector } from '../../store/index.js';
+import { closePanel, selectRailItems, togglePanel, useAppDispatch, useAppSelector } from '../../store/index.js';
 import { useServiceSnapshot } from '../services/AppServicesContext.js';
 import { summarizeLayers } from '../../layers/layerSummary.js';
 
@@ -45,7 +45,8 @@ export function ActivityBar() {
                         ? { 'aria-expanded': item.active, 'aria-controls': item.active ? 'right-dock-panel' : undefined }
                         : { 'aria-pressed': item.active }),
                     'data-panel-id': item.id,
-                    onClick: () => toggle(item.id),
+                    // 19.53.0: przy otwartym widoku grupy (np. Ceny) ikona Analizy zamyka ten widok.
+                    onClick: () => (item.openChild ? dispatch(closePanel(item.openChild)) : toggle(item.id)),
                 },
                     h(PanelIcon, { name: item.icon, size: 19 }),
                     // 19.8.5: widoczny podpis — same ikony (dwie podobne lupy) były

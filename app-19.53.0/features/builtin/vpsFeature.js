@@ -4,10 +4,10 @@ export const vpsFeature = defineFeature({
     id: 'vps',
     title: 'Analizy lokalne',
     panels: [{
-        id: 'vpsData', title: 'Działka i otoczenie', subtitle: 'Plan, granice i otoczenie działki',
+        id: 'vpsData', title: 'Analiza działki (serwer)', subtitle: 'Plan, granice i otoczenie działki',
         icon: 'parcel-report', railLabel: 'Raport', dock: 'right', order: 26, collapsible: true,
-        // 19.11.0: zakładka „Raport” karty miejsca (App.js: PlaceCardTabs).
-        placeCard: true, placeCardLabel: 'Analiza działki (serwer)', floatGroup: 'place-card', defaultWidth: 380, minWidth: 310, maxWidth: 530,
+        // 19.53.0 (Etap 5): widok w doku Analizy (dawniej zakładka „Raport” karty działki).
+        railGroup: 'analyses', floatGroup: 'right-overlay', defaultWidth: 380, minWidth: 310, maxWidth: 530,
         resizeDirection: -1,
         load: () => import('../../app/components/VpsDataPanel.js').then(m => m.VpsDataPanel),
     }],

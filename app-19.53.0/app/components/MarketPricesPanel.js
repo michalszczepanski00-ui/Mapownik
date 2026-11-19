@@ -10,7 +10,8 @@ import Fill from 'ol/style/Fill.js';
 import CircleStyle from 'ol/style/Circle.js';
 import Text from 'ol/style/Text.js';
 import { transform, transformExtent } from 'ol/proj.js';
-import { useService } from '../services/AppServicesContext.js';
+import { useService, useServiceSnapshot } from '../services/AppServicesContext.js';
+import { RcnPrices } from './RcnPrices.js';
 import { usePanel } from '../hooks/useDockGeometry.js';
 import { PanelHeaderActions } from './PanelHeaderActions.js';
 import { PanelIcon } from './PanelIcon.js';
@@ -55,7 +56,49 @@ function toCsv(items) {
     return '﻿' + [head.join(';'), ...items.map((i) => [i.date, i.price, i.area, i.perM2, i.label, (i.parcels || []).join(' '), i.market, i.type, i.inStats ? 'tak' : 'nie', i.note, i.x, i.y].map(esc).join(';'))].join('\r\n');
 }
 
+const SCOPE_KEY = 'mapownik:market-prices-scope';
+const NO_IDENTIFY = Object.freeze({ open: false });
+function readScope() { try { return window.localStorage.getItem(SCOPE_KEY); } catch { return null; } }
+
+/** Przełącznik zakresu: „Wokół działki” (ceny wokół działki z karty) | „W widoku mapy” (transakcje w widoku). */
+function ScopeSwitch({ scope, onChange, hasParcel }) {
+    return h('div', { className: 'market-scope', role: 'radiogroup', 'aria-label': 'Zakres cen' },
+        [['parcel', 'Wokół działki'], ['view', 'W widoku mapy']].map(([value, label]) => h('button', {
+            key: value, type: 'button', role: 'radio', 'aria-checked': scope === value, className: `market-scope-option${scope === value ? ' is-active' : ''}`,
+            title: value === 'parcel' && !hasParcel ? 'Wybierz działkę na mapie — ceny liczone wokół niej' : undefined,
+            onClick: () => onChange(value),
+        }, label)));
+}
+
+/**
+ * 19.53.0 (Etap 5) — jeden widok „Ceny transakcyjne” z przełącznikiem zakresu (decyzja właściciela po Etapie 0).
+ * „Wokół działki” to ceny z dawnej zakładki Raport (RcnPrices), „W widoku mapy” — dotychczasowe narzędzie Ceny.
+ * Obie części liczą jak dotąd (api/rcn.php: x,y,r albo bbox).
+ */
 export function MarketPricesPanel() {
+    const identify = useServiceSnapshot('identify', NO_IDENTIFY);
+    const center = identify.open ? (identify.parcelCenterLonLat ?? identify.coordinateLonLat ?? null) : null;
+    const [scope, setScopeState] = useState(() => readScope() ?? 'parcel');
+    const setScope = (value) => { setScopeState(value); try { window.localStorage.setItem(SCOPE_KEY, value); } catch { /* prywatny tryb */ } };
+    const switcher = h(ScopeSwitch, { scope, onChange: setScope, hasParcel: Boolean(center) });
+    if (scope === 'parcel') return h(ParcelPricesPanel, { switcher, center, label: identify.parcel?.parcel ? `dz. ${identify.parcel.parcel}` : (center ? 'wskazany punkt' : '') });
+    return h(ViewPricesPanel, { switcher });
+}
+
+function ParcelPricesPanel({ switcher, center, label }) {
+    const panel = usePanel(ID);
+    if (!panel.open) return null;
+    const title = 'Ceny transakcyjne';
+    if (panel.collapsed && !panel.docked) return h(PanelMinimized, { title, icon: h(PanelIcon, { name: 'market-prices' }), style: panel.style, onRestore: panel.restore });
+    return h(PanelShell, { className: 'market-panel', title, subtitle: 'Rejestr Cen Nieruchomości · wokół działki', label: title, docked: panel.docked, style: panel.style,
+        icon: h(PanelIcon, { name: 'market-prices', size: 16 }), actions: h(PanelHeaderActions, { id: ID }),
+        onDragStart: panel.onDragStart, onResizeWidth: panel.onResizeStart, onResizeHeight: panel.onResizeHeightStart },
+    h('div', { className: 'market-body' }, switcher,
+        center ? h(RcnPrices, { center, centerLabel: label })
+            : h(Message, { tone: 'info' }, 'Wybierz działkę na mapie (karta działki) — ceny policzymy wokół niej. Bez działki przełącz na „W widoku mapy”.')));
+}
+
+function ViewPricesPanel({ switcher }) {
     const controller = useService('mapController');
     const panel = usePanel(ID);
     const prefs = useMemo(readPrefs, []);
@@ -172,7 +215,7 @@ export function MarketPricesPanel() {
     return h(PanelShell, { className: 'market-panel', title, subtitle: 'Rejestr Cen Nieruchomości · widok mapy', label: title, docked: panel.docked, style: panel.style,
         icon: h(PanelIcon, { name: 'market-prices', size: 16 }), actions: h(PanelHeaderActions, { id: ID }),
         onDragStart: panel.onDragStart, onResizeWidth: panel.onResizeStart, onResizeHeight: panel.onResizeHeightStart },
-    h('div', { className: 'market-body' },
+    h('div', { className: 'market-body' }, switcher,
         h('div', { className: 'market-controls' },
             h(SelectField, { label: 'Rodzaj', value: kind, onChange: setKind, options: KINDS }),
             h(SelectField, { label: 'Okres', value: years, onChange: setYears, options: YEARS }),

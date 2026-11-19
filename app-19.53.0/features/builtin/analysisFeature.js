@@ -34,6 +34,24 @@ export const analysisFeature = defineFeature({
     title: t('feature.analysis'),
     panels: [
         {
+            // 19.53.0 (Etap 5): dok Analizy — lista narzędzi analiz; każde otwiera swój widok w tym samym doku
+            // („← Analizy” wraca do listy). W kolumnie ikon zostają tylko Warstwy, Obiekty i Analizy.
+            id: 'analyses',
+            railLabel: 'Analizy',
+            title: 'Analizy',
+            subtitle: 'Otoczenie, ceny, budowy, analiza działki',
+            icon: 'analysis',
+            dock: 'right',
+            order: 25,
+            collapsible: true,
+            floatGroup: 'right-overlay',
+            defaultWidth: 320,
+            minWidth: 280,
+            maxWidth: 440,
+            resizeDirection: -1,
+            load: () => import('../../app/components/AnalysesPanel.js').then((module) => module.AnalysesPanel),
+        },
+        {
             id: 'analysis',
             railLabel: 'Analizy',
             title: t('panel.analysis.title'),
@@ -42,10 +60,9 @@ export const analysisFeature = defineFeature({
             dock: 'right',
             order: 30,
             collapsible: true,
-            // 19.11.0: zakładka „Analizy” karty miejsca (App.js: PlaceCardTabs).
-            placeCard: true,
-            placeCardLabel: 'Otoczenie działki',
-            floatGroup: 'place-card',
+            // 19.53.0 (Etap 5): widok w doku Analizy (prawy dok), nie zakładka karty działki.
+            railGroup: 'analyses',
+            floatGroup: 'right-overlay',
             defaultWidth: 336,
             minWidth: 300,
             maxWidth: 460,

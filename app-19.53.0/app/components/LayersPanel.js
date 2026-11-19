@@ -150,6 +150,8 @@ export function LayersPanel() {
     const [favorites, setFavorites] = useState(() => new Set(initial.favorites));
     const [query, setQuery] = useState('');
     const [filterMode, setFilterMode] = useState('all');
+    // 19.53.0 (Etap 5): grupy z włączoną warstwą są rozwinięte, chyba że użytkownik je zwinie (tylko w tej sesji panelu).
+    const [collapsedOverride, setCollapsedOverride] = useState(() => new Set());
     // 19.48.0 (M17): „Pokaż warstwy archiwalne” (menu ⋯ panelu), zapamiętane w przeglądarce.
     const [showArchive, setShowArchive] = useState(() => { try { return localStorage.getItem(ARCHIVE_PREF) === '1'; } catch { return false; } });
     const toggleArchive = useCallback(() => setShowArchive((value) => { try { localStorage.setItem(ARCHIVE_PREF, value ? '0' : '1'); } catch { /* tryb prywatny */ } return !value; }), []);
@@ -181,7 +183,6 @@ export function LayersPanel() {
     }), [manager]);
     const overlayLayers = useMemo(() => snapshot.layers.filter((layer) => layer.role === 'overlay' && (!PANEL_HIDDEN.has(layer.id) || layer.visible)), [snapshot.layers]);
     const activeLayers = useMemo(() => overlayLayers.filter((layer) => layer.visible), [overlayLayers]);
-    const favoriteCount = useMemo(() => overlayLayers.reduce((count, layer) => count + Number(favorites.has(layer.id)), 0), [overlayLayers, favorites]);
     const normalizedQuery = query.trim().toLocaleLowerCase('pl-PL');
     const filteredLayers = useMemo(() => {
         // 19.48.0 (M17): grupa „Archiwum” ukryta, dopóki użytkownik nie włączy „Pokaż warstwy archiwalne”
@@ -190,7 +191,7 @@ export function LayersPanel() {
         const candidates = filterMode === 'enabled'
             ? pool.filter((layer) => layer.visible)
             : filterMode === 'inview' ? pool.filter((layer) => coverageRef.current[layer.id] === 'yes')
-            : filterMode === 'favorites' ? pool.filter((layer) => favorites.has(layer.id)) : pool;
+            : pool;
         return normalizedQuery
             ? candidates.filter((layer) => `${layer.title} ${layer.group} ${layer.description ?? ''} ${layer.serviceName ?? ''} ${layer.attribution?.label ?? ''}`.toLocaleLowerCase('pl-PL').includes(normalizedQuery))
             : candidates;
@@ -229,11 +230,15 @@ export function LayersPanel() {
     useEffect(() => { if (nextCoverageKey !== coverageKey) setCoverageKey(nextCoverageKey); }, [nextCoverageKey, coverageKey]);
 
     if (!open) return null;
-    const toggleGroup = (group) => setExpandedGroups((current) => {
-        const next = new Set(current);
-        if (next.has(group)) next.delete(group); else next.add(group);
-        return next;
-    });
+    const groupHasVisible = (group) => overlayLayers.some((layer) => layer.group === group && layer.visible);
+    const isGroupOpen = (group) => expandedGroups.has(group) || (groupHasVisible(group) && !collapsedOverride.has(group));
+    const toggleGroup = (group) => {
+        const open = isGroupOpen(group);
+        setExpandedGroups((current) => { const next = new Set(current); if (open) next.delete(group); else next.add(group); return next; });
+        setCollapsedOverride((current) => { const next = new Set(current); if (open) next.add(group); else next.delete(group); return next; });
+    };
+    const renderLayerRow = (layer, keyPrefix = '') => _jsx(LayerRow, { layer, manager, scale: scaleState(layer, zoom), favorite: favorites.has(layer.id), dragging: dragId === layer.id, dragActive: dragId !== null, actions, coverage: coverage[layer.id] ?? null }, keyPrefix + layer.id);
+    const favoriteLayers = filterMode === 'all' && !normalizedQuery ? overlayLayers.filter((layer) => favorites.has(layer.id)) : [];
     const title = t('panel.layers.title');
     if (collapsed && !docked) {
         return _jsx(PanelMinimized, { className: 'layers-panel panel-minimized--layers', title, icon: _jsx(Layers3, { size: 18 }), style, onRestore });
@@ -256,14 +261,18 @@ export function LayersPanel() {
                 _jsx(IconButton, { className: 'layers-off-button', label: t('layers.allOff.hint'), tooltipSide: 'left', disabled: activeLayers.length === 0, onClick: () => manager?.setAllOverlaysVisibility?.(false), children: _jsx(EyeOff, { size: 15 }) }),
             ] }, 'toolbar'),
             _jsxs('div', { className: 'layers-filter-bar', role: 'group', 'aria-label': t('layers.filter.aria'), children: [
-                _jsxs('button', { type: 'button', className: `layers-filter${filterMode === 'all' ? ' is-active' : ''}`, 'aria-pressed': filterMode === 'all', onClick: () => setFilterMode('all'), children: [t('layers.filter.all'), _jsx('small', { children: overlayLayers.length })] }),
                 _jsxs('button', { type: 'button', className: `layers-filter${filterMode === 'enabled' ? ' is-active' : ''}`, 'aria-pressed': filterMode === 'enabled', onClick: () => setFilterMode('enabled'), children: [t('layers.filter.enabled'), _jsx('small', { children: activeLayers.length })] }),
                 _jsxs('button', { type: 'button', className: `layers-filter${filterMode === 'inview' ? ' is-active' : ''}`, 'aria-pressed': filterMode === 'inview', title: 'Warstwy planistyczne (MPZP, POG), które mają dane w obecnym widoku mapy — sprawdzane po zatrzymaniu mapy', onClick: () => setFilterMode('inview'), children: ['W widoku', _jsx('small', { children: inViewChecking ? '…' : inViewCount })] }),
-                _jsxs('button', { type: 'button', className: `layers-filter${filterMode === 'favorites' ? ' is-active' : ''}`, 'aria-pressed': filterMode === 'favorites', onClick: () => setFilterMode('favorites'), children: [t('layers.filter.favorites'), _jsx('small', { children: favoriteCount })] }),
+                _jsxs('button', { type: 'button', className: `layers-filter${filterMode === 'all' ? ' is-active' : ''}`, 'aria-pressed': filterMode === 'all', onClick: () => setFilterMode('all'), children: [t('layers.filter.all'), _jsx('small', { children: overlayLayers.length })] }),
             ] }, 'filters'),
             _jsxs('div', { className: 'layers-list', role: 'list', 'aria-label': t('layers.list'), children: [
+                // 19.53.0 (Etap 5): Ulubione jako przypięta sekcja na górze listy (zamiast osobnego filtra).
+                favoriteLayers.length > 0 && _jsxs('section', { className: 'layer-group layer-group--favorites', 'aria-label': t('layers.filter.favorites'), children: [
+                    _jsx('div', { className: 'layer-group-title layer-group-title--static', children: _jsxs('span', { children: [t('layers.filter.favorites'), _jsx('small', { children: favoriteLayers.length })] }) }),
+                    favoriteLayers.map((layer) => renderLayerRow(layer, 'fav:')),
+                ] }, '__favorites'),
                 groupedLayers.map(([group, layers]) => {
-                    const groupCollapsed = !expandedGroups.has(group) && !normalizedQuery && filterMode === 'all';
+                    const groupCollapsed = !isGroupOpen(group) && !normalizedQuery && filterMode === 'all';
                     const allGroupLayers = overlayLayers.filter((layer) => layer.group === group);
                     const visibleCount = allGroupLayers.filter((layer) => layer.visible).length;
                     const allOn = visibleCount === allGroupLayers.length || (group === 'Uzbrojenie terenu' && allGroupLayers.some(layer => layer.id === 'overlay.utilities.all' && layer.visible));
@@ -286,7 +295,7 @@ export function LayersPanel() {
                         !groupCollapsed && group === 'Rzeźba i wysokości' && _jsx(Button, { size:'sm', className:'terrain-layer-action', onClick:async () => { await tools?.activate('core.terrain.area'); terrain?.setSurfaceMode('slope'); }, children:'Analizuj nachylenie obszaru' }),
                         !groupCollapsed && group === 'Energetyka' && _jsx(Button, {size:'sm', className:'terrain-layer-action', onClick:()=>manager?.setVisibility('overlay.kiut.power',true), children:'Pokaż sieć lokalną KIUT'}),
                         !groupCollapsed && (() => {
-                            const renderRow = (layer) => _jsx(LayerRow, { layer, manager, scale: scaleState(layer, zoom), favorite: favorites.has(layer.id), dragging: dragId === layer.id, dragActive: dragId !== null, actions, coverage: coverage[layer.id] ?? null }, layer.id);
+                            const renderRow = (layer) => renderLayerRow(layer);
                             if (normalizedQuery || filterMode !== 'all') return layers.map(renderRow);
                             const shown = new Set();
                             return layers.map((layer) => {

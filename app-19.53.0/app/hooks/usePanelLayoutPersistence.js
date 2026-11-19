@@ -3,6 +3,8 @@ import { isNarrowScreen } from './useIsMobile.js';
 import {
     closePanel,
     hydratePanels,
+    PANEL_MODE,
+    setPanelMode,
     readStoredPanelLayout,
     useAppDispatch,
     useAppSelector,
@@ -28,6 +30,9 @@ export function usePanelLayoutPersistence() {
     useEffect(() => {
         const stored = readStoredPanelLayout();
         if (stored) dispatch(hydratePanels(stored));
+        // 19.53.0 (Etap 5): Otoczenie i Analiza działki to widoki doku Analizy — zapisany układ z wersji, w których były
+        // oknami karty działki (tryb „floating”), wraca do doku.
+        for (const id of ['analysis', 'vpsData']) { dispatch(setPanelMode(id, PANEL_MODE.docked)); dispatch(closePanel(id)); }
         // 18.10.3: przy pierwszym uruchomieniu na telefonie panel jest arkuszem od
         // dołu i zasłaniałby paletę narzędzi oraz przełącznik podkładów — zaczynamy
         // ze zwiniętym panelem. Zapisany układ użytkownika ma pierwszeństwo.

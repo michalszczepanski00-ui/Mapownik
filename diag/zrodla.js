@@ -1,4 +1,4 @@
-// msportal 19.52.0 — teksty źródłowe dla testów diagnostyki, które sprawdzają treść modułów
+// msportal 19.53.0 — teksty źródłowe dla testów diagnostyki, które sprawdzają treść modułów
 // (np. „panel używa klucza X”, „arkusz zawiera regułę Y”).
 //
 // Do 19.44.0 diagnostyka pobierała je z serwera (katalog app-<wersja>/ i assets/css/). Od 19.45.0
@@ -10,7 +10,7 @@ const pliki = import.meta.glob(['../app-*/**/*.js', '../assets/css/*.css'], {
   eager: true,
 });
 
-/** Ścieżka względna do katalogu portalu (np. „app-19.52.0/main.js”) → treść pliku. */
+/** Ścieżka względna do katalogu portalu (np. „app-19.53.0/main.js”) → treść pliku. */
 export const ZRODLA = new Map(
   Object.entries(pliki).map(([sciezka, tresc]) => [sciezka.replace(/^\.\.\//, ''), String(tresc)]),
 );

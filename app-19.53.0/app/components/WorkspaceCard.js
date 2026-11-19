@@ -27,11 +27,15 @@ export function WorkspaceCard() {
     const rootRef = useRef(null);
     const dragCleanup = useRef(null);
     const width = clampWorkCardWidth(prefs.width, viewport);
-    const collapsed = prefs.collapsed;
+    // 19.53.0 (Etap 5): poniżej 1440 px otwarcie prawego doku zwija kartę (mapa nie węższa niż w test22);
+    // zamknięcie doku ją przywraca. Zwinięcie automatyczne nie trafia do zapisanych ustawień, ręczne rozwinięcie ma pierwszeństwo.
+    const [autoCollapsed, setAutoCollapsed] = useState(false);
+    const collapsed = prefs.collapsed || autoCollapsed;
     useEffect(() => { if (openId) setVisited((current) => current.includes(openId) ? current : [...current,openId]); }, [openId]);
     // 19.28.0: wąski ekran (tablet w pionie) — wynik w karcie chowa panel po prawej, żeby została mapa (audyt C4).
     const rightActive = useAppSelector((state) => state.panels.dock.right.activeId);
     useEffect(() => { if (openId && rightActive && window.innerWidth < 900) dispatch(closePanel(rightActive)); }, [openId]);
+    useEffect(() => { setAutoCollapsed(Boolean(rightActive) && window.innerWidth < 1440); }, [rightActive]);
     useEffect(() => {
         const resize = () => setViewport(window.innerWidth);
         const reset = () => setPrefs(readWorkCardPreferences(storage()));
@@ -50,7 +54,7 @@ export function WorkspaceCard() {
         controller?.setOcclusion?.({ left: inset });
         return () => { area?.style.removeProperty('--work-card-inset-left'); controller?.setOcclusion?.({ left: 0 }); };
     }, [collapsed, width, controller]);
-    const toggle = () => setPrefs((current) => ({ ...current, collapsed: !current.collapsed }));
+    const toggle = () => { if (autoCollapsed) { setAutoCollapsed(false); return; } setPrefs((current) => ({ ...current, collapsed: !current.collapsed })); };
     const changeWidth = (value) => setPrefs((current) => ({ ...current, width: clampWorkCardWidth(value, window.innerWidth) }));
     const resizeStart = (event) => {
         if (event.button !== undefined && event.button !== 0) return;

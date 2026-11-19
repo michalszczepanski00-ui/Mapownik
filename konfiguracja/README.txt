@@ -1,4 +1,4 @@
-Mapownik 19.52.0 — konfiguracja raportu działki PDF
+Mapownik 19.53.0 — konfiguracja raportu działki PDF
 
 Plik konfiguracja/raport-pdf.json (opcjonalny) zmienia raport dla wszystkich użytkowników portalu.
 Bez niego działają ustawienia domyślne. Aktualizacje portalu nie nadpisują raport-pdf.json ani logo.

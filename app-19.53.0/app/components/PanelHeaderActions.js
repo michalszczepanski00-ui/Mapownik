@@ -1,10 +1,10 @@
 import { createElement as h } from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { Ellipsis, Minus, PictureInPicture2, Pin, X } from 'lucide-react';
+import { ChevronLeft, Ellipsis, Minus, PictureInPicture2, Pin, X } from 'lucide-react';
 import { IconButton } from './IconButton.js';
 import { usePanel } from '../hooks/useDockGeometry.js';
 import { useIsMobile } from '../hooks/useIsMobile.js';
-import { PANEL_DEFS } from '../../store/index.js';
+import { PANEL_DEFS, openPanel, useAppDispatch } from '../../store/index.js';
 import { t } from '../../i18n/index.js';
 
 /**
@@ -34,6 +34,14 @@ function PanelMenuItems({ items }) {
             h(DropdownMenu.ItemIndicator, { className: 'dropdown-check' }, '✓'), item.label)
         : h(DropdownMenu.Item, { key: item.id, className: 'dropdown-item', onSelect: item.onSelect }, item.label)));
 }
+/** 19.53.0 (Etap 5): widok grupy (np. Ceny w doku Analizy) — „← Analizy” wraca do listy narzędzi grupy. */
+function BackToGroup({ id }) {
+    const dispatch = useAppDispatch();
+    const group = PANEL_DEFS[id]?.railGroup;
+    if (!group || !PANEL_DEFS[group]) return null;
+    return h('button', { type: 'button', className: 'panel-back-button', title: `Wróć do listy: ${PANEL_DEFS[group].title}`, onClick: () => dispatch(openPanel(group)) },
+        h(ChevronLeft, { size: 15, 'aria-hidden': true }), PANEL_DEFS[group].title);
+}
 export function PanelHeaderActions({ id, onClose, menuItems = null }) {
     const { docked, close, collapse, undock, dock } = usePanel(id);
     const title = PANEL_DEFS[id].title;
@@ -43,6 +51,7 @@ export function PanelHeaderActions({ id, onClose, menuItems = null }) {
 
     if (docked) {
         return h('div', { className: 'panel-actions' },
+            h(BackToGroup, { id }),
             !mobile && h(DropdownMenu.Root, null,
                 h(DropdownMenu.Trigger, { asChild: true }, h('button', { type: 'button', className: 'icon-button', 'aria-label': `Opcje panelu: ${title}` }, h(Ellipsis, { size: 17 }))),
                 h(DropdownMenu.Portal, null, h(DropdownMenu.Content, { className: 'dropdown-content', align: 'end', sideOffset: 5 },

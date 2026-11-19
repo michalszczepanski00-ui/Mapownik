@@ -1,10 +1,10 @@
-import { createElement as h, useId, useState } from 'react';
+import { createElement as h, useState } from 'react';
 import { Building2, Eye, EyeOff, Layers3, LoaderCircle, RotateCw, ScanSearch, Search, Trash2 } from 'lucide-react';
 import { useService, useServiceSnapshot } from '../services/AppServicesContext.js';
 import { usePanel } from '../hooks/useDockGeometry.js';
 import { PanelHeaderActions } from './PanelHeaderActions.js';
 import { selectRightOverlayOffset, useAppSelector } from '../../store/index.js';
-import { Button, KeyValue, Message, NumberField, PanelMinimized, PanelShell, Section, SelectField, Tabs, tabPanelProps } from '../ui/index.js';
+import { Button, KeyValue, Message, NumberField, PanelMinimized, PanelShell, Section, SelectField } from '../ui/index.js';
 import { screeningCategory, screeningQuality, summarizeScreening, QUALITY_LABELS } from '../../analysis/screeningQuality.js';
 import { formatNumber, t, tn } from '../../i18n/index.js';
 import { formatArea as formatUnitArea, formatLength } from '../../core/units.js';
@@ -291,8 +291,6 @@ export function AnalysisPanel() {
     const snapshot = useServiceSnapshot('analysis', EMPTY);
     const { open, collapsed, docked, restore: onRestore } = usePanel('analysis');
     const panelMode = snapshot.panelMode ?? 'screening';
-    const setPanelMode = (value) => manager?.setPanelMode(value);
-    const tabsId = useId();
     // Odpięty panel jest zakotwiczony do prawej krawędzi obszaru mapy
     // i ustępuje odpiętym Obiektom — odsunięcie liczy selektor, nie JSX.
     const rightOffset = useAppSelector(selectRightOverlayOffset);
@@ -308,15 +306,12 @@ export function AnalysisPanel() {
         docked,
         style,
         icon: h(ScanSearch, { size: 16 }),
-        title: t('panel.analysis.title'),
+        // 19.53.0 (Etap 5): tytuł widoku według narzędzia wybranego w doku Analizy (bez zakładek w środku).
+        title: screening ? t('panel.analysis.title') : 'Analiza źródła',
         subtitle: screening ? t('analysis.subtitle.screening') : t('analysis.subtitle.manual'),
         actions: h(PanelHeaderActions, { id: 'analysis' }),
         footer: t('analysis.footer'),
     },
-        h(Tabs, {
-            className: 'analysis-mode-tabs', label: t('analysis.modeLabel'), value: panelMode, onChange: setPanelMode, idBase: tabsId,
-            items: [{ value: 'screening', label: t('analysis.tab.screening') }, { value: 'manual', label: t('analysis.tab.manual') }],
-        }),
-        h('div', { className: 'analysis-panel-body', ...tabPanelProps(tabsId, panelMode) },
+        h('div', { className: 'analysis-panel-body' },
             screening ? h(ScreeningTab, { manager, snapshot }) : h(ManualTab, { manager, snapshot })));
 }

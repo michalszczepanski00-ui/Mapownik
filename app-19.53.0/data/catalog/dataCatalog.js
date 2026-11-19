@@ -155,7 +155,7 @@ const rawDataCatalog = {
                 transparent: true,
                 tiled: true,
                 tileSize: 512,
-                legendUrl: './assets/legend/las-wlasnosc.svg?v=19.52.0',
+                legendUrl: './assets/legend/las-wlasnosc.svg?v=19.53.0',
                 identifyUrl: './api/forest.php',
             },
         },
@@ -880,7 +880,8 @@ const rawDataCatalog = {
  * z panelu przez zapomniany wpis.
  */
 /** Grupy rozwinięte w panelu Warstwy przy pierwszym uruchomieniu. */
-export const DEFAULT_EXPANDED_GROUPS = Object.freeze(['Działki i grunty', 'Planowanie przestrzenne']);
+// 19.53.0 (Etap 5): grupy domyślnie zwinięte — rozwinięte są tylko grupy z włączoną warstwą (LayersPanel).
+export const DEFAULT_EXPANDED_GROUPS = Object.freeze([]);
 const OVERLAY_GROUP_ORDER_ALL = ['Działki i grunty','Planowanie przestrzenne','Uzbrojenie terenu','Energetyka','Środowisko i wody','Uciążliwości','Dziedzictwo','Geologia i górnictwo','Rzeźba i wysokości','Dane pomocnicze','Archiwum'];
 
 rawDataCatalog.catalogVersion = 15;

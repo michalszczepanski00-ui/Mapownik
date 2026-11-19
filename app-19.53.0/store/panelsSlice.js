@@ -565,15 +565,18 @@ export const selectDockRailTabs = memoizeByPanels((state) => {
 // a Eksport ma przycisk w górnym pasku; szyna zostaje dla Warstw, Obiektów i Zdjęć.
 const RAIL_ELSEWHERE = new Set(['export']);
 export const selectRailItems = memoizeByPanels((state) => PANEL_IDS
-    .filter((id) => PANEL_DEFS[id].rail !== false && !PANEL_DEFS[id].placeCard && !RAIL_ELSEWHERE.has(id))
+    // 19.53.0 (Etap 5): widoki z `railGroup` (Ceny, Budowy, Otoczenie, Analiza działki) nie mają własnej ikony —
+    // ikona grupy (Analizy) jest aktywna, gdy otwarty jest którykolwiek z nich.
+    .filter((id) => PANEL_DEFS[id].rail !== false && !PANEL_DEFS[id].placeCard && !PANEL_DEFS[id].railGroup && !RAIL_ELSEWHERE.has(id))
     .map((id) => ({
+        openChild: PANEL_IDS.find((child) => PANEL_DEFS[child].railGroup === id && selectPanelOpen(state, child)) ?? null,
         id,
         title: PANEL_DEFS[id].title,
         // 19.8.5: krótki podpis pod ikoną szyny (audyt UX A1).
         railLabel: PANEL_DEFS[id].railLabel ?? null,
         icon: PANEL_DEFS[id].icon,
         docked: selectPanelDocked(state, id),
-        active: selectPanelOpen(state, id),
+        active: selectPanelOpen(state, id) || PANEL_IDS.some((child) => PANEL_DEFS[child].railGroup === id && selectPanelOpen(state, child)),
         // 18.10: moduł sterowany serwisem (Informacja) ma wynik do pokazania.
         hasResult: typeof PANEL_DEFS[id].controlledBy === 'string' && Boolean(state.panels.available[id]),
     })));
