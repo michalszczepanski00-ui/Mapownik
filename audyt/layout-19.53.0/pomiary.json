@@ -1,0 +1,517 @@
+{
+ "1280": {
+  "islands": {
+   "logo": {
+    "x": 8,
+    "y": 8,
+    "w": 40,
+    "h": 40,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "search": {
+    "x": 54,
+    "y": 8,
+    "w": 410,
+    "h": 40,
+    "radius": "0px",
+    "shadow": "none",
+    "bg": "rgba(0, 0, 0, 0)"
+   },
+   "card": {
+    "x": 8,
+    "y": 56,
+    "w": 260,
+    "h": 204,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "project": {
+    "x": 985,
+    "y": 8,
+    "w": 97,
+    "h": 36,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "share": {
+    "x": 1088,
+    "y": 8,
+    "w": 104,
+    "h": 36,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(47, 107, 69)"
+   },
+   "help": {
+    "x": 1198,
+    "y": 8,
+    "w": 36,
+    "h": 36,
+    "radius": "0px",
+    "shadow": "none",
+    "bg": "rgba(0, 0, 0, 0)"
+   },
+   "settings": {
+    "x": 1240,
+    "y": 10,
+    "w": 32,
+    "h": 32,
+    "radius": "8px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "rail": {
+    "x": 1224,
+    "y": 52,
+    "w": 48,
+    "h": 132,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "modes": {
+    "x": 581,
+    "y": 746,
+    "w": 327,
+    "h": 46,
+    "radius": "12px",
+    "shadow": "rgba(22, 38, 30, 0.1) 0px 1px 2px 0px, rgba(22, 38, 30, 0.16) 0px 6px 18px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "zoom": null,
+   "basemap": {
+    "x": 8,
+    "y": 739,
+    "w": 52,
+    "h": 53,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgba(255, 255, 255, 0.92)"
+   },
+   "scale": null,
+   "footer": null
+  },
+  "sizes": {
+   "12px": 10,
+   "11.5px": 1,
+   "11px": 1,
+   "13px": 6,
+   "10.5px": 1
+  },
+  "weights": {
+   "400": 11,
+   "500": 3,
+   "600": 3,
+   "650": 1,
+   "700": 1
+  },
+  "radii": {
+   "10px": 11,
+   "6px": 3,
+   "5px": 1,
+   "50%": 1,
+   "8px": 5,
+   "12px": 1,
+   "7px": 8,
+   "4px": 1
+  },
+  "heights": {
+   "28": 1,
+   "32": 3,
+   "33": 3,
+   "36": 6,
+   "40": 6,
+   "46": 1
+  },
+  "shadows": {
+   "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px": 10,
+   "color(srgb 0.184314 0.419608 0.270588 / 0.5) 0px 0px 0px 1px inset": 1,
+   "rgba(27, 39, 58, 0.12) 0px 8px 28px 0px": 1,
+   "rgba(22, 38, 30, 0.1) 0px 1px 2px 0px, rgba(22, 38, 30, 0.16) 0px 6px 18px 0px": 1
+  },
+  "truncated": [],
+  "font": "Inter, \"Segoe UI\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+  "tokens": {
+   "--accent": "#1d4ed8",
+   "--bg": "",
+   "--surface": "",
+   "--surface-solid": "#fff",
+   "--text": "#141b26",
+   "--text-muted": "#556274",
+   "--border": "#d5dae2",
+   "--success": "#166534",
+   "--warning": "#92400e",
+   "--danger": "#b91c1c",
+   "--accent-soft": "#e2ebff"
+  },
+  "colors": {
+   "rgb(20, 27, 38)": 7,
+   "rgb(85, 98, 116)": 6,
+   "rgb(185, 28, 28)": 1,
+   "rgb(255, 255, 255)": 2,
+   "rgb(22, 38, 30)": 3
+  }
+ },
+ "1440": {
+  "islands": {
+   "logo": {
+    "x": 8,
+    "y": 8,
+    "w": 40,
+    "h": 40,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "search": {
+    "x": 54,
+    "y": 8,
+    "w": 440,
+    "h": 40,
+    "radius": "0px",
+    "shadow": "none",
+    "bg": "rgba(0, 0, 0, 0)"
+   },
+   "card": {
+    "x": 8,
+    "y": 56,
+    "w": 260,
+    "h": 204,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "project": {
+    "x": 1145,
+    "y": 8,
+    "w": 97,
+    "h": 36,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "share": {
+    "x": 1248,
+    "y": 8,
+    "w": 104,
+    "h": 36,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(47, 107, 69)"
+   },
+   "help": {
+    "x": 1358,
+    "y": 8,
+    "w": 36,
+    "h": 36,
+    "radius": "0px",
+    "shadow": "none",
+    "bg": "rgba(0, 0, 0, 0)"
+   },
+   "settings": {
+    "x": 1400,
+    "y": 10,
+    "w": 32,
+    "h": 32,
+    "radius": "8px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "rail": {
+    "x": 1384,
+    "y": 52,
+    "w": 48,
+    "h": 132,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "modes": {
+    "x": 661,
+    "y": 846,
+    "w": 327,
+    "h": 46,
+    "radius": "12px",
+    "shadow": "rgba(22, 38, 30, 0.1) 0px 1px 2px 0px, rgba(22, 38, 30, 0.16) 0px 6px 18px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "zoom": null,
+   "basemap": {
+    "x": 8,
+    "y": 839,
+    "w": 52,
+    "h": 53,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgba(255, 255, 255, 0.92)"
+   },
+   "scale": null,
+   "footer": null
+  },
+  "sizes": {
+   "12px": 10,
+   "11.5px": 1,
+   "11px": 1,
+   "13px": 6,
+   "10.5px": 1
+  },
+  "weights": {
+   "400": 11,
+   "500": 3,
+   "600": 3,
+   "650": 1,
+   "700": 1
+  },
+  "radii": {
+   "10px": 11,
+   "6px": 3,
+   "5px": 1,
+   "50%": 1,
+   "8px": 5,
+   "12px": 1,
+   "7px": 8,
+   "4px": 1
+  },
+  "heights": {
+   "28": 1,
+   "32": 3,
+   "33": 3,
+   "36": 6,
+   "40": 6,
+   "46": 1
+  },
+  "shadows": {
+   "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px": 10,
+   "color(srgb 0.184314 0.419608 0.270588 / 0.5) 0px 0px 0px 1px inset": 1,
+   "rgba(27, 39, 58, 0.12) 0px 8px 28px 0px": 1,
+   "rgba(22, 38, 30, 0.1) 0px 1px 2px 0px, rgba(22, 38, 30, 0.16) 0px 6px 18px 0px": 1
+  },
+  "truncated": [],
+  "font": "Inter, \"Segoe UI\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+  "tokens": {
+   "--accent": "#1d4ed8",
+   "--bg": "",
+   "--surface": "",
+   "--surface-solid": "#fff",
+   "--text": "#141b26",
+   "--text-muted": "#556274",
+   "--border": "#d5dae2",
+   "--success": "#166534",
+   "--warning": "#92400e",
+   "--danger": "#b91c1c",
+   "--accent-soft": "#e2ebff"
+  },
+  "colors": {
+   "rgb(20, 27, 38)": 7,
+   "rgb(85, 98, 116)": 6,
+   "rgb(185, 28, 28)": 1,
+   "rgb(255, 255, 255)": 2,
+   "rgb(22, 38, 30)": 3
+  }
+ },
+ "1920": {
+  "islands": {
+   "logo": {
+    "x": 8,
+    "y": 8,
+    "w": 40,
+    "h": 40,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "search": {
+    "x": 54,
+    "y": 8,
+    "w": 440,
+    "h": 40,
+    "radius": "0px",
+    "shadow": "none",
+    "bg": "rgba(0, 0, 0, 0)"
+   },
+   "card": {
+    "x": 8,
+    "y": 56,
+    "w": 260,
+    "h": 564,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "project": {
+    "x": 1625,
+    "y": 8,
+    "w": 97,
+    "h": 36,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "share": {
+    "x": 1728,
+    "y": 8,
+    "w": 104,
+    "h": 36,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(47, 107, 69)"
+   },
+   "help": {
+    "x": 1838,
+    "y": 8,
+    "w": 36,
+    "h": 36,
+    "radius": "0px",
+    "shadow": "none",
+    "bg": "rgba(0, 0, 0, 0)"
+   },
+   "settings": {
+    "x": 1880,
+    "y": 10,
+    "w": 32,
+    "h": 32,
+    "radius": "8px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "rail": {
+    "x": 1864,
+    "y": 52,
+    "w": 48,
+    "h": 132,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "modes": {
+    "x": 901,
+    "y": 1026,
+    "w": 327,
+    "h": 46,
+    "radius": "12px",
+    "shadow": "rgba(22, 38, 30, 0.1) 0px 1px 2px 0px, rgba(22, 38, 30, 0.16) 0px 6px 18px 0px",
+    "bg": "rgb(255, 255, 255)"
+   },
+   "zoom": null,
+   "basemap": {
+    "x": 8,
+    "y": 1019,
+    "w": 52,
+    "h": 53,
+    "radius": "10px",
+    "shadow": "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px",
+    "bg": "rgba(255, 255, 255, 0.92)"
+   },
+   "scale": null,
+   "footer": null
+  },
+  "sizes": {
+   "12px": 68,
+   "11.5px": 12,
+   "11px": 28,
+   "13px": 2,
+   "10.5px": 1,
+   "17px": 1,
+   "9px": 6,
+   "12.5px": 4
+  },
+  "weights": {
+   "400": 49,
+   "500": 13,
+   "600": 53,
+   "700": 7
+  },
+  "radii": {
+   "10px": 10,
+   "6px": 5,
+   "5px": 5,
+   "50%": 6,
+   "8px": 6,
+   "12px": 1,
+   "7px": 15,
+   "999px": 15,
+   "4px": 1
+  },
+  "heights": {
+   "19": 1,
+   "21": 5,
+   "22": 4,
+   "25": 1,
+   "28": 4,
+   "30": 3,
+   "32": 2,
+   "33": 3,
+   "36": 6,
+   "40": 6,
+   "46": 1
+  },
+  "shadows": {
+   "rgba(18, 22, 28, 0.12) 0px 1px 2px 0px, rgba(18, 22, 28, 0.14) 0px 4px 12px 0px": 10,
+   "color(srgb 0.184314 0.419608 0.270588 / 0.5) 0px 0px 0px 1px inset": 1,
+   "rgba(22, 38, 30, 0.1) 0px 1px 2px 0px, rgba(22, 38, 30, 0.16) 0px 6px 18px 0px": 1
+  },
+  "truncated": [
+   "21,85 ha · Janowo · gm. Starogard Gdański",
+   "uchwalony · 107SO",
+   "powiat starogardzki",
+   "Plan ogólny — uchwalony",
+   "Plan ogólny — projektowany",
+   "Strefa otwarta (107SO)",
+   "Powódź — obszar zagrożenia",
+   "Główny Zbiornik Wód Podziemnych",
+   "Ponów"
+  ],
+  "font": "Inter, \"Segoe UI\", ui-sans-serif, system-ui, -apple-system, sans-serif",
+  "tokens": {
+   "--accent": "#1d4ed8",
+   "--bg": "",
+   "--surface": "",
+   "--surface-solid": "#fff",
+   "--text": "#141b26",
+   "--text-muted": "#556274",
+   "--border": "#d5dae2",
+   "--success": "#166534",
+   "--warning": "#92400e",
+   "--danger": "#b91c1c",
+   "--accent-soft": "#e2ebff"
+  },
+  "colors": {
+   "rgb(20, 27, 38)": 45,
+   "rgb(85, 98, 116)": 52,
+   "rgb(255, 255, 255)": 5,
+   "rgb(22, 38, 30)": 3,
+   "rgb(47, 107, 69)": 8,
+   "rgb(95, 107, 124)": 7,
+   "rgb(161, 70, 12)": 2
+  }
+ },
+ "layersPanel": {
+  "panel": [
+   1128,
+   52,
+   250,
+   442
+  ],
+  "filters": [
+   [
+    "Włączone",
+    57,
+    39
+   ],
+   [
+    "W widoku|0",
+    57,
+    39
+   ],
+   [
+    "Wszystkie|62",
+    57,
+    39
+   ]
+  ]
+ }
+}
