@@ -8,6 +8,7 @@ import Fill from 'ol/style/Fill.js';
 import Stroke from 'ol/style/Stroke.js';
 import CircleStyle from 'ol/style/Circle.js';
 import { fromLonLat } from 'ol/proj.js';
+import { MAP_SELECTION_LIGHT, mapSelectionFill } from '../../map/selectionColors.js';
 
 /**
  * 18.14.0 — „Moja lokalizacja”: niebieska kropka z kołem dokładności GPS,
@@ -15,10 +16,10 @@ import { fromLonLat } from 'ol/proj.js';
  * włącza śledzenie (mapa jedzie za użytkownikiem), następne je wyłącza.
  */
 const DOT = [
-    new Style({ image: new CircleStyle({ radius: 10, fill: new Fill({ color: 'rgba(37, 99, 235, 0.25)' }) }) }),
-    new Style({ image: new CircleStyle({ radius: 7, fill: new Fill({ color: '#2563eb' }), stroke: new Stroke({ color: '#ffffff', width: 2.5 }) }) }),
+    new Style({ image: new CircleStyle({ radius: 10, fill: new Fill({ color: mapSelectionFill(0.25) }) }) }),
+    new Style({ image: new CircleStyle({ radius: 7, fill: new Fill({ color: MAP_SELECTION_LIGHT }), stroke: new Stroke({ color: '#ffffff', width: 2.5 }) }) }),
 ];
-const ACCURACY = new Style({ fill: new Fill({ color: 'rgba(37, 99, 235, 0.12)' }), stroke: new Stroke({ color: 'rgba(37, 99, 235, 0.45)', width: 1 }) });
+const ACCURACY = new Style({ fill: new Fill({ color: mapSelectionFill(0.12) }), stroke: new Stroke({ color: mapSelectionFill(0.45), width: 1 }) });
 
 export class LocationTracker {
     constructor(controller, onChange) {

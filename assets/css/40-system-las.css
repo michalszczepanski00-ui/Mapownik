@@ -53,3 +53,47 @@
   color: inherit; opacity: .75; font-size: 11px; font-weight: 400; line-height: 1;
 }
 .layers-filter:focus-visible, .market-scope-option:focus-visible, .rcn-kind:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ------------------------------------------------------------------ T1 paleta „Las” jako bazowa (motyw jasny)
+   Sześć kolorów + jeden kolor wyłącznie mapowy. Dotąd Las nadpisywał tylko akcent i pasek narzędzi,
+   a tekst i linie brały niebieskawą szarość z 10-tokens.css. Zdefiniowane na :root i na powłoce,
+   żeby objęły też okna i menu wyświetlane poza .app-shell (portale). */
+:root:not([data-theme="dark"]),
+.app-shell:not([data-theme="dark"]) {
+  --las: #2f6b45;      /* akcent, jedyny wypełniony przycisk, aktywny tryb */
+  --bor: #16261e;      /* tekst */
+  --mech: #5f6b62;     /* tekst pomocniczy, ikony nieaktywne */
+  --szron: #dfe4dc;    /* linie, ramki kontrolek na mapie */
+  --polana: #e6f0e9;   /* tło wyniku, aktywna pozycja przełącznika */
+  --rdza: #a1460c;     /* ostrzeżenie */
+  --zaznaczenie: #1d4ed8; /* T2: tylko na mapie (obrys wybranej działki, celownik) — nigdy w panelach */
+
+  --accent: var(--las); --accent-soft: var(--polana); --on-accent: #ffffff; --info: var(--las);
+  --text: var(--bor); --text-muted: var(--mech); --text-faint: #66716a;
+  --border: var(--szron); --border-strong: #c9d1c6; --border-soft: var(--szron);
+  --control-border: #7d8a80;
+  --surface-hover: #eef3ef; --surface-raised: #f6f8f5; --surface-active: var(--polana);
+  --bg: #f3f5f1;
+  --warning: var(--rdza); --state-warn: var(--rdza);
+  --v2-ink-text: var(--bor); --v2-ink-muted: var(--mech); --v2-ink-line: var(--szron);
+
+  /* T5: dwa cienie — powierzchnia z treścią i menu rozwijane; małe kontrolki mapy mają linię zamiast cienia. */
+  --shadow-surface: 0 1px 2px rgba(22, 38, 30, .10), 0 6px 18px rgba(22, 38, 30, .14);
+  --shadow-menu: 0 8px 28px rgba(22, 38, 30, .18);
+  --shadow: var(--shadow-menu); --shadow-soft: var(--shadow-surface);
+  --v2-float-shadow: var(--shadow-surface); --v2-dock-shadow: var(--shadow-surface);
+}
+
+/* ------------------------------------------------------------------ T3 skala tekstu: 11 / 12,5 / 14 / 18 px, grubości 400 i 600 (700 — numer działki) */
+:root, .app-shell {
+  --fs-xs: 11px; --fs-sm: 12.5px; --fs-md: 12.5px; --fs-lg: 14px; --fs-xl: 14px; --fs-2xl: 18px;
+  --fw-medium: 400;
+}
+
+/* ------------------------------------------------------------------ T5 promienie: 6 kontrolki · 10 powierzchnie · pełne pigułki */
+:root, .app-shell { --radius-control: 6px; --control-radius: 6px; --radius-sm: 6px; --radius-md: 6px; --radius: 10px; --panel-radius: 10px; }
+
+/* T5: małe kontrolki na mapie — linia zamiast cienia (cień zostaje dla karty, doku, paska trybów i menu). */
+.map-view-controls,
+.basemap-switcher.is-collapsed,
+.map-scalebar { box-shadow: none; border: 1px solid var(--szron, var(--border)); }

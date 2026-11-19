@@ -20,7 +20,7 @@
   display: grid;
   grid-template-rows: auto auto auto minmax(0, 1fr) auto;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: visible;
   background: var(--surface-solid);
   box-shadow: var(--shadow);
@@ -79,7 +79,7 @@
   min-width: 210px;
   padding: 5px;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 10px;
   background: var(--surface-solid);
   color: var(--text);
   box-shadow: var(--shadow);
@@ -136,7 +136,7 @@
   gap: 3px;
   padding: 4px 4px 4px 7px;
   border: 1px solid transparent;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: default;
   user-select: none;
 }
@@ -223,17 +223,17 @@
   grid-template-columns: 16px 24px minmax(0, 1fr) 25px 25px;
   gap: 2px;
   padding: 2px 2px 2px 5px;
-  border-radius: 7px;
+  border-radius: 6px;
 }
 .objects-panel--compact .object-row + .object-row { margin-top: 1px; }
 .objects-panel--compact .object-kind-icon {
   width: 23px;
   height: 23px;
-  border-radius: 5px;
+  border-radius: 6px;
 }
 .objects-panel--compact .object-kind-icon svg { width: 15px; height: 15px; }
 .objects-panel--compact .object-row-copy strong { font-size: var(--fs-md); }
-.objects-panel--compact .object-row-action { width: 24px; height: 24px; border-radius: 5px; }
+.objects-panel--compact .object-row-action { width: 24px; height: 24px; border-radius: 6px; }
 .objects-panel--compact .object-check { width: 13px; height: 13px; }
 
 /* Floating panel movement + resize */
@@ -248,7 +248,7 @@
   cursor: grab;
   touch-action: none;
   opacity: .55;
-  border-radius: 4px;
+  border-radius: 6px;
   background-image: radial-gradient(circle, var(--text-faint) 1px, transparent 1.2px);
   background-size: 4px 4px;
   background-position: center;
@@ -277,7 +277,7 @@
   display: grid !important;
   grid-template: 1fr / 1fr !important;
   overflow: hidden !important;
-  border-radius: 10px !important;
+  border-radius: 10px!important;
   animation: panel-mini-in 120ms ease-out;
 }
 .panel-minimized--objects { right: 10px; top: 10px; }
@@ -315,7 +315,7 @@
 /* Tooltip readability; keyboard shortcuts already included in tool labels. */
 .tooltip-content {
   padding: 6px 8px;
-  border-radius: 7px;
+  border-radius: 6px;
   line-height: 1.35;
   box-shadow: var(--shadow-soft);
 }

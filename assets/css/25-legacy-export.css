@@ -21,7 +21,7 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--surface-solid);
   box-shadow: var(--shadow);
 }
@@ -29,13 +29,13 @@
 .export-section {
   padding: 10px;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: 10px;
   background: var(--surface-raised);
 }
 .export-section + .export-section { margin-top: 9px; }
 
 .export-status,
-.export-message { margin-top: 9px; padding: 8px 9px; border-radius: 7px; font-size: var(--fs-sm); line-height: 1.4; }
+.export-message { margin-top: 9px; padding: 8px 9px; border-radius: 6px; font-size: var(--fs-sm); line-height: 1.4; }
 .export-status { display: flex; align-items: center; gap: 6px; color: var(--text-muted); background: var(--surface-raised); }
 .export-message--success { color: var(--success); background: color-mix(in srgb, var(--success) 13%, var(--surface-raised)); }
 .export-message--error { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--surface-raised)); }
@@ -58,7 +58,7 @@
 .export-checks { margin: 8px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 5px 10px; }
 .export-checks label { display: flex; align-items: center; gap: 6px; min-width: 0; color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.25; }
 .export-checks input { margin: 0; }
-.export-plan { margin: 8px 0; padding: 8px 9px; display: grid; gap: 2px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface-solid); }
+.export-plan { margin: 8px 0; padding: 8px 9px; display: grid; gap: 2px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-solid); }
 .export-plan strong { color: var(--text); font-size: var(--fs-md); }
 .export-plan span, .export-plan small { color: var(--text-muted); font-size: var(--fs-xs); line-height: 1.35; }
 
@@ -106,7 +106,7 @@
   display: grid;
   gap: 5px;
   border: 1px solid color-mix(in srgb, var(--warning) 55%, var(--border));
-  border-radius: 8px;
+  border-radius: 6px;
   background: color-mix(in srgb, var(--warning) 9%, var(--surface-solid));
 }
 .export-incomplete strong { color: var(--warning); font-size: var(--fs-sm); }

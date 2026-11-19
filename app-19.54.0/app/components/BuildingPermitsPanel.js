@@ -14,6 +14,7 @@ import { usePanel } from '../hooks/useDockGeometry.js';
 import { PanelHeaderActions } from './PanelHeaderActions.js';
 import { PanelIcon } from './PanelIcon.js';
 import { Button, CheckboxField, Message, PanelMinimized, PanelShell, SelectField } from '../ui/index.js';
+import { MAP_SELECTION } from '../../map/selectionColors.js';
 
 /**
  * 19.32.0 — narzędzie „Pozwolenia na budowę”: wnioski, decyzje i zgłoszenia budowlane (RWDZ, GUNB) wokół
@@ -169,7 +170,7 @@ export function BuildingPermitsPanel() {
                 if (!cache.has(key)) {
                     const fill = new Fill({ color: TYPE[item.type]?.color ?? '#9ca3af' });
                     // zgłoszenie: mniejszy punkt z ciemną obwódką; wniosek/pozwolenie: biała obwódka
-                    const stroke = new Stroke({ color: selected ? '#1d4ed8' : item.src === 'Z' ? '#1f2937' : '#ffffff', width: selected ? 3 : item.src === 'Z' ? 2 : 1.5 });
+                    const stroke = new Stroke({ color: selected ? MAP_SELECTION : item.src === 'Z' ? '#1f2937' : '#ffffff', width: selected ? 3 : item.src === 'Z' ? 2 : 1.5 });
                     cache.set(key, new Style({
                         image: new CircleStyle({ radius: selected ? 8 : item.src === 'Z' ? 5 : 6, fill, stroke }),
                         zIndex: selected ? 3 : 1,

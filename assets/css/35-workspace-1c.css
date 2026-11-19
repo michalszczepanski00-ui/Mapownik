@@ -8,12 +8,12 @@
 }
 .app-shell.is-workspace-1c .workspace-card.is-collapsed { width: auto; max-height: 44px; } /* 19.54.0 (L6): przycisk z nazwą działki */
 .workspace-card-head { display: flex; align-items: center; gap: 2px; min-height: 38px; padding: 3px 5px 3px 10px; border-bottom: 1px solid var(--border); flex: none; }
-.workspace-card-head > strong { flex: 1; min-width: 0; font-size: 12px; font-weight: 650; }
+.workspace-card-head > strong { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 600; }
 .workspace-card-head .icon-button { width: 28px; height: 28px; flex: 0 0 28px; }
 .workspace-card.is-collapsed .workspace-card-head { padding: 3px; border: 0; justify-content: center; }
 .workspace-card-body { overflow: auto; min-height: 0; overscroll-behavior: contain; scrollbar-gutter: stable; }
 .workspace-card [hidden] { display: none !important; }
-.workspace-card-resizer { position: absolute; right: -4px; top: 0; bottom: 0; width: 8px; cursor: ew-resize; touch-action: none; border-radius: 4px; }
+.workspace-card-resizer { position: absolute; right: -4px; top: 0; bottom: 0; width: 8px; cursor: ew-resize; touch-action: none; border-radius: 6px; }
 .workspace-card-resizer:hover, .workspace-card-resizer:focus-visible { background: var(--accent); outline: 2px solid var(--surface-solid); }
 /* Old floating-panel geometry must not escape the stable left card. */
 .app-shell.is-v2.is-workspace-1c .workspace-card .ui-panel {
@@ -35,7 +35,7 @@
 }
 .workspace-context .context-zone { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; min-width: 0; width: 100%; padding: 0; border: 0; }
 .workspace-context .context-zone--object { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-.workspace-context .context-tool-name { color: var(--text); white-space: normal; font-size: 12px; }
+.workspace-context .context-tool-name { color: var(--text); white-space: normal; font-size: 12.5px; }
 .workspace-context .context-tool-icon { display: none; }
 .workspace-context .context-next-step { display: block; width: 100%; min-width: 0; max-width: none; max-height: none; white-space: normal; overflow: visible; font-size: 11px; line-height: 1.5; color: var(--text-muted); }
 .workspace-context .context-fields { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; min-width: 0; }
@@ -44,21 +44,21 @@
 .workspace-context .context-sketch { position: static; inset: auto; display: flex; flex-wrap: wrap; gap: 6px; width: 100%; min-width: 0; border: 0; box-shadow: none; padding: 0; background: transparent; }
 .workspace-context .context-readouts { display: flex; flex-wrap: wrap; gap: 7px; width: 100%; }
 .workspace-context .ui-readout { display: flex; flex: 1 1 90px; flex-direction: column; align-items: flex-start; gap: 2px; padding: 7px 8px; border-radius: 6px; background: var(--accent-soft); color: var(--text); }
-.workspace-context .ui-readout strong { font-size: 15px; font-variant-numeric: tabular-nums; }
-.workspace-context .ui-field-label { color: var(--text-muted); font-size: 10.5px; }
-.workspace-context .context-object-name { max-width: 100%; white-space: normal; overflow-wrap: anywhere; font-size: 12px; }
-.workspace-context .context-object-label { font-size: 10px; }
+.workspace-context .ui-readout strong { font-size: 14px; font-variant-numeric: tabular-nums; }
+.workspace-context .ui-field-label { color: var(--text-muted); font-size: 11px; }
+.workspace-context .context-object-name { max-width: 100%; white-space: normal; overflow-wrap: anywhere; font-size: 12.5px; }
+.workspace-context .context-object-label { font-size: 11px; }
 .workspace-context .context-tool-help { margin-left: auto; }
 /* The right dock stays independent of result/tool changes on the left. */
 .app-shell.is-workspace-1c .dock--right-panel { width: var(--dock-panel-width, 250px); max-width: min(420px, 42vw); top: 56px; max-height: calc(100% - 164px); }
 .app-shell.is-workspace-1c .dock--right-panel .ui-panel { min-width: 0; max-width: 100%; }
 .app-shell.is-workspace-1c .layers-panel--v2 .layer-row-main { padding-left: 7px; }
-.app-shell.is-workspace-1c .layers-panel--v2 .layer-row-titleline strong { font-size: 11.5px; }
+.app-shell.is-workspace-1c .layers-panel--v2 .layer-row-titleline strong { font-size: 11px; }
 /* Only four primary actions carry persistent labels; details keep names in tooltips/ARIA. */
 .app-shell.is-workspace-1c .tool-dock { left: calc(var(--work-card-inset-left, 272px) + 8px); }
 .app-shell.is-workspace-1c .tool-dock-main { overflow-x: auto; max-width: 100%; flex-wrap: nowrap; }
 .app-shell.is-workspace-1c .tool-dock-groups { display: flex; flex: none; }
-.app-shell.is-workspace-1c .tool-dock .tool-dock-main .tool-dock-group { width: auto; padding: 0 9px; min-width: 0; height: 36px; flex: none; font-size: 12px; justify-content: center; }
+.app-shell.is-workspace-1c .tool-dock .tool-dock-main .tool-dock-group { width: auto; padding: 0 9px; min-width: 0; height: 36px; flex: none; font-size: 12.5px; justify-content: center; }
 .app-shell.is-workspace-1c .tool-dock.is-expanded .tool-dock-main .tool-dock-group > span { display: inline; }
 .app-shell.is-workspace-1c .tool-dock-tool { width: 42.5px; height: 42.5px; padding: 0; justify-content: center; }
 
@@ -98,7 +98,7 @@
   box-shadow: var(--v2-float-shadow); gap: 8px; padding: 4px 4px 4px 12px; flex-wrap: nowrap; justify-content: center;
   max-width: min(100%, 980px); row-gap: 4px;
 }
-.object-style-name { flex: 0 1 auto; min-width: 36px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 650; }
+.object-style-name { flex: 0 1 auto; min-width: 36px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; font-weight: 600; }
 .object-style-fields { display: flex; align-items: center; flex-wrap: nowrap; gap: 4px 10px; min-width: 0; }
 .object-style-fields input[role="spinbutton"] { width: 46px; }
 .object-style-fields select { width: 118px !important; }
@@ -107,8 +107,8 @@
 @media (max-width: 1180px) { .object-style-advanced > span { display: none; } .object-style-advanced { padding: 0 8px; } }
 .object-style-fields .ui-field-label { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
 .object-style-advanced {
-  display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 10px; border-radius: 8px;
-  border: 1px solid var(--border); background: transparent; color: var(--text); font: inherit; font-size: 12px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 10px; border-radius: 6px;
+  border: 1px solid var(--border); background: transparent; color: var(--text); font: inherit; font-size: 12.5px; cursor: pointer;
 }
 .object-style-advanced:hover { border-color: var(--border-strong); }
 .object-style-advanced.is-active { background: var(--v2-dock-active-bg, #2f6b45); border-color: transparent; color: var(--v2-dock-active-text, #fff); }
@@ -124,7 +124,7 @@
   display: flex; align-items: center; gap: 4px; min-height: 38px; padding: 3px 5px 3px 4px;
   border-bottom: 1px solid var(--border); cursor: move; touch-action: none; user-select: none; flex: none;
 }
-.object-window-head > strong { flex: 1; min-width: 0; font-size: 12px; font-weight: 650; }
+.object-window-head > strong { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 600; }
 .object-window-head .icon-button { width: 28px; height: 28px; flex: 0 0 28px; cursor: pointer; }
 .object-window-grip { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 28px; color: var(--text-muted); border-radius: 6px; }
 .object-window-grip:focus-visible { outline: 2px solid var(--v2-dock-focus, currentColor); }

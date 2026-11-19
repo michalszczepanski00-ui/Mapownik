@@ -9,6 +9,7 @@ import Stroke from 'ol/style/Stroke.js';
 import { fromLonLat } from 'ol/proj.js';
 import { parseParcelWkt } from '../parcels/wkt.js';
 import { toViewGeometry } from '../objects/geometryConversion.js';
+import { MAP_SELECTION_LIGHT } from '../map/selectionColors.js';
 const CLEAR_DELAY_MS = 12000;
 /** Punkt na pewno wewnątrz działki (środek ciężkości działki wklęsłej bywa poza nią), EPSG:3857. */
 function interiorPoint(geometry) {
@@ -63,7 +64,7 @@ function searchFeatureStyle(feature) {
         image: new CircleStyle({
             radius: 7,
             fill: new Fill({ color: 'rgba(37,99,235,0.22)' }),
-            stroke: new Stroke({ color: '#2563eb', width: 2 }),
+            stroke: new Stroke({ color: MAP_SELECTION_LIGHT, width: 2 }),
         }),
     });
 }

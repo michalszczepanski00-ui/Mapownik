@@ -16,6 +16,7 @@ import { usePanel } from '../hooks/useDockGeometry.js';
 import { PanelHeaderActions } from './PanelHeaderActions.js';
 import { PanelIcon } from './PanelIcon.js';
 import { Button, CheckboxField, Message, PanelMinimized, PanelShell, SelectField } from '../ui/index.js';
+import { MAP_SELECTION } from '../../map/selectionColors.js';
 
 /**
  * 19.32.0 — narzędzie „Ceny transakcyjne”: transakcje z Rejestru Cen Nieruchomości (GUGiK) w bieżącym widoku mapy.
@@ -164,7 +165,7 @@ function ViewPricesPanel({ switcher }) {
                 const key = `${cls}|${selected}|${showLabel ? item.id : ''}`;
                 if (!cache.has(key)) {
                     cache.set(key, new Style({
-                        image: new CircleStyle({ radius: selected ? 8 : 6, fill: new Fill({ color: cls < 0 ? GREY : COLORS[cls] }), stroke: new Stroke({ color: selected ? '#1d4ed8' : '#3b2a20', width: selected ? 3 : 1 }) }),
+                        image: new CircleStyle({ radius: selected ? 8 : 6, fill: new Fill({ color: cls < 0 ? GREY : COLORS[cls] }), stroke: new Stroke({ color: selected ? MAP_SELECTION : '#3b2a20', width: selected ? 3 : 1 }) }),
                         text: showLabel ? new Text({ text: item.perM2 !== null && item.inStats ? `${zl.format(item.perM2)} zł/m²` : `${zl.format(item.price ?? 0)} zł`, offsetY: -14, font: '600 11px Inter, system-ui, sans-serif',
                             fill: new Fill({ color: '#2a1d14' }), stroke: new Stroke({ color: 'rgba(255,255,255,.95)', width: 3 }) }) : undefined,
                         zIndex: selected ? 3 : cls + 1,

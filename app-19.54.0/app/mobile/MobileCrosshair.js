@@ -15,6 +15,7 @@ import { fromViewGeometry } from '../../objects/index.js';
 import { formatArea, formatLength } from '../../core/units.js';
 import { MAP_STYLE_TOKENS } from '../../core/index.js';
 import { t } from '../../i18n/index.js';
+import { MAP_SELECTION_LIGHT, mapSelectionFill } from '../../map/selectionColors.js';
 
 /**
  * 18.14.1 — pomiar z celownikiem (wzór: „Zmierz odległość” w Mapach Google).
@@ -30,9 +31,9 @@ const EMPTY_MEASUREMENT = Object.freeze({ temporary: false });
 const MEASURE_COLOR = MAP_STYLE_TOKENS.measurement;
 const PREVIEW = [
     new Style({ stroke: new Stroke({ color: '#ffffff', width: 5 }) }),
-    new Style({ stroke: new Stroke({ color: '#2563eb', width: 2.5, lineDash: [8, 6] }), fill: new Fill({ color: 'rgba(37, 99, 235, 0.14)' }) }),
+    new Style({ stroke: new Stroke({ color: MAP_SELECTION_LIGHT, width: 2.5, lineDash: [8, 6] }), fill: new Fill({ color: mapSelectionFill(0.14) }) }),
 ];
-const VERTICES = new Style({ image: new CircleStyle({ radius: 6, fill: new Fill({ color: '#2563eb' }), stroke: new Stroke({ color: '#ffffff', width: 2 }) }) });
+const VERTICES = new Style({ image: new CircleStyle({ radius: 6, fill: new Fill({ color: MAP_SELECTION_LIGHT }), stroke: new Stroke({ color: '#ffffff', width: 2 }) }) });
 
 function projected(points) {
     // Długości i powierzchnie w układzie projektu (EPSG:2180, metry), jak w zapisanym pomiarze.

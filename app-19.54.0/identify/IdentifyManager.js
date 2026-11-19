@@ -12,6 +12,7 @@ import Stroke from 'ol/style/Stroke.js';
 import { parseParcelWkt } from '../parcels/wkt.js';
 import { geometryArea, parcelCentroid } from '../parcels/parcelGeometrySummary.js';
 import { t } from '../i18n/index.js';
+import { MAP_SELECTION, MAP_SELECTION_LIGHT } from '../map/selectionColors.js';
 
 const PARCEL_PLUS_TARGETS = [
     { id: 'parcelplus.mpzp', title: 'MPZP', sourceKey: 'mpzp', section: 'planning' },
@@ -168,10 +169,10 @@ export class IdentifyManager {
                     image: new CircleStyle({
                         radius: 6,
                         fill: new Fill({ color: 'rgba(37,99,235,0.20)' }),
-                        stroke: new Stroke({ color: '#2563eb', width: 2 }),
+                        stroke: new Stroke({ color: MAP_SELECTION_LIGHT, width: 2 }),
                     }),
                     fill: new Fill({ color: 'rgba(37,99,235,0.16)' }),
-                    stroke: new Stroke({ color: '#1d4ed8', width: 3 }),
+                    stroke: new Stroke({ color: MAP_SELECTION, width: 3 }),
                 }),
             ],
             properties: { catalogId: 'runtime.identify-marker' },

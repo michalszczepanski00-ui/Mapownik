@@ -5,11 +5,11 @@
    Dotyczy tylko `.app-shell.is-v2` (telefon ma własną powłokę). */
 
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/inter-latin-400.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/inter-latin-500.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/inter-latin-500.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/inter-latin-600.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 700; font-display: swap; src: url("../fonts/inter-latin-700.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/inter-latin-ext-400.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/inter-latin-ext-500.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/inter-latin-ext-500.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/inter-latin-ext-600.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 @font-face { font-family: "Inter"; font-style: normal; font-weight: 700; font-display: swap; src: url("../fonts/inter-latin-ext-700.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 
@@ -116,7 +116,7 @@
   background: var(--surface-solid);
   box-shadow: var(--v2-float-shadow);
 }
-.map-topbar .icon-button.topbar-primary-action { width: 32px; height: 32px; flex-basis: 32px; border-radius: 8px; }
+.map-topbar .icon-button.topbar-primary-action { width: 32px; height: 32px; flex-basis: 32px; border-radius: 6px; }
 .map-topbar-end > .settings-menu-trigger,
 .map-topbar-end > .icon-button {
   width: 36px; height: 36px; flex-basis: 36px; border-radius: 10px;
@@ -128,7 +128,7 @@
   padding: 0 12px;
   border-radius: 10px;
   box-shadow: var(--v2-float-shadow);
-  font-size: 13px;
+  font-size: 12.5px;
 }
 .map-brand-button.icon-button {
   width: 40px; height: 40px; flex: 0 0 40px;
@@ -138,7 +138,7 @@
   box-shadow: var(--v2-float-shadow);
 }
 .map-brand-button.icon-button:hover { background: var(--v2-dock-hover-solid); }
-.map-brand-button img { width: 24px; height: 24px; border-radius: 5px; display: block; }
+.map-brand-button img { width: 24px; height: 24px; border-radius: 6px; display: block; }
 
 /* Wyszukiwarka: 440 × 40, zawsze widoczna. */
 .map-topbar .map-search {
@@ -163,7 +163,7 @@
 }
 .map-topbar .map-search-place { flex: 1 1 auto; min-width: 0; }
 .map-topbar .map-search-parcel { flex: 0 0 130px; border-left: 1px solid var(--border); border-radius: 0 10px 10px 0; }
-.map-topbar .map-search input { border: 0; background: transparent; font-size: 13px; }
+.map-topbar .map-search input { border: 0; background: transparent; font-size: 12.5px; }
 .map-topbar .search-permanent-label {
   position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
 }
@@ -184,7 +184,7 @@
   box-shadow: var(--v2-float-shadow);
 }
 .app-shell.is-v2 .activity-bar-heading { display: none; }
-.app-shell.is-v2 .activity-bar-button.has-label { width: 42px; height: 42px; border-radius: 8px; }
+.app-shell.is-v2 .activity-bar-button.has-label { width: 42px; height: 42px; border-radius: 6px; }
 
 /* Karta panelu przy szynie, pod górnym paskiem. */
 .app-shell.is-v2 .dock--right-panel {
@@ -210,7 +210,7 @@
   align-items: center;
   gap: 6px;
   pointer-events: none;
-  font-size: 13px;
+  font-size: 12.5px;
 }
 .tool-dock-row {
   pointer-events: auto;
@@ -220,7 +220,7 @@
   gap: 2px;
   max-width: 100%;
   padding: 4px;
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--v2-ink);
   color: var(--v2-ink-text);
   box-shadow: var(--v2-dock-shadow);
@@ -240,16 +240,16 @@
   align-items: center;
   gap: 6px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 6px;
   background: transparent;
   color: var(--v2-ink-text);
   font: inherit;
-  font-weight: 500;
+  font-weight: 400;
   white-space: nowrap;
   cursor: pointer;
 }
-.tool-dock-group { height: 36px; padding: 0 12px 0 10px; font-size: 13px; }
-.tool-dock-tool { height: 34px; padding: 0 8px 0 7px; gap: 5px; font-size: 12px; }
+.tool-dock-group { height: 36px; padding: 0 12px 0 10px; font-size: 12.5px; }
+.tool-dock-tool { height: 34px; padding: 0 8px 0 7px; gap: 5px; font-size: 12.5px; }
 .tool-dock-group:hover,
 .tool-dock-tool:hover { background: var(--v2-dock-hover); }
 .tool-dock-group.is-active,
@@ -259,7 +259,7 @@
 .tool-dock-tool:disabled { opacity: .5; cursor: default; }
 .tool-dock-tool kbd {
   font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--v2-ink-muted);
   background: none; border: 0; padding: 0; box-shadow: none;
 }
@@ -281,15 +281,15 @@
   background: transparent;
   box-shadow: none;
   color: var(--v2-ink-text);
-  font-size: 12px;
+  font-size: 12.5px;
   overflow: hidden;
 }
 .tool-dock .context-zone { display: flex; align-items: center; gap: 8px; min-width: 0; border: 0; padding: 0; background: transparent; }
 .tool-dock .context-zone--object { margin-left: 8px; padding-left: 10px; border-left: 1px solid var(--v2-ink-line); }
 .tool-dock .context-tool-icon { display: none; }
-.tool-dock .context-tool-name { color: var(--v2-dock-strong); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.tool-dock .context-tool-name { color: var(--v2-dock-strong); font-size: 12.5px; font-weight: 600; white-space: nowrap; }
 .tool-dock .context-next-step,
-.tool-dock .context-object-label { color: var(--v2-ink-muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 360px; }
+.tool-dock .context-object-label { color: var(--v2-ink-muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 360px; }
 .tool-dock .context-object-name { color: var(--v2-dock-strong); font-weight: 600; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tool-dock .context-tool-help { color: var(--v2-ink-muted); width: 24px; height: 24px; flex-basis: 24px; }
 .tool-dock .context-fields { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
@@ -299,10 +299,10 @@
 .tool-dock select {
   height: 28px;
   border: 1px solid var(--v2-ink-line);
-  border-radius: 7px;
+  border-radius: 6px;
   background: var(--v2-dock-field-bg);
   color: var(--v2-dock-strong);
-  font-size: 12px;
+  font-size: 12.5px;
 }
 .tool-dock .context-sketch {
   position: static;
@@ -313,7 +313,7 @@
 /* 19.15.0: przyciski w doku (Cofnij punkt, Zakończ, Anuluj, Działania i właściwości) —
    klasy ui-button z app/ui; wcześniej reguły celowały w nieużywane .button i przyciski
    zostawały jasne. */
-.tool-dock .ui-button { height: 28px; min-height: 28px; padding: 0 10px; border-radius: 7px; font-size: 12px; font-weight: 500; white-space: nowrap; box-shadow: none; }
+.tool-dock .ui-button { height: 28px; min-height: 28px; padding: 0 10px; border-radius: 6px; font-size: 12.5px; font-weight: 400; white-space: nowrap; box-shadow: none; }
 .tool-dock .ui-button--secondary,
 .tool-dock .ui-button--ghost { background: transparent; color: var(--v2-dock-strong); border: 1px solid var(--v2-ink-line); }
 .tool-dock .ui-button--secondary:hover:not(:disabled),
@@ -327,10 +327,10 @@
    obiektu (.has-measures) i przycisk „Działania i właściwości” wypadał poza dok. */
 .tool-dock .ui-readout { display: inline-flex; align-items: baseline; gap: 5px; padding: 0; border: 0; background: transparent; color: var(--v2-dock-strong); white-space: nowrap; }
 .tool-dock .ui-readout .ui-field-label { color: var(--v2-ink-muted); font-size: 11px; }
-.tool-dock .ui-readout strong { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 12px; font-weight: 500; color: var(--v2-dock-strong); }
+.tool-dock .ui-readout strong { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; font-weight: 400; color: var(--v2-dock-strong); }
 .tool-dock .context-readouts { display: inline-flex; gap: 10px; align-items: baseline; }
 .tool-dock .context-zone--object { flex: 0 1 auto; min-width: 0; }
-.tool-dock .context-zone--object .ui-button { flex: 0 0 auto; height: 26px; min-height: 26px; padding: 0 10px; border: 1px solid var(--v2-ink-line); border-radius: 7px; background: transparent; color: var(--v2-dock-strong); font-size: 12px; font-weight: 500; white-space: nowrap; }
+.tool-dock .context-zone--object .ui-button { flex: 0 0 auto; height: 26px; min-height: 26px; padding: 0 10px; border: 1px solid var(--v2-ink-line); border-radius: 6px; background: transparent; color: var(--v2-dock-strong); font-size: 12.5px; font-weight: 400; white-space: nowrap; }
 
 /* -------------------------------------------- elementy w rogach mapy */
 .app-shell.is-v2 .map-statusbar {
@@ -374,7 +374,7 @@
   box-shadow: var(--v2-float-shadow);
 }
 .app-shell.is-v2 .basemap-switcher.is-collapsed .basemap-thumb { width: 44px; height: 32px; }
-.app-shell.is-v2 .basemap-switcher.is-collapsed .basemap-option { width: 44px; font-size: 10px; }
+.app-shell.is-v2 .basemap-switcher.is-collapsed .basemap-option { width: 44px; font-size: 11px; }
 .app-shell.is-v2 .map-scalebar { left: var(--v2-gap); bottom: 56px; }
 
 /* ------------------------------------------------ warstwy — kompaktowo */
@@ -444,7 +444,7 @@
 }
 .layers-panel--v2 .layer-status-chip {
   height: 22px; padding: 0 8px;
-  border: 1px solid var(--border-strong); border-radius: 11px;
+  border: 1px solid var(--border-strong); border-radius: 10px;
   background: var(--surface-solid); color: var(--text);
   font: inherit; font-size: 11px; font-weight: 600; cursor: pointer;
 }
@@ -508,23 +508,23 @@
 .object-inspector.object-inspector--compact { padding: 6px 8px; }
 .object-inspector-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .object-inspector-title { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-.object-inspector--compact .object-inspector-title h3 { margin: 0; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
+.object-inspector--compact .object-inspector-title h3 { margin: 0; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
 .object-inspector--compact .context-readouts { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: 11px; }
 .object-inspector--compact .ui-readout { display: inline-flex; gap: 4px; align-items: baseline; padding: 0; border: 0; background: transparent; }
-.object-inspector--compact .ui-readout .ui-field-label { color: var(--text-muted); font-size: 11.5px; }
-.object-inspector--compact .ui-readout strong { font-size: 12px; font-weight: 600; }
+.object-inspector--compact .ui-readout .ui-field-label { color: var(--text-muted); font-size: 11px; }
+.object-inspector--compact .ui-readout strong { font-size: 12.5px; font-weight: 600; }
 .object-actions-trigger {
   flex: 0 0 auto;
   display: inline-flex; align-items: center; gap: 4px;
   height: 28px; padding: 0 8px 0 10px;
-  border: 1px solid var(--border-strong); border-radius: 7px;
+  border: 1px solid var(--border-strong); border-radius: 6px;
   background: var(--surface-solid); color: var(--text);
-  font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+  font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
 }
 .object-actions-trigger:hover { background: var(--surface-hover); }
 .object-actions-trigger[data-state="open"] { border-color: var(--accent); color: var(--accent); }
 .object-inspector--compact .object-properties { margin-top: 4px; }
-.object-inspector--compact .object-properties > summary { font-size: 12px; }
+.object-inspector--compact .object-properties > summary { font-size: 12.5px; }
 .object-inspector--compact .object-properties-fields > .ui-field { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
 .object-inspector--compact .object-properties-fields > .ui-field input { min-height: 28px; width: 100%; }
 
@@ -535,17 +535,17 @@
    ===================================================================== */
 
 /* --- 1. Rama panelu: karta po lewej i panel po prawej wyglądają tak samo --- */
-.app-shell.is-v2 .ui-panel { border: 0; border-radius: 10px; box-shadow: var(--v2-float-shadow); background: var(--surface-solid); font-size: 12px; }
+.app-shell.is-v2 .ui-panel { border: 0; border-radius: 10px; box-shadow: var(--v2-float-shadow); background: var(--surface-solid); font-size: 12.5px; }
 .app-shell.is-v2 .ui-panel > .panel-header {
   min-height: 44px; padding: 6px 8px 6px 12px; gap: 8px;
   border-bottom: 1px solid var(--border); background: var(--surface-solid);
 }
 .app-shell.is-v2 .ui-panel .panel-title { gap: 8px; }
 .app-shell.is-v2 .ui-panel .panel-title > svg { width: 16px; height: 16px; color: var(--text); }
-.app-shell.is-v2 .ui-panel .panel-title strong { font-size: 13px; font-weight: 600; line-height: 1.25; }
+.app-shell.is-v2 .ui-panel .panel-title strong { font-size: 12.5px; font-weight: 600; line-height: 1.25; }
 .app-shell.is-v2 .ui-panel .panel-title span { margin-top: 1px; font-size: 11px; color: var(--text-muted); }
 .app-shell.is-v2 .ui-panel .panel-actions { gap: 2px; }
-.app-shell.is-v2 .ui-panel .panel-actions .icon-button { width: 28px; height: 28px; flex-basis: 28px; border-radius: 7px; }
+.app-shell.is-v2 .ui-panel .panel-actions .icon-button { width: 28px; height: 28px; flex-basis: 28px; border-radius: 6px; }
 .app-shell.is-v2 .ui-panel > .panel-footer { min-height: 26px; padding: 4px 12px; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border); }
 /* Karta miejsca: zakładka jest tytułem — bez drugiego nagłówka i stopki. */
 .app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) > .panel-header,
@@ -555,14 +555,14 @@
 .app-shell.is-v2 .ui-panel .ui-button,
 .app-shell.is-v2 .dropdown-content .ui-button {
   height: 30px; min-height: 30px; padding: 0 12px; gap: 6px;
-  border-radius: 7px; font-size: 12px; font-weight: 600; box-shadow: none;
+  border-radius: 6px; font-size: 12.5px; font-weight: 600; box-shadow: none;
 }
 .app-shell.is-v2 .ui-panel .ui-button--sm { height: 28px; min-height: 28px; padding: 0 10px; }
 .app-shell.is-v2 .ui-panel .ui-button--primary { background: var(--accent); border: 1px solid var(--accent); color: var(--on-accent); }
 .app-shell.is-v2 .ui-panel .ui-button--secondary { background: var(--surface-solid); border: 1px solid var(--border-strong); color: var(--text); }
 .app-shell.is-v2 .ui-panel .ui-button--ghost { background: transparent; border: 1px solid transparent; color: var(--accent); }
 .app-shell.is-v2 .ui-panel .ui-button--ghost:hover:not(:disabled) { background: var(--accent-soft); }
-.app-shell.is-v2 .object-actions-trigger { height: 28px; border-radius: 7px; font-size: 12px; }
+.app-shell.is-v2 .object-actions-trigger { height: 28px; border-radius: 6px; font-size: 12.5px; }
 /* „Pokaż na mapie” — przycisk tekstowy, nie kolejna pigułka. */
 /* Akcje karty Działka: akcja główna rozciągnięta, „Działania” obok. */
 
@@ -576,7 +576,7 @@
 .app-shell.is-v2 .identify-layer-dot--error { background: var(--state-warn); -webkit-mask-image: var(--icon-state-warn); mask-image: var(--icon-state-warn); }
 .app-shell.is-v2 .identify-layer-dot--loading { background: var(--text-faint); -webkit-mask-image: var(--icon-state-wait); mask-image: var(--icon-state-wait); }
 /* Napis stanu bez kolorowych plakietek — znaczenie niesie znaczek. */
-.app-shell.is-v2 .parcelplus-status { padding: 0; background: transparent; color: var(--text-muted); font-size: 11px; font-weight: 500; }
+.app-shell.is-v2 .parcelplus-status { padding: 0; background: transparent; color: var(--text-muted); font-size: 11px; font-weight: 400; }
 .app-shell.is-v2 .parcelplus-status--ready { color: var(--text); font-weight: 600; }
 .app-shell.is-v2 .parcelplus-status--error { color: var(--state-warn); font-weight: 600; }
 /* Werdykt (karta Działka) i podsumowanie screeningu — te same znaczki. */
@@ -603,17 +603,17 @@
 /* --- 4. Skala: wiersze 28–30 px, tekst 11/12/13, odstępy 4/8/12 --- */
 .app-shell.is-v2 .identify-panel-body { padding: 8px; gap: 8px; }
 .app-shell.is-v2 .parcelplus-row > summary { min-height: 30px; padding: 4px 8px; gap: 8px; align-items: center; }
-.app-shell.is-v2 .parcelplus-row .identify-layer-copy strong { font-size: 12px; font-weight: 600; }
+.app-shell.is-v2 .parcelplus-row .identify-layer-copy strong { font-size: 12.5px; font-weight: 600; }
 .app-shell.is-v2 .parcelplus-row .identify-layer-preview { font-size: 11px; }
 .app-shell.is-v2 .parcelplus-row { border-radius: 0; border-width: 0 0 1px; }
 .app-shell.is-v2 .parcelplus-row:last-child { border-bottom: 0; }
 .app-shell.is-v2 .identify-fact span { font-size: 11px; }
-.app-shell.is-v2 .identify-fact strong { font-size: 12px; }
-.app-shell.is-v2 .ui-panel :is(input, select):not([type="checkbox"]):not([type="radio"]):not([type="range"]) { min-height: 28px; font-size: 12px; border-radius: 7px; }
+.app-shell.is-v2 .identify-fact strong { font-size: 12.5px; }
+.app-shell.is-v2 .ui-panel :is(input, select):not([type="checkbox"]):not([type="radio"]):not([type="range"]) { min-height: 28px; font-size: 12.5px; border-radius: 6px; }
 .app-shell.is-v2 .ui-panel .ui-field-label { font-size: 11px; color: var(--text-muted); }
 .app-shell.is-v2 .objects-panel .object-row,
 .app-shell.is-v2 .objects-panel [role="listitem"] { min-height: 30px; }
-.app-shell.is-v2 .ui-panel details > summary { font-size: 12px; }
+.app-shell.is-v2 .ui-panel details > summary { font-size: 12.5px; }
 /* Telefon: kafle werdyktu w podglądzie karty są niskie — „Pokaż na mapie” się nie mieściło. */
 
 /* 19.19.0: bounded cards and usable controls on small laptops / forced desktop. */

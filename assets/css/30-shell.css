@@ -98,7 +98,7 @@
   padding: 2px 0 5px;
   text-align: center;
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: var(--fw-semibold);
   line-height: 1;
 }
@@ -133,10 +133,10 @@
   height: 14px;
   box-sizing: border-box;
   padding: 0 3px;
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--accent);
   color: var(--surface-solid);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: var(--fw-semibold);
   line-height: 14px;
   text-align: center;
@@ -450,7 +450,7 @@
   padding: 6px 11px;
   border: 1px solid transparent;
   border-bottom: 0;
-  border-radius: 8px 8px 0 0;
+  border-radius: 6px 6px 0 0;
   background: none;
   color: var(--text-muted);
   font: inherit;
@@ -508,14 +508,14 @@
   width: 30px;
   height: 30px;
   flex: 0 0 auto;
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--accent-soft);
   color: var(--accent);
 }
 .dialog-window--danger .dialog-icon { background: color-mix(in srgb, var(--danger) 16%, transparent); color: var(--danger); }
 :root[data-theme="dark"] .dialog-window--danger .dialog-icon { color: var(--danger); }
 
-.dialog-title { margin: 0; font-size: var(--fs-xl); font-weight: 650; letter-spacing: -.01em; }
+.dialog-title { margin: 0; font-size: var(--fs-xl); font-weight: 600; letter-spacing: -.01em; }
 .dialog-message { margin: 0; font-size: var(--fs-lg); line-height: 1.5; color: var(--text-muted); }
 .dialog-hint { margin: 0; font-size: var(--fs-md); line-height: 1.45; color: var(--text-faint); }
 
@@ -591,7 +591,7 @@
   margin: 4px 0 2px 30px;
   padding: 7px 8px;
   border: 1px solid var(--border);
-  border-radius: 7px;
+  border-radius: 6px;
   background: var(--surface-raised);
   display: flex;
   flex-direction: column;
@@ -613,7 +613,7 @@
 .layer-legend-image {
   max-width: 100%;
   align-self: flex-start;
-  border-radius: 4px;
+  border-radius: 6px;
   background: var(--legend-bg);
   padding: 3px;
 }
@@ -690,7 +690,7 @@
   max-height: min(78vh, 760px, calc(100% - 16px));
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: var(--shadow);
 }
 /* 18.10: panel leży na mapie — przyciski widoku ustępują mu miejsca. Wartości
@@ -745,7 +745,7 @@
     max-width: none;
     height: min(var(--mobile-sheet-height), calc(100% - var(--statusbar-height) - 24px));
     max-height: calc(100% - var(--statusbar-height) - 24px);
-    border-radius: 12px 12px 0 0;
+    border-radius: 10px 10px 0 0;
   }
   .mobile-sheet-grip {
     flex: 0 0 36px;
@@ -761,7 +761,7 @@
     content: "";
     width: 44px;
     height: 4px;
-    border-radius: 4px;
+    border-radius: 6px;
     background: var(--border-strong);
   }
   .mobile-sheet-grip:hover::after,
@@ -807,7 +807,7 @@
   max-width: calc(100% - 20px);
   padding: 3px 7px;
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: 6px;
   background: var(--surface);
 }
 .app-shell.is-map-only .map-statusbar > :not(.status-attributions) { display: none; }
@@ -823,7 +823,7 @@
   min-height: 32px;
   padding: 5px 10px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 6px;
   color: var(--text);
   background: var(--surface);
   box-shadow: var(--shadow-soft);
@@ -878,7 +878,7 @@
   overflow: hidden;
   box-sizing: border-box;
   border: 1px solid var(--border-strong);
-  border-radius: 7px;
+  border-radius: 6px;
   background: var(--thumb-base);
 }
 .basemap-thumb img {
@@ -914,7 +914,7 @@
   height: 46px;
   display: grid;
   place-items: center;
-  border-radius: 7px;
+  border-radius: 6px;
   background: var(--thumb-overlay);
   color: var(--thumb-overlay-text);
 }
@@ -1246,7 +1246,7 @@
   padding: 0 5px;
   border: 1px solid var(--border);
   border-bottom-width: 2px;
-  border-radius: 4px;
+  border-radius: 6px;
   background: var(--surface-raised);
   color: var(--text-muted);
   font: var(--fw-semibold) var(--fs-xs)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -1274,7 +1274,7 @@
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--surface-solid);
   color: var(--text);
   box-shadow: var(--shadow);
@@ -1466,7 +1466,7 @@
   display: inline-grid;
   place-items: center;
   border: 1.5px solid var(--border-strong);
-  border-radius: 4px;
+  border-radius: 6px;
   background: var(--surface-solid);
   color: var(--on-accent);
 }
@@ -1871,14 +1871,14 @@
   --context-bar-height: 36px;
 }
 
-.layer-coverage-note { margin: 4px 6px; font-size: 12px; line-height: 1.4; color: var(--text-muted); }
+.layer-coverage-note { margin: 4px 6px; font-size: 12.5px; line-height: 1.4; color: var(--text-muted); }
 /* Zanikanie u dołu: element o zerowej wysokości przyklejony do dolnej krawędzi
    palety (18.10.4: bez przycisku podpisów); wewnętrzna warstwa rysuje gradient. */
 
 /* Stały układ nagłówka i pełna szerokość wykresu w doku i odpiętym oknie. */
 .terrain-profile-chart svg,
 .dock--bottom .terrain-profile-panel .terrain-profile-chart svg { display: block; width: 100%; height: 100%; }
-.list-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px; font-size: 12px; }
+.list-pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 6px; font-size: 12.5px; }
 .list-pagination > span { flex: 1; text-align: center; }
 
 /* 18.10.4: paleta ma same ikony — nazwy i skróty pokazuje podpowiedź po najechaniu. */
@@ -2000,7 +2000,7 @@
   width: 240px;
   padding: 6px;
   border: 1px solid var(--accent);
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--surface-solid);
   box-shadow: var(--shadow-soft);
 }
@@ -2042,7 +2042,7 @@
   padding: 7px 9px;
   border: 1px solid var(--border);
   border-left-width: 3px;
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--surface-raised);
 }
 
@@ -2110,7 +2110,7 @@
 .m-search .map-search-fields { display: flex; gap: 6px; width: 100%; }
 .m-search .map-search-place { flex: 1 1 auto; min-width: 0; }
 .m-search .map-search-parcel { flex: 0 0 96px; }
-.m-search input { font-size: 16px; min-height: 44px; border: 0; background: transparent; }
+.m-search input { font-size: 14px; min-height: 44px; border: 0; background: transparent; }
 .m-search .map-search-dropdown { position: fixed; left: 10px; right: 10px; top: calc(env(safe-area-inset-top, 0px) + 66px); max-height: 60vh; border-radius: 16px; }
 
 /* Przełączniki warstw — przewijany rząd jak kategorie w Mapach Google. */
@@ -2157,7 +2157,7 @@
 .m-fab--locate.is-on, .m-fab--locate.is-searching { color: var(--accent); }
 .m-fab--locate.is-follow { background: var(--accent); color: var(--on-accent); }
 .m-shell.has-card .m-fab--locate { bottom: calc(var(--m-peek-h) + 14px); }
-.m-toast { position: absolute; left: 16px; right: 16px; bottom: calc(var(--m-nav-h) + 80px); padding: 12px 14px; border-radius: 12px; background: var(--surface-solid); box-shadow: var(--shadow); color: var(--text); }
+.m-toast { position: absolute; left: 16px; right: 16px; bottom: calc(var(--m-nav-h) + 80px); padding: 12px 14px; border-radius: 10px; background: var(--surface-solid); box-shadow: var(--shadow); color: var(--text); }
 
 /* Dolny pasek nawigacji. */
 .m-nav {
@@ -2171,7 +2171,7 @@
 }
 .m-nav button { display: grid; place-items: center; align-content: center; gap: 2px; border: 0; background: transparent; color: var(--text-muted); font: inherit; font-size: var(--fs-sm); font-weight: var(--fw-medium); }
 .m-nav button.is-active { color: var(--accent); }
-.m-nav button.is-active svg { background: var(--accent-soft); border-radius: 14px; padding: 3px 14px; box-sizing: content-box; }
+.m-nav button.is-active svg { background: var(--accent-soft); border-radius: 10px; padding: 3px 14px; box-sizing: content-box; }
 .m-shell.has-card .m-nav { display: none; }
 
 /* Dolne arkusze (karta działki, Warstwy, Narzędzia, Więcej). */
@@ -2193,7 +2193,7 @@
 .m-sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 0 14px 16px; }
 .m-card-head { display: flex; align-items: flex-start; gap: 10px; }
 .m-card-title { flex: 1 1 auto; min-width: 0; display: grid; gap: 2px; }
-.m-card-title strong { font-size: 19px; line-height: 1.25; }
+.m-card-title strong { font-size: 18px; line-height: 1.25; }
 .m-card-title span { color: var(--text-muted); font-size: var(--fs-md); }
 .m-icon-button { width: 40px; height: 40px; flex: 0 0 40px; border: 0; border-radius: 20px; background: var(--surface-hover); color: var(--text); display: grid; place-items: center; }
 
@@ -2204,7 +2204,7 @@
 .m-action:disabled { opacity: .45; }
 .m-action-label { color: var(--text); }
 
-.m-screening { border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; background: var(--surface-raised); }
+.m-screening { border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; background: var(--surface-raised); }
 .m-screening-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; }
 .m-screening-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .m-screening-row { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--border); font-size: var(--fs-md); }
@@ -2227,7 +2227,7 @@
 .m-layers-sheet .m-chips { flex-wrap: wrap; overflow: visible; }
 .m-list-button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 0 6px; border: 0; border-bottom: 1px solid var(--border); background: transparent; color: var(--text); font: inherit; font-size: var(--fs-md); text-align: left; }
 .m-tool-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 6px; padding: 4px 0 8px; }
-.m-tool { display: grid; justify-items: center; gap: 6px; border: 0; background: transparent; color: var(--text); font: inherit; font-size: 12px; text-align: center; line-height: 1.2; }
+.m-tool { display: grid; justify-items: center; gap: 6px; border: 0; background: transparent; color: var(--text); font: inherit; font-size: 12.5px; text-align: center; line-height: 1.2; }
 .m-tool-icon { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: var(--surface-raised); border: 1px solid var(--border); color: var(--accent); }
 .m-tool.is-active .m-tool-icon { background: var(--accent); color: var(--on-accent); }
 
@@ -2375,7 +2375,7 @@ html:has(.app-shell.is-mobile), body:has(.app-shell.is-mobile) { overflow: hidde
 /* 18.18.0: spadki terenu (udział klas) oraz wykopy i nasypy w analizie wysokości. */
 .terrain-slope-summary, .terrain-earthworks { display: grid; gap: 8px; margin: 12px 0 4px; padding-top: 10px; border-top: 1px solid var(--border); }
 .terrain-section-title { font-size: var(--fs-md); font-weight: var(--fw-semibold); }
-.terrain-slope-bar { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--surface-hover); }
+.terrain-slope-bar { display: flex; height: 14px; border-radius: 6px; overflow: hidden; background: var(--surface-hover); }
 .terrain-slope-bar > span { display: block; min-width: 2px; }
 .terrain-slope-table { display: grid; gap: 2px; font-size: var(--fs-sm); }
 .terrain-slope-row { display: grid; grid-template-columns: minmax(0, 1fr) auto 56px; gap: 10px; align-items: center; padding: 3px 0; border-bottom: 1px solid var(--border); }

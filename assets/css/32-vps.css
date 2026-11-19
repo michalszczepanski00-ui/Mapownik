@@ -3,7 +3,7 @@
    domyślny przeglądarki; kolory pochodziły z nieistniejących zmiennych, więc w ciemnym
    motywie kafelki były białe z białym tekstem. */
 @layer utilities {
-.m-basemap-health{position:absolute;bottom:calc(var(--m-nav-h,64px) + env(safe-area-inset-bottom,0px) + 8px);left:8px;right:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:7px 10px;border:1px solid var(--border);border-radius:10px;background:var(--surface-solid);color:var(--text);font-size:12px;pointer-events:auto}
+.m-basemap-health{position:absolute;bottom:calc(var(--m-nav-h,64px) + env(safe-area-inset-bottom,0px) + 8px);left:8px;right:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:7px 10px;border:1px solid var(--border);border-radius:10px;background:var(--surface-solid);color:var(--text);font-size:12.5px;pointer-events:auto}
 .m-basemap-health span{flex:1 1 160px}.m-basemap-health button{min-height:44px;border:1px solid var(--border);border-radius:6px;padding:5px 10px;background:var(--surface-raised);color:var(--text)}
 
 .vps-task-inputs{display:flex;flex-direction:column;gap:8px;min-width:0}
