@@ -7,7 +7,7 @@ const action = (over: Record<string, unknown> = {}) => ({ id: 'a', zone: 'inspec
 
 describe('rejestr akcji (19.53.0, Etap 3)', () => {
   it('strefy: stałe oraz mode:<tryb> i dock:<panel>', () => {
-    for (const zone of ['topbar.project', 'contextbar', 'inspector.primary', 'inspector.secondary', 'inspector.analyses', 'mode:terrain', 'dock:analyses'])
+    for (const zone of ['topbar.project', 'topbar.share', 'contextbar', 'inspector.primary', 'inspector.secondary', 'inspector.analyses', 'mode:terrain', 'dock:analyses'])
       expect(isActionZone(zone)).toBe(true);
     for (const zone of ['inspector', 'mode:', 'dock:x y', 'footer', '', null]) expect(isActionZone(zone)).toBe(false);
   });
@@ -47,6 +47,9 @@ describe('rejestr akcji (19.53.0, Etap 3)', () => {
       'Otoczenie działki', 'Ceny transakcyjne', 'Budowy i pozwolenia', 'Analiza działki (serwer)',
       'Bufor', 'Obszar analizowany WZ', 'Wysokości i nachylenie', 'Profil terenu', 'Teren 3D']);
     expect(registry.list('dock:analyses')).toHaveLength(5);
+    // Etap 6: menu Projekt (bez „Nowy”) i Udostępnij (link, eksport mapy, pliki GIS).
+    expect(registry.list('topbar.project').map((a) => a.label)).toEqual(['Otwórz projekt…', 'Zapisz plik projektu', 'Importuj pliki GIS…']);
+    expect(registry.list('topbar.share').map((a) => a.label)).toEqual(['Link do projektu…', 'Eksport mapy (PNG / PDF)…', 'Pliki GIS…']);
     // Akcje działki niedostępne bez działki na karcie (paleta poleceń ich nie pokazuje).
     const ctx = { get: () => ({ getSnapshot: () => ({ open: false }) }) };
     expect(registry.list('inspector.analyses', ctx)).toEqual([]);

@@ -8,7 +8,7 @@ import {
     Redo2,
 } from 'lucide-react';
 import { IconButton } from './IconButton.js';
-import { ProjectMenu } from './ProjectMenu.js';
+import { ProjectMenu, ShareMenu } from './ProjectMenu.js';
 import { openPanel } from '../../store/index.js';
 import { SettingsMenu } from './SettingsMenu.js';
 import { SearchToolbar } from './SearchToolbar.js';
@@ -81,10 +81,9 @@ export function AppBar() {
 /**
  * 19.9.0 — pasek aplikacji rozłożony na mapie zamiast paska na całą szerokość.
  *
- * Lewy górny róg: znak (otwiera paletę poleceń, Ctrl+K) i wyszukiwarka
- * miejsca/działki, widoczna zawsze — także przy otwartym panelu i narzędziu.
- * Prawy górny róg: przyciąganie, historia, projekt, eksport, widok, ustawienia.
- * Te same kontrolki i polecenia co w AppBar; zmienia się tylko miejsce.
+ * 19.53.0 (Etap 6): znak (paleta poleceń, Ctrl+K) · wyszukiwarka · odstęp · Projekt ▾ z kropką zapisu ·
+ * Udostępnij ▾ (jedyny wypełniony przycisk: link, eksport mapy PNG/PDF, pliki GIS) · pomoc · ustawienia.
+ * Pozycje menu pochodzą z rejestru akcji (strefy topbar.project i topbar.share).
  */
 export function MapTopBar() {
     const dispatch = useAppDispatch();
@@ -96,9 +95,8 @@ export function MapTopBar() {
                 h('img', { src: './assets/mapownik-logo-icon.png?v=19.53.0', alt: '', 'aria-hidden': true })),
             h(SearchToolbar, { manager: searchManager })),
         h('div', { className: 'map-topbar-end', role: 'toolbar', 'aria-label': 'Projekt i widok' },
-            // 19.49.0 (M2, Etap 2): przyciąganie, cofnij i ponów przeniesione do paska kontekstowego (MapContextBar).
             h('div', { className: 'map-topbar-group map-topbar-project' }, h(ProjectMenu, null)),
-            h('button', { type: 'button', className: 'export-map-trigger', onClick: () => dispatch(openPanel('export')) }, 'Eksport'),
+            h(ShareMenu, null),
             h(QuickHelp, null),
             h(SettingsMenu, null)));
 }

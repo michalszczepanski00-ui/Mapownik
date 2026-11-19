@@ -8,6 +8,7 @@
  *
  * Strefy:
  *   topbar.project        menu Projekt w górnym pasku
+ *   topbar.share          menu Udostępnij w górnym pasku (jedyny wypełniony przycisk paska)
  *   contextbar            pasek kontekstowy u góry mapy
  *   inspector.primary     główny przycisk karty działki (najwyżej 1 — jedyny wypełniony)
  *   inspector.secondary   drugi przycisk karty działki (najwyżej 1)
@@ -22,7 +23,7 @@
  */
 
 export const ACTION_ZONE_LIMITS = Object.freeze({ 'inspector.primary': 1, 'inspector.secondary': 1 });
-const FIXED_ZONES = new Set(['topbar.project', 'contextbar', 'inspector.primary', 'inspector.secondary', 'inspector.analyses']);
+const FIXED_ZONES = new Set(['topbar.project', 'topbar.share', 'contextbar', 'inspector.primary', 'inspector.secondary', 'inspector.analyses']);
 const PREFIXED_ZONE = /^(mode|dock):[a-zA-Z][a-zA-Z0-9-]*$/;
 
 export function isActionZone(zone) {

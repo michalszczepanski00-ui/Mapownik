@@ -211,7 +211,9 @@ test('Esc zamyka panel Eksport, a wybrana działka zostaje (19.46.0)', async ({ 
   await page.fill('#map-search-input', '220408_2.0006.210/2');
   await page.getByRole('option').first().click();
   await expect(page.getByText('Działka 210/2').first()).toBeVisible({ timeout: 60_000 });
-  await page.getByRole('button', { name: 'Eksport', exact: true }).click();
+  // 19.53.0 (Etap 6): eksport mapy w menu Udostępnij ▾.
+  await page.getByRole('button', { name: 'Udostępnij ▾' }).click();
+  await page.getByRole('menuitem', { name: 'Eksport mapy (PNG / PDF)…' }).click();
   await expect(page.locator('.export-panel').first()).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.locator('.export-panel')).toHaveCount(0);
