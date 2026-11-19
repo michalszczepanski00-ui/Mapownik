@@ -82,6 +82,7 @@
   --shadow-menu: 0 8px 28px rgba(22, 38, 30, .18);
   --shadow: var(--shadow-menu); --shadow-soft: var(--shadow-surface);
   --v2-float-shadow: var(--shadow-surface); --v2-dock-shadow: var(--shadow-surface);
+  --shadow-sm: var(--shadow-surface); --shadow-panel: var(--shadow-surface);
 }
 
 /* ------------------------------------------------------------------ T3 skala tekstu: 11 / 12,5 / 14 / 18 px, grubości 400 i 600 (700 — numer działki) */

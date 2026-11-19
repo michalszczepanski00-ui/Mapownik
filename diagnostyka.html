@@ -1579,6 +1579,7 @@ await test('18.1.0 — ikony narzędzi i modułów (Tabler)',async()=>{
     'terrain-profile':'chart-area-line', 'terrain-area':'terrain-frame',
     layers:'stack-2', objects:'list-details', analysis:'area-search', 'parcel-report':'file-analytics', export:'download', orthophoto:'photo-time', 'market-prices':'tag', 'building-permits':'crane',
     terrain:'chart-area-line', table:'table',
+    /* 19.54.0 (audyt K3): dok Analizy i Otoczenie działki z własnymi kształtami */ analyses:'analyze', screening:'circle-dot',
   };
   for(const [slot,name] of Object.entries(expected))
     if(map[slot]!==name)throw new Error(`Slot ${slot}: oczekiwano ${name}, jest ${map[slot]}`);
