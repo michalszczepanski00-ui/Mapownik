@@ -1,11 +1,11 @@
-import { createElement as h, useEffect, useState } from 'react';
+import { createElement as h, useEffect, useMemo, useState } from 'react';
 import { Bookmark, Download, LoaderCircle, Navigation, RotateCw, ScanSearch, Share2, X } from 'lucide-react';
 import { reportDialog } from '../components/reportDialogStore.js';
 import { useService, useServiceSnapshot } from '../services/AppServicesContext.js';
-import { IdentifyPanel, Nearby, Verdict } from '../components/IdentifyPanel.js';
+import { normalizeLayer } from '../components/IdentifyPanel.js';
+import { ParcelCard } from '../components/ParcelCard.js';
 import { MobileSheet } from './MobileSheet.js';
 import { screeningCategory, screeningQuality, QUALITY_LABELS } from '../../analysis/screeningQuality.js';
-import { openPanel, useAppDispatch } from '../../store/index.js';
 import { formatParcelArea, formatLength } from '../../core/units.js';
 import { t, tn } from '../../i18n/index.js';
 
@@ -54,10 +54,9 @@ function ScreeningBlock({ analysis, manager }) {
  * 18.14.0 — karta działki na telefonie (jak karta miejsca w Mapach Google).
  * Pasek: numer, obręb, powierzchnia i najważniejsze znaczniki. Pół ekranu:
  * akcje (Screening, Zapisz, Nawiguj, Udostępnij) i wynik screeningu w tej
- * samej karcie. Pełny ekran: wszystkie dane z sekcjami.
+ * samej karcie. 19.53.0: wyniki w grupach karty działki (ParcelCard bez nagłówka), szczegóły rozwijane w wierszach.
  */
 export function MobileParcelCard() {
-    const dispatch = useAppDispatch();
     const tools = useService('tools');
     const identify = useService('identify');
     const parcels = useService('parcels');
@@ -71,6 +70,7 @@ export function MobileParcelCard() {
 
     // Nowe wskazanie → karta wraca do paska.
     useEffect(() => { setSnap('peek'); setSavedId(null); }, [key]);
+    const layers = useMemo(() => (snapshot.layers ?? []).map(normalizeLayer), [snapshot.layers]);
     if (!snapshot.open) return null;
 
     const parcel = snapshot.parcel;
@@ -124,9 +124,9 @@ export function MobileParcelCard() {
                 h('button', { type: 'button', disabled: !parcel?.wkt || analysis.screeningBusy, onClick: onScreening }, 'Analizuj'),
                 h('button', { type: 'button', disabled: !parcel?.wkt, onClick: () => { try { ensureSaved(); identify?.close(); void tools?.activate('core.buffer'); } catch (error) { toasts?.show?.({ tone: 'danger', message: String(error) }); } } }, 'Bufor'))),
     },
-        h('div', { className: 'm-card-verdict' }, h(Verdict, { layers: snapshot.layers ?? [] })),
-        // 19.34.0: „W okolicy” od razu pod statusami (w szczegółach karty ukryte — bez powtórzenia).
-        parcel?.wkt && snapshot.parcelCenterLonLat ? h(Nearby, { center: snapshot.parcelCenterLonLat }) : null,
+        // 19.53.0: te same grupy wyników co na komputerze (Planowanie · Ograniczenia · Grunt, „W okolicy”,
+        // „Szczegóły i źródła”, stan źródeł) — w pasku arkusza widać Planowanie.
+        h('div', { className: 'm-card-groups' }, h(ParcelCard, { snapshot, manager: identify, layers, headless: true })),
         h('div', { className: 'm-actions', role: 'group', 'aria-label': t('mobile.card.actions') },
             h(ActionButton, { primary: true, icon: h(ScanSearch, { size: 20 }), label: t('mobile.card.screeningAction'), onClick: onScreening, disabled: !parcel?.wkt || analysis.screeningBusy, busy: analysis.screeningBusy }),
             h(ActionButton, { icon: h(Bookmark, { size: 20 }), label: savedId ? t('mobile.card.savedShort') : t('mobile.card.save'), onClick: onSave, disabled: !parcel?.wkt }),
@@ -134,7 +134,5 @@ export function MobileParcelCard() {
             h(ActionButton, { icon: h(Share2, { size: 20 }), label: t('mobile.card.share'), onClick: onShare, disabled: !target }),
             // 19.36.0: raport działki PDF.
             h(ActionButton, { icon: h(Download, { size: 20 }), label: 'Raport PDF', onClick: () => parcel?.wkt && reportDialog.open(parcel), disabled: !parcel?.wkt })),
-        h(ScreeningBlock, { analysis, manager: analysisManager }),
-        h('div', { className: 'm-card-details' },
-            h(IdentifyPanel, { snapshot, manager: identify, tools: null, docked: true })));
+        h(ScreeningBlock, { analysis, manager: analysisManager }));
 }

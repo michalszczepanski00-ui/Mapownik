@@ -286,7 +286,10 @@ if((results['Biblioteki w paczce aplikacji']||{}).ok){
  });
  await test('19.39.0 — ergonomia: akcje działki na wierzchu, zwinięty eksport z serwera, czytelny profil',async()=>{
    const src=await fetchSources(['./app-19.53.0/app/components/IdentifyPanel.js','./app-19.53.0/app/components/ExportPanel.js','./app-19.53.0/app/components/TerrainProfilePanel.js','./app-19.53.0/app/components/VpsDataPanel.js']);
-   for(const t of ['identify-actions--v3','identify-actions-more','export-advanced','terrain-ylabel','vps-pdf-shortcut'])if(!src.includes(t))throw new Error('Brak: '+t);
+   /* 19.53.0: akcje działki w karcie z rejestru akcji (ParcelCard, strefy inspector.*) zamiast starego paska akcji */
+   const card=await fetchSources(['./app-19.53.0/app/components/ParcelCard.js','./app-19.53.0/features/builtin/parcelActionsFeature.js']);
+   for(const t of ['pc-actions','inspector.primary','inspector.analyses'])if(!card.includes(t))throw new Error('Brak: '+t);
+   for(const t of ['export-advanced','terrain-ylabel','vps-pdf-shortcut'])if(!src.includes(t))throw new Error('Brak: '+t);
    // 19.42.0: style są łączone przez Vite w jeden plik assets/build/main-*.css — szukamy reguły z 38-ergonomia.css.
    {const idx=await (await fetch('./index.html',{cache:'no-store'})).text();let ok=idx.includes('38-ergonomia.css');
     if(!ok){const css=(idx.match(/href="\.\/(assets\/build\/main-[\w-]+\.css)"/)||[])[1];ok=!!css&&(await (await fetch('./'+css,{cache:'no-store'})).text()).includes('.terrain-hover-dot');}
@@ -548,11 +551,12 @@ await test('19.9.0 — dok narzędzi Sprawdź · Rysuj · Mierz · Teren (19.53.
    return 'karta: nagłówek, 3 przyciski, grupy wyników, szczegóły i źródła; powrót z widoków analiz';
  });
  await test('18.1.0 — Sekcje działki, kopiowanie i punktowy screening',async()=>{
-   const src=await (await fetch('./app-19.53.0/app/components/IdentifyPanel.js?v=19.53.0',{cache:'no-store'})).text();
-   const missing=await missingTexts(src,['Identyfikator','identify-headline','Działka ${parcel.parcel}','Środek działki (WGS84)','Planowanie przestrzenne','Grunty','Ograniczenia','parcelplus-more-toggle','Kopiuj:']);
+   /* 19.53.0: sekcje działki to grupy karty (ParcelCard) na komputerze i telefonie; puste wyniki zbiera linia „Brak: …” */
+   const src=await fetchSources(['./app-19.53.0/app/components/IdentifyPanel.js','./app-19.53.0/app/components/ParcelCard.js']);
+   const missing=await missingTexts(src,['Identyfikator','Działka ${parcel.parcel}','Środek działki (WGS84)','Planowanie','Grunt','Ograniczenia','Brak: ','Kopiuj:']);
    if(missing.length)throw new Error('Brak elementu panelu: '+missing.join(', '));
-   if(!src.includes("layers.filter((layer) => layer.status !== 'empty')"))throw new Error('Brak filtrowania pustych wyników');
-   return 'sekcje + współrzędne środka + kopiowanie + wyniki punktowe OK';
+   if(!src.includes("restrictions.filter((r) => r.state === 'no')"))throw new Error('Brak zbierania pustych wyników w linii „Brak: …”');
+   return 'grupy karty + współrzędne środka + kopiowanie + wyniki punktowe OK';
  });
  await test('18.1.0 — Analizy: dwie osobne zakładki + pogrupowane źródła',async()=>{
    // Na życzenie: panel Analiz łączył dwa różne narzędzia (automatyczny

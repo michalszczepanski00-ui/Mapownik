@@ -251,3 +251,8 @@ details[open] > summary .pc-chev { transform: rotate(90deg); }
 .ui-panel:has(.panel-back-button) .panel-title--compact > div { min-width: 0; }
 .ui-panel:has(.panel-back-button) .panel-title--compact > div > strong,
 .ui-panel:has(.panel-back-button) .panel-title--compact > div > span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* 19.53.0: karta działki na telefonie — te same grupy wyników co na komputerze, większe pola dotyku. */
+.m-card-groups { margin: 0 -4px 8px; }
+.m-card-groups .parcel-card { font-size: 14px; }
+.m-card-groups .pc-row { min-height: 40px; }
+.m-card-groups .pc-show, .m-card-groups .pc-status button { min-height: 36px; }

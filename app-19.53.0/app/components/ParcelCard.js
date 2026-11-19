@@ -114,7 +114,11 @@ const detailOf = (layer) => (layer?.status === 'ready' && layer.text ? { title: 
     : layer?.status === 'error' ? { title: layer.title, text: layer.error || 'Usługa nie odpowiedziała.' } : null);
 const eeaOf = (layers) => layers.find((l) => l.fallback === 'eea')?.fallbackNote ?? null;
 
-export function ParcelCard({ snapshot, manager, layers, onScreening }) {
+/**
+ * @param {object} props
+ * @param {boolean} [props.headless] 19.53.0: telefon — bez nagłówka i przycisków (ma je arkusz karty), te same grupy wyników.
+ */
+export function ParcelCard({ snapshot, manager, layers, onScreening = null, headless = false }) {
     const features = useService('features');
     const ctx = useService('featureContext');
     const bySource = useMemo(() => new Map(layers.map((l) => [l.sourceKey, l])), [layers]);
@@ -179,12 +183,13 @@ export function ParcelCard({ snapshot, manager, layers, onScreening }) {
     const region = parcel?.region ? (/^\d+$/.test(parcel.region) ? `obręb ${parcel.region}` : parcel.region) : null;
     const sub = [area, region, parcel?.commune ? `gm. ${parcel.commune}` : null].filter(Boolean).join(' · ');
 
-    return h('div', { className: 'parcel-card' },
+    const note = !snapshot.zoneOnly && !parcel && !snapshot.parcelBusy ? h('p', { className: 'pc-note' }, snapshot.parcelError ? 'Nie udało się odczytać działki — wyniki dotyczą samego punktu.' : 'W tym punkcie nie odczytano działki — wyniki dotyczą samego punktu.') : null;
+    return h('div', { className: `parcel-card${headless ? ' parcel-card--headless' : ''}` },
         // P1 + P2
-        h('header', { className: 'pc-head' },
+        headless ? note : h('header', { className: 'pc-head' },
             h('h2', { className: 'pc-title' }, titleText),
             sub ? h('div', { className: 'pc-sub', title: snapshot.parcelAreaSqm ? formatParcelArea(snapshot.parcelAreaSqm) : sub }, sub) : null,
-            !snapshot.zoneOnly && !parcel && !snapshot.parcelBusy ? h('p', { className: 'pc-note' }, snapshot.parcelError ? 'Nie udało się odczytać działki — wyniki dotyczą samego punktu.' : 'W tym punkcie nie odczytano działki — wyniki dotyczą samego punktu.') : null,
+            note,
             !snapshot.zoneOnly && parcel?.wkt ? h('div', { className: 'pc-actions' },
                 zone('inspector.primary').map((action) => actionButton(action, true)),
                 zone('inspector.secondary').map((action) => actionButton(action, false)),

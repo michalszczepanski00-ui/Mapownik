@@ -6,8 +6,6 @@ import { DOCK_LABELS, TOOL_GROUPS, IDLE_TOOL_IDS, groupOfTool } from './toolGrou
 import { ObjectStyleBar } from './ObjectStyleBar.js';
 
 const EMPTY = Object.freeze({ items: [] });
-const IDLE_SKETCH = Object.freeze({ active: false });
-const IDLE_ANALYSIS = Object.freeze({ sources: [], operations: [], busy: false, screeningBusy: false });
 const IDLE = new Set(IDLE_TOOL_IDS);
 const IDENTIFY = 'core.identify';
 

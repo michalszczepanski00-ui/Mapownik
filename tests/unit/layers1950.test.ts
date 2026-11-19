@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { frontAt, wzDistance } from '@app/buffer/WzAreaManager.js';
-import { floodVerdict, verdictState } from '@app/app/components/IdentifyPanel.js';
+import { RESTRICTIONS, itemState } from '@app/app/components/ParcelCard.js';
 
 // Działka 30 × 20 m, dolna krawędź podzielona na trzy odcinki w jednej linii (jak obrys z ewidencji).
 const parcel = { type: 'Polygon', coordinates: [[[0, 0], [10, 0], [20, 0.1], [30, 0], [30, 20], [0, 20], [0, 0]]] };
@@ -21,17 +21,17 @@ describe('obszar analizowany WZ (19.50.0)', () => {
   });
 });
 
-describe('werdykt: powódź i zabytek (19.50.0)', () => {
+describe('karta działki: powódź (19.50.0, od 19.53.0 tylko karta w grupach)', () => {
   const by = (entries: Record<string, string>) => new Map(Object.entries(entries).map(([k, status]) => [k, { sourceKey: k, status }]));
+  const flood = RESTRICTIONS.find((r) => r.id === 'flood')!;
+  const layersOf = (map: Map<string, { sourceKey: string; status: string }>) => flood.keys.map((k) => map.get(k)).filter(Boolean) as { sourceKey: string; status: string }[];
   it('obszar zagrożenia ma pierwszeństwo przed strefą ryzyka', () => {
-    expect(floodVerdict(by({ flood_mzpmrp: 'ready', flood_risk: 'ready' }))[0]).toBe('obszar zagrożenia');
-    expect(floodVerdict(by({ flood_mzpmrp: 'empty', flood_risk: 'ready' }))[0]).toBe('strefa ryzyka');
-    expect(floodVerdict(by({ flood_mzpmrp: 'empty', flood_risk: 'empty' }))[0]).toBe('brak w mapach');
-    expect(floodVerdict(by({ flood_mzpmrp: 'error', flood_risk: 'empty' }))[0]).toBe('nie sprawdzono');
+    expect(flood.value([], by({ flood_mzpmrp: 'ready', flood_risk: 'ready' }))).toBe('obszar zagrożenia');
+    expect(flood.value([], by({ flood_mzpmrp: 'empty', flood_risk: 'ready' }))).toBe('strefa ryzyka');
   });
   it('stan wiersza powodzi liczony z obu źródeł', () => {
-    const item = { key: 'flood_mzpmrp', keys: ['flood_mzpmrp', 'flood_risk'] };
-    expect(verdictState(item, by({ flood_mzpmrp: 'empty', flood_risk: 'ready' }))).toBe('yes');
-    expect(verdictState(item, by({ flood_mzpmrp: 'empty', flood_risk: 'empty' }))).toBe('no');
+    expect(itemState(layersOf(by({ flood_mzpmrp: 'empty', flood_risk: 'ready' })))).toBe('yes');
+    expect(itemState(layersOf(by({ flood_mzpmrp: 'empty', flood_risk: 'empty' })))).toBe('no');
+    expect(itemState(layersOf(by({ flood_mzpmrp: 'error', flood_risk: 'empty' })))).toBe('unknown');
   });
 });

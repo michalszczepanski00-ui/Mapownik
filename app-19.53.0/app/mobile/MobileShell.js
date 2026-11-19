@@ -1,5 +1,5 @@
 import { createElement as h, useEffect, useMemo, useRef, useState } from 'react';
-import { Activity, Check, Download, Ellipsis, FolderOpen, ImageDown, Layers3, LayoutGrid, LocateFixed, Monitor, Moon, ScanSearch, Sun, X } from 'lucide-react';
+import { Activity, Check, Download, Ellipsis, FolderOpen, ImageDown, Layers3, LocateFixed, Monitor, Moon, ScanSearch, Sun, X } from 'lucide-react';
 import { useService, useServiceSnapshot } from '../services/AppServicesContext.js';
 import { ContextField } from '../components/ContextBar.js';
 import { SearchToolbar } from '../components/SearchToolbar.js';

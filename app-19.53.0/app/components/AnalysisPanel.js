@@ -1,11 +1,11 @@
-import { createElement as h, useState } from 'react';
+import { createElement as h } from 'react';
 import { Building2, Eye, EyeOff, Layers3, LoaderCircle, RotateCw, ScanSearch, Search, Trash2 } from 'lucide-react';
 import { useService, useServiceSnapshot } from '../services/AppServicesContext.js';
 import { usePanel } from '../hooks/useDockGeometry.js';
 import { PanelHeaderActions } from './PanelHeaderActions.js';
 import { selectRightOverlayOffset, useAppSelector } from '../../store/index.js';
 import { Button, KeyValue, Message, NumberField, PanelMinimized, PanelShell, Section, SelectField } from '../ui/index.js';
-import { screeningCategory, screeningQuality, summarizeScreening, QUALITY_LABELS } from '../../analysis/screeningQuality.js';
+import { screeningQuality, summarizeScreening, QUALITY_LABELS } from '../../analysis/screeningQuality.js';
 import { formatNumber, t, tn } from '../../i18n/index.js';
 import { formatArea as formatUnitArea, formatLength } from '../../core/units.js';
 
@@ -105,7 +105,6 @@ function screeningNote(row) {
 
 function ScreeningTargetHelp() {
     const tools = useService('tools');
-    const parcels = useService('parcels');
     const identify = useServiceSnapshot('identify', EMPTY_IDENTIFY_SNAPSHOT);
     const parcel = identify?.parcel?.wkt ? identify.parcel : null;
     // 19.28.0: działka z karty jest celem od razu (przycisk „Sprawdź otoczenie działki …” poniżej) — tu tylko „wskaż inną”.
