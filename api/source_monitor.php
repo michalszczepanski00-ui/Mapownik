@@ -127,7 +127,6 @@ const MONITOR_REFERENCE_POINTS = [
 $referencePoint = false;
 if (((string)($_GET['point'] ?? '')) === 'ref' && isset(MONITOR_REFERENCE_POINTS[$key])) { [$x, $y] = MONITOR_REFERENCE_POINTS[$key]; $referencePoint = true; }
 if (!is_finite($x) || !is_finite($y) || $x<100000 || $x>950000 || $y<50000 || $y>1000000) monitor_reply(['ok'=>false,'error'=>'Punkt poza zakresem Polski.'],400);
-if ($key === 'orthophoto_archive') $sources[$key]['time'] = '2025-11-01';
 $identity = isset($sources[$key]) ? $sources[$key] : $key;
 $hash = hash('sha256', json_encode([$identity,$mode, $mode==='image' ? [round($x,-1),round($y,-1)] : null]));
 $dir = cache_root() . '/source-monitor';

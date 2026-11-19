@@ -1,85 +1,15 @@
-import { createElement as h, useCallback } from 'react';
-import {
-    Moon,
-    Magnet,
-    Focus,
-    Sun,
-    Undo2,
-    Redo2,
-} from 'lucide-react';
+import { createElement as h } from 'react';
 import { IconButton } from './IconButton.js';
 import { ProjectMenu, ShareMenu } from './ProjectMenu.js';
-import { openPanel } from '../../store/index.js';
 import { SettingsMenu } from './SettingsMenu.js';
 import { SearchToolbar } from './SearchToolbar.js';
 import { QuickHelp } from './QuickHelp.js';
-import { useService, useServiceSnapshot } from '../services/AppServicesContext.js';
-import { t } from '../../i18n/index.js';
-import { openOverlay, setMapOnly, toggleTheme, useAppDispatch, useAppSelector } from '../../store/index.js';
-
-const EMPTY_COMMANDS = Object.freeze({ canUndo: false, canRedo: false, undoLabel: null, redoLabel: null, undoDepth: 0, redoDepth: 0, error: null });
-const IDLE_SKETCH = Object.freeze({ active: false });
-const NO_TOOLS = Object.freeze({ items: [] });
-const NO_OBJECTS = Object.freeze({ count: 0 });
-const EMPTY_EDITING = Object.freeze({ mode: 'pan', circleRadiusMeters: 25, snapEnabled: true, snapTargetCount: 0, error: null });
+import { useService } from '../services/AppServicesContext.js';
+import { openOverlay, useAppDispatch } from '../../store/index.js';
 
 /**
- * Pasek aplikacji — to, co dotyczy całej sesji, a nie bieżącego zaznaczenia:
- * tożsamość, snap, historia operacji, wyszukiwarka i motyw (podkład: miniatury
- * na mapie, BasemapSwitcher).
- *
- * Aktywne narzędzie i zaznaczony obiekt mają pasek kontekstu (ContextBar),
- * a przełączniki paneli — zakładki doku.
- */
-export function AppBar() {
-    const dispatch = useAppDispatch();
-    const theme = useAppSelector((state) => state.ui.theme);
-
-    const commandBus = useService('commands');
-    const editingManager = useService('editing');
-    const searchManager = useService('search');
-
-    const commands = useServiceSnapshot('commands', EMPTY_COMMANDS);
-    const editing = useServiceSnapshot('editing', EMPTY_EDITING);
-
-    const ctx = useService('featureContext');
-    const sketch = useServiceSnapshot('sketch', IDLE_SKETCH);
-    const onToggleTheme = useCallback(() => dispatch(toggleTheme()), [dispatch]);
-
-    return h('div', { className: 'app-bar' },
-        h('div', { className: 'brand', 'aria-label': 'Mapownik' },
-            h('img', { className: 'brand-logo-image', src: './assets/mapownik-logo-icon.png?v=19.53.0', alt: '', 'aria-hidden': true }),
-            h('div', { className: 'brand-copy' }, h('strong', null, 'Mapownik'))),
-
-        h(ProjectMenu, null),
-        h('div', { className: 'toolbar-divider toolbar-divider--snap' }),
-        h(IconButton, {
-            label: editing.snapEnabled
-                ? t('appbar.snapOn', { count: editing.snapTargetCount ?? 0 })
-                : t('appbar.snapOff'),
-            tooltipSide: 'bottom',
-            className: `topbar-primary-action${editing.snapEnabled ? ' is-active' : ''}`,
-            'aria-pressed': editing.snapEnabled,
-            disabled: !editingManager,
-            onClick: () => editingManager?.toggleSnap(),
-        }, h(Magnet, { size: 17 })),
-
-        h('div', { className: 'toolbar-divider toolbar-divider--history' }),
-        h(IconButton, { className: 'topbar-primary-action', label: sketch.active ? 'Cofnij punkt szkicu' : commands.undoLabel ? t('appbar.undo', { label: commands.undoLabel }) : t('appbar.undoNone'), tooltipSide: 'bottom', disabled: !commandBus || (!sketch.active && !commands.canUndo), onClick: () => sketch.active ? ctx?.interactions.undoLastPoint() : commandBus?.undo() }, h(Undo2, { size: 17 })),
-        h(IconButton, { className: 'topbar-primary-action', label: commands.redoLabel ? t('appbar.redo', { label: commands.redoLabel }) : t('appbar.redoNone'), tooltipSide: 'bottom', disabled: !commandBus || !commands.canRedo, onClick: () => commandBus?.redo() }, h(Redo2, { size: 17 })),
-
-        h('div', { className: 'top-spacer' }),
-        h(SearchToolbar, { manager: searchManager }),
-        h('button', { type: 'button', className: 'export-map-trigger', onClick: () => dispatch(openPanel('export')) }, 'Eksport mapy'),
-        h(IconButton, { id: 'map-only-enter', className: 'topbar-primary-action', label: t('mapOnly.enter'), tooltipSide: 'bottom', onClick: () => dispatch(setMapOnly(true)) }, h(Focus, { size: 18 })),
-        // 18.0: menu ustawień (motyw, podpisy narzędzi, gęstość, skróty, paleta
-        // poleceń, układ paneli) zamiast menu „Widok” z jedną pozycją.
-        h(SettingsMenu, null),
-        h(IconButton, { className: 'topbar-primary-action', label: theme === 'dark' ? t('appbar.themeLight') : t('appbar.themeDark'), tooltipSide: 'bottom', onClick: onToggleTheme }, theme === 'dark' ? h(Sun, { size: 18 }) : h(Moon, { size: 18 })));
-}
-
-/**
- * 19.9.0 — pasek aplikacji rozłożony na mapie zamiast paska na całą szerokość.
+ * 19.9.0 — pasek aplikacji rozłożony na mapie zamiast paska na całą szerokość
+ * (19.53.0, Etap 7: dawny pasek na całą szerokość `AppBar` usunięty — nieużywany od 19.9.0).
  *
  * 19.53.0 (Etap 6): znak (paleta poleceń, Ctrl+K) · wyszukiwarka · odstęp · Projekt ▾ z kropką zapisu ·
  * Udostępnij ▾ (jedyny wypełniony przycisk: link, eksport mapy PNG/PDF, pliki GIS) · pomoc · ustawienia.

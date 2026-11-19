@@ -185,7 +185,6 @@
 }
 .app-shell.is-v2 .activity-bar-heading { display: none; }
 .app-shell.is-v2 .activity-bar-button.has-label { width: 42px; height: 42px; border-radius: 8px; }
-.app-shell.is-v2 .activity-bar-label { max-width: 42px; font-size: 9.5px; }
 
 /* Karta panelu przy szynie, pod górnym paskiem. */
 .app-shell.is-v2 .dock--right-panel {
@@ -234,11 +233,6 @@
 .tool-dock-main { max-width: min(100%, 980px); }
 .tool-dock-main .context-bar { flex: 0 1 auto; }
 .tool-dock-sep { flex: 0 0 1px; width: 1px; height: 22px; margin: 0 5px; background: var(--v2-ink-line); }
-.tool-dock-caption {
-  padding: 0 6px 0 4px;
-  font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
-  color: var(--v2-ink-muted); white-space: nowrap;
-}
 .tool-dock-groups { display: flex; align-items: center; gap: 2px; flex: 0 0 auto; }
 .tool-dock-group,
 .tool-dock-tool {
@@ -470,61 +464,6 @@
    (maska SVG w kolorze tekstu — działa w obu motywach):
    ● z ptaszkiem — jest / obowiązuje · ○ z kreską — brak / poza ·
    ▲ bursztynowy — ograniczenie albo nie sprawdzono · ◌ — sprawdzanie. */
-.app-shell.is-v2 .identify-panel .identify-verdict {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  padding: 2px 0;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface-solid);
-}
-.app-shell.is-v2 .identify-panel .identify-verdict-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 30px;
-  margin: 0;
-  padding: 0 8px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
-.app-shell.is-v2 .identify-panel .identify-verdict-item + .identify-verdict-item { border-top: 1px solid var(--border); }
-.app-shell.is-v2 .identify-panel .identify-verdict-item::before {
-  content: "";
-  flex: 0 0 14px;
-  width: 14px;
-  height: 14px;
-  background: var(--text);
-  -webkit-mask: var(--verdict-icon) center / contain no-repeat;
-  mask: var(--verdict-icon) center / contain no-repeat;
-}
-.app-shell.is-v2 .identify-panel .identify-verdict-item > span { flex: 0 0 118px; font-size: 12px; color: var(--text-muted); }
-.app-shell.is-v2 .identify-panel .identify-verdict-item > strong { flex: 1 1 auto; min-width: 0; font-size: 12px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.app-shell.is-v2 .identify-panel .identify-verdict-item--info { --verdict-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.6 5.6-4.3 4.9L4.4 8l1-1.1 1.9 1.6 3.3-3.8z'/%3E%3C/svg%3E"); }
-.app-shell.is-v2 .identify-panel :is(.identify-verdict-item--neutral, .identify-verdict-item--ok) { --verdict-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm0 1.6a6.4 6.4 0 1 1 0 12.8A6.4 6.4 0 0 1 8 1.6zM4.5 7.2h7v1.6h-7z'/%3E%3C/svg%3E"); }
-.app-shell.is-v2 .identify-panel .identify-verdict-item--warning { --verdict-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 .8 15.6 15H.4zm-.8 5v4.6h1.6V5.8zm0 6v1.6h1.6v-1.6z'/%3E%3C/svg%3E"); }
-.app-shell.is-v2 .identify-panel .identify-verdict-item--warning::before { background: #b45309; }
-.app-shell.is-v2[data-theme="dark"] .identify-panel .identify-verdict-item--warning::before { background: #fbbf24; }
-.app-shell.is-v2 .identify-panel .identify-verdict-item--warning > strong { color: var(--warning); }
-.app-shell.is-v2 .identify-panel .identify-verdict-item--loading { --verdict-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6' stroke-dasharray='2.4 2'%3E%3Ccircle cx='8' cy='8' r='6.6'/%3E%3C/svg%3E"); }
-.identify-verdict-show {
-  flex: 0 0 auto;
-  height: 22px;
-  padding: 0 8px;
-  border: 1px solid var(--border-strong);
-  border-radius: 11px;
-  background: var(--surface-solid);
-  color: var(--accent);
-  font: inherit;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.identify-verdict-show:hover:not(:disabled) { border-color: var(--accent); }
-.identify-verdict-show.is-shown { color: var(--text-muted); border-style: dashed; cursor: default; }
 
 /* ------------------------------- 19.13.0: telefon — pięć pozycji dolnego paska */
 .app-shell.is-mobile .m-nav.m-nav--five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
@@ -593,7 +532,6 @@
 .object-inspector--compact .object-properties-fields > .ui-field { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
 .object-inspector--compact .object-properties-fields > .ui-field input { min-height: 28px; width: 100%; }
 
-
 /* =====================================================================
    19.16.0 — spójność układu: jedna rama panelu, trzy rodzaje przycisków,
    jeden język stanów, jedna skala (tekst 11/12/13/15, wiersze 28–30 px,
@@ -630,9 +568,6 @@
 .app-shell.is-v2 .ui-panel .ui-button--ghost:hover:not(:disabled) { background: var(--accent-soft); }
 .app-shell.is-v2 .object-actions-trigger { height: 28px; border-radius: 7px; font-size: 12px; }
 /* „Pokaż na mapie” — przycisk tekstowy, nie kolejna pigułka. */
-.identify-verdict-show { height: 24px; padding: 0 6px; border: 0; border-radius: 6px; background: transparent; color: var(--accent); font-size: 11px; }
-.identify-verdict-show:hover:not(:disabled) { background: var(--accent-soft); }
-.identify-verdict-show.is-shown { border: 0; color: var(--text-muted); font-weight: 500; }
 /* Akcje karty Działka: akcja główna rozciągnięta, „Działania” obok. */
 
 /* --- 3. Jeden język stanów: ● jest · ○ brak · ▲ ograniczenie/błąd · ◌ sprawdzanie --- */
@@ -649,11 +584,6 @@
 .app-shell.is-v2 .parcelplus-status--ready { color: var(--text); font-weight: 600; }
 .app-shell.is-v2 .parcelplus-status--error { color: var(--state-warn); font-weight: 600; }
 /* Werdykt (karta Działka) i podsumowanie screeningu — te same znaczki. */
-.app-shell.is-v2 .identify-verdict-item--info { --verdict-icon: var(--icon-state-yes); }
-.app-shell.is-v2 :is(.identify-verdict-item--neutral, .identify-verdict-item--ok) { --verdict-icon: var(--icon-state-no); }
-.app-shell.is-v2 .identify-verdict-item--warning { --verdict-icon: var(--icon-state-warn); }
-.app-shell.is-v2 .identify-verdict-item--loading { --verdict-icon: var(--icon-state-wait); }
-.app-shell.is-v2 .identify-panel .identify-verdict-item--warning::before { background: var(--state-warn); }
 .app-shell.is-v2 .screening-summary-item {
   position: relative; padding-left: 26px; border-left: 0;
 }
@@ -676,16 +606,11 @@
 
 /* --- 4. Skala: wiersze 28–30 px, tekst 11/12/13, odstępy 4/8/12 --- */
 .app-shell.is-v2 .identify-panel-body { padding: 8px; gap: 8px; }
-.app-shell.is-v2 .parcelplus-section-head { min-height: 30px; padding: 0 8px; font-size: 12px; }
-.app-shell.is-v2 .parcelplus-section-head strong { font-size: 12px; font-weight: 600; }
-.app-shell.is-v2 .parcelplus-section-head small { font-size: 11px; color: var(--text-muted); }
 .app-shell.is-v2 .parcelplus-row > summary { min-height: 30px; padding: 4px 8px; gap: 8px; align-items: center; }
 .app-shell.is-v2 .parcelplus-row .identify-layer-copy strong { font-size: 12px; font-weight: 600; }
 .app-shell.is-v2 .parcelplus-row .identify-layer-preview { font-size: 11px; }
-.app-shell.is-v2 .parcelplus-list { gap: 0; }
 .app-shell.is-v2 .parcelplus-row { border-radius: 0; border-width: 0 0 1px; }
 .app-shell.is-v2 .parcelplus-row:last-child { border-bottom: 0; }
-.app-shell.is-v2 .parcelplus-disclaimer { padding: 6px 8px; font-size: 11px; line-height: 1.4; border-radius: 7px; }
 .app-shell.is-v2 .identify-fact span { font-size: 11px; }
 .app-shell.is-v2 .identify-fact strong { font-size: 12px; }
 .app-shell.is-v2 .ui-panel :is(input, select):not([type="checkbox"]):not([type="radio"]):not([type="range"]) { min-height: 28px; font-size: 12px; border-radius: 7px; }
@@ -694,7 +619,6 @@
 .app-shell.is-v2 .objects-panel [role="listitem"] { min-height: 30px; }
 .app-shell.is-v2 .ui-panel details > summary { font-size: 12px; }
 /* Telefon: kafle werdyktu w podglądzie karty są niskie — „Pokaż na mapie” się nie mieściło. */
-.m-card-verdict .identify-verdict-show { display: none; }
 
 /* 19.19.0: bounded cards and usable controls on small laptops / forced desktop. */
 .app-shell.is-v2 .workspace { --place-card-width: min(360px, max(220px, calc(100vw - var(--dock-inset-right, 0px) - 86px))); }

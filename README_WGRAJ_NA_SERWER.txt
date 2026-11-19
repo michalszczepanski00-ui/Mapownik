@@ -1,7 +1,7 @@
-msportal 19.53.0 — PEŁNA PACZKA (18.11.2026)
-Paczka: msportal-19.52.0-serwer.zip (zawartość katalogu portalu). Opis zmian: ZMIANY_19.52.0.md (usunięte: hałas i pompa ciepła), ZMIANY_19.51.0.md (uproszczona karta działki), ZMIANY_19.50.0.md (luki z audytu warstw: GDOŚ/EEA, nowe warstwy, Obszar WZ), ZMIANY_19.49.0.md (przebudowa UI — Etap 2), ZMIANY_19.48.0.md (Etap 1), ZMIANY_19.47.0.md, ZMIANY_19.46.0.md, kontrola po wgraniu: README_KONTROLA_WDROZENIA.md.
+msportal 19.53.0 — PEŁNA PACZKA (19.11.2026)
+Paczka: msportal-19.53.0-serwer.zip (zawartość katalogu portalu). Opis zmian: ZMIANY_19.53.0.md (przebudowa UI — Etapy 3, 5, 6, 7: dok Analizy, tryb Teren, rejestr akcji, Udostępnij, karta na telefonie, sprzątanie), ZMIANY_19.52.0.md (usunięte: hałas i pompa ciepła), ZMIANY_19.51.0.md (uproszczona karta działki), ZMIANY_19.50.0.md (luki z audytu warstw: GDOŚ/EEA, nowe warstwy, Obszar WZ), ZMIANY_19.49.0.md (przebudowa UI — Etap 2), ZMIANY_19.48.0.md (Etap 1), ZMIANY_19.47.0.md, ZMIANY_19.46.0.md, kontrola po wgraniu: README_KONTROLA_WDROZENIA.md.
 0. PRZEBUDOWA UI (od 19.48.0): każdy etap wgrywaj do NOWEGO katalogu testowego (Etap 1 → np. /test23/).
-   Etap 2 → np. /test24/, 19.50.0 (warstwy) → np. /test25/, 19.51.0 (karta działki) → np. /test26/, 19.52.0 → np. /test27/ (poprzednie katalogi zostają do porównania). NIGDY nie nadpisuj /test22/ ani wersji produkcyjnej. Nowy katalog = pusty katalog + cała paczka
+   Etap 2 → np. /test24/, 19.50.0 (warstwy) → np. /test25/, 19.51.0 (karta działki) → np. /test26/, 19.52.0 → np. /test27/, 19.53.0 → np. /test28/ (poprzednie katalogi zostają do porównania). NIGDY nie nadpisuj /test22/ ani wersji produkcyjnej. Nowy katalog = pusty katalog + cała paczka
    (+ data/rwdz/rwdz.sqlite, jeśli chcesz testować Budowy).
 1. Kopia projektu .mapownik i kopia obecnych plików portalu poza katalogiem WWW.
 2. Wgraj CAŁĄ zawartość ZIP („nadpisz zawsze”, z .htaccess); index.html i .htaccess najlepiej na końcu.
@@ -9,6 +9,7 @@ Paczka: msportal-19.52.0-serwer.zip (zawartość katalogu portalu). Opis zmian: 
      app-19.44.0/ (i każdy inny katalog app-*),
      vendor/static/, vendor/ol-esm-2/, vendor/opt/, vendor/geometry/ (zostaje vendor/pdf/),
      setup-vendors.php, api/vendor_status.php, api/_vendor_builder.php,
+     api/orthophoto.php, api/_orthophoto.php (od 19.53.0),
      assets/css/ — wszystkie pliki OPRÓCZ monitor.css.
    NIE usuwaj data/, cache/, vendor/pdf/ ani starszych plików w assets/build/.
    Pozostawione pliki nie psują działania (serwer zwraca dla nich 410/404); listę pokazuje

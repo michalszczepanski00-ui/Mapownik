@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/_common.php';
-require_once __DIR__ . '/_orthophoto.php';
 
 maybe_maintain_map_cache();
 
@@ -29,10 +28,6 @@ if ($key === '' || !isset($wmsSources[$key])) {
 }
 $source = $wmsSources[$key];
 $time = null;
-if ($key === 'orthophoto_archive') {
-    $time = orthophoto_time($_GET['TIME'] ?? $_GET['time'] ?? null);
-    if ($time === null) reject_tile_request('Nieprawidłowy parametr TIME ortofotomapy.', 400);
-}
 
 $bbox = (string)($_GET['BBOX'] ?? $_GET['bbox'] ?? '');
 if (!preg_match('/^-?\d+(\.\d+)?,-?\d+(\.\d+)?,-?\d+(\.\d+)?,-?\d+(\.\d+)?$/', $bbox)) {

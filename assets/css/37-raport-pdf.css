@@ -86,12 +86,9 @@ div.rpdf-preset-main { cursor: default; }
 }
 @media (prefers-reduced-motion: reduce) { .rpdf-spinner { animation: none; } }
 /* przycisk w karcie działki i sekcja w panelu Eksport */
-.identify-report { display: flex; margin: 8px 0 2px; }
-.identify-report > button { flex: 1; justify-content: center; }
 .export-section--report small { color: var(--text-muted); }
 /* telefon: piąta akcja w karcie działki (Raport PDF) */
 .m-actions { grid-template-columns: repeat(5, 1fr); }
-.m-card-details .identify-report { display: none; }
 /* 19.37.1: ponowne utworzenie raportu po zmianie ustawień */
 .rpdf-again { border: 0; background: transparent; color: var(--text-muted); font: inherit; font-size: 12.5px; text-decoration: underline; cursor: pointer; padding: 4px 0; align-self: center; }
 .rpdf-again:hover { color: var(--text); }

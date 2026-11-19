@@ -11,7 +11,6 @@ const EMPTY_CAPS = { ok: false, gd: false, zip: false, safe_single_pixels: 12000
 const BASEMAP_SOURCE = {
     'basemap.topography': 'topography',
     'basemap.orthophoto': 'orthophoto',
-    'basemap.orthophoto.archive': 'orthophoto_archive',
     'basemap.orthophoto.true': 'orthophoto_true',
     'basemap.nmt.shaded': 'nmt_shaded',
 };

@@ -188,7 +188,7 @@ if((results['Biblioteki w paczce aplikacji']||{}).ok){
    const read=async(f)=>(await fetch('./app-19.53.0/'+f+'?v=19.53.0',{cache:'no-store'})).text();
    const [search,mobile]=await Promise.all([read('app/components/SearchToolbar.js'),read('app/mobile/MobileParcelCard.js')]);
    if(!search.includes('msportal:recent-parcels:v1'))throw new Error('Brak listy ostatnio sprawdzanych działek');
-   if(!mobile.includes('h(Nearby'))throw new Error('Karta działki na telefonie bez „W okolicy”');
+   /* 19.53.0: telefon pokazuje kartę w grupach (ParcelCard), a „W okolicy” jest jej częścią */const card=await read('app/components/ParcelCard.js');if(!(mobile.includes('h(ParcelCard')&&card.includes('h(Nearby')))throw new Error('Karta działki na telefonie bez „W okolicy”');
    return 'ostatnie działki (do 6) · „W okolicy” w karcie na telefonie';
  });
  await test('19.33.0 — intuicyjny układ (start, kliknięcia, podpowiedź, legenda)',async()=>{
@@ -358,7 +358,7 @@ if((results['Biblioteki w paczce aplikacji']||{}).ok){
  await test('19.14.0 — dane w widoku (sonda warstw planistycznych)',async()=>{const src=await (await fetch('./app-19.53.0/app/components/layerCoverage.js?v=19.53.0',{cache:'no-store'})).text();const {dataCatalog}=await import('./app-19.53.0/data/catalog/index.js');const planning=dataCatalog.layers.filter((l)=>l.group==='Planowanie przestrzenne'&&l.source?.kind==='wms'&&l.id!=='overlay.mpzp');if(planning.length<7)throw new Error('Za mało warstw planistycznych: '+planning.length);const noProxy=planning.filter((l)=>!/[?&]source=/.test(l.source.url));if(noProxy.length)throw new Error('Bez adresu proxy: '+noProxy.map((l)=>l.id).join(', '));/* 19.47.0: środek kadru do 512 px w skali mapy; włączone warstwy bez osobnej próbki (obraz z mapy) */if(!/MAX_SIDE = 512/.test(src)||!/CONCURRENCY = 2/.test(src)||!/readLayerImageCoverage/.test(src))throw new Error('Limity sondy zmienione — sprawdź obciążenie serwera');return planning.length+' warstw przez proxy · obraz ≤1024 px (19.37.2) · 2 naraz'});
 await test('19.10.0 — karta miejsca i rodziny statusów',async()=>{const {PANEL_DEFS}=await import('./app-19.53.0/store/index.js');if(!PANEL_DEFS.identify?.placeCard||PANEL_DEFS.identify.floatGroup==='right-overlay')throw new Error('Działka nie jest kartą miejsca');const src=await (await fetch('./app-19.53.0/app/components/LayersPanel.js?v=19.53.0',{cache:'no-store'})).text();const {dataCatalog}=await import('./app-19.53.0/data/catalog/index.js');const ids=[...src.matchAll(/\['(overlay\.[a-z0-9.]+)', '[A-ZĄĆĘŁŃÓŚŹŻ]/g)].map((m)=>m[1]);if(ids.length!==6)throw new Error('Rodziny statusów: '+ids.length+' warstw zamiast 6');const missing=ids.filter((id)=>!dataCatalog.layers.some((l)=>l.id===id));if(missing.length)throw new Error('Brak w katalogu: '+missing.join(', '));return 'Działka po lewej · MPZP i POG: 6 warstw w 2 wierszach'});
 await test('19.9.0 — dok narzędzi Sprawdź · Rysuj · Mierz · Teren (19.53.0)',async()=>{const m=await import('./app-19.53.0/app/components/ToolDock.js');if(!m.ToolDock)throw new Error('ToolDock missing');const g=await import('./app-19.53.0/app/components/toolGroups.js');const ids=g.TOOL_GROUPS.map((x)=>x.id).join(',');/* 19.53.0 (Etap 3): cztery tryby, Teren osobno */if(ids!=='information,drawing,measurement,terrain')throw new Error('Grupy doku: '+ids);const all=g.TOOL_GROUPS.flatMap((x)=>x.tools);for(const id of ['core.draw.road','core.terrain.profile','core.terrain.area','core.buffer','core.select','core.parcel.pick'])if(!all.includes(id))throw new Error('Brak w doku: '+id);if(g.groupOfTool('core.draw.road')?.id!=='drawing'||g.groupOfTool('core.terrain.area')?.id!=='terrain'||g.groupOfTool('core.buffer')?.id!=='terrain'||g.groupOfTool('core.wz.area')?.id!=='terrain')throw new Error('Przejazd ma być w Rysuj; Bufor, Obszar WZ i narzędzia terenu w trybie Teren');if(g.TOOL_GROUPS.find((x)=>x.id==='measurement').tools.join(',')!=='core.measure.line,core.measure.area')throw new Error('Mierz: tylko Odległość i Powierzchnia');return '4 tryby · Przejazd w Rysuj · Bufor, WZ i teren w Teren · Mierz: 2 narzędzia'});
- await test('Faza 2 — pasek aplikacji i pasek kontekstu',async()=>{const [bar,ctx]=await Promise.all([import('./app-19.53.0/app/components/AppBar.js'),import('./app-19.53.0/app/components/ContextBar.js')]);if(!bar.AppBar)throw new Error('AppBar missing');if(!ctx.ContextBar)throw new Error('ContextBar missing');return 'pasek aplikacji + pasek kontekstu (narzędzie · zaznaczenie) OK'});
+ await test('Faza 2 — pasek aplikacji i pasek kontekstu',async()=>{const [bar,ctx]=await Promise.all([import('./app-19.53.0/app/components/AppBar.js'),import('./app-19.53.0/app/components/ContextBar.js')]);/* 19.53.0: pasek aplikacji to MapTopBar (dawny AppBar usunięty) */if(!bar.MapTopBar)throw new Error('MapTopBar missing');if(!ctx.ContextBar)throw new Error('ContextBar missing');return 'pasek aplikacji + pasek kontekstu (narzędzie · zaznaczenie) OK'});
  await test('Faza 5 — odległość per obiekt',async()=>{
    const {analyzeFeatureDistances}=await import('./app-19.53.0/analysis/analysisDistanceEngine.js');
    const sq=(x,y,s)=>({type:'Polygon',coordinates:[[[x,y],[x+s,y],[x+s,y+s],[x,y+s],[x,y]]]});
@@ -545,7 +545,8 @@ await test('19.9.0 — dok narzędzi Sprawdź · Rysuj · Mierz · Teren (19.53.
    return `aktywacja i warunek klikalności zgodne — oba tryb '${activationMode}'`;
  });
  await test('19.51.0 — uproszczona karta działki (grupy, menu Analizy, bez zakładek)',async()=>{
-   const src=await fetchSources(['./app-19.53.0/app/components/ParcelCard.js','./app-19.53.0/app/components/WorkspaceCard.js']);
+   /* 19.53.0: pozycje menu karty są w rejestrze akcji (features/builtin/parcelActionsFeature.js) */
+   const src=await fetchSources(['./app-19.53.0/app/components/ParcelCard.js','./app-19.53.0/app/components/WorkspaceCard.js','./app-19.53.0/features/builtin/parcelActionsFeature.js']);
    for(const t of ['Raport PDF','Do projektu','Analizy działki','Brak: ','Szczegóły i źródła','Obszar analizowany WZ','Analiza działki (serwer)','workspace-back'])if(!src.includes(t))throw new Error('Brak: '+t);
    if(src.includes("role:'tablist'"))throw new Error('Karta nadal ma zakładki');
    return 'karta: nagłówek, 3 przyciski, grupy wyników, szczegóły i źródła; powrót z widoków analiz';
@@ -961,8 +962,7 @@ await test('15.2 — konfiguracja źródeł mapowych',async()=>{
    const {dataCatalog:restCatalog}=await import('./app-19.53.0/data/catalog/index.js');
    const keys=[...new Set(restCatalog.layers.filter((l)=>l.source?.kind==='wms'&&String(l.source.url||'').startsWith('./api/wms.php')).map((l)=>(/[?&]source=([a-z0-9_]+)/.exec(l.source.url||'')||[])[1]).filter(Boolean))].filter((k)=>!sourceAudit.has(k));
    if(!keys.length)return 'wszystkie źródła miały już próbę';
-   const archiveTime=restCatalog.layers.find((l)=>l.id==='basemap.orthophoto.archive')?.source?.time;
-   const results=await mapLimit(keys,2,(source)=>source==='orthophoto_archive'?probePhotoSource(source,undefined,{TIME:archiveTime||''}):source.startsWith('orthophoto')?probePhotoSource(source):probeMapSource(source));
+   const results=await mapLimit(keys,2,(source)=>source.startsWith('orthophoto')?probePhotoSource(source):probeMapSource(source));
    const errors=[];results.forEach((r,i)=>{if(r.status!=='fulfilled')errors.push(keys[i]+': '+(r.reason?.message||String(r.reason)))});
    if(errors.length)throw new Error(errors.join(' | '));
    return keys.length+' źródeł — OK: '+keys.join(', ');

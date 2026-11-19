@@ -38,7 +38,8 @@ $leftovers = $appDirs;
 foreach (['vendor/static', 'vendor/ol-esm', 'vendor/ol-esm-2', 'vendor/opt', 'vendor/shims', 'vendor/geometry'] as $dir) {
     if (is_dir($root . '/' . $dir)) $leftovers[] = $dir;
 }
-foreach (['setup-vendors.php', 'api/vendor_status.php', 'api/_vendor_builder.php'] as $file) {
+// 19.53.0: api/orthophoto.php i api/_orthophoto.php (dawny moduł zdjęć archiwalnych) — usunięte z paczki.
+foreach (['setup-vendors.php', 'api/vendor_status.php', 'api/_vendor_builder.php', 'api/orthophoto.php', 'api/_orthophoto.php'] as $file) {
     if (is_file($root . '/' . $file)) $leftovers[] = $file;
 }
 $expectedHealth = $version !== '' ? $version . '-server' : null;

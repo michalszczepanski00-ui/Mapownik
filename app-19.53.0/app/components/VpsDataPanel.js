@@ -263,7 +263,7 @@ export function VpsDataPanel(){
             option('500','500 m'),option('1000','1000 m'),option('2000','2000 m')]),
           h(Button,{variant:'primary',disabled:parcelPending||!isReady||(!parcelId.trim()&&!view.ready),
             onClick:()=>void runParcel()},parcelPending?'Tworzenie raportu…':'Utwórz raport działki')),
-      // 19.53.0: ceny wokół działki są w doku Analizy → Ceny transakcyjne („Wokół działki”) — nazwa widoku odpowiada zawartości.
+      // 19.53.0: ceny wokół działki są w doku Analizy → Ceny („Wokół działki”) — nazwa widoku odpowiada zawartości.
       parcelError&&h(Message,{tone:'danger'},parcelError),
       parcelReport&&h('div',{className:'vps-parcel-report'},
         h('div',{className:'vps-stats'},

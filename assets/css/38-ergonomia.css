@@ -2,28 +2,9 @@
    zaawansowane opcje zwinięte, poprawki łamania tekstu w wąskiej karcie (260 px). */
 
 /* ---- karta działki: nagłówek zamiast tabeli 5 wierszy ---- */
-.identify-headline { display: grid; gap: 2px; margin: 2px 2px 8px; }
-.identify-headline-title { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.identify-headline-title strong { font-size: 17px; line-height: 1.2; color: var(--text); }
-.identify-headline-title span { font-size: var(--fs-sm); color: var(--text-muted); }
-.identify-headline-sub { font-size: var(--fs-sm); color: var(--text); font-weight: 550; }
-.identify-headline-id .identify-fact { padding: 0; background: transparent; border: 0; min-height: 0; display: flex; align-items: center; gap: 6px; }
-.identify-headline-id .identify-fact > span { flex: 0 0 auto; }
-.identify-headline-id .identify-fact strong { font-weight: 500; font-size: var(--fs-xs); color: var(--text-muted); font-variant-numeric: tabular-nums; }
-.identify-headline-id .identify-fact-value > button { min-width: 26px; min-height: 26px; width: 26px; height: 26px; }
 
 /* ---- karta działki: działania widoczne bez menu ---- */
-.app-shell .identify-panel .identify-actions.identify-actions--v3 { display: grid; gap: 6px; margin: 8px 0 4px; }
-.identify-actions-main { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-.identify-actions-main > .ui-button { justify-content: center; min-width: 0; }
 /* 19.46.0: zawijanie — w wąskiej karcie „3D” nie wychodzi poza krawędź, przyciski w pełnej szerokości przechodzą do drugiego wiersza. */
-.identify-actions-more { display: flex; flex-wrap: wrap; gap: 4px; }
-.identify-actions-more > button {
-  flex: 1 1 auto; min-height: 28px; padding: 3px 5px; border: 1px solid var(--border); border-radius: 7px;
-  background: var(--surface-solid); color: var(--text); font: inherit; font-size: var(--fs-xs); font-weight: 550; cursor: pointer;
-  white-space: nowrap;
-}
-.identify-actions-more > button:hover, .identify-actions-more > button:focus-visible { border-color: var(--accent); color: var(--accent); background: var(--surface-hover); }
 
 /* ---- Analizy: stan „sprawdzanie” w wąskiej karcie ---- */
 /* Przycisk z postępem na całą szerokość, „Zatrzymaj” pod nim — wcześniej oba w jednym wierszu łamały się w pół słowa. */
@@ -55,7 +36,6 @@
 .vps-pdf-shortcut > .ui-button { flex: 1; justify-content: center; }
 @media (prefers-reduced-motion: reduce) { .export-advanced > summary::before { transition: none; } }
 
-
 /* ---- Profil terenu: czytelne etykiety, niższy panel na niskich ekranach ---- */
 .terrain-profile-chart { position: relative; }
 .terrain-ylabel { position: absolute; left: 6px; padding: 0 4px; border-radius: 4px; background: color-mix(in srgb, var(--surface-solid) 85%, transparent); color: var(--text-muted); font-size: var(--fs-xs); font-variant-numeric: tabular-nums; pointer-events: none; }
@@ -72,14 +52,11 @@
 }
 
 /* ---- telefon: nagłówek arkusza już podaje numer, gminę i powierzchnię — w szczegółach tylko identyfikator ---- */
-.m-card-details .identify-headline-title, .m-card-details .identify-headline-sub { display: none; }
 
 /* 19.46.0: przycisk raportu z numerem działki — zawija się zamiast ucinać nazwę. */
 .vps-pdf-wide { white-space: normal; height: auto; min-height: 30px; text-align: center; line-height: 1.25; }
 
 /* 19.46.0: podsumowanie karty — dłuższa wartość („w opracowaniu (4SU)”) zawija się, zamiast ściskać etykietę „Plan ogólny”. */
-.app-shell.is-v2 .workspace-card .identify-verdict-item { grid-template-columns: 14px minmax(74px, 1fr) minmax(0, auto) auto; }
-.app-shell.is-v2 .workspace-card .identify-verdict-item > strong { white-space: normal; line-height: 1.2; }
 
 /* 19.47.0: przełącznik podkładów jak w Google Maps — jedna miniatura; po najechaniu rozwija się w JEDNYM rzędzie
    nad mapą (nakładka, nic nie przesuwa: pasek narzędzi, skala i lewy panel zostają na miejscu). */
@@ -99,16 +76,7 @@
 .project-status-dot.is-pending { background: var(--warning); opacity: 1; }
 .project-status-dot.is-error { background: var(--danger); opacity: 1; box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger) 25%, transparent); }
 /* Werdykt karty działki: trzy stany (jest ✓ zieleń palety · nie dotyczy ○ szary · brak danych ? szary) + sprawdzanie. */
-.app-shell .identify-verdict-item--state-yes { --verdict-icon: var(--icon-state-yes); }
-.app-shell .identify-verdict-item--state-no { --verdict-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm0 1.6a6.4 6.4 0 1 1 0 12.8A6.4 6.4 0 0 1 8 1.6z'/%3E%3C/svg%3E"); }
-.app-shell .identify-verdict-item--state-unknown { --verdict-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm0 1.6a6.4 6.4 0 1 1 0 12.8A6.4 6.4 0 0 1 8 1.6zM8 3.6c-1.6 0-2.8 1-2.9 2.5h1.6c.1-.6.6-1 1.3-1 .8 0 1.3.5 1.3 1.1 0 .5-.3.8-.9 1.2-.8.5-1.2 1-1.2 2v.4h1.6v-.3c0-.6.3-.9.9-1.3.8-.5 1.3-1.1 1.3-2 0-1.6-1.2-2.6-3-2.6zm-.8 7.6v1.6h1.6v-1.6z'/%3E%3C/svg%3E"); }
-.app-shell .identify-verdict-item--state-loading { --verdict-icon: var(--icon-state-wait); }
-.app-shell.is-v2 .identify-panel .identify-verdict-item--state-yes::before { background: var(--accent); }
-.app-shell.is-v2 .identify-panel :is(.identify-verdict-item--state-no, .identify-verdict-item--state-unknown, .identify-verdict-item--state-loading)::before { background: var(--text-muted); }
-.app-shell.is-v2 .identify-panel .identify-verdict-item--state-unknown > strong { color: var(--text-muted); font-weight: 500; }
 /* Kolumna oka zawsze tej samej szerokości — także gdy wiersz chwilowo nie ma przycisku. */
-.identify-verdict-show { width: 26px; justify-content: center; display: inline-flex; align-items: center; }
-.identify-verdict-show.is-placeholder { visibility: hidden; pointer-events: none; }
 /* Szkielet panelu na czas pobierania jego kodu (bez animacji). */
 .panel-skeleton { display: grid; gap: 10px; padding: 10px 12px; background: var(--surface-raised, var(--surface)); border: 1px solid var(--border); border-radius: 8px; min-width: 220px; }
 .panel-skeleton-head { padding-bottom: 8px; border-bottom: 1px solid var(--border); }

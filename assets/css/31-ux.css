@@ -285,9 +285,6 @@ a.m-list-button:visited { color: var(--text); text-decoration: none; }
 .m-sheet-grip::before { content: ''; position: absolute; left: 0; right: 0; top: -8px; bottom: -8px; }
 
 /* ==== 18.18.3 — okno informacji: nazwa obszaru chronionego w podsumowaniu ==== */
-.identify-verdict-item--wide { grid-column: 1 / -1; }
-.identify-verdict-item--wide > strong { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; }
-.m-card-verdict .identify-verdict-item--wide { min-width: 200px; max-width: 280px; }
 
 /* 19.0.0: podziałka mapy (lewy dolny róg) i skala w pasku stanu. */
 .map-scalebar {
@@ -329,15 +326,10 @@ a.m-list-button:visited { color: var(--text); text-decoration: none; }
 @media(max-width:950px) { .context-zone--object.has-measures { max-width: 320px; } }
 
 /* 19.0.0: informacja o działce — komunikat, gdy w punkcie nie odczytano działki. */
-.identify-no-parcel { margin: 6px 2px 8px; font-size: 12px; line-height: 1.4; color: var(--text-muted); }
 
 /* 19.0.0: telefon — karta wyniku i arkusze. */
 /* Pasek: jeden przewijany rząd z wyblakłą prawą krawędzią jako wskazówką, że jest ciąg dalszy. */
-.m-parcel-card.m-sheet--peek .m-card-verdict .identify-verdict { padding-right: 28px; -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent); }
 /* Rozwinięta karta: dwie kolumny jak w panelu na komputerze, wartość „w obszarze: …" na całą szerokość. */
-.m-parcel-card:not(.m-sheet--peek) .m-card-verdict .identify-verdict { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
-.m-parcel-card:not(.m-sheet--peek) .m-card-verdict .identify-verdict-item { min-width: 0; }
-.m-parcel-card:not(.m-sheet--peek) .m-card-verdict .identify-verdict-item--wide { grid-column: 1 / -1; max-width: none; }
 /* Arkusze (Warstwy, Narzędzia, Więcej, Projekt, Uzbrojenie) nie zasłaniają dolnej nawigacji:
    można przejść do Sprawdź / Mierz / Projekt bez zamykania arkusza. Treść arkusza przewija się nad paskiem. */
 .m-shell:not(.has-card) .m-nav { z-index: 5; }

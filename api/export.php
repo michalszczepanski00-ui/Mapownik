@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 require __DIR__ . '/_common.php';
-require_once __DIR__ . '/_orthophoto.php';
 $wmsSources = require __DIR__ . '/_wms_sources.php';
 
 header('X-Content-Type-Options: nosniff');
@@ -193,13 +192,7 @@ $format = ($payload['format'] ?? 'png') === 'jpeg' ? 'jpeg' : 'png';
 $quality = max(40, min(100, (int)($payload['quality'] ?? 90)));
 $basemap = sanitize_source_key($payload['basemap'] ?? null, $wmsSources);
 $basemapOptions = is_array($payload['basemapOptions'] ?? null) ? $payload['basemapOptions'] : [];
-if ($basemap === 'orthophoto_archive') {
-    $month = $basemapOptions['archiveMonth'] ?? '';
-    $time = is_string($month) ? orthophoto_time($month . '-01') : null;
-    if ($time === null) json_fail('Nieprawidłowy miesiąc archiwalnej ortofotomapy.');
-    $wmsSources[$basemap]['variants'] = [['fixed_params' => ['TIME' => $time]]];
-}
-if (in_array($basemap, ['orthophoto', 'orthophoto_high', 'orthophoto_archive', 'orthophoto_true'], true)) {
+if (in_array($basemap, ['orthophoto', 'orthophoto_high', 'orthophoto_true'], true)) {
     $opacity = $basemapOptions['photoOpacity'] ?? 1;
     if (!finite_num($opacity) || (float)$opacity < 0.1 || (float)$opacity > 1) json_fail('Nieprawidłowe krycie ortofotomapy.');
     $wmsSources[$basemap]['opacity'] = (float)$opacity;

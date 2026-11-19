@@ -118,17 +118,6 @@
   gap: 2px;
   padding: 2px 0;
 }
-.activity-bar-label {
-  display: block;
-  max-width: 50px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 10px;
-  font-weight: var(--fw-semibold);
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-}
 /* Otwarty panel ma obrys zamiast wypełnienia używanego przez aktywne
    narzędzia mapy (.icon-button.is-active). */
 .activity-bar-button.is-open {
@@ -746,8 +735,7 @@
   .activity-bar-button,
   .activity-bar-button.has-label { width: 40px; height: 40px; }
   /* Telefon: szyna zostaje wąska, podpis zastępuje podpowiedź i etykieta dostępności. */
-  .activity-bar-label { display: none; }
-  .dock--right-panel {
+    .dock--right-panel {
     top: auto;
     left: 0;
     right: var(--activity-bar-width);
@@ -964,7 +952,6 @@
 @media (max-height: 820px) {
   .basemap-switcher { bottom: 36px; padding: 5px; }
 }
-
 
 /* ===================================================================
    18.0 — czytelność: role tekstu i rozmiary kontrolek (audyt ergonomii).
@@ -1718,7 +1705,6 @@
 .source-health-retry { flex: 0 0 auto; }
 
 /* Szczegóły działki */
-.parcelplus-more-toggle { justify-self: start; }
 .identify-panel .ui-message { margin: 8px 0 0; }
 .terrain-area-selection { min-width: 0; }
 
@@ -1936,25 +1922,10 @@
 
 /* 18.9.8: niewielka karta ortofotomap, w istniejącym doku i trybie pływającym. */
 @layer shell {
-    .ortho-controls, .ortho-point { display: grid; gap: var(--space-2, 8px); }
-    .ortho-date-fields { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2, 8px); }
-    .ortho-controls .ui-field, .ortho-controls select { min-width: 0; width: 100%; }
-    .ortho-status, .ortho-point small { display: block; color: var(--text-muted); }
-    .ortho-point { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
-    .ortho-records { list-style: none; margin: 0; padding: 0; max-height: 180px; overflow-y: auto; }
-    .ortho-records li { display: flex; flex-direction: column; gap: 2px; padding: 5px 0; font-size: 12px; border-bottom: 1px solid var(--border); }
-    .ortho-records span { color: var(--text-muted); }
-    .ortho-details { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
-    .ortho-details summary { cursor: pointer; }
-    .ortho-details p { margin: 6px 0; line-height: 1.5; }
-    /* 18.9.11: treść panelu Ortofotomap ma własny margines (pola dotykały ramki). */
-    .ortho-body { min-height: 0; overflow: auto; padding: 10px 12px 12px; display: grid; gap: 10px; align-content: start; }
-    .ortho-body .ortho-point { margin-top: 2px; }
-    .ortho-body .ortho-details { margin-top: 2px; }
-    /* Powód wyłączenia przycisku — widoczny tuż pod nim. */
+                                                /* 18.9.11: treść panelu Ortofotomap ma własny margines (pola dotykały ramki). */
+                /* Powód wyłączenia przycisku — widoczny tuż pod nim. */
     .disabled-reason { display: block; margin-top: 6px; color: var(--text-muted); font-size: var(--fs-sm, 11px); line-height: 1.4; }
 }
-
 
 /* ==========================================================================
    18.10.1 — drobne poprawki układu z audytu prawej belki
@@ -1962,8 +1933,7 @@
 @layer shell {
     /* Eksport: lista wyboru dostaje całą szerokość wiersza, etykieta nad nią —
        „PUWG 1992 / EPSG:2180” i opis układu mapy nie są już ucinane. */
-    .export-panel-body .ui-field:has(select),
-    .ortho-controls > .ui-field:has(select) { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .export-panel-body .ui-field:has(select){ grid-template-columns: minmax(0, 1fr); gap: 4px; }
 
     /* Pusty panel Informacji: przycisk pod opisem, wyśrodkowany jak reszta. */
     .identify-panel--empty .identify-panel-body { display: grid; justify-items: center; align-content: start; gap: 10px; padding-bottom: 12px; }
@@ -2065,14 +2035,14 @@
 .map-inline-text-hint { grid-column: 1 / -1; color: var(--text-muted); font-size: var(--fs-xs); }
 
 /* 18.12.2: podsumowanie wyniku — najważniejsze odpowiedzi na górze panelu. */
-.identify-verdict,
+
 .screening-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
   margin: 8px 0;
 }
-.identify-verdict-item,
+
 .screening-summary-item {
   display: grid;
   gap: 2px;
@@ -2083,22 +2053,18 @@
   border-radius: 8px;
   background: var(--surface-raised);
 }
-.identify-verdict-item > span,
+
 .screening-summary-item > span { color: var(--text-muted); font-size: var(--fs-xs); }
-.identify-verdict-item > strong,
+
 .screening-summary-item > strong { font-size: var(--fs-md); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.identify-verdict-item--info { border-left-color: var(--info); }
-.identify-verdict-item--warning, .screening-summary-item--warning { border-left-color: var(--warning); }
-.identify-verdict-item--warning > strong, .screening-summary-item--warning > strong { color: var(--warning); }
-.identify-verdict-item--ok, .screening-summary-item--ok { border-left-color: var(--success); }
-.identify-verdict-item--danger, .screening-summary-item--danger { border-left-color: var(--danger); }
-.identify-verdict-item--danger > strong, .screening-summary-item--danger > strong { color: var(--danger); }
-.identify-verdict-item--neutral { border-left-color: var(--border-strong); }
-.identify-verdict-item--muted > strong, .identify-verdict-item--loading > strong { color: var(--text-faint); font-weight: var(--fw-medium); }
-.identify-verdict-item--loading { border-left-color: var(--border); }
+ .screening-summary-item--warning { border-left-color: var(--warning); }
+ .screening-summary-item--warning > strong { color: var(--warning); }
+ .screening-summary-item--ok { border-left-color: var(--success); }
+ .screening-summary-item--danger { border-left-color: var(--danger); }
+ .screening-summary-item--danger > strong { color: var(--danger); }
 
 /* Baner „źródła nie odpowiadają” — tekst i przycisk w jednej kolumnie. */
-.identify-sources-down, .screening-sources-down { display: grid; gap: 6px; }
+ .screening-sources-down { display: grid; gap: 6px; }
 .identify-error { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 
 /* 18.12.2: Analiza źródła w trzech krokach; ustawienia rzadziej zmieniane schowane. */
@@ -2117,14 +2083,7 @@
 /* 18.12.3: jak wskazać działkę do screeningu; akcja „Screening tej działki”. */
 .screening-target-help { display: grid; gap: 6px; margin: 6px 0 4px; }
 .screening-target-help small { color: var(--text-muted); font-size: var(--fs-xs); line-height: 1.35; }
-.identify-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
-.identify-actions .ui-button, .identify-actions button { flex: 1 1 auto; min-width: 0; }
 /* 19.8.5: główna akcja w osobnym, pełnym wierszu — w 340 px ucinała się („Screenin…”). */
-.identify-actions .ui-button--primary { order: -1; flex-basis: 100%; }
-.identify-more-facts { margin: 2px 0 6px; font-size: 12px; }
-.identify-more-facts > summary { cursor: pointer; color: var(--text-muted); padding: 3px 0; }
-.identify-more-facts > summary:hover { color: var(--text); }
-.identify-more-facts > .identify-summary-grid { margin-top: 4px; }
 
 /* =====================================================================
    18.14.0 — powłoka mobilna „MSPortal w terenie” (wzór: Mapy Google).
@@ -2246,8 +2205,6 @@
 .m-card-title span { color: var(--text-muted); font-size: var(--fs-md); }
 .m-icon-button { width: 40px; height: 40px; flex: 0 0 40px; border: 0; border-radius: 20px; background: var(--surface-hover); color: var(--text); display: grid; place-items: center; }
 
-.m-card-verdict .identify-verdict { display: flex; overflow-x: auto; scrollbar-width: none; gap: 6px; margin: 2px 0 10px; }
-.m-card-verdict .identify-verdict-item { flex: 0 0 auto; min-width: 104px; }
 .m-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 4px 0 12px; }
 .m-action { display: grid; justify-items: center; gap: 6px; border: 0; background: transparent; color: var(--accent); font: inherit; font-size: var(--fs-sm); font-weight: var(--fw-medium); padding: 0; }
 .m-action-icon { width: 48px; height: 48px; border-radius: 24px; border: 1px solid var(--border); display: grid; place-items: center; background: var(--surface-raised); }
@@ -2269,16 +2226,8 @@
 .m-note { color: var(--text-muted); font-size: var(--fs-sm); line-height: 1.4; }
 
 /* Pełne dane działki w karcie — bez drugiego nagłówka i powtórzonego podsumowania. */
-.m-card-details .panel-header,
-.m-card-details .identify-verdict,
-.m-card-details .identify-actions,
-.m-card-details .ui-panel-foot,
-.m-card-details .panel-footer { display: none !important; }
-.m-card-details .identify-panel { position: static; width: 100%; max-width: none; max-height: none; border: 0; box-shadow: none; background: transparent; }
 .m-sheet--peek .m-actions,
-.m-sheet--peek .m-screening,
-.m-sheet--peek .m-card-details { visibility: hidden; }
-.m-sheet--half .m-card-details { opacity: .9; }
+.m-sheet--peek .m-screening{ visibility: hidden; }
 
 .m-section-title { margin: 6px 0 8px; font-size: var(--fs-sm); color: var(--text-muted); font-weight: var(--fw-semibold); text-transform: uppercase; letter-spacing: .04em; }
 .m-layers-sheet .basemap-switcher { position: static; display: flex; flex-wrap: wrap; box-shadow: none; border: 0; background: transparent; padding: 0; }

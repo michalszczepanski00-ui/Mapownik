@@ -96,14 +96,6 @@
       "minZoom": null
     },
     {
-      "id": "wms.orthophoto_archive",
-      "title": "Ortofotomapa archiwalna",
-      "group": "Podkłady",
-      "kind": "wms",
-      "sourceKey": "orthophoto_archive",
-      "minZoom": 12
-    },
-    {
       "id": "wms.orthophoto_true",
       "title": "Prawdziwa ortofotomapa",
       "group": "Podkłady",

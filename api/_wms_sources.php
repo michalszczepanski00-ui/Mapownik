@@ -35,11 +35,6 @@ $sources = [
             ['url' => 'https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/StandardResolution', 'version' => '1.1.1', 'layers' => 'Raster'],
         ],
     ],
-    'orthophoto_archive' => [
-        'url' => 'https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/StandardResolutionTime',
-        'layers' => 'Raster', 'version' => '1.1.1', 'format' => 'image/png', 'transparent' => true,
-        'ttl' => 30 * 86400, 'timeout' => 12, 'error_mode' => 'http',
-    ],
     'orthophoto_true' => [
         'url' => 'https://mapy.geoportal.gov.pl/wss/service/PZGIK/ORTO/WMS/TrueOrtho',
         'layers' => 'PrawdziwaOrtofotomapa', 'version' => '1.1.1', 'format' => 'image/png', 'transparent' => true,

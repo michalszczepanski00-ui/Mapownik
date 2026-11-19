@@ -15,11 +15,6 @@
 .workspace-card [hidden] { display: none !important; }
 .workspace-card-resizer { position: absolute; right: -4px; top: 0; bottom: 0; width: 8px; cursor: ew-resize; touch-action: none; border-radius: 4px; }
 .workspace-card-resizer:hover, .workspace-card-resizer:focus-visible { background: var(--accent); outline: 2px solid var(--surface-solid); }
-.workspace-place-tabs { display: flex; padding: 5px; gap: 3px; border-block: 1px solid var(--border); background: var(--surface-solid); }
-.workspace-place-tab { flex: 1; min-width: 0; border: 0; border-radius: 6px; padding: 7px 3px; background: transparent; color: var(--text); font: inherit; font-size: 11.5px; cursor: pointer; }
-.workspace-place-tab:hover { background: var(--accent-soft); }
-.workspace-place-tab.is-active { background: var(--accent); color: var(--on-accent); font-weight: 600; }
-.workspace-place-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 /* Old floating-panel geometry must not escape the stable left card. */
 .app-shell.is-v2.is-workspace-1c .workspace-card .ui-panel {
   position: static !important; inset: auto !important; width: 100% !important;
@@ -32,12 +27,6 @@
 .app-shell.is-workspace-1c .workspace-card .panel-drag-handle,
 .app-shell.is-workspace-1c .workspace-card .panel-resizer,
 .app-shell.is-workspace-1c .workspace-card .panel-height-resizer { display: none; }
-.workspace-card .identify-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.workspace-card .identify-summary-grid .identify-fact { min-width: 0; }
-.workspace-card .identify-summary-grid strong { overflow-wrap: anywhere; }
-.workspace-card .identify-verdict-item { flex-wrap: wrap; gap: 4px; }
-.workspace-card .identify-verdict-item > strong { white-space: normal; text-overflow: clip; overflow-wrap: anywhere; }
-.workspace-card .identify-actions { flex-wrap: wrap; }
 .workspace-card .analysis-mode-tabs { flex-wrap: wrap; }
 /* Reuse the existing live metric/parameter descriptors, in one vertical card. */
 .app-shell.is-workspace-1c .workspace-context .context-bar {
@@ -72,9 +61,8 @@
 .app-shell.is-workspace-1c .tool-dock .tool-dock-main .tool-dock-group { width: auto; padding: 0 9px; min-width: 0; height: 36px; flex: none; font-size: 12px; justify-content: center; }
 .app-shell.is-workspace-1c .tool-dock.is-expanded .tool-dock-main .tool-dock-group > span { display: inline; }
 .app-shell.is-workspace-1c .tool-dock-tool { width: 42.5px; height: 42.5px; padding: 0; justify-content: center; }
-.app-shell.is-workspace-1c .tool-dock-tool .tool-secondary-label,
-.app-shell.is-workspace-1c .tool-dock-tool kbd,
-.app-shell.is-workspace-1c .tool-dock-caption { display: none; }
+
+.app-shell.is-workspace-1c .tool-dock-tool kbd{ display: none; }
 .app-shell.is-workspace-1c .tool-dock-group:disabled { opacity: .5; cursor: default; }
 @media (max-width: 1150px) {
   /* The toolbar uses the bottom strip rather than squeezing into a narrow center. */
@@ -82,8 +70,7 @@
 }
 @media (pointer: coarse) {
   .workspace-card-head .icon-button { width: 36px; height: 36px; flex-basis: 36px; }
-  .workspace-place-tab { min-height: 44px; }
-  .app-shell.is-workspace-1c .tool-dock-tool { width: 55px; height: 55px; }
+    .app-shell.is-workspace-1c .tool-dock-tool { width: 55px; height: 55px; }
   .app-shell.is-workspace-1c .tool-dock .tool-dock-main .tool-dock-group { min-height: 44px; }
   .app-shell.is-workspace-1c .workspace-card, .app-shell.is-workspace-1c .dock--right-panel { max-height: calc(100% - 186px); }
 }
@@ -165,11 +152,5 @@
 /* 19.27.0 — okna odpięte bez własnych reguł położenia („Wyniki analizy”, „Ortofotomapy”).
    Wcześniej wpadały w zwykły przepływ strony: (0,0), pod paskiem aplikacji, na całą szerokość.
    Pozycję (left/top) i rozmiar ustawia usePanel; tu tylko warstwa, wymiary domyślne i wygląd. */
-.map-area > :is(.analysis-results-panel, .orthophoto-panel):not(.is-docked) {
-  position: absolute; z-index: var(--z-dock-raised); left: 50%; top: 64px; right: auto; bottom: auto;
-  width: 860px; max-width: calc(100% - 16px); max-height: calc(100% - 140px); min-height: 0;
-  background: var(--surface-solid); color: var(--text); border-radius: 10px; box-shadow: var(--v2-dock-shadow); overflow: hidden;
-}
-.map-area > .orthophoto-panel:not(.is-docked) { width: 380px; }
 .map-area > .analysis-results-panel:not(.is-docked) { height: 320px; }
 .map-area > .analysis-results-panel:not(.is-docked) > :not(.panel-header):not(.panel-footer) { min-height: 0; overflow: auto; }

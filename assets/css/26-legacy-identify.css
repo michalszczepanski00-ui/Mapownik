@@ -30,8 +30,7 @@
 .identify-panel-body { min-height: 0; overflow: auto; padding: 8px; }
 .identify-loading,
 .identify-empty,
-.identify-error,
-.identify-progress {
+.identify-error{
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -40,9 +39,6 @@
   line-height: 1.35;
 }
 .identify-error { color: var(--danger); }
-.identify-progress { margin-top: 7px; }
-.identify-message { margin-top: 7px; padding: 7px 8px; border-radius: 7px; font-size: var(--fs-xs); line-height: 1.35; }
-.identify-message--error { color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--surface-raised)); }
 
 @media (max-width: 760px), (pointer: coarse) and (max-height: 500px) {
   .identify-panel { left: 52px; right: 8px; width: auto; max-width: none; max-height: 58vh; }
@@ -51,15 +47,6 @@
 /* Informacja o miejscu */
 .identify-panel--compact { width: 322px; max-height: min(62vh, 560px); }
 .identify-panel--compact .identify-panel-body { padding: 6px; }
-.identify-summary-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--border);
-}
 .identify-fact {
   min-width: 0;
   padding: 5px 7px;
@@ -95,7 +82,6 @@
   line-height: 1.4;
   white-space: pre-line;
 }
-.identify-panel--compact .identify-progress { margin: 5px 2px 0; }
 
 @media (max-width: 760px), (pointer: coarse) and (max-height: 500px) {
   .identify-panel--compact { max-height: 54vh; }
@@ -113,57 +99,6 @@
 
 /* 14.3 — Informacja o działce+ */
 .identify-panel--parcelplus { width: 372px; max-height: min(72vh, 700px); }
-.parcelplus-disclaimer {
-  margin-top: 6px;
-  padding: 6px 8px;
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--border));
-  border-radius: 7px;
-  color: var(--text-muted);
-  background: color-mix(in srgb, var(--accent) 5%, var(--surface-raised));
-  font-size: var(--fs-xs);
-  line-height: 1.35;
-}
-.parcelplus-section { margin-top: 7px; border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
-.parcelplus-section-head {
-  min-height: 24px;
-  padding: 0 3px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  cursor: pointer;
-  list-style: none;
-  background: var(--surface-raised);
-}
-.parcelplus-section-head::-webkit-details-marker { display: none; }
-.parcelplus-section-head::before { content: '›'; color: var(--text-muted); font-size: var(--fs-xl); line-height: 1; }
-.parcelplus-section[open] .parcelplus-section-head::before { transform: rotate(90deg); }
-.parcelplus-section-head:hover { background: var(--surface-hover); }
-.parcelplus-section-content { padding: 4px; }
-.parcelplus-section-head strong { font-size: var(--fs-md); }
-.parcelplus-section-head small {
-  min-width: 27px;
-  padding: 1px 5px;
-  border-radius: 999px;
-  color: var(--text-muted);
-  background: var(--surface-raised);
-  text-align: center;
-  font-size: var(--fs-xs);
-}
-.parcelplus-note {
-  margin: -1px 3px 4px;
-  color: var(--text-faint);
-  font-size: var(--fs-xs);
-  line-height: 1.3;
-}
-.parcelplus-list {
-  display: grid;
-  gap: 2px;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  background: var(--border);
-}
 .parcelplus-row {
   overflow: hidden;
   background: var(--surface-solid);
@@ -214,26 +149,6 @@
 /* 17.8.10 — uproszczony widok: sekcje screeningu chowają domyślnie źródła
    bez wyniku; ta linijka wyjaśnia, że zostały sprawdzone, a przycisk
    pozwala je jednak pokazać (np. do dokumentacji negatywnego wyniku). */
-.parcelplus-note--empty {
-  margin: 3px 3px 0;
-  padding: 6px 8px;
-  border: 1px dashed var(--border);
-  border-radius: 7px;
-  background: var(--surface-raised);
-}
-.parcelplus-more-toggle {
-  margin: 4px 3px 0;
-  padding: 3px 6px;
-  border: none;
-  border-radius: 6px;
-  background: none;
-  color: var(--text-muted);
-  font-size: var(--fs-xs);
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.parcelplus-more-toggle:hover { color: var(--text); background: var(--surface-hover); }
 @media (max-width: 760px), (pointer: coarse) and (max-height: 500px) {
   .identify-panel--parcelplus { width: auto; max-height: 64vh; }
 }
