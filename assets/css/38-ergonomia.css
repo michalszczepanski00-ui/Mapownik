@@ -240,3 +240,14 @@ details[open] > summary .pc-chev { transform: rotate(90deg); }
 .market-scope-option.is-active { background: var(--accent); color: var(--on-accent, #fff); }
 .layer-group-title--static { padding: 6px 8px; font-weight: 600; font-size: 12px; color: var(--text-muted); }
 .layer-group-title--static small { margin-left: 6px; }
+
+/* 19.53.0 (Etap 3): pasek narzędzi trybu i prawa kolumna — same ikony (nazwa i skrót w dymku). */
+.app-shell.is-workspace-1c .tool-dock-tool { width: 40px; min-width: 40px; height: 40px; padding: 0; flex-direction: row; justify-content: center; gap: 0; }
+@media (pointer: coarse) { .app-shell.is-workspace-1c .tool-dock-tool { width: 48px; min-width: 48px; height: 48px; } }
+.tool-dock-sep[title] { cursor: default; }
+.activity-bar-button { width: 40px; height: 40px; }
+/* 19.53.0: widok z przyciskiem „‹ Analizy” — tytuł i podtytuł w jednym wierszu (wielokropek). */
+.ui-panel:has(.panel-back-button) .panel-title--compact { min-width: 0; flex: 1 1 auto; }
+.ui-panel:has(.panel-back-button) .panel-title--compact > div { min-width: 0; }
+.ui-panel:has(.panel-back-button) .panel-title--compact > div > strong,
+.ui-panel:has(.panel-back-button) .panel-title--compact > div > span { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

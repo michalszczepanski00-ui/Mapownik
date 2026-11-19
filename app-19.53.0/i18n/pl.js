@@ -252,6 +252,7 @@ export const PL = Object.freeze({
     'command.group.view': 'Widok',
     'command.group.panels': 'Panele',
     'command.group.help': 'Pomoc',
+    'command.group.actions': 'Działka i analizy',
     'command.undo': 'Cofnij',
     'command.redo': 'Ponów',
     'command.delete': 'Usuń zaznaczony obiekt',

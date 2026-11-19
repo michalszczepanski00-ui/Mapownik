@@ -1,38 +1,45 @@
 /**
- * 19.9.0: trzy grupy pierwszego poziomu — Sprawdź, Szkic, Pomiar.
- * „Przejazd” należy do Szkicu, „Teren” do Pomiaru. „Przesuń” nie ma własnego
+ * 19.9.0: grupy pierwszego poziomu (od 19.53.0 cztery tryby, opis niżej).
+ * „Przesuń” nie ma własnego
  * przycisku: przeciąganie zawsze przesuwa mapę, a kliknięcie znaczy „sprawdź tu”
  * (spacja nadal włącza czyste przesuwanie). Skróty klawiszowe bez zmian.
  *
- * `sections` dzielą pasek narzędzi doku separatorami (`caption` — podpis sekcji,
- * tylko tam, gdzie mieści się w pasku); `tools` to płaska lista (katalog mobilny).
+ * `sections` dzielą pasek narzędzi doku separatorami (nazwa sekcji w dymku i dla czytnika ekranu);
+ * `tools` to płaska lista (katalog mobilny).
  */
 function group(entry) {
     return Object.freeze({ ...entry, tools: entry.sections.flatMap((section) => section.tools) });
 }
 
+// 19.53.0 (Etap 3): cztery tryby — Sprawdź · Rysuj · Mierz · Teren. Mierz to tylko pomiar
+// (Odległość, Powierzchnia); narzędzia działające na terenie i obszarze (Bufor, Obszar WZ,
+// Profil, Wysokości, Teren 3D) mają własny tryb. Rysuj: kształty · opisy · specjalne · Edytuj.
+// Narzędzia, skróty i ich działanie bez zmian — zmienia się tylko przydział do trybu.
 export const TOOL_GROUPS = Object.freeze([
     group({ id: 'information', title: 'Sprawdź', icon: 'identify', sections: [{ tools: ['core.identify'] }] }),
     group({
         id: 'drawing', title: 'Rysuj', icon: 'polygon', defaultTool: 'core.draw.polygon',
         sections: [
-            { title: 'Obiekty', tools: ['core.draw.point', 'core.draw.line', 'core.draw.polygon', 'core.draw.rectangle', 'core.draw.circle', 'core.parcel.pick'] },
-            { title: 'Opis', tools: ['core.draw.text', 'core.draw.arrow', 'core.draw.callout'] },
-            { title: 'Przejazd', tools: ['core.draw.road'] },
+            { title: 'Kształty', tools: ['core.draw.point', 'core.draw.line', 'core.draw.polygon', 'core.draw.rectangle', 'core.draw.circle'] },
+            { title: 'Opisy', tools: ['core.draw.text', 'core.draw.arrow', 'core.draw.callout'] },
+            { title: 'Specjalne', tools: ['core.parcel.pick', 'core.draw.road'] },
             { title: 'Edycja', tools: ['core.select'] },
         ],
     }),
     group({
         id: 'measurement', title: 'Mierz', icon: 'measure-line', defaultTool: 'core.measure.line',
+        sections: [{ title: 'Pomiar', tools: ['core.measure.line', 'core.measure.area'] }],
+    }),
+    group({
+        id: 'terrain', title: 'Teren', icon: 'terrain-profile', defaultTool: 'core.buffer',
         sections: [
-            { title: 'Pomiar', caption: 'Pomiar', tools: ['core.measure.line', 'core.measure.area', 'core.buffer', 'core.wz.area'] },
-            { title: 'Teren', caption: 'Teren', tools: ['core.terrain.profile', 'core.terrain.area', 'core.terrain.3d'] },
+            { title: 'Obszar', tools: ['core.buffer', 'core.wz.area'] },
+            { title: 'Rzeźba terenu', tools: ['core.terrain.profile', 'core.terrain.area', 'core.terrain.3d'] },
         ],
     }),
 ]);
 
-/** Krótsze podpisy w pasku doku (pełna nazwa zostaje w podpowiedzi). */
-// 19.28.0: podpisy pod ikonami doku na komputerze — te same nazwy co w arkuszach telefonu.
+/** Krótkie nazwy narzędzi — dymek ikony w doku (19.53.0: bez podpisów pod ikonami) i arkusze telefonu. */
 export const DOCK_LABELS = Object.freeze({
     'core.draw.point': 'Punkt', 'core.draw.line': 'Linia', 'core.draw.polygon': 'Poligon', 'core.draw.rectangle': 'Prostokąt',
     'core.draw.circle': 'Okrąg', 'core.parcel.pick': 'Działka', 'core.draw.text': 'Tekst', 'core.draw.arrow': 'Strzałka',

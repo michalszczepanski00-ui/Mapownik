@@ -5,7 +5,6 @@ import { usePanel } from '../hooks/useDockGeometry.js';
 import { PanelHeaderActions } from './PanelHeaderActions.js';
 import { PanelIcon } from './PanelIcon.js';
 import { PanelMinimized, PanelShell } from '../ui/index.js';
-import { openPanel, useAppDispatch } from '../../store/index.js';
 
 /**
  * 19.53.0 (Etap 5) — dok Analizy: lista narzędzi analiz. Każde otwiera swój widok w tym samym doku,
@@ -16,24 +15,10 @@ import { openPanel, useAppDispatch } from '../../store/index.js';
 const ID = 'analyses';
 const NO_IDENTIFY = Object.freeze({ open: false });
 
-export const ANALYSIS_TOOLS = Object.freeze([
-    { id: 'screening', panel: 'analysis', mode: 'screening', icon: 'analysis', title: 'Otoczenie działki', text: 'Ochrona przyrody, plany, ograniczenia wokół działki (usługi WMS).' },
-    { id: 'prices', panel: 'marketPrices', icon: 'market-prices', title: 'Ceny transakcyjne', text: 'Wokół działki albo w widoku mapy (Rejestr Cen Nieruchomości).' },
-    { id: 'permits', panel: 'buildingPermits', icon: 'building-permits', title: 'Budowy i pozwolenia', text: 'Wnioski, decyzje i zgłoszenia budowlane w okolicy (GUNB).' },
-    { id: 'server', panel: 'vpsData', icon: 'parcel-report', title: 'Analiza działki (serwer)', text: 'Granice, plan i odległości do budynków i dróg (BDOT10k).' },
-    { id: 'source', panel: 'analysis', mode: 'manual', icon: 'analysis', title: 'Analiza źródła', text: 'Wybrana warstwa w obszarze lub wokół obiektu.' },
-]);
-
-/** Otwiera widok narzędzia (wspólne dla doku, karty działki i palety poleceń). */
-export function openAnalysisTool(dispatch, analysisManager, tool) {
-    if (tool.mode) analysisManager?.setPanelMode?.(tool.mode);
-    dispatch(openPanel(tool.panel));
-}
-
 export function AnalysesPanel() {
-    const dispatch = useAppDispatch();
     const panel = usePanel(ID);
-    const analysis = useService('analysis');
+    const features = useService('features');
+    const ctx = useService('featureContext');
     const identify = useServiceSnapshot('identify', NO_IDENTIFY);
     if (!panel.open) return null;
     const title = 'Analizy';
@@ -44,9 +29,10 @@ export function AnalysesPanel() {
         onDragStart: panel.onDragStart, onResizeWidth: panel.onResizeStart, onResizeHeight: panel.onResizeHeightStart },
     h('div', { className: 'analyses-body' },
         h('p', { className: 'analyses-context' }, parcel ? `Kontekst: ${parcel} (karta działki).` : 'Brak wybranej działki — narzędzia działają na widoku mapy albo wskażesz działkę w widoku.'),
-        h('ul', { className: 'analyses-list', role: 'list' }, ANALYSIS_TOOLS.map((tool) => h('li', { key: tool.id },
-            h('button', { type: 'button', className: 'analyses-item', 'data-tool': tool.id, onClick: () => openAnalysisTool(dispatch, analysis, tool) },
+        // 19.53.0 (Etap 3): lista ze strefy „dock:analyses” rejestru akcji (features/builtin/parcelActionsFeature.js).
+        h('ul', { className: 'analyses-list', role: 'list' }, (features?.actions.list('dock:analyses', ctx) ?? []).map((tool) => h('li', { key: tool.id },
+            h('button', { type: 'button', className: 'analyses-item', 'data-tool': tool.id.replace(/^analyses\./, ''), onClick: () => features.actions.run(tool.id, ctx) },
                 h('span', { className: 'analyses-item-icon', 'aria-hidden': true }, h(PanelIcon, { name: tool.icon, size: 17 })),
-                h('span', { className: 'analyses-item-text' }, h('strong', null, tool.title), h('small', null, tool.text)),
+                h('span', { className: 'analyses-item-text' }, h('strong', null, tool.label), h('small', null, tool.description)),
                 h(ChevronRight, { size: 15, 'aria-hidden': true })))))));
 }

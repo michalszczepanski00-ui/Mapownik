@@ -20,6 +20,7 @@ import { objectsFeature } from './builtin/objectsFeature.js';
 import { analysisFeature } from './builtin/analysisFeature.js';
 import { vpsFeature } from './builtin/vpsFeature.js';
 import { exportFeature } from './builtin/exportFeature.js';
+import { parcelActionsFeature } from './builtin/parcelActionsFeature.js';
 import { collectPanels } from './defineFeature.js';
 
 export const BUILTIN_FEATURES = Object.freeze([
@@ -37,6 +38,7 @@ export const BUILTIN_FEATURES = Object.freeze([
     analysisFeature,
     vpsFeature,
     exportFeature,
+    parcelActionsFeature,
 ]);
 
 /** 18.1: manifesty paneli (stan doku w store i rejestr komponentów paneli). */

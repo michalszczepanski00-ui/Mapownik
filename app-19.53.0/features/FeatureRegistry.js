@@ -1,4 +1,5 @@
 import { t } from '../i18n/index.js';
+import { ActionRegistry } from '../actions/registry.js';
 
 /**
  * 18.0 — rejestr funkcji: instaluje deklaracje z defineFeature w runtime mapy
@@ -16,7 +17,8 @@ export class FeatureRegistry {
     constructor(features = []) {
         this.features = [];
         this.toolDefs = new Map();
-        this.slots = { statusItems: [], contextMenu: [], objectFields: [], exportFormats: [], analysisSources: [], analysisOperations: [], settings: [] };
+        this.slots = { statusItems: [], contextMenu: [], objectFields: [], exportFormats: [], analysisSources: [], analysisOperations: [], settings: [], actions: [] };
+        this.actions = new ActionRegistry([]);
         this.disposers = [];
         this.createdServices = [];
         this.installed = false;
@@ -115,6 +117,10 @@ export class FeatureRegistry {
         }
         for (const slot of Object.keys(this.slots))
             this.slots[slot].sort((a, b) => (a.order ?? 1000) - (b.order ?? 1000));
+        // 6. 19.53.0: rejestr akcji ze strefami (limity sprawdzane tutaj) + te same akcje w palecie poleceń.
+        this.actions = new ActionRegistry(this.slots.actions);
+        for (const command of this.actions.paletteCommands(context, t('command.group.actions')))
+            this.disposers.push(commandRegistry.register(command));
         toolRegistry.refresh();
     }
 
@@ -148,6 +154,7 @@ export class FeatureRegistry {
             analysisSources: (feature.analysisSources ?? []).length,
             analysisOperations: (feature.analysisOperations ?? []).map((operation) => operation.id),
             settings: (feature.settings ?? []).map((setting) => setting.id),
+            actions: (feature.actions ?? []).map((action) => action.id),
         }));
     }
 

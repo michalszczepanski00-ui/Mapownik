@@ -1,12 +1,8 @@
 import { createElement as h, useMemo } from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { transform } from 'ol/proj.js';
 import { Check, ChevronDown, ChevronRight, Eye, RotateCw } from 'lucide-react';
-import { reportDialog } from './reportDialogStore.js';
 import { useService, useServiceSnapshot } from '../services/AppServicesContext.js';
-import { openPanel, useAppDispatch } from '../../store/index.js';
 import { formatParcelArea } from '../../core/units.js';
-import { runTerrainFor } from '../../terrain/runTerrainFor.js';
 import { Fact, SummaryRow, Nearby, protectedAreaName, forestOwner, soilClass, pogVerdict, isRetryableLayerError } from './IdentifyPanel.js';
 
 /**
@@ -119,42 +115,23 @@ const detailOf = (layer) => (layer?.status === 'ready' && layer.text ? { title: 
 const eeaOf = (layers) => layers.find((l) => l.fallback === 'eea')?.fallbackNote ?? null;
 
 export function ParcelCard({ snapshot, manager, layers, onScreening }) {
-    const dispatch = useAppDispatch();
-    const parcels = useService('parcels');
-    const registeredTools = useService('tools');
-    const terrainService = useService('terrainProfile');
-    const objects = useService('objects');
-    const controller = useService('mapController');
-    const toasts = useService('featureContext')?.toasts;
+    const features = useService('features');
+    const ctx = useService('featureContext');
     const bySource = useMemo(() => new Map(layers.map((l) => [l.sourceKey, l])), [layers]);
     const parcel = snapshot.parcel;
-    const fail = (error) => toasts?.show({ tone: 'danger', message: error instanceof Error ? error.message : String(error) });
     const retry = (ids) => void manager?.retryFailed(ids);
 
-    // --- działania (P2): te same wywołania co dotychczasowe przyciski karty
-    const addToProject = () => { try { return parcels?.addParcel(parcel) ?? null; } catch (error) { fail(error); return null; } };
-    const run = {
-        save: () => { if (addToProject()) dispatch(openPanel('objects')); },
-        screening: () => onScreening?.(parcel),
-        prices: () => {
-            const c = snapshot.parcelCenterLonLat;
-            if (controller && Array.isArray(c)) {
-                const [cx, cy] = transform(c, 'EPSG:4326', 'EPSG:3857');
-                const r = 500 / Math.cos(c[1] * Math.PI / 180);
-                controller.fitExtent([cx - r, cy - r, cx + r, cy + r], { maxZoom: 18, duration: 250, padding: [24, 24, 24, 24] });
-            }
-            dispatch(openPanel('marketPrices'));
-        },
-        permits: () => dispatch(openPanel('buildingPermits')),
-        server: () => dispatch(openPanel('vpsData')),
-        buffer: async () => { if (!addToProject()) return; manager?.close(); await registeredTools?.activate('core.buffer'); },
-        wz: async () => { const id = addToProject(); if (!id) return; try { objects?.select(id); } catch { /* zaznaczenie pomocnicze */ } manager?.close(); await registeredTools?.activate('core.wz.area'); },
-        terrain: async () => { const id = addToProject(); if (!id) return; manager?.close(); await registeredTools?.activate('core.terrain.area'); await runTerrainFor(terrainService, id); },
-        profile: async () => { await registeredTools?.activate('core.terrain.profile'); },
-        model3d: () => void import('../../terrain3d/terrain3dTool.js').then((m) => m.openParcel3D(parcel)).catch(fail),
-    };
-    const menuItem = (label, onSelect, hint = null) => h(DropdownMenu.Item, { className: 'dropdown-item pc-menu-item', onSelect: () => { try { const r = onSelect(); if (r?.catch) r.catch(fail); } catch (error) { fail(error); } } },
-        h('span', null, label), hint ? h('small', null, hint) : null);
+    // --- działania (P2): z rejestru akcji (19.53.0, strefy inspector.*; deklaracje w features/builtin/parcelActionsFeature.js)
+    const actions = features?.actions;
+    const zone = (name) => (actions?.list(name, ctx) ?? []).filter((action) => onScreening || action.id !== 'parcel.screening');
+    const runAction = (action) => actions?.run(action.id, ctx);
+    const menuItems = zone('inspector.analyses').flatMap((action, index) => [
+        action.separatorBefore && index > 0 ? h(DropdownMenu.Separator, { key: `${action.id}-sep`, className: 'dropdown-separator' }) : null,
+        h(DropdownMenu.Item, { key: action.id, className: 'dropdown-item pc-menu-item', 'data-action-id': action.id, onSelect: () => runAction(action) },
+            h('span', null, action.label), action.hint ? h('small', null, action.hint) : null),
+    ]).filter(Boolean);
+    const actionButton = (action, primary) => h('button', { key: action.id, type: 'button', className: `pc-btn${primary ? ' pc-btn--primary' : ''}`, 'data-action-id': action.id,
+        title: action.hint ?? action.label, onClick: () => runAction(action) }, action.label);
 
     // --- Planowanie (zawsze)
     const mpzp = bySource.get('mpzp');
@@ -209,21 +186,11 @@ export function ParcelCard({ snapshot, manager, layers, onScreening }) {
             sub ? h('div', { className: 'pc-sub', title: snapshot.parcelAreaSqm ? formatParcelArea(snapshot.parcelAreaSqm) : sub }, sub) : null,
             !snapshot.zoneOnly && !parcel && !snapshot.parcelBusy ? h('p', { className: 'pc-note' }, snapshot.parcelError ? 'Nie udało się odczytać działki — wyniki dotyczą samego punktu.' : 'W tym punkcie nie odczytano działki — wyniki dotyczą samego punktu.') : null,
             !snapshot.zoneOnly && parcel?.wkt ? h('div', { className: 'pc-actions' },
-                h('button', { type: 'button', className: 'pc-btn pc-btn--primary', title: 'Raport działki PDF — szablony i zakres do wyboru', onClick: () => reportDialog.open(parcel) }, 'Raport PDF'),
-                h('button', { type: 'button', className: 'pc-btn', title: 'Dodaj granicę działki do projektu (panel Obiekty)', onClick: run.save }, 'Do projektu'),
-                h(DropdownMenu.Root, null,
+                zone('inspector.primary').map((action) => actionButton(action, true)),
+                zone('inspector.secondary').map((action) => actionButton(action, false)),
+                menuItems.length ? h(DropdownMenu.Root, null,
                     h(DropdownMenu.Trigger, { asChild: true }, h('button', { type: 'button', className: 'pc-btn', 'aria-label': 'Analizy działki' }, 'Analizy', h(ChevronDown, { size: 13, 'aria-hidden': true }))),
-                    h(DropdownMenu.Portal, null, h(DropdownMenu.Content, { className: 'dropdown-content pc-menu', align: 'end', sideOffset: 5 },
-                        onScreening ? menuItem('Otoczenie działki', run.screening, 'screening') : null,
-                        menuItem('Ceny transakcyjne', run.prices),
-                        menuItem('Budowy i pozwolenia', run.permits),
-                        menuItem('Analiza działki (serwer)', run.server),
-                        h(DropdownMenu.Separator, { className: 'dropdown-separator' }),
-                        menuItem('Bufor', run.buffer, 'B'),
-                        menuItem('Obszar analizowany WZ', run.wz, 'Z'),
-                        menuItem('Wysokości i nachylenie', run.terrain),
-                        menuItem('Profil terenu', run.profile),
-                        menuItem('Teren 3D', run.model3d))))) : null),
+                    h(DropdownMenu.Portal, null, h(DropdownMenu.Content, { className: 'dropdown-content pc-menu', align: 'end', sideOffset: 5 }, menuItems))) : null) : null),
         // P3/P4 Planowanie
         h('section', { className: 'pc-group', 'aria-label': 'Planowanie' },
             h('h3', { className: 'pc-group-title' }, 'Planowanie'),

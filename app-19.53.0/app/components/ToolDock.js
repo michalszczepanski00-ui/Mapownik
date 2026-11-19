@@ -14,9 +14,9 @@ const IDENTIFY = 'core.identify';
 /**
  * 19.9.0 — dok narzędzi na dole mapy (zastępuje lewą szynę FloatingTools).
  *
- * Dolny wiersz: trzy grupy (Sprawdź · Szkic · Pomiar) i pasek kontekstu
- * aktywnego narzędzia (instrukcja, parametry, odczyt szkicu, Zakończ/Anuluj).
- * Wybranie Szkicu albo Pomiaru rozwija nad nim wiersz ze WSZYSTKIMI
+ * Dolny wiersz: tryby (19.53.0: Sprawdź · Rysuj · Mierz · Teren). Opcje aktywnego
+ * narzędzia są w pasku kontekstowym u góry mapy (19.49.0).
+ * Wybranie trybu innego niż Sprawdź rozwija nad nim wiersz ze WSZYSTKIMI
  * narzędziami grupy — bez rozwijanych list. Ponowne kliknięcie aktywnej grupy
  * albo Esc wraca do „Sprawdź”.
  */
@@ -51,10 +51,10 @@ export function ToolDock() {
             key: id, type: 'button', className: `tool-dock-tool${tool.active ? ' is-active' : ''}`,
             'data-tool-id': id, 'aria-label': tool.title, 'aria-pressed': tool.active, 'aria-busy': tool.loading || undefined,
             disabled: !registry || !tool.enabled || tool.loading,
-            title: [tool.title, tool.shortcut?.label && `(${tool.shortcut.label})`].filter(Boolean).join(' ') + (tool.description ? `\n${tool.description}` : ''),
+            // 19.53.0 (Etap 3): same ikony — nazwa i skrót w dymku (oraz dla czytnika ekranu).
+            title: [DOCK_LABELS[id] ?? tool.title, tool.shortcut?.label && `(${tool.shortcut.label})`].filter(Boolean).join(' ') + (tool.description ? `\n${tool.description}` : ''),
             onClick: () => activate(id),
-        }, h(ToolIcon, { name: tool.icon, size: 20 }), h('span', { className: 'tool-secondary-label' }, DOCK_LABELS[id] ?? tool.label ?? tool.title),
-            tool.shortcut && h('kbd', null, tool.shortcut.label));
+        }, h(ToolIcon, { name: tool.icon, size: 20 }));
     };
 
     const onKeys = (event) => {
@@ -74,8 +74,7 @@ export function ToolDock() {
         h(ObjectStyleBar, null),
         expanded && h('div', { className: 'tool-dock-row tool-dock-tools', role: 'toolbar', 'aria-label': activeGroup.title },
             activeGroup.sections.map((section, index) => h(Fragment, { key: section.title ?? index },
-                index > 0 && h('span', { className: 'tool-dock-sep', 'aria-hidden': true }),
-                section.caption && h('span', { className: 'tool-dock-caption' }, section.caption),
+                index > 0 && h('span', { className: 'tool-dock-sep', 'aria-hidden': true, title: section.title }),
                 section.tools.map(toolButton)))),
         h('div', { className: 'tool-dock-row tool-dock-main' },
             h('div', { className: 'tool-dock-groups', role: 'group', 'aria-label': 'Grupy narzędzi' },
@@ -85,8 +84,8 @@ export function ToolDock() {
                         key: entry.id, type: 'button', className: `tool-dock-group${on ? ' is-active' : ''}`,
                         'data-tool-group': entry.id, 'aria-pressed': on,
                         'aria-expanded': entry.id === 'information' ? undefined : on,
-                        title: entry.id === 'information' ? 'Sprawdź miejsce (I) — kliknij mapę' : `${entry.title} — ${on ? 'zwiń (Esc)' : 'pokaż narzędzia'}`,
+                        title: entry.id === 'information' ? 'Sprawdź miejsce (I) — kliknij mapę' : `${entry.title}: ${entry.sections.map((section) => section.tools.map((id) => DOCK_LABELS[id]).join(', ')).join(' · ')} — ${on ? 'zwiń (Esc)' : 'pokaż narzędzia'}`,
                         onClick: () => pickGroup(entry),
-                    }, h(ToolIcon, { name: entry.icon, size: 17 }), h('span', null, entry.id === 'drawing' ? 'Rysuj' : entry.id === 'measurement' ? 'Mierz' : entry.title));
+                    }, h(ToolIcon, { name: entry.icon, size: 17 }), h('span', null, entry.title));
                 }))));
 }

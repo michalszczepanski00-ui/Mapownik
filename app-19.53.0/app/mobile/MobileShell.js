@@ -101,11 +101,14 @@ const GROUP_NOTES = {
     drawing: 'Rysuj palcem po mapie; „Zakończ” na pasku szkicu. Edytuj — przy zaznaczonym obiekcie.',
     measurement: 'Odległość, powierzchnię i profil dodajesz celownikiem; bufor i wysokości obszaru — dotknięciem mapy.',
 };
+// 19.53.0: na komputerze Teren jest osobnym trybem; na telefonie zostaje w arkuszu Mierz (dolna nawigacja bez zmian).
+const SHEET_GROUPS = { measurement: ['measurement', 'terrain'] };
 function ToolsSheet({ onClose, onCrosshair, groupId = null }) {
     const tools = useService('tools');
     const snapshot = useServiceSnapshot('tools', EMPTY_TOOLS);
     const [snap, setSnap] = useState('half');
-    const groups = groupId ? TOOL_GROUPS.filter((group) => group.id === groupId) : TOOL_GROUPS.filter((group) => group.id !== 'information');
+    const ids = groupId ? SHEET_GROUPS[groupId] ?? [groupId] : null;
+    const groups = ids ? TOOL_GROUPS.filter((group) => ids.includes(group.id)) : TOOL_GROUPS.filter((group) => group.id !== 'information');
     const title = groupId ? groups[0]?.title ?? 'Narzędzia' : 'Wszystkie narzędzia';
     const tool = (id) => {
         const item = snapshot.items.find((entry) => entry.id === id);
@@ -122,7 +125,7 @@ function ToolsSheet({ onClose, onCrosshair, groupId = null }) {
             h('button', { type: 'button', className: 'm-icon-button', 'aria-label': t('mobile.close'), onClick: onClose }, h(X, { size: 20 }))),
     },
         groups.flatMap((group) => group.sections.map((section, index) => h('section', { key: `${group.id}-${index}`, className: 'm-tool-section' },
-            h('h3', { className: 'm-section-title' }, groupId ? (section.title ?? group.title) : `${group.title} · ${section.title ?? ''}`),
+            h('h3', { className: 'm-section-title' }, groupId && groups.length === 1 ? (section.title ?? group.title) : `${group.title} · ${section.title ?? ''}`),
             h('div', { className: 'm-tool-grid' }, section.tools.map(tool))))),
         h('p', { className: 'm-note' }, groupId ? GROUP_NOTES[groupId] ?? '' : 'Parametry aktywnego narzędzia pojawią się pod jego nazwą.'));
 }
@@ -349,7 +352,7 @@ export function MobileShell() {
     const activeGroup = activeToolId && !IDLE_TOOLS.has(activeToolId) ? groupOfTool(activeToolId)?.id : null;
     const tab = sheet === 'layers' || sheet === 'utilities' || rightActive === 'layers' ? 'layers'
         : sheet === 'sketch' || (!sheet && activeGroup === 'drawing') ? 'sketch'
-            : sheet === 'measure' || crosshair || (!sheet && activeGroup === 'measurement') ? 'measure'
+            : sheet === 'measure' || crosshair || (!sheet && (activeGroup === 'measurement' || activeGroup === 'terrain')) ? 'measure'
                 : sheet === 'project' || rightActive === 'objects' ? 'project'
                     : sheet === 'more' || sheet === 'tools' || MORE_PANELS.has(rightActive) ? 'more' : 'check';
     const cardOpen = identify.open;

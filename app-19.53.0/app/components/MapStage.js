@@ -9,7 +9,7 @@ import { StatusSlotItems } from './StatusSlotItems.js';
 import { SourceHealthPanel } from './SourceHealthPanel.js';
 import { MapScaleBar } from './MapScaleBar.js';
 import { formatScale, niceScaleDenominator } from '../../projections/mapScale.js';
-import { mapRuntimeStarted, mapRuntimeStopped, mapViewChanged, useAppDispatch, useAppSelector } from '../../store/index.js';
+import { mapRuntimeStarted, mapRuntimeStopped, mapViewChanged, openPanel, useAppDispatch, useAppSelector } from '../../store/index.js';
 import { useService, useServiceHub, useServiceSnapshot } from '../services/AppServicesContext.js';
 import { t } from '../../i18n/index.js';
 
@@ -166,6 +166,8 @@ export function MapStage({ focusMap = false, mapOnly = false }) {
         setPersistenceSnapshot(runtime.projectSession.getSnapshot());
         // 18.0: publikacja całej mapy serwisów runtime (rdzeń + funkcje z
         // features/). Nowa funkcja nie dopisuje się tutaj do żadnej listy.
+        // 19.53.0: akcje z rejestru (actions/registry.js) otwierają panele przez store powłoki.
+        runtime.context.panels = { open: (id) => dispatch(openPanel(id)) };
         services.publish({ ...runtime.services, featureContext: runtime.context });
         setEditingSnapshot(runtime.editingManager.getSnapshot());
         const unsubscribeLayers = runtime.layerManager.subscribe(() => {

@@ -1,3 +1,5 @@
+import { isActionZone } from '../actions/registry.js';
+
 /**
  * 18.0 — KONTRAKT FUNKCJI.
  *
@@ -53,6 +55,12 @@
  *   settings        [{ id, label, type: 'toggle', default, order?, description? }]
  *                   pozycja menu Ustawienia; wartość czyta się przez ctx.settings.get(id).
  *
+ * 19.53.0 — slot akcji interfejsu ze strefami (actions/registry.js):
+ *   actions         [{ id, zone, label, order, run(ctx), when?(ctx), hint?, description?, icon?,
+ *                      separatorBefore?, palette?: boolean, paletteTitle?, keywords? }]
+ *                   przycisk albo pozycja menu w strefie (karta działki, menu Projekt, dok…);
+ *                   ta sama akcja trafia do palety poleceń. Limity stref sprawdza ActionRegistry.
+ *
  * Funkcje w deklaracjach dostają `ctx` z metodą get(nazwaSerwisu) — w runtime
  * mapy i w komponentach React ten sam kształt. Deklaracje nie zawierają JSX:
  * pola paska kontekstu i pozycje paska stanu są DANYMI, które rysuje powłoka.
@@ -65,7 +73,7 @@
  *     disabled?, tone?: 'warning'|'danger'|'accent', width? }
  */
 
-const SLOTS = ['services', 'interaction', 'tools', 'commands', 'statusItems', 'contextMenu', 'objectFields', 'panels', 'exportFormats', 'analysisSources', 'analysisOperations', 'settings'];
+const SLOTS = ['services', 'interaction', 'tools', 'commands', 'statusItems', 'contextMenu', 'objectFields', 'panels', 'exportFormats', 'analysisSources', 'analysisOperations', 'settings', 'actions'];
 const PANEL_DOCKS = new Set(['right', 'bottom']);
 const KNOWN_KEYS = new Set(['id', 'title', 'description', ...SLOTS]);
 
@@ -135,6 +143,11 @@ export function defineFeature(feature) {
         for (const action of format.actions)
             for (const id of action.options ?? [])
                 if (!optionIds.has(id)) fail(feature.id, `akcja ${format.id}.${action.id} wskazuje nieznaną opcję ${id}.`);
+    }
+    for (const action of requireArray(feature, 'actions')) {
+        if (!action?.id || !action.label || typeof action.run !== 'function') fail(feature.id, 'akcja wymaga id, label i run(ctx).');
+        if (!isActionZone(action.zone)) fail(feature.id, `akcja ${action.id}: nieznana strefa „${action.zone}”.`);
+        if (!Number.isFinite(action.order)) fail(feature.id, `akcja ${action.id} nie ma kolejności (order).`);
     }
     for (const source of requireArray(feature, 'analysisSources')) {
         if (!source?.id || !source.title) fail(feature.id, 'źródło analizy wymaga id i title.');

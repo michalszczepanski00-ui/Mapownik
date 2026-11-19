@@ -38,7 +38,7 @@ export function ActivityBar() {
                         : (item.active ? t('activity.detachedClose', { title: item.title }) : t('activity.detached', { title: item.title })))
                         + (item.hasResult && !item.active ? t('activity.hasResult') : ''),
                     tooltipSide: 'left',
-                    className: `activity-bar-button${item.railLabel ? ' has-label' : ''}${item.active ? ' is-open' : ''}${item.docked ? '' : ' is-detached'}`,
+                    className: `activity-bar-button${item.active ? ' is-open' : ''}${item.docked ? '' : ' is-detached'}`,
                     // 18.10.1: przycisk zadokowanego modułu rozwija panel (aria-expanded +
                     // aria-controls); odpięte okno to przełącznik widoczności (aria-pressed).
                     ...(item.docked
@@ -49,9 +49,7 @@ export function ActivityBar() {
                     onClick: () => (item.openChild ? dispatch(closePanel(item.openChild)) : toggle(item.id)),
                 },
                     h(PanelIcon, { name: item.icon, size: 19 }),
-                    // 19.8.5: widoczny podpis — same ikony (dwie podobne lupy) były
-                    // nieczytelne bez najechania kursorem.
-                    item.railLabel ? h('span', { className: 'activity-bar-label', 'aria-hidden': true }, item.railLabel) : null,
+                    // 19.53.0 (Etap 3): same ikony — trzy różne (Warstwy, Obiekty, Analizy); nazwa w dymku.
                     badgeCount > 0
                         ? h('span', { className: 'activity-bar-badge', 'aria-hidden': true }, badgeCount > 99 ? '99+' : badgeCount)
                         : null,
