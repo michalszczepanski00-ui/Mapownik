@@ -43,6 +43,8 @@ $sources = [
     'dzialki' => [
         'url' => 'https://integracja.gugik.gov.pl/cgi-bin/KrajowaIntegracjaEwidencjiGruntow',
         'layers' => 'dzialki,budynki,numery_dzialek',
+        // 19.56.0: z klasami gruntów jednym obrazem i bez numerów poniżej progu skali (LayerManager.applyLabelMerge).
+        'client_layers' => ['dzialki,budynki', 'dzialki,budynki,kontury,uzytki,numery_dzialek', 'dzialki,budynki,kontury,uzytki'],
         'version' => '1.3.0',
         'format' => 'image/png',
         'transparent' => true,

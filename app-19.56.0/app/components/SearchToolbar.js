@@ -19,7 +19,7 @@ function localityContextLabel(item) {
     const parts = [];
     if (item?.commune) parts.push(t('search.commune', { name: item.commune }));
     if (item?.county) parts.push(t('search.county', { name: item.county }));
-    if (item?.voivodeship) parts.push(t('search.voivodeship', { name: item.voivodeship }));
+    if (item?.voivodeship) parts.push(t('search.voivodeship', { name: String(item.voivodeship).replace(/^województwo\s+/i, '') }));
     return parts.join(' · ');
 }
 function localityBadgeLabel(item) {
@@ -30,14 +30,14 @@ function streetContextLabel(item) {
     const parts = [];
     if (item?.localityName) parts.push(item.localityName);
     if (item?.commune) parts.push(t('search.commune', { name: item.commune }));
-    if (item?.voivodeship) parts.push(t('search.voivodeship', { name: item.voivodeship }));
+    if (item?.voivodeship) parts.push(t('search.voivodeship', { name: String(item.voivodeship).replace(/^województwo\s+/i, '') }));
     return parts.join(' · ');
 }
 function parcelContextLabel(item) {
     const parts = [];
     if (item?.region) parts.push(t('search.region', { name: item.region }));
     if (item?.commune) parts.push(t('search.commune', { name: item.commune }));
-    if (item?.voivodeship) parts.push(t('search.voivodeship', { name: item.voivodeship }));
+    if (item?.voivodeship) parts.push(t('search.voivodeship', { name: String(item.voivodeship).replace(/^województwo\s+/i, '') }));
     return parts.join(' · ');
 }
 // 19.23.0: miejscowości i ulice (Nominatim) najpierw wprost z przeglądarki; proxy PHP tylko jako zapas.
@@ -74,7 +74,7 @@ function addressContextLabel(item) {
     const parts = [];
     if (item?.postcode) parts.push(item.postcode);
     if (item?.county && item.county !== item.localityName) parts.push(t('search.county', { name: item.county }));
-    if (item?.voivodeship) parts.push(t('search.voivodeship', { name: item.voivodeship }));
+    if (item?.voivodeship) parts.push(t('search.voivodeship', { name: String(item.voivodeship).replace(/^województwo\s+/i, '') }));
     if (item?.approximate) parts.push('ulica — numer nieznany');
     if (item?.source) parts.push(item.source);
     return parts.join(' · ');
@@ -120,6 +120,8 @@ function SearchDropdown({ open, loading, error, emptyLabel, items, kind, context
                 onMouseDown: (event) => event.preventDefault(),
                 onMouseEnter: () => onHighlight(index),
                 onClick: () => onSelect(item),
+                // 19.56.0: pełna nazwa w podpowiedzi (wynik może być skrócony w wąskim polu).
+                title: [copy.title, copy.meta].filter(Boolean).join(' — '),
             },
                 h('span', { className: 'map-search-result-icon', 'aria-hidden': true }, h(ResultIcon, { kind: item._kind ?? kind })),
                 h('span', { className: 'map-search-result-copy' }, h('strong', null, copy.title), copy.meta ? h('span', null, copy.meta) : null)

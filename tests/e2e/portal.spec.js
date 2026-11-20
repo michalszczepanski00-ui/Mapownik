@@ -1,4 +1,4 @@
-// msportal 19.55.0 — scenariusze w przeglądarce na zbudowanej paczce.
+// msportal 19.56.0 — scenariusze w przeglądarce na zbudowanej paczce.
 import { test, expect } from '@playwright/test';
 
 /** Zbiera błędy konsoli, wyjątki i naruszenia CSP strony. */
@@ -207,7 +207,7 @@ test('Esc zamyka panel Eksport, a wybrana działka zostaje (19.46.0)', async ({ 
   test.slow();
   await page.goto('/index.html');
   await expect(page.locator('#map-search-input')).toBeVisible({ timeout: 60_000 });
-  await expect(page).toHaveTitle(/Mapownik/);
+  await expect(page).toHaveTitle(/MSportal/);
   await page.fill('#map-search-input', '220408_2.0006.210/2');
   await page.getByRole('option').first().click();
   await expect(page.getByText('Działka 210/2').first()).toBeVisible({ timeout: 60_000 });

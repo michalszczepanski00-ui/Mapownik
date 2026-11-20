@@ -4,6 +4,7 @@ import { Check, ChevronDown, ChevronRight, Eye, RotateCw } from 'lucide-react';
 import { useService, useServiceSnapshot } from '../services/AppServicesContext.js';
 import { formatParcelArea } from '../../core/units.js';
 import { Fact, SummaryRow, Nearby, protectedAreaName, forestOwner, soilClass, pogVerdict, isRetryableLayerError } from './IdentifyPanel.js';
+import { useParcelShares, significantItems, isHighClass, areaLabel, pctLabel, POG_ZONE_NAMES, profileLabel, dateLabel } from './parcelShares.js';
 
 /**
  * 19.51.0 — uproszczona karta działki (propozycje P1–P10, propozycje/PROPOZYCJA_LEWY_PANEL.md).
@@ -161,6 +162,15 @@ export function ParcelCard({ snapshot, manager, layers, onScreening = null, head
     const pogHere = pogLayers.some((l) => l.status === 'ready');
     const ouz = ouzAdopted ?? ouzDraft;
     const ouzFromDraft = !ouzAdopted && Boolean(ouzDraft);
+    // 19.56.0: strefy w granicy działki (udział, profil, data) i klasy gruntu z powierzchnią — api/parcel_shares.php.
+    const pogKind = bySource.get('pog_adopted')?.status === 'ready' || bySource.get('pog_zones')?.status === 'ready' ? 'pog' : bySource.get('pog_draft')?.status === 'ready' ? 'pog_draft' : null;
+    const hasParcel = Boolean(!snapshot.zoneOnly && parcel?.wkt);
+    const zoneShares = useParcelShares(pogKind, parcel, hasParcel && Boolean(pogKind));
+    const draftShares = useParcelShares('pog_draft', parcel, hasParcel && pogKind === 'pog');
+    const zones = zoneShares.status === 'ready' ? significantItems(zoneShares.data, snapshot.parcelAreaSqm).map((zone) => {
+        const twin = draftShares.data?.items?.find((d) => d.code === zone.code && (!zone.attrs?.przestrzenNazw || d.attrs?.przestrzenNazw === zone.attrs.przestrzenNazw));
+        return { ...zone, attrs: { ...(twin?.attrs ?? {}), ...zone.attrs, profilPodstawowy: zone.attrs?.profilPodstawowy ?? twin?.attrs?.profilPodstawowy, profilDodatkowy: zone.attrs?.profilDodatkowy ?? twin?.attrs?.profilDodatkowy, nazwa: zone.attrs?.nazwa ?? twin?.attrs?.nazwa } };
+    }) : [];
 
     // --- Ograniczenia: osobno tylko to, co dotyczy; reszta w jednej linii
     const restrictions = RESTRICTIONS.map((r) => {
@@ -177,6 +187,12 @@ export function ParcelCard({ snapshot, manager, layers, onScreening = null, head
     const soil = bySource.get('egib_classes');
     const soilValue = soil?.status === 'ready' && !soil.noClass ? soilClass(soil.text) : null;
     const kowr = bySource.get('kowr');
+    const soilShares = useParcelShares('soil', parcel, hasParcel && Boolean(soil) && soil.status !== 'loading');
+    const soilItems = soilShares.status === 'ready' ? significantItems(soilShares.data, snapshot.parcelAreaSqm) : [];
+    const soilListed = soilValue ? soilValue.split(/,\s*/) : (soilShares.data?.codes ?? []);
+    const highClasses = [...new Set([...soilItems.map((i) => i.code), ...soilListed].filter(isHighClass))];
+    const soilShortValue = soilItems.length ? soilItems.slice(0, 2).map((i) => `${i.code} ${pctLabel(i.share)}`).join(', ') + (soilItems.length > 2 ? ' …' : '') : null;
+    const soilNote = soilShares.status === 'ready' && !soilItems.length ? soilShares.data?.note : null;
 
     // --- Pozostałe trafienia (np. włączone warstwy) — wcześniej sekcja „Pozostałe dane”
     const known = new Set([...PLANNING_KEYS, ...RESTRICTION_KEYS, ...GROUND_KEYS, 'bdl_forest']);
@@ -229,7 +245,18 @@ export function ParcelCard({ snapshot, manager, layers, onScreening = null, head
         h('section', { className: 'pc-group', 'aria-label': 'Planowanie' },
             h('h3', { className: 'pc-group-title' }, 'Planowanie'),
             mpzp ? h(ResultRow, { label: 'MPZP', value: mpzpValue, state: mpzpState, details: [detailOf(mpzp)].filter(Boolean), show: ['overlay.mpzp'], onRetry: () => retry([mpzp.id]) }) : null,
-            pogLayers.length ? h(ResultRow, { label: 'Plan ogólny', value: pogValue, state: pogState, details: pogLayers.map(detailOf).filter(Boolean), show: pogShow, title: pogRaw?.[3] ?? null, onRetry: () => retry(pogLayers.filter(isRetryableLayerError).map((l) => l.id)) }) : null,
+            pogLayers.length ? h(ResultRow, { label: 'Plan ogólny', value: zones.length > 1 ? `${String(pogValue).split(' · ')[0]} · ${zones.length} strefy` : pogValue, state: pogState, details: pogLayers.map(detailOf).filter(Boolean), show: pogShow, title: pogRaw?.[3] ?? null, onRetry: () => retry(pogLayers.filter(isRetryableLayerError).map((l) => l.id)) }) : null,
+            // 19.56.0: strefy w granicy działki od razu pod wierszem — oznaczenie, udział, nazwa, profile, data.
+            zones.length ? h('div', { className: 'pc-zones' }, zones.map((zone) => h('div', { key: zone.code, className: 'pc-zone' },
+                h('div', { className: 'pc-zone-head' }, h('strong', null, zone.code), h('span', null, zones.length > 1 || zone.share < 0.995 ? `${pctLabel(zone.share)} · ${areaLabel(zone.areaM2)}` : 'cała działka')),
+                h('div', { className: 'pc-zone-name' }, zone.attrs?.nazwa || POG_ZONE_NAMES[zone.attrs?.symbol] || ''),
+                zone.attrs?.profilPodstawowy ? h('div', { className: 'pc-zone-line' }, h('b', null, 'Profil podstawowy: '), profileLabel(zone.attrs.profilPodstawowy)) : null,
+                zone.attrs?.profilDodatkowy ? h('div', { className: 'pc-zone-line' }, h('b', null, 'Profil dodatkowy: '), profileLabel(zone.attrs.profilDodatkowy)) : null,
+                !zone.attrs?.profilPodstawowy && !zone.attrs?.profilDodatkowy ? h('div', { className: 'pc-zone-line pc-zone-muted' }, 'Profil: usługa nie podaje — w uchwale planu.') : null,
+                zone.attrs?.obowiazujeOd ? h('div', { className: 'pc-zone-line pc-zone-muted' }, `${pogKind === 'pog_draft' ? 'Projekt, wersja z' : 'Obowiązuje od'} ${dateLabel(zone.attrs.obowiazujeOd)}`) : null)),
+                zoneShares.data?.otherShare > 0.01 ? h('div', { className: 'pc-zone-line pc-zone-muted' }, `Inne strefy: ${pctLabel(zoneShares.data.otherShare)}`) : null,
+                zoneShares.data?.noneShare > 0.02 ? h('div', { className: 'pc-zone-line pc-zone-muted' }, `Poza strefami planu: ${pctLabel(zoneShares.data.noneShare)}`) : null)
+                : zoneShares.status === 'loading' ? h('div', { className: 'pc-zones pc-zone-muted' }, 'Liczę udział stref w granicy działki…') : null,
             pogHere ? h(ResultRow, { label: 'Uzupełnienie zabudowy', value: ouz ? `w obszarze${ouzFromDraft ? ' (projekt)' : ''} · ${ouz}` : 'poza obszarem', state: ouz ? 'yes-plan' : 'no',
                 title: ouz ? 'Obszar uzupełnienia zabudowy (OUZ) z planu ogólnego — tylko w nim można uzyskać decyzję o warunkach zabudowy po wejściu planu w życie.' : 'Punkt nie leży w obszarze uzupełnienia zabudowy wyznaczonym w planie ogólnym.',
                 details: [{ title: 'Obszar uzupełnienia zabudowy', text: ouz ? `Oznaczenie w planie ogólnym: ${ouz}${ouzFromDraft ? ' (projekt planu, przed uchwaleniem)' : ''}. Decyzję o warunkach zabudowy po wejściu planu ogólnego wydaje się tylko w obszarze uzupełnienia zabudowy.` : 'W tym punkcie plan ogólny nie wyznacza obszaru uzupełnienia zabudowy. Po wejściu planu w życie decyzji o warunkach zabudowy nie wyda się tu bez planu miejscowego.' }],
@@ -248,9 +275,19 @@ export function ParcelCard({ snapshot, manager, layers, onScreening = null, head
         // Grunt
         soil || (kowr && kowr.status === 'ready') ? h('section', { className: 'pc-group', 'aria-label': 'Grunt' },
             h('h3', { className: 'pc-group-title' }, 'Grunt'),
-            soil ? h(ResultRow, { label: 'Klasa gruntu', value: soil.status === 'loading' ? '' : soilValue ?? (soil.status === 'error' ? 'nie sprawdzono' : 'brak w usłudze'),
-                state: soil.status === 'loading' ? 'loading' : soilValue ? 'info' : 'unknown', details: [detailOf(soil)].filter(Boolean), show: ['overlay.egib.arable-classes'],
-                title: soilValue ? null : 'Ewidencja nie podała klasy w tym punkcie (zależy od publikacji powiatu).', onRetry: soil.status === 'error' ? () => retry([soil.id]) : null }) : null,
+            soil ? h(ResultRow, { label: 'Klasa gruntu', value: soil.status === 'loading' ? '' : soilShortValue ?? soilValue ?? (soil.status === 'error' ? 'nie sprawdzono' : soilShares.status === 'loading' ? 'liczę…' : 'nie publikowana'),
+                state: soil.status === 'loading' ? 'loading' : soilShortValue || soilValue ? 'info' : 'unknown',
+                details: [
+                    soilItems.length ? { title: 'Klasy w granicy działki', text: soilItems.map((i) => `${i.code} ${areaLabel(i.areaM2)} (${pctLabel(i.share)})`).join('\n') + '\n\nPowierzchnie z nałożenia granicy działki na kontury klasyfikacyjne powiatu (obraz usługi w rozdzielczości ok. 0,5 m) — orientacyjne, rozstrzyga wypis z ewidencji.' } : null,
+                    soilNote ? { title: 'Klasy w granicy działki', text: soilNote } : null,
+                    !soilValue && !soilItems.length && !soilNote && soil.status === 'ready' ? { title: 'Ewidencja gruntów', text: 'Powiat nie udostępnia oznaczeń konturów do odczytu — klasy są widoczne tylko na mapie (warstwa „Klasy gruntów ornych”). Udziałów nie da się policzyć automatycznie.' } : null,
+                    detailOf(soil),
+                ].filter(Boolean), show: ['overlay.egib.arable-classes'],
+                title: soilItems.length ? soilItems.map((i) => `${i.code} ${areaLabel(i.areaM2)} (${pctLabel(i.share)})`).join(', ') : soilValue ? null : 'Powiat nie publikuje klas do odczytu — widać je tylko na mapie.', onRetry: soil.status === 'error' ? () => retry([soil.id]) : null }) : null,
+            // 19.56.0: grunty klas I–III — zmiana przeznaczenia / wyłączenie z produkcji rolnej wymaga zgody.
+            highClasses.length ? h(ResultRow, { label: 'Klasy I–III', value: 'wymagana zgoda na wyłączenie', state: 'warn',
+                details: [{ title: 'Grunty rolne klas I–III', text: `W działce: ${highClasses.join(', ')}. Wyłączenie gruntów rolnych klas I–III z produkcji rolnej wymaga decyzji, a zmiana ich przeznaczenia w planie miejscowym — zgody (dla większych powierzchni ministra rolnictwa). Sprawdź w wypisie z ewidencji.` }],
+                show: ['overlay.egib.arable-classes'] }) : null,
             kowr?.status === 'ready' ? h(ResultRow, { label: 'Zasób KOWR', value: 'w zasobie', state: 'warn', details: [detailOf(kowr)].filter(Boolean), show: ['overlay.kowr.parcels'] }) : null) : null,
         others.length ? h('section', { className: 'pc-group', 'aria-label': 'Włączone warstwy' },
             h('h3', { className: 'pc-group-title' }, 'Włączone warstwy'),

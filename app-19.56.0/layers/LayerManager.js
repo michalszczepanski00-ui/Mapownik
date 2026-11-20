@@ -61,6 +61,19 @@ function legendUrlFor(definition) {
  */
 const DARK_BASEMAP = /^basemap\.(orthophoto|nmt)/;
 const POG_ZONES = ['overlay.pog.zones', 'overlay.pog.draft.zones'];
+// 19.56.0: działki (KIEG) i klasy gruntów (kontury, użytki) jednym obrazem z serwera powiatu — jeden rysunek,
+// więc serwer sam rozsuwa nachodzące etykiety numerów i klas. Numery działek dopiero od progu skali.
+const PARCELS_ID = 'overlay.dzialki';
+const CLASSES_ID = 'overlay.egib.arable-classes';
+export const PARCEL_NUMBERS_MAX_SCALE = 2500;
+export function parcelLayersFor({ merged, numbers }) {
+    return ['dzialki', 'budynki', ...(merged ? ['kontury', 'uzytki'] : []), ...(numbers ? ['numery_dzialek'] : [])].join(',');
+}
+function viewScale(snapshot) {
+    const zoom = snapshot?.zoom; const lat = snapshot?.centerLonLat?.[1];
+    if (!Number.isFinite(zoom) || !Number.isFinite(lat)) return null;
+    return (156543.03392 / 2 ** zoom) * Math.cos((lat * Math.PI) / 180) / 0.00028;
+}
 export function effectiveOpacityFactor(definition, { darkBasemap = false, zonesVisible = false } = {}) {
     if (definition?.role !== 'overlay' || definition.group !== 'Planowanie przestrzenne') return 1;
     let factor = darkBasemap ? 0.6 : 1;
@@ -179,6 +192,7 @@ export class LayerManager {
     handleViewChange() {
         if (this.disposed)
             return;
+        this.applyEffectiveOpacity();
         for (const entry of this.entries.values()) {
             if (!entry.visible || entry.rendered)
                 continue;
@@ -263,7 +277,21 @@ export class LayerManager {
         if (entry.visible) void this.ensureLoaded(entry);
     }
     /** 19.47.0: krycie warstwy w mapie = suwak użytkownika × mnożnik czytelności (effectiveOpacityFactor). */
+    /** 19.56.0: wspólny obraz działek i klas gruntów + próg skali numerów działek (patrz PARCELS_ID). */
+    applyLabelMerge() {
+        const parcels = this.entries.get(PARCELS_ID);
+        const classes = this.entries.get(CLASSES_ID);
+        if (!parcels) return;
+        const scale = viewScale(this.host.getViewSnapshot?.());
+        const merged = Boolean(classes?.visible && parcels.visible && this.isWithinZoomRange(parcels));
+        const numbers = scale === null || scale <= PARCEL_NUMBERS_MAX_SCALE * 1.05;
+        const layers = parcelLayersFor({ merged, numbers });
+        const source = parcels.layer?.getSource?.();
+        if (source?.getParams && source.getParams().LAYERS !== layers) source.updateParams({ LAYERS: layers });
+        this.labelMerge = merged;
+    }
     applyEffectiveOpacity() {
+        this.applyLabelMerge();
         const visible = [...this.entries.values()].filter((entry) => entry.visible);
         const context = {
             darkBasemap: visible.some((entry) => entry.definition.role === 'basemap' && DARK_BASEMAP.test(entry.definition.id)),
@@ -271,7 +299,9 @@ export class LayerManager {
         };
         for (const entry of this.entries.values()) {
             if (!entry.layer) continue;
-            const value = clampOpacity(entry.opacity * effectiveOpacityFactor(entry.definition, context));
+            // 19.56.0: przy wspólnym obrazie z działkami osobny obraz klas jest wygaszony (rysuje je warstwa działek).
+            const merged = this.labelMerge && entry.definition.id === CLASSES_ID;
+            const value = merged ? 0 : clampOpacity(entry.opacity * effectiveOpacityFactor(entry.definition, context));
             entry.effectiveOpacity = value;
             if (entry.layer.getOpacity() !== value) entry.layer.setOpacity(value);
         }

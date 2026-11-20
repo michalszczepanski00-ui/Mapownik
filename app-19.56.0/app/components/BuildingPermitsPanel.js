@@ -160,7 +160,7 @@ export function BuildingPermitsPanel() {
         const cache = new Map();
         const layer = new VectorLayer({
             source: new VectorSource({ features }), zIndex: 966,
-            properties: { title: 'Mapownik — pozwolenia na budowę', mapownikRole: 'building-permits', mapownikClickPriority: true },
+            properties: { title: 'MSportal — pozwolenia na budowę', mapownikRole: 'building-permits', mapownikClickPriority: true },
             style: (feature) => {
                 const role = feature.get('role');
                 if (role === 'ring') return ringStyle;

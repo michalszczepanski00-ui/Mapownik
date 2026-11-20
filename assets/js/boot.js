@@ -1,5 +1,5 @@
 /*
- * msportal 19.55.0 — skrypt startowy (zwykły skrypt, nie moduł; ładowany przed aplikacją).
+ * msportal 19.56.0 — skrypt startowy (zwykły skrypt, nie moduł; ładowany przed aplikacją).
  *
  * Od 19.42.0 kod aplikacji jest budowany narzędziem Vite do kilku plików w assets/build/ o nazwach
  * z sumą treści. Ten plik zastępuje dawny skrypt wbudowany w index.html (CSP: bez skryptów inline):
@@ -10,7 +10,7 @@
  */
 (function () {
   'use strict';
-  var VERSION = '19.55.0';
+  var VERSION = '19.56.0';
   window.__MAPOWNIK_DEPLOY_VERSION__ = VERSION;
   window.__MAPOWNIK_BOOTED__ = false;
   var shown = false;
@@ -52,14 +52,14 @@
   // Błąd kodu przed pierwszym renderem.
   function early(reason) {
     if (window.__MAPOWNIK_BOOTED__) return;
-    setTimeout(function () { if (!window.__MAPOWNIK_BOOTED__) showError('Mapownik nie wystartował', String(reason)); }, 50);
+    setTimeout(function () { if (!window.__MAPOWNIK_BOOTED__) showError('MSportal nie wystartował', String(reason)); }, 50);
   }
   window.addEventListener('error', function (event) { if (event.target === window || !event.target || !event.target.tagName) early(event.message || event.error); });
   window.addEventListener('unhandledrejection', function (event) { early(event.reason && event.reason.stack || event.reason); });
 
   // Nic się nie dzieje (np. zablokowany skrypt): komunikat po 45 s zamiast wiecznego „Wczytywanie mapy…”.
   setTimeout(function () {
-    if (!window.__MAPOWNIK_BOOTED__) showError('Mapownik nie wystartował', 'Aplikacja nie uruchomiła się w ciągu 45 sekund. Sprawdź połączenie i odśwież stronę (Ctrl+F5).');
+    if (!window.__MAPOWNIK_BOOTED__) showError('MSportal nie wystartował', 'Aplikacja nie uruchomiła się w ciągu 45 sekund. Sprawdź połączenie i odśwież stronę (Ctrl+F5).');
   }, 45000);
 
   // 19.43.0: tryb offline — service worker (sw.js, generowany przy budowaniu) zapamiętuje aplikację.

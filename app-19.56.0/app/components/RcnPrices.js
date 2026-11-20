@@ -110,7 +110,7 @@ export function RcnPrices({ center, centerLabel, defaultRadius }) {
         const layer = new VectorLayer({
             source: new VectorSource({ features }), zIndex: 960, declutter: true,
             style: (feature, resolution) => pointStyle(feature.get('rcn'), stats, feature.getId() === selectedRef.current, resolution),
-            properties: { title: 'Mapownik — ceny transakcyjne RCN' },
+            properties: { title: 'MSportal — ceny transakcyjne RCN' },
         });
         controller.addLayer(layer); layerRef.current = layer;
         return () => { controller.removeLayer(layer); layerRef.current = null; };

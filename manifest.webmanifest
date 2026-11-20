@@ -1,6 +1,6 @@
 {
-  "name": "Mapownik — działki, plany i teren",
-  "short_name": "Mapownik",
+  "name": "MSportal — działki, plany i teren",
+  "short_name": "MSportal",
   "description": "Mapa działek z planami, ograniczeniami, cenami i analizą terenu.",
   "lang": "pl",
   "start_url": "./",

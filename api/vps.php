@@ -16,7 +16,7 @@ require_once __DIR__ . '/_vps_store.php';
 require_once __DIR__ . '/_vps_geo.php';
 require_once __DIR__ . '/_vps_ru.php';
 
-const VPS_VERSION = '19.55.0';
+const VPS_VERSION = '19.56.0';
 const VPS_EXPENSIVE = ['rcn/stats', 'bdot/nearby', 'site/screening', 'parcel/analyze'];
 
 final class VpsHttpError extends RuntimeException {

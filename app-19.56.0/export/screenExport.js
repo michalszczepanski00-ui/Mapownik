@@ -117,7 +117,7 @@ function withFooter(mapCanvas, map, scale, titles) {
     const barLabel = barMeters >= 1000 ? `${barMeters / 1000} km` : `${barMeters} m`;
     ctx.fillText(barLabel, pad, y0 + 36 * scale);
     const textX = pad + Math.max(barPx, ctx.measureText(barLabel).width) + 16 * scale;
-    ctx.fillText(`Mapownik · ${scaleText} · ${new Date().toLocaleDateString('pl-PL')}`, textX, y0 + 18 * scale);
+    ctx.fillText(`MSportal · ${scaleText} · ${new Date().toLocaleDateString('pl-PL')}`, textX, y0 + 18 * scale);
     ctx.font = `400 ${10 * scale}px Inter, system-ui, sans-serif`;
     ctx.fillStyle = '#4b5563';
     let layersText = titles.length ? `Warstwy: ${titles.join(', ')}` : 'Podkład mapy';

@@ -1,11 +1,11 @@
-# Etap 2 — pasek kontekstowy (msportal 19.55.0)
+# Etap 2 — pasek kontekstowy (msportal 19.56.0)
 
 Paczka: `dist/msportal-19.49.0-serwer.zip` → wgrać do **nowego** katalogu, np. `/test24/` (test23 z Etapem 1 zostaje do porównania). test22 i produkcja bez zmian.
 
 Decyzje po Etapie 1: prawdziwa ortofotomapa zostaje w podkładach; ikony werdyktu bez zmian.
 
 ## Zmienione pliki
-Wszystkie w `app-19.55.0/`, chyba że zaznaczono inaczej.
+Wszystkie w `app-19.56.0/`, chyba że zaznaczono inaczej.
 
 | Plik | Zmiana |
 |---|---|

@@ -93,7 +93,7 @@ export function VpsDataPanel(){
         {dataProjection:'EPSG:4326',featureProjection:'EPSG:3857'});
       const layerObj=new VectorLayer({source:new VectorSource({features}),style:new Style({
         stroke:new Stroke({color:'#16a34a',width:3}),fill:new Fill({color:'rgba(22,163,74,.17)'})
-      }),zIndex:970,properties:{title:'Mapownik — działka EGiB'}});
+      }),zIndex:970,properties:{title:'MSportal — działka EGiB'}});
       controller.addLayer(layerObj);parcelLayer.current=layerObj;
       if(features[0]?.getGeometry())controller.fitExtent(features[0].getGeometry().getExtent(),
         {maxZoom:18,duration:220,padding:[70,70,70,70]});
@@ -115,7 +115,7 @@ export function VpsDataPanel(){
     try{
       const features=new GeoJSON().readFeatures(payload,{dataProjection:'EPSG:4326',featureProjection:'EPSG:3857'});
       const item=new VectorLayer({source:new VectorSource({features}),style:resultStyle(),zIndex:950,
-        properties:{title:'Mapownik — BDOT'}});
+        properties:{title:'MSportal — BDOT'}});
       controller.addLayer(item);layer.current=item;
     }catch(e){setError('Nie można narysować wyników: '+e.message);}
     return clearLayer;

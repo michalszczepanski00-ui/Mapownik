@@ -64,7 +64,7 @@ export const REPORT_OPTIONS = {
 
 export const REPORT_TEXTS = {
     title: 'Raport działki',
-    brand: 'Mapownik',
+    brand: 'MSportal',
     color: '#2e6b3f',
     header: { name: '', contact: '', logo: '' },
     disclaimer: 'Raport ma charakter informacyjny i nie zastępuje wypisu i wyrysu z planu, wypisu z rejestru gruntów ani mapy do celów projektowych. '

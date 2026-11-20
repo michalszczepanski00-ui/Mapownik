@@ -95,7 +95,7 @@ export function safeFileStem(value) {
         .slice(0, 64);
     return normalized || 'projekt-mapownika';
 }
-export function createmsportalProjectFile(loaded, appVersion = (typeof window !== 'undefined' && window.__MAPOWNIK_DEPLOY_VERSION__) || '19.55.0') {
+export function createmsportalProjectFile(loaded, appVersion = (typeof window !== 'undefined' && window.__MAPOWNIK_DEPLOY_VERSION__) || '19.56.0') {
     var _a, _b, _c, _d, _e;
     const state = loaded.state
         ? projectStateSchema.parse({ ...loaded.state, projectId: LOCAL_PROJECT_ID })
@@ -173,7 +173,7 @@ export function createGeoJsonFile(objects, targetProjection = WGS84) {
         throw new Error(t('persistence.nieobslugiwanyUkladEksportu', { targetProjection }));
     const collection = {
         type: 'FeatureCollection',
-        name: 'Mapownik – obiekty',
+        name: 'MSportal – obiekty',
         features: objects.map((object) => ({
             type: 'Feature',
             id: object.id,

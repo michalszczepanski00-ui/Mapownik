@@ -157,7 +157,7 @@ function ViewPricesPanel({ switcher }) {
         const cache = new Map();
         const layer = new VectorLayer({
             source: new VectorSource({ features }), zIndex: 965, declutter: true,
-            properties: { title: 'Mapownik — ceny transakcyjne (widok)', mapownikRole: 'market-prices', mapownikClickPriority: true },
+            properties: { title: 'MSportal — ceny transakcyjne (widok)', mapownikRole: 'market-prices', mapownikClickPriority: true },
             style: (feature, resolution) => {
                 const item = feature.get('rcn'); const selected = feature.getId() === selectedRef.current;
                 const cls = item.inStats ? classOf(item.perM2, classes) : -1;

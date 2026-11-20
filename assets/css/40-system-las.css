@@ -159,3 +159,28 @@
 .analyses-body { padding: 2px 0 6px; gap: 0; }
 .analyses-context { padding: 8px 12px; }
 .workspace-card:has(.workspace-card-head.is-bare) .pc-title.pc-title--fraction { padding-right: 0; }
+
+/* ------------------------------------------------------------------ 19.56.0: wyszukiwarka nie ucina nazwy miejscowości
+   Po wybraniu miejscowości pole rośnie (miejsce na chip i pole numeru działki); chip i wyniki mają pełną nazwę
+   (do dwóch linii w wynikach), a pełny tekst jest też w podpowiedzi po najechaniu. */
+.app-shell.is-v2 .map-topbar .map-search:has(.map-search-chip) { width: clamp(160px, 44vw, 600px); max-width: max(160px, calc(100vw - 470px)); }
+.map-search--refined .map-search-chip { max-width: none; flex: 0 0 auto; }
+.map-search-chip > span { overflow: visible; text-overflow: clip; white-space: nowrap; }
+.map-search-result-copy strong, .map-search-result-copy span { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.3; }
+.map-topbar .map-search-dropdown { min-width: 100%; width: max(100%, 420px); }
+
+/* 19.56.0: biała obwódka pod rysunkiem warstw działek i klas gruntów (numery, klasy, granice) — czytelne na zdjęciach i mapie. */
+.ol-layer--halo { filter: drop-shadow(0 0 0.6px #fff) drop-shadow(0 0 0.6px #fff) drop-shadow(0 0 1.2px rgba(255, 255, 255, .9)); }
+
+/* 19.56.0: strefy planu ogólnego w granicy działki — pod wierszem „Plan ogólny”. */
+.pc-zones { display: grid; gap: 6px; margin: 2px 0 4px 19px; font-size: 12.5px; }
+.pc-zone { padding-left: 8px; border-left: 2px solid var(--szron, var(--border)); }
+.pc-zone-head { display: flex; justify-content: space-between; gap: 8px; }
+.pc-zone-head strong { font-weight: 600; }
+.pc-zone-head span { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.pc-zone-name { color: var(--text); }
+.pc-zone-line { color: var(--text); font-family: "Fira Sans Condensed", "Fira Sans", sans-serif; line-height: 1.35; }
+.pc-zone-line b { font-weight: 600; }
+.pc-zone-muted { color: var(--text-muted); }
+.map-search-place > svg { flex: 0 0 15px; width: 15px; height: 15px; }
+.map-search--refined .map-search-chip { margin-right: 6px; }

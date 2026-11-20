@@ -141,7 +141,7 @@ if (isset($options['json'])) {
     file_put_contents((string)$options['json'], json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 }
 if ($problems && isset($options['mail'])) {
-    mail((string)$options['mail'], 'Mapownik: źródła planistyczne nie przeszły kontroli', implode("\n", $problems));
+    mail((string)$options['mail'], 'MSportal: źródła planistyczne nie przeszły kontroli', implode("\n", $problems));
 }
 echo PHP_EOL . ($problems ? count($problems) . ' problemów' : 'wszystkie sprawdzenia poprawne') . PHP_EOL;
 exit($problems ? 1 : 0);

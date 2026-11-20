@@ -21,8 +21,8 @@ export function MapTopBar() {
 
     return h('div', { className: 'map-topbar' },
         h('div', { className: 'map-topbar-start' },
-            h(IconButton, { className: 'map-brand-button', label: 'Mapownik — polecenia (Ctrl+K)', tooltipSide: 'bottom', onClick: () => dispatch(openOverlay('palette')) },
-                h('img', { src: './assets/mapownik-logo-icon.png?v=19.55.0', alt: '', 'aria-hidden': true })),
+            h(IconButton, { className: 'map-brand-button', label: 'MSportal — polecenia (Ctrl+K)', tooltipSide: 'bottom', onClick: () => dispatch(openOverlay('palette')) },
+                h('img', { src: './assets/mapownik-logo-icon.png?v=19.56.0', alt: '', 'aria-hidden': true })),
             h(SearchToolbar, { manager: searchManager })),
         h('div', { className: 'map-topbar-end', role: 'toolbar', 'aria-label': 'Projekt i widok' },
             h('div', { className: 'map-topbar-group map-topbar-project' }, h(ProjectMenu, null)),

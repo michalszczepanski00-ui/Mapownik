@@ -1,9 +1,9 @@
-# Etap 1 — szybkie poprawki bez zmiany układu (msportal 19.55.0)
+# Etap 1 — szybkie poprawki bez zmiany układu (msportal 19.56.0)
 
 Paczka: `dist/msportal-19.48.0-serwer.zip` → wgrać do **nowego** katalogu `/test23/`. test22 i produkcja bez zmian.
 
 ## Zmienione pliki
-Wszystkie w `app-19.55.0/`, chyba że zaznaczono inaczej.
+Wszystkie w `app-19.56.0/`, chyba że zaznaczono inaczej.
 
 | Plik | Zmiana |
 |---|---|

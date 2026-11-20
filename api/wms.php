@@ -27,6 +27,13 @@ if ($key === '' || !isset($wmsSources[$key])) {
     reject_tile_request('Nieznane źródło WMS: ' . $key, 404);
 }
 $source = $wmsSources[$key];
+// 19.56.0: zestaw warstw z listy dozwolonych podany przez przeglądarkę — np. działki z konturami i użytkami
+// jednym obrazem (serwer powiatu rozsuwa wtedy nachodzące etykiety numerów i klas). Inne wartości są ignorowane.
+$clientLayers = (string)($_GET['LAYERS'] ?? $_GET['layers'] ?? '');
+if ($clientLayers !== '' && $clientLayers !== (string)$source['layers'] && in_array($clientLayers, (array)($source['client_layers'] ?? []), true)) {
+    $source['layers'] = $clientLayers;
+    if (!empty($source['variants'])) { foreach ($source['variants'] as &$clientVariant) $clientVariant['layers'] = $clientLayers; unset($clientVariant); }
+}
 $time = null;
 
 $bbox = (string)($_GET['BBOX'] ?? $_GET['bbox'] ?? '');
