@@ -306,6 +306,25 @@ $sources = [
             ['version'=>'1.1.1','layers'=>'strefy_planistyczne'],
         ],
     ],
+    // 19.55.0: obszary uzupełnienia zabudowy (OUZ) z planów ogólnych jako osobna warstwa.
+    // Styl GUGiK to cienka przerywana kreska, niewidoczna pod strefami planistycznymi —
+    // własny styl SLD (usługa obsługuje UserStyle): ciemny obrys 2 px i lekkie wypełnienie.
+    'pog_ouz' => [
+        'url' => 'https://mapy.geoportal.gov.pl/wss/ext/PlanyOgolneGmin',
+        'layers' => 'obszarUzupelnieniaZabudowy', 'version' => '1.1.1', 'format' => 'image/png', 'transparent' => true, 'ttl' => 86400,
+        'variants' => [
+            ['version'=>'1.1.1','layers'=>'obszarUzupelnieniaZabudowy','fixed_params'=>['SLD_BODY'=>'<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"><NamedLayer><Name>obszarUzupelnieniaZabudowy</Name><UserStyle><FeatureTypeStyle><Rule><PolygonSymbolizer><Fill><CssParameter name="fill">#16261e</CssParameter><CssParameter name="fill-opacity">0.16</CssParameter></Fill><Stroke><CssParameter name="stroke">#16261e</CssParameter><CssParameter name="stroke-width">2</CssParameter></Stroke></PolygonSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>']],
+            ['version'=>'1.1.1','layers'=>'obszarUzupelnieniaZabudowy'],
+        ],
+    ],
+    'pog_draft_ouz' => [
+        'url' => 'https://mapy.geoportal.gov.pl/wss/ext/ProjektowanePlanyOgolneGmin',
+        'layers' => 'obszarUzupelnieniaZabudowy', 'version' => '1.1.1', 'format' => 'image/png', 'transparent' => true, 'ttl' => 86400,
+        'variants' => [
+            ['version'=>'1.1.1','layers'=>'obszarUzupelnieniaZabudowy','fixed_params'=>['SLD_BODY'=>'<StyledLayerDescriptor version="1.0.0" xmlns="http://www.opengis.net/sld" xmlns:ogc="http://www.opengis.net/ogc"><NamedLayer><Name>obszarUzupelnieniaZabudowy</Name><UserStyle><FeatureTypeStyle><Rule><PolygonSymbolizer><Fill><CssParameter name="fill">#16261e</CssParameter><CssParameter name="fill-opacity">0.16</CssParameter></Fill><Stroke><CssParameter name="stroke">#16261e</CssParameter><CssParameter name="stroke-width">2</CssParameter></Stroke></PolygonSymbolizer></Rule></FeatureTypeStyle></UserStyle></NamedLayer></StyledLayerDescriptor>']],
+            ['version'=>'1.1.1','layers'=>'obszarUzupelnieniaZabudowy'],
+        ],
+    ],
     'kowr' => [
         'url' => 'https://mapy.geoportal.gov.pl/wss/ext/kowr',
         'layers' => 'dzialki', 'version' => '1.1.1', 'format' => 'image/png', 'transparent' => true, 'ttl' => 7 * 86400,

@@ -54,7 +54,7 @@ function exact_rank(string $query, string $candidate): int {
  * własny User-Agent z adresem serwisu (zamiast udawania przeglądarki), pamięć wyników na 24 h
  * i najwyżej 1 zapytanie na sekundę z całego hostingu (wszyscy użytkownicy dzielą jego adres IP).
  */
-const NOMINATIM_USER_AGENT = 'MSPortal/19.54.0 (+https://mapownik.swiadectwa.net)';
+const NOMINATIM_USER_AGENT = 'MSPortal/19.55.0 (+https://mapownik.swiadectwa.net)';
 const NOMINATIM_CACHE_TTL = 86400;
 function nominatim_get(string $url): array {
     $dir = cache_root() . '/nominatim';

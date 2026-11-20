@@ -1,7 +1,7 @@
-msportal 19.54.0 — PEŁNA PACZKA (19.11.2026)
-Paczka: msportal-19.54.0-serwer.zip (zawartość katalogu portalu). Opis zmian: ZMIANY_19.54.0.md (zmiany po audycie layoutu: paleta Las, krój Fira, karta działki, przełączniki), ZMIANY_19.53.0.md (przebudowa UI — Etapy 3, 5, 6, 7: dok Analizy, tryb Teren, rejestr akcji, Udostępnij, karta na telefonie, sprzątanie), ZMIANY_19.52.0.md (usunięte: hałas i pompa ciepła), ZMIANY_19.51.0.md (uproszczona karta działki), ZMIANY_19.50.0.md (luki z audytu warstw: GDOŚ/EEA, nowe warstwy, Obszar WZ), ZMIANY_19.49.0.md (przebudowa UI — Etap 2), ZMIANY_19.48.0.md (Etap 1), ZMIANY_19.47.0.md, ZMIANY_19.46.0.md, kontrola po wgraniu: README_KONTROLA_WDROZENIA.md.
+msportal 19.55.0 — PEŁNA PACZKA (19.11.2026)
+Paczka: msportal-19.55.0-serwer.zip (zawartość katalogu portalu). Opis zmian: ZMIANY_19.55.0.md (obszary uzupełnienia zabudowy z planów ogólnych, bez legendy planów w panelu Warstwy), ZMIANY_19.54.0.md (zmiany po audycie layoutu: paleta Las, krój Fira, karta działki, przełączniki), ZMIANY_19.53.0.md (przebudowa UI — Etapy 3, 5, 6, 7: dok Analizy, tryb Teren, rejestr akcji, Udostępnij, karta na telefonie, sprzątanie), ZMIANY_19.52.0.md (usunięte: hałas i pompa ciepła), ZMIANY_19.51.0.md (uproszczona karta działki), ZMIANY_19.50.0.md (luki z audytu warstw: GDOŚ/EEA, nowe warstwy, Obszar WZ), ZMIANY_19.49.0.md (przebudowa UI — Etap 2), ZMIANY_19.48.0.md (Etap 1), ZMIANY_19.47.0.md, ZMIANY_19.46.0.md, kontrola po wgraniu: README_KONTROLA_WDROZENIA.md.
 0. PRZEBUDOWA UI (od 19.48.0): każdy etap wgrywaj do NOWEGO katalogu testowego (Etap 1 → np. /test23/).
-   Etap 2 → np. /test24/, 19.50.0 (warstwy) → np. /test25/, 19.51.0 (karta działki) → np. /test26/, 19.52.0 → np. /test27/, 19.53.0 → np. /test28/, 19.54.0 → np. /test29/ (poprzednie katalogi zostają do porównania). NIGDY nie nadpisuj /test22/ ani wersji produkcyjnej. Nowy katalog = pusty katalog + cała paczka
+   Etap 2 → np. /test24/, 19.50.0 (warstwy) → np. /test25/, 19.51.0 (karta działki) → np. /test26/, 19.52.0 → np. /test27/, 19.53.0 → np. /test28/, 19.54.0 → np. /test29/, 19.55.0 → np. /test30/ (poprzednie katalogi zostają do porównania). NIGDY nie nadpisuj /test22/ ani wersji produkcyjnej. Nowy katalog = pusty katalog + cała paczka
    (+ data/rwdz/rwdz.sqlite, jeśli chcesz testować Budowy).
 1. Kopia projektu .mapownik i kopia obecnych plików portalu poza katalogiem WWW.
 2. Wgraj CAŁĄ zawartość ZIP („nadpisz zawsze”, z .htaccess); index.html i .htaccess najlepiej na końcu.
@@ -14,7 +14,7 @@ Paczka: msportal-19.54.0-serwer.zip (zawartość katalogu portalu). Opis zmian: 
    NIE usuwaj data/, cache/, vendor/pdf/ ani starszych plików w assets/build/.
    Pozostawione pliki nie psują działania (serwer zwraca dla nich 410/404); listę pokazuje
    verify-deployment.php w polu "leftover_files".
-4. verify-deployment.php → "deployment_consistent": true i "leftover_files": []; Ctrl+F5; api/health.php → 19.54.0-server.
+4. verify-deployment.php → "deployment_consistent": true i "leftover_files": []; Ctrl+F5; api/health.php → 19.55.0-server.
 Programista: README_PROGRAMISTY.md (npm run build tworzy tę paczkę; wdrożenie także przez GitHub Actions — usuwa pozostałości samo).
 
 msportal 19.41.4-b — POPRAWKI BEZPIECZEŃSTWA (08.11.2026)
@@ -23,7 +23,7 @@ W skrócie: wgraj cały api/, potem data/.htaccess, index.html, setup-vendors.ph
 sprawdź api/health.php → "patch": "19.41.4-b". Błąd 500 po .htaccess → usuń linię „Options -Indexes”.
 setup-vendors.php działa już tylko z wiersza poleceń; brakujące biblioteki wgrywa się z paczki (vendor/). Od 19.45.0 plik usunięty — biblioteki są w paczce aplikacji.
 
-msportal 19.54.0 — HOSTING WSPÓŁDZIELONY (bez VPS)
+msportal 19.55.0 — HOSTING WSPÓŁDZIELONY (bez VPS)
 
 PEŁNA PACZKA 19.41.4 — AKTUALIZACJA DZIAŁAJĄCEGO PORTALU (np. /test22/ z 19.27.0)
 1. Pobierz kopię projektu .mapownik (Projekt → Zapisz plik projektu).

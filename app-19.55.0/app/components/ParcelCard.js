@@ -69,6 +69,14 @@ const RESTRICTION_KEYS = new Set(RESTRICTIONS.flatMap((r) => r.keys));
 const PLANNING_KEYS = new Set(['mpzp', 'pog_adopted', 'pog_draft', 'pog_zones']);
 const GROUND_KEYS = new Set(['egib_classes', 'kowr']);
 
+/** 19.55.0: oznaczenie obszaru uzupełnienia zabudowy z odpowiedzi planu ogólnego („Oznaczenie: 93OUZ”, „Symbol: OUZ”) albo null. */
+export function ouzMark(text) {
+    const value = String(text ?? '');
+    const mark = value.match(/^\s*Oznaczenie:\s*(\S*OUZ\S*)\s*$/mi);
+    if (mark) return mark[1];
+    return /^\s*Symbol:\s*OUZ\s*$/mi.test(value) ? 'OUZ' : null;
+}
+
 /** Stan pozycji z kilku źródeł: yes / no / unknown / loading (jak verdictState). */
 export function itemState(layers) {
     if (!layers.length) return 'none';
@@ -146,6 +154,13 @@ export function ParcelCard({ snapshot, manager, layers, onScreening = null, head
     const pogState = !pogLayers.length ? 'none' : pogRaw?.[1] === 'loading' ? 'loading' : pogLayers.some((l) => l.status === 'ready') ? 'yes-plan' : pogLayers.some(isRetryableLayerError) ? 'unknown' : 'no';
     const pogValue = pogRaw ? String(pogRaw[0]).replace(/\s*\((\w+)\)$/, ' · $1') : '';
     const pogShow = bySource.get('pog_adopted')?.status === 'ready' || bySource.get('pog_zones')?.status === 'ready' ? ['overlay.pog.adopted', 'overlay.pog.zones'] : ['overlay.pog.draft', 'overlay.pog.draft.zones'];
+    // 19.55.0: obszar uzupełnienia zabudowy (OUZ) — odpowiedź planu ogólnego zawiera „Symbol: OUZ”, gdy punkt leży w obszarze.
+    // Wiersz tylko tam, gdzie w punkcie jest plan ogólny (uchwalony albo projekt); bez planu pojęcie nie ma zastosowania.
+    const ouzAdopted = bySource.get('pog_adopted')?.status === 'ready' ? ouzMark(bySource.get('pog_adopted').text) : null;
+    const ouzDraft = bySource.get('pog_draft')?.status === 'ready' ? ouzMark(bySource.get('pog_draft').text) : null;
+    const pogHere = pogLayers.some((l) => l.status === 'ready');
+    const ouz = ouzAdopted ?? ouzDraft;
+    const ouzFromDraft = !ouzAdopted && Boolean(ouzDraft);
 
     // --- Ograniczenia: osobno tylko to, co dotyczy; reszta w jednej linii
     const restrictions = RESTRICTIONS.map((r) => {
@@ -214,7 +229,11 @@ export function ParcelCard({ snapshot, manager, layers, onScreening = null, head
         h('section', { className: 'pc-group', 'aria-label': 'Planowanie' },
             h('h3', { className: 'pc-group-title' }, 'Planowanie'),
             mpzp ? h(ResultRow, { label: 'MPZP', value: mpzpValue, state: mpzpState, details: [detailOf(mpzp)].filter(Boolean), show: ['overlay.mpzp'], onRetry: () => retry([mpzp.id]) }) : null,
-            pogLayers.length ? h(ResultRow, { label: 'Plan ogólny', value: pogValue, state: pogState, details: pogLayers.map(detailOf).filter(Boolean), show: pogShow, title: pogRaw?.[3] ?? null, onRetry: () => retry(pogLayers.filter(isRetryableLayerError).map((l) => l.id)) }) : null),
+            pogLayers.length ? h(ResultRow, { label: 'Plan ogólny', value: pogValue, state: pogState, details: pogLayers.map(detailOf).filter(Boolean), show: pogShow, title: pogRaw?.[3] ?? null, onRetry: () => retry(pogLayers.filter(isRetryableLayerError).map((l) => l.id)) }) : null,
+            pogHere ? h(ResultRow, { label: 'Uzupełnienie zabudowy', value: ouz ? `w obszarze${ouzFromDraft ? ' (projekt)' : ''} · ${ouz}` : 'poza obszarem', state: ouz ? 'yes-plan' : 'no',
+                title: ouz ? 'Obszar uzupełnienia zabudowy (OUZ) z planu ogólnego — tylko w nim można uzyskać decyzję o warunkach zabudowy po wejściu planu w życie.' : 'Punkt nie leży w obszarze uzupełnienia zabudowy wyznaczonym w planie ogólnym.',
+                details: [{ title: 'Obszar uzupełnienia zabudowy', text: ouz ? `Oznaczenie w planie ogólnym: ${ouz}${ouzFromDraft ? ' (projekt planu, przed uchwaleniem)' : ''}. Decyzję o warunkach zabudowy po wejściu planu ogólnego wydaje się tylko w obszarze uzupełnienia zabudowy.` : 'W tym punkcie plan ogólny nie wyznacza obszaru uzupełnienia zabudowy. Po wejściu planu w życie decyzji o warunkach zabudowy nie wyda się tu bez planu miejscowego.' }],
+                show: ouzFromDraft || (!ouzAdopted && bySource.get('pog_draft')?.status === 'ready' && bySource.get('pog_adopted')?.status !== 'ready') ? ['overlay.pog.draft.ouz'] : ['overlay.pog.ouz'] }) : null),
         // P3/P4 Ograniczenia
         restrictions.length ? h('section', { className: 'pc-group', 'aria-label': 'Ograniczenia' },
             h('h3', { className: 'pc-group-title' }, hits.length ? `Ograniczenia · ${hits.length}` : 'Ograniczenia'),

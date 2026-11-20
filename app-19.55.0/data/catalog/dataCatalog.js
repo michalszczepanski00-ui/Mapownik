@@ -155,7 +155,7 @@ const rawDataCatalog = {
                 transparent: true,
                 tiled: true,
                 tileSize: 512,
-                legendUrl: './assets/legend/las-wlasnosc.svg?v=19.54.0',
+                legendUrl: './assets/legend/las-wlasnosc.svg?v=19.55.0',
                 identifyUrl: './api/forest.php',
             },
         },
@@ -834,6 +834,32 @@ const rawDataCatalog = {
             attribution: { label: 'GUGiK — Plany Ogólne Gmin', url: 'https://www.geoportal.gov.pl/' },
             capabilities: { identify: true, selectable: false, editable: false },
             source: { kind: 'wms', url: './api/wms.php?source=pog_zones', transport: 'direct-then-proxy', directUrl: 'https://mapy.geoportal.gov.pl/wss/ext/PlanyOgolneGmin', directTimeoutMs: 9000, proxyTimeoutMs: 15000, layers: 'strefaPlanistyczna', version: '1.1.1', format: 'image/png', transparent: true, tiled: true, tileSize: 512, dpiScale: 2, transition: 120 },
+        },
+        {
+            // 19.55.0: obszar uzupełnienia zabudowy (OUZ) z planu ogólnego jako osobna, wyraźna warstwa —
+            // decyzję o warunkach zabudowy po wejściu planu ogólnego wydaje się tylko w takim obszarze.
+            // Styl własny (SLD po stronie serwera): ciemny obrys, lekkie wypełnienie; GUGiK rysuje go cienką kreską.
+            id: 'overlay.pog.ouz',
+            title: 'Obszary uzupełnienia zabudowy (plan ogólny)',
+            description: 'Obszary, w których po wejściu planu ogólnego można uzyskać decyzję o warunkach zabudowy. Widoczne od skali ok. 1:100 000.',
+            group: 'Planowanie przestrzenne',
+            role: 'overlay', visible: false, opacity: 0.95, minZoom: 12, zIndex: 104,
+            attribution: { label: 'GUGiK — Plany Ogólne Gmin', url: 'https://www.geoportal.gov.pl/' },
+            capabilities: { identify: false, selectable: false, editable: false },
+            source: { kind: 'wms', url: './api/wms.php?source=pog_ouz', transport: 'proxy', directUrl: 'https://mapy.geoportal.gov.pl/wss/ext/PlanyOgolneGmin', proxyTimeoutMs: 15000, layers: 'obszarUzupelnieniaZabudowy', version: '1.1.1', format: 'image/png', transparent: true, tiled: true, tileSize: 512, dpiScale: 2, transition: 120, legendUrl: false },
+        },
+        {
+            // 19.55.0: obszar uzupełnienia zabudowy (OUZ) z planu ogólnego jako osobna, wyraźna warstwa —
+            // decyzję o warunkach zabudowy po wejściu planu ogólnego wydaje się tylko w takim obszarze.
+            // Styl własny (SLD po stronie serwera): ciemny obrys, lekkie wypełnienie; GUGiK rysuje go cienką kreską.
+            id: 'overlay.pog.draft.ouz',
+            title: 'Obszary uzupełnienia zabudowy (projekt planu)',
+            description: 'Obszary uzupełnienia zabudowy w projektach planów ogólnych (przed uchwaleniem). Widoczne od skali ok. 1:100 000.',
+            group: 'Planowanie przestrzenne',
+            role: 'overlay', visible: false, opacity: 0.95, minZoom: 12, zIndex: 105,
+            attribution: { label: 'GUGiK — Plany Ogólne Gmin', url: 'https://www.geoportal.gov.pl/' },
+            capabilities: { identify: false, selectable: false, editable: false },
+            source: { kind: 'wms', url: './api/wms.php?source=pog_draft_ouz', transport: 'proxy', directUrl: 'https://mapy.geoportal.gov.pl/wss/ext/ProjektowanePlanyOgolneGmin', proxyTimeoutMs: 15000, layers: 'obszarUzupelnieniaZabudowy', version: '1.1.1', format: 'image/png', transparent: true, tiled: true, tileSize: 512, dpiScale: 2, transition: 120, legendUrl: false },
         },
         // 19.23.0: warstwa „Działki w zasobie KOWR” ukryta — usługa GUGiK ext/kowr zwraca puste
         // obrazy dla dzialki/dzialki_pkt/powiaty w każdej skali (audyt 30.10.2026). Źródło `kowr`

@@ -376,9 +376,9 @@ function LayerLegend({ url, title }) {
     ] });
 }
 
-// 18.0: warstwy z legendą widoczną zawsze, gdy są włączone (strefy planistyczne
-// bez legendy są nieczytelne). Legenda stoi pod swoją warstwą, nie nad listą.
-const ALWAYS_LEGEND = new Set(['overlay.pog.zones', 'overlay.pog.draft.zones']);
+// 19.55.0: plany ogólne bez legendy w panelu Warstwy (na życzenie właściciela) — legenda stref zajmowała
+// większość panelu. Legenda planu ogólnego jest nadal w przycisku „Legenda” na mapie (MapLegend).
+const NO_PANEL_LEGEND = (id) => id.startsWith('overlay.pog.');
 
 function RowMenu({ layer, favorite, actions }) {
     return _jsxs(DropdownMenu.Root, { children: [
@@ -406,7 +406,6 @@ const LayerRow = memo(function LayerRow({ layer, manager, scale, favorite, dragg
     const error = layer.status === 'error';
     const telemetry = layer.sourceTelemetry;
     const badge = healthBadge(layer);
-    const alwaysLegend = ALWAYS_LEGEND.has(layer.id) && layer.visible && layer.legendUrl;
     const metricTitle = layer.visible ? [
         telemetry?.lastGoodAt ? t('layers.lastGood', { time: new Date(telemetry.lastGoodAt).toLocaleTimeString('pl-PL') }) : null,
         telemetry?.lastTerminalError ?? null,
@@ -436,14 +435,13 @@ const LayerRow = memo(function LayerRow({ layer, manager, scale, favorite, dragg
                 : t('layers.scale.zoomOut') }),
             belowMinZoom ? _jsx(Button, { variant: 'ghost', size: 'sm', className: 'layer-scale-action', icon: _jsx(ZoomIn, { size: 12 }), onClick: () => manager?.zoomToLayerMinimum?.(layer.id), children: t('layers.scale.action') }) : null,
         ] }),
-        alwaysLegend && _jsx('div', { className: 'zone-legend-panel layer-inline-legend', role: 'region', 'aria-label': t('layers.legend.region', { title: layer.title }), children: _jsx(LayerLegend, { url: layer.legendUrl, title: layer.title }) }),
         infoOpen && _jsxs('div', { className: 'layer-expanded-info', children: [
             layer.description ? _jsx('p', { children: layer.description }) : null,
             layer.attribution?.label ? _jsxs('p', { children: [_jsx('strong', { children: `${t('layers.source')} ` }), layer.attribution.label] }) : null,
             layer.listUrl ? _jsx('a', { href: layer.listUrl, target: '_blank', rel: 'noopener noreferrer', children: t('layers.csv') }) : null,
             layer.serviceName ? _jsxs('p', { children: [_jsx('strong', { children: `${layer.sourceKind?.toUpperCase() ?? 'WMS'}: ` }), layer.serviceName] }) : null,
             layer.visible && !error ? _jsx(RangeField, { className: 'layer-opacity', label: t('layers.opacity'), ariaLabel: t('layers.opacity.aria', { title: layer.title }), min: 0, max: 100, step: 5, value: opacityPercent, format: (value) => `${value}%`, onChange: (value) => manager?.setOpacity(layer.id, Number(value) / 100) }) : null,
-            layer.legendUrl && !ALWAYS_LEGEND.has(layer.id) ? _jsx(LayerLegend, { url: layer.legendUrl, title: layer.title }) : null,
+            layer.legendUrl && !NO_PANEL_LEGEND(layer.id) ? _jsx(LayerLegend, { url: layer.legendUrl, title: layer.title }) : null,
         ] }),
         layer.id === 'overlay.kowr.biogas' && layer.visible && _jsx(KowrCoverage, {}),
         error && _jsxs('div', { className: 'layer-error-row', children: [_jsx('span', { title: layer.error ?? undefined, children: t('layers.error') }), _jsx(IconButton, { className: 'layer-error-retry', label: t('layers.retry.aria', { title: layer.title }), tooltipSide: 'left', onClick: () => manager?.retry(layer.id), children: _jsx(RefreshCw, { size: 13 }) })] }),

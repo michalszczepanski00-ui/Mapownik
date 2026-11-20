@@ -1,7 +1,7 @@
 # Audyt warstw Mapownika i propozycja nowych warstw (16.11.2026)
 
 **Stan bazowy:** 19.49.0.
-- **Katalog:** `app-19.54.0/data/catalog/dataCatalog.js` i `sourceProfiles.js` (z `data/source-profiles.json`).
+- **Katalog:** `app-19.55.0/data/catalog/dataCatalog.js` i `sourceProfiles.js` (z `data/source-profiles.json`).
 - **Serwer pośredniczący:** `api/_wms_sources.php`.
 
 **Sprawdzenie kandydatów:** 16.11.2026, na żywo, przez zapytanie `GetCapabilities` z tego środowiska.

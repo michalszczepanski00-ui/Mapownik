@@ -62,12 +62,16 @@ if ($resolvedCapabilitiesLayers !== null && $resolvedCapabilitiesLayers !== '') 
 // 17.8.3 — remember the variant that last worked for this source and try it
 // first. Failed variants used to be retried on every cold tile.
 $variantSignature = static function (array $variant) use ($source): string {
-    return hash('sha256', json_encode([
+    $parts = [
         (string)($variant['url'] ?? $source['url']),
         (string)($variant['layers'] ?? $source['layers']),
         (string)($variant['version'] ?? $source['version'] ?? '1.1.1'),
         (string)($variant['styles'] ?? ''),
-    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '');
+    ];
+    // 19.55.0: parametry stałe (np. własny styl SLD_BODY) odróżniają warianty o tych samych warstwach —
+    // bez tego zapamiętany „zwycięzca” wybierał wariant zapasowy bez stylu. Dla źródeł bez parametrów podpis bez zmian.
+    if (!empty($variant['fixed_params'])) $parts[] = $variant['fixed_params'];
+    return hash('sha256', json_encode($parts, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '');
 };
 // 19.8.6 — tryb „merge: fill” (plany ogólne): obraz składany z KAŻDEGO źródła, puste
 // piksele pierwszego uzupełniane kolejnymi. Ani krajowa integracja GUGiK, ani Rejestr

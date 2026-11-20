@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { shortArea, itemState, shortProtectedName, shortForestOwner, RESTRICTIONS } from '@app/app/components/ParcelCard.js';
+import { shortArea, itemState, shortProtectedName, shortForestOwner, RESTRICTIONS, ouzMark } from '@app/app/components/ParcelCard.js';
 
 describe('karta działki 19.51.0 — krótkie wartości', () => {
   it('powierzchnia: ha z dwoma miejscami, poniżej 1 ha w m²', () => {
@@ -26,5 +26,17 @@ describe('karta działki 19.51.0 — grupowanie ograniczeń', () => {
   });
   it('każde źródło ograniczeń ma nazwę do linii „Brak: …” i warstwę na mapie', () => {
     for (const r of RESTRICTIONS) { expect(r.short.length).toBeGreaterThan(1); expect(r.show.length).toBeGreaterThan(0); }
+  });
+});
+
+describe('obszar uzupełnienia zabudowy (19.55.0)', () => {
+  it('odczytuje oznaczenie OUZ z odpowiedzi planu ogólnego', () => {
+    const text = 'Tytuł: Plan ogólny gminy Zapolice\nObowiązuje od: 2025/11/28\n\nOznaczenie: 93OUZ\nSymbol: OUZ\nObowiązuje od: 2025/11/28';
+    expect(ouzMark(text)).toBe('93OUZ');
+    expect(ouzMark('Symbol: OUZ')).toBe('OUZ');
+  });
+  it('strefa planistyczna to nie obszar uzupełnienia', () => {
+    expect(ouzMark('Oznaczenie: 107SO\nSymbol: SO')).toBeNull();
+    expect(ouzMark('')).toBeNull();
   });
 });

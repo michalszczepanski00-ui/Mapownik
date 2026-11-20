@@ -1,6 +1,6 @@
 <?php
 /**
- * msportal 19.54.0 — testy poprawek karty działki (CLI, bez sieci):  php tools/test_19.46.0.php
+ * msportal 19.55.0 — testy poprawek karty działki (CLI, bez sieci):  php tools/test_19.46.0.php
  * Opis obiektów z usług planów: bez powtórzeń, polskie etykiety pól, „Data wersji” przy projekcie planu.
  */
 declare(strict_types=1);
