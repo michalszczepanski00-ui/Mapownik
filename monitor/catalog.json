@@ -1,0 +1,675 @@
+{
+  "version": "19.3.1",
+  "sources": [
+    {
+      "id": "server",
+      "title": "Serwer i spójność wersji",
+      "group": "Aplikacja",
+      "kind": "api",
+      "url": "./api/health.php"
+    },
+    {
+      "id": "bdot",
+      "title": "Lokalna baza budynków BDOT10k",
+      "group": "Aplikacja",
+      "kind": "api",
+      "url": "./api/analysis_buildings.php?action=status"
+    },
+    {
+      "id": "export",
+      "title": "Eksport rastrowy",
+      "group": "Aplikacja",
+      "kind": "api",
+      "url": "./api/export.php?action=capabilities"
+    },
+    {
+      "id": "search",
+      "title": "Wyszukiwanie miejscowości",
+      "group": "Aplikacja",
+      "kind": "api",
+      "url": "./api/search.php?mode=locality&q=Warszawa"
+    },
+    {
+      "id": "kowr",
+      "title": "Rejestr biogazowni KOWR",
+      "group": "Dane lokalne",
+      "kind": "json",
+      "url": "./data/kowr/installations.json"
+    },
+    {
+      "id": "osm",
+      "title": "Mapa standardowa OSM",
+      "group": "Usługi referencyjne",
+      "kind": "xyz",
+      "sourceKey": "osm"
+    },
+    {
+      "id": "wmts_standard",
+      "title": "Ortofotomapa WMTS standardowa",
+      "group": "Usługi referencyjne",
+      "kind": "wmts",
+      "sourceKey": "wmts_standard"
+    },
+    {
+      "id": "wmts_high",
+      "title": "Ortofotomapa wysokiej rozdzielczości (WMS HD)",
+      "group": "Usługi referencyjne",
+      "kind": "wmts",
+      "sourceKey": "wmts_high"
+    },
+    {
+      "id": "uldk",
+      "title": "ULDK — geometria działki",
+      "group": "Usługi referencyjne",
+      "kind": "api",
+      "sourceKey": "uldk"
+    },
+    {
+      "id": "nmt",
+      "title": "NMT — wysokość punktu",
+      "group": "Usługi referencyjne",
+      "kind": "api",
+      "sourceKey": "nmt"
+    },
+    {
+      "id": "wms.topography",
+      "title": "Topografia",
+      "group": "Podkłady",
+      "kind": "wms",
+      "sourceKey": "topography",
+      "minZoom": null
+    },
+    {
+      "id": "wms.orthophoto",
+      "title": "orthophoto",
+      "group": "Dane pomocnicze",
+      "kind": "wms",
+      "sourceKey": "orthophoto",
+      "minZoom": null
+    },
+    {
+      "id": "wms.orthophoto_high",
+      "title": "orthophoto_high",
+      "group": "Dane pomocnicze",
+      "kind": "wms",
+      "sourceKey": "orthophoto_high",
+      "minZoom": null
+    },
+    {
+      "id": "wms.orthophoto_true",
+      "title": "Prawdziwa ortofotomapa",
+      "group": "Podkłady",
+      "kind": "wms",
+      "sourceKey": "orthophoto_true",
+      "minZoom": 13
+    },
+    {
+      "id": "wms.dzialki",
+      "title": "Działki ewidencyjne (KIEG)",
+      "group": "Granice i działki",
+      "kind": "wms",
+      "sourceKey": "dzialki",
+      "minZoom": 14
+    },
+    {
+      "id": "wms.egib_classes",
+      "title": "Klasy bonitacyjne I–VI i użytki (EGiB)",
+      "group": "Działki i grunty",
+      "kind": "wms",
+      "sourceKey": "egib_classes",
+      "minZoom": 16,
+      "sourceUrl": "https://integracja.gugik.gov.pl/cgi-bin/KrajowaIntegracjaEwidencjiGruntow",
+      "layerNames": "kontury,uzytki",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.natura2000",
+      "title": "Obszary chronione / Natura 2000",
+      "group": "Środowisko",
+      "kind": "wms",
+      "sourceKey": "natura2000",
+      "minZoom": null
+    },
+    {
+      "id": "wms.mpzp",
+      "title": "MPZP (KIMP)",
+      "group": "Planowanie przestrzenne",
+      "kind": "wms",
+      "sourceKey": "mpzp",
+      "minZoom": 13
+    },
+    {
+      "id": "wms.glebowa",
+      "title": "Mapa glebowo-rolnicza — kontury",
+      "group": "Działki i grunty",
+      "kind": "wms",
+      "sourceKey": "glebowa",
+      "minZoom": 11,
+      "sourceUrl": "https://mapy.geoportal.gov.pl/wss/service/pub/guest/MapaGlebowoRolnicza/MapServer/WMSServer",
+      "layerNames": "0",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.bdot10k_buildings",
+      "title": "Budynki (BDOT10k)",
+      "group": "Budynki",
+      "kind": "wms",
+      "sourceKey": "bdot10k_buildings",
+      "minZoom": 13
+    },
+    {
+      "id": "wms.bdot10k_transport",
+      "title": "Drogi i kolej (BDOT10k)",
+      "group": "Dane referencyjne",
+      "kind": "wms",
+      "sourceKey": "bdot10k_transport",
+      "minZoom": 11
+    },
+    {
+      "id": "wms.bdot10k_water",
+      "title": "Wody (BDOT10k)",
+      "group": "Dane referencyjne",
+      "kind": "wms",
+      "sourceKey": "bdot10k_water",
+      "minZoom": 11
+    },
+    {
+      "id": "wms.bdot10k_landuse",
+      "title": "Użytkowanie terenu i lasy (BDOT10k)",
+      "group": "Dane referencyjne",
+      "kind": "wms",
+      "sourceKey": "bdot10k_landuse",
+      "minZoom": 10
+    },
+    {
+      "id": "wms.prg_boundaries",
+      "title": "Granice administracyjne (PRG)",
+      "group": "Granice i działki",
+      "kind": "wms",
+      "sourceKey": "prg_boundaries",
+      "minZoom": 6
+    },
+    {
+      "id": "wms.prng_names",
+      "title": "Nazwy geograficzne (PRNG)",
+      "group": "Dane referencyjne",
+      "kind": "wms",
+      "sourceKey": "prng_names",
+      "minZoom": 9
+    },
+    {
+      "id": "wms.kina_addresses",
+      "title": "Adresy i ulice (KINA)",
+      "group": "Dane referencyjne",
+      "kind": "wms",
+      "sourceKey": "kina_addresses",
+      "minZoom": 14
+    },
+    {
+      "id": "wms.gdos_protection",
+      "title": "Rezerwaty, parki i OChK (GDOŚ)",
+      "group": "Środowisko",
+      "kind": "wms",
+      "sourceKey": "gdos_protection",
+      "minZoom": 8
+    },
+    {
+      "id": "wms.kiut_power",
+      "title": "Energia elektryczna",
+      "group": "Uzbrojenie terenu",
+      "kind": "wms",
+      "sourceKey": "kiut_power",
+      "minZoom": 17
+    },
+    {
+      "id": "wms.kiut_gas",
+      "title": "Gaz",
+      "group": "Uzbrojenie terenu",
+      "kind": "wms",
+      "sourceKey": "kiut_gas",
+      "minZoom": 17
+    },
+    {
+      "id": "wms.kiut_water",
+      "title": "Wodociąg",
+      "group": "Uzbrojenie terenu",
+      "kind": "wms",
+      "sourceKey": "kiut_water",
+      "minZoom": 17
+    },
+    {
+      "id": "wms.kiut_sewer",
+      "title": "Kanalizacja",
+      "group": "Uzbrojenie terenu",
+      "kind": "wms",
+      "sourceKey": "kiut_sewer",
+      "minZoom": 17
+    },
+    {
+      "id": "wms.kiut_telecom",
+      "title": "Telekomunikacja",
+      "group": "Uzbrojenie terenu",
+      "kind": "wms",
+      "sourceKey": "kiut_telecom",
+      "minZoom": 17
+    },
+    {
+      "id": "wms.kiut_heat",
+      "title": "Sieć ciepłownicza",
+      "group": "Uzbrojenie terenu",
+      "kind": "wms",
+      "sourceKey": "kiut_heat",
+      "minZoom": 17
+    },
+    {
+      "id": "wms.kiut_other",
+      "title": "Sieci specjalne i niezidentyfikowane",
+      "group": "Uzbrojenie terenu",
+      "kind": "wms",
+      "sourceKey": "kiut_other",
+      "minZoom": 17,
+      "sourceUrl": "https://integracja.gugik.gov.pl/cgi-bin/KrajowaIntegracjaUzbrojeniaTerenu",
+      "layerNames": "przewod_specjalny,przewod_niezidentyfikowany",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.kibdot_bdot500",
+      "title": "Obiekty topograficzne (BDOT500)",
+      "group": "Dane referencyjne",
+      "kind": "wms",
+      "sourceKey": "kibdot_bdot500",
+      "minZoom": 17
+    },
+    {
+      "id": "wms.nmt_shaded",
+      "title": "NMT — cieniowanie",
+      "group": "Podkłady",
+      "kind": "wms",
+      "sourceKey": "nmt_shaded",
+      "minZoom": null
+    },
+    {
+      "id": "wms.pog_adopted",
+      "title": "POG — obszary wiążące / realizowane",
+      "group": "Planowanie przestrzenne",
+      "kind": "wms",
+      "sourceKey": "pog_adopted",
+      "minZoom": 9,
+      "sourceUrl": "https://rejestr-urbanistyczny.gov.pl/uslugi-sieciowe/wms-pog/wms",
+      "layerNames": "APP.POG.PrawnieWiazacyLubRealizowany",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.pog_draft",
+      "title": "POG — w trakcie przyjmowania",
+      "group": "Planowanie przestrzenne",
+      "kind": "wms",
+      "sourceKey": "pog_draft",
+      "minZoom": 11,
+      "sourceUrl": "https://rejestr-urbanistyczny.gov.pl/uslugi-sieciowe/wms-pog/wms",
+      "layerNames": "APP.POG.SW.WTrakciePrzyjmowania,APP.POG.SJ.WTrakciePrzyjmowania,APP.POG.SZ.WTrakciePrzyjmowania,APP.POG.SU.WTrakciePrzyjmowania,APP.POG.SH.WTrakciePrzyjmowania,APP.POG.SP.WTrakciePrzyjmowania,APP.POG.SR.WTrakciePrzyjmowania,APP.POG.SI.WTrakciePrzyjmowania,APP.POG.SN.WTrakciePrzyjmowania,APP.POG.SC.WTrakciePrzyjmowania,APP.POG.SG.WTrakciePrzyjmowania,APP.POG.SO.WTrakciePrzyjmowania,APP.POG.SK.WTrakciePrzyjmowania",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.pog_zones",
+      "title": "Strefy POG — wiążące / realizowane",
+      "group": "Planowanie przestrzenne",
+      "kind": "wms",
+      "sourceKey": "pog_zones",
+      "minZoom": 11,
+      "sourceUrl": "https://rejestr-urbanistyczny.gov.pl/uslugi-sieciowe/wms-pog/wms",
+      "layerNames": "APP.POG.SW.PrawnieWiazacyLubRealizowany,APP.POG.SJ.PrawnieWiazacyLubRealizowany,APP.POG.SZ.PrawnieWiazacyLubRealizowany,APP.POG.SU.PrawnieWiazacyLubRealizowany,APP.POG.SH.PrawnieWiazacyLubRealizowany,APP.POG.SP.PrawnieWiazacyLubRealizowany,APP.POG.SR.PrawnieWiazacyLubRealizowany,APP.POG.SI.PrawnieWiazacyLubRealizowany,APP.POG.SN.PrawnieWiazacyLubRealizowany,APP.POG.SC.PrawnieWiazacyLubRealizowany,APP.POG.SG.PrawnieWiazacyLubRealizowany,APP.POG.SO.PrawnieWiazacyLubRealizowany,APP.POG.SK.PrawnieWiazacyLubRealizowany",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.kowr",
+      "title": "Działki w zasobie KOWR (ukryta w portalu — brak danych)",
+      "group": "Grunty",
+      "kind": "wms",
+      "sourceKey": "kowr",
+      "minZoom": 11
+    },
+    {
+      "id": "wms.pgi_deposits",
+      "title": "Udokumentowane złoża kopalin (MIDAS)",
+      "group": "Geologia i górnictwo",
+      "kind": "wms",
+      "sourceKey": "pgi_deposits",
+      "minZoom": 8,
+      "sourceUrl": "https://cbdgmapa.pgi.gov.pl/arcgis/services/midas/MapServer/WMSServer",
+      "layerNames": "5",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.pgi_miningareas",
+      "title": "Obszary górnicze (MIDAS)",
+      "group": "Geologia i górnictwo",
+      "kind": "wms",
+      "sourceKey": "pgi_miningareas",
+      "minZoom": 8,
+      "sourceUrl": "https://cbdgmapa.pgi.gov.pl/arcgis/services/midas/MapServer/WMSServer",
+      "layerNames": "4",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.pgi_miningterrains",
+      "title": "Tereny górnicze (MIDAS)",
+      "group": "Geologia i górnictwo",
+      "kind": "wms",
+      "sourceKey": "pgi_miningterrains",
+      "minZoom": 8,
+      "sourceUrl": "https://cbdgmapa.pgi.gov.pl/arcgis/services/midas/MapServer/WMSServer",
+      "layerNames": "3",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.midas_archive_0",
+      "title": "Archiwalne tereny górnicze (MIDAS)",
+      "group": "Archiwum",
+      "kind": "wms",
+      "sourceKey": "midas_archive_0",
+      "minZoom": 8,
+      "sourceUrl": "https://cbdgmapa.pgi.gov.pl/arcgis/services/midas/MapServer/WMSServer",
+      "layerNames": "0",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.midas_archive_1",
+      "title": "Archiwalne obszary górnicze (MIDAS)",
+      "group": "Archiwum",
+      "kind": "wms",
+      "sourceKey": "midas_archive_1",
+      "minZoom": 8,
+      "sourceUrl": "https://cbdgmapa.pgi.gov.pl/arcgis/services/midas/MapServer/WMSServer",
+      "layerNames": "1",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.midas_archive_2",
+      "title": "Złoża wybilansowane (MIDAS)",
+      "group": "Archiwum",
+      "kind": "wms",
+      "sourceKey": "midas_archive_2",
+      "minZoom": 8,
+      "sourceUrl": "https://cbdgmapa.pgi.gov.pl/arcgis/services/midas/MapServer/WMSServer",
+      "layerNames": "2",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.glebowa_coverage",
+      "title": "Zasięg mapy glebowo-rolniczej",
+      "group": "Działki i grunty",
+      "kind": "wms",
+      "sourceKey": "glebowa_coverage",
+      "minZoom": 7,
+      "sourceUrl": "https://mapy.geoportal.gov.pl/wss/service/pub/guest/MapaGlebowoRolnicza/MapServer/WMSServer",
+      "layerNames": "1",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.pse",
+      "title": "Linie i stacje najwyższych napięć (PSE)",
+      "group": "Energetyka",
+      "kind": "wms",
+      "sourceKey": "pse",
+      "minZoom": 8,
+      "sourceUrl": "https://mapy.geoportal.gov.pl/wss/ext/PSE",
+      "layerNames": "linie,stacje",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": "III kwartał 2026"
+    },
+    {
+      "id": "wms.pog_preparation",
+      "title": "POG — w opracowaniu",
+      "group": "Planowanie przestrzenne",
+      "kind": "wms",
+      "sourceKey": "pog_preparation",
+      "minZoom": 9,
+      "sourceUrl": "https://rejestr-urbanistyczny.gov.pl/uslugi-sieciowe/wms-pog/wms",
+      "layerNames": "APP.POG.WOpracowaniu",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.ru_mpzp_prawniewiazacylubrealizowany",
+      "title": "MPZP — obszary wiążące / realizowane",
+      "group": "Planowanie przestrzenne",
+      "kind": "wms",
+      "sourceKey": "ru_mpzp_prawniewiazacylubrealizowany",
+      "minZoom": 10,
+      "sourceUrl": "https://rejestr-urbanistyczny.gov.pl/uslugi-sieciowe/wms-mpzp/wms",
+      "layerNames": "APP.MPZP.PrawnieWiazacyLubRealizowany",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.ru_mpzp_wtrakcieprzyjmowania",
+      "title": "MPZP — obszary w trakcie przyjmowania",
+      "group": "Planowanie przestrzenne",
+      "kind": "wms",
+      "sourceKey": "ru_mpzp_wtrakcieprzyjmowania",
+      "minZoom": 10,
+      "sourceUrl": "https://rejestr-urbanistyczny.gov.pl/uslugi-sieciowe/wms-mpzp/wms",
+      "layerNames": "APP.MPZP.WTrakciePrzyjmowania",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.ru_mpzp_wopracowaniu",
+      "title": "MPZP — obszary w opracowaniu",
+      "group": "Planowanie przestrzenne",
+      "kind": "wms",
+      "sourceKey": "ru_mpzp_wopracowaniu",
+      "minZoom": 10,
+      "sourceUrl": "https://rejestr-urbanistyczny.gov.pl/uslugi-sieciowe/wms-mpzp/wms",
+      "layerNames": "APP.MPZP.WOpracowaniu",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.nmt_hypsometry",
+      "title": "Mapa wysokości (NMT) (ukryta w portalu — brak danych)",
+      "group": "Rzeźba i wysokości",
+      "kind": "wms",
+      "sourceKey": "nmt_hypsometry",
+      "minZoom": 10,
+      "sourceUrl": "https://mapy.geoportal.gov.pl/wss/service/PZGIK/NMT/GRID1/WMS/Hypsometry",
+      "layerNames": "Raster",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.sopo",
+      "title": "Osuwiska i tereny zagrożone (SOPO)",
+      "group": "Geologia i górnictwo",
+      "kind": "wms",
+      "sourceKey": "sopo",
+      "minZoom": 10,
+      "sourceUrl": "https://cbdgmapa.pgi.gov.pl/arcgis/services/geozagrozenia/sopo_obszary/MapServer/WMSServer",
+      "layerNames": "0,1,2",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.gdos_birds",
+      "title": "Natura 2000 — ptasia",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "gdos_birds",
+      "minZoom": 8,
+      "sourceUrl": "https://sdi.gdos.gov.pl/wms",
+      "layerNames": "GDOS:ObszarySpecjalnejOchrony",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.gdos_habitats",
+      "title": "Natura 2000 — siedliskowa",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "gdos_habitats",
+      "minZoom": 8,
+      "sourceUrl": "https://sdi.gdos.gov.pl/wms",
+      "layerNames": "GDOS:SpecjalneObszaryOchrony",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.gdos_national",
+      "title": "Parki narodowe",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "gdos_national",
+      "minZoom": 8,
+      "sourceUrl": "https://sdi.gdos.gov.pl/wms",
+      "layerNames": "GDOS:ParkiNarodowe",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.gdos_landscape",
+      "title": "Parki krajobrazowe",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "gdos_landscape",
+      "minZoom": 8,
+      "sourceUrl": "https://sdi.gdos.gov.pl/wms",
+      "layerNames": "GDOS:ParkiKrajobrazowe",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.gdos_reserves",
+      "title": "Rezerwaty przyrody",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "gdos_reserves",
+      "minZoom": 8,
+      "sourceUrl": "https://sdi.gdos.gov.pl/wms",
+      "layerNames": "GDOS:Rezerwaty",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.gdos_protected",
+      "title": "Obszary chronionego krajobrazu",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "gdos_protected",
+      "minZoom": 8,
+      "sourceUrl": "https://sdi.gdos.gov.pl/wms",
+      "layerNames": "GDOS:ObszaryChronionegoKrajobrazu",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.gdos_ecological",
+      "title": "Użytki ekologiczne",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "gdos_ecological",
+      "minZoom": 8,
+      "sourceUrl": "https://sdi.gdos.gov.pl/wms",
+      "layerNames": "GDOS:UzytkiEkologiczne",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.gdos_complexes",
+      "title": "Zespoły przyrodniczo-krajobrazowe",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "gdos_complexes",
+      "minZoom": 8,
+      "sourceUrl": "https://sdi.gdos.gov.pl/wms",
+      "layerNames": "GDOS:ZespolyPrzyrodniczoKrajobrazowe",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.gdos_monuments",
+      "title": "Pomniki przyrody",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "gdos_monuments",
+      "minZoom": 11,
+      "sourceUrl": "https://sdi.gdos.gov.pl/wms",
+      "layerNames": "GDOS:PomnikiPrzyrody",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.gdos_sites",
+      "title": "Stanowiska dokumentacyjne",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "gdos_sites",
+      "minZoom": 11,
+      "sourceUrl": "https://sdi.gdos.gov.pl/wms",
+      "layerNames": "GDOS:StanowiskaDokumentacyjne",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.flood_river",
+      "title": "Powódź rzeczna — obszary zagrożenia",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "flood_river",
+      "minZoom": 10,
+      "sourceUrl": "https://wody.isok.gov.pl/wss/INSPIRE/INSPIRE_NZ_HY_MZPMRP_WMS",
+      "layerNames": "NZ.Fluvial",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.flood_sea",
+      "title": "Powódź morska — obszary zagrożenia",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "flood_sea",
+      "minZoom": 10,
+      "sourceUrl": "https://wody.isok.gov.pl/wss/INSPIRE/INSPIRE_NZ_HY_MZPMRP_WMS",
+      "layerNames": "NZ.SeaWater",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.flood_dam",
+      "title": "Zagrożenie przy awarii budowli piętrzących",
+      "group": "Środowisko i wody",
+      "kind": "wms",
+      "sourceKey": "flood_dam",
+      "minZoom": 10,
+      "sourceUrl": "https://wody.isok.gov.pl/wss/INSPIRE/INSPIRE_NZ_HY_MZPMRP_WMS",
+      "layerNames": "NZ.ArtificialWaterBearingInfrastructure",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    },
+    {
+      "id": "wms.kiut_all",
+      "title": "Wszystkie sieci — zestaw KIUT",
+      "group": "Uzbrojenie terenu",
+      "kind": "wms",
+      "sourceKey": "kiut_all",
+      "minZoom": 17,
+      "sourceUrl": "https://integracja.gugik.gov.pl/cgi-bin/KrajowaIntegracjaUzbrojeniaTerenu",
+      "layerNames": "przewod_elektroenergetyczny,przewod_gazowy,przewod_wodociagowy,przewod_kanalizacyjny,przewod_telekomunikacyjny,przewod_cieplowniczy,przewod_specjalny,przewod_niezidentyfikowany",
+      "configurationCheckedAt": "2026-10-15",
+      "dataDate": null
+    }
+  ]
+}

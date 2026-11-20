@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><title>Makieta karty działki</title>
+<style>
+:root{--accent:#2f6b45;--accent-soft:#e6f0e9;--ink:#16261e;--muted:#5f6b62;--line:#dfe4dc;--warn:#a1460c;--warn-soft:#fbefe6;--bg:#fbfaf6;--surface:#fff}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:#e9ece6;font:13px/1.35 "Segoe UI",system-ui,sans-serif;color:var(--ink);display:flex;gap:24px;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:6px}.cap{font:600 12px system-ui;color:#444;width:268px}
+.card{width:268px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 18px rgba(22,38,30,.14);overflow:hidden}
+.head{padding:10px 12px 8px;border-bottom:1px solid var(--line);position:relative}
+.head h1{font-size:17px;margin:0;line-height:1.2}.head h1 small{font-size:12px;font-weight:400;color:var(--muted)}
+.sub{color:var(--muted);font-size:12px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbtns{display:flex;gap:5px;margin-top:8px;align-items:center}
+.btn{white-space:nowrap;border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 0;font:600 11.5px system-ui;justify-content:center;flex:1 1 auto;color:var(--ink);display:inline-flex;gap:5px;align-items:center;cursor:default}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.ghost{border-color:transparent;padding:5px 6px}
+.icon{width:26px;height:26px;border-radius:7px;border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;color:var(--muted)}
+.top-icons{position:absolute;top:8px;right:8px;display:flex;gap:2px}
+.sec{padding:8px 12px;border-bottom:1px solid var(--line)}.sec:last-child{border-bottom:0}
+.lab{font:600 11.5px system-ui;color:var(--muted);text-transform:none;margin:0 0 4px}
+.row{display:grid;grid-template-columns:16px 1fr auto 18px;gap:6px;align-items:center;min-height:26px}
+.row .v{font-weight:600;text-align:right;white-space:nowrap}.row .eye{color:var(--muted);font-size:12px;text-align:center}
+.row.warn .v{color:var(--warn)}.row .chev{color:var(--muted)}
+.dot{width:14px;height:14px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;background:var(--accent)}
+.dot.warn{background:var(--warn)}.dot.no{background:#fff;border:1.5px solid #aeb7ae}.dot.unk{background:#fff;border:1.5px solid #aeb7ae;color:var(--muted);font-weight:700}
+.okline{display:flex;gap:6px;align-items:flex-start;color:var(--muted);font-size:12.5px;padding:3px 0}
+.detail{margin:2px 0 6px 22px;padding:6px 8px;background:var(--bg);border-radius:7px;font-size:12px;color:var(--ink)}
+.detail div{display:flex;justify-content:space-between;gap:8px}.detail div span:first-child{color:var(--muted)}
+.near .row{grid-template-columns:1fr auto}.near a{color:var(--accent);font-weight:600;text-decoration:none}
+.status{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.status b{color:var(--warn);font-weight:600}.status a{color:var(--accent);font-weight:600}
+.more{display:flex;justify-content:space-between;color:var(--ink);font-weight:600;font-size:12.5px}
+.menu{position:relative;margin:4px 0 0;border:1px solid var(--line);border-radius:9px;background:#fff;box-shadow:0 6px 18px rgba(22,38,30,.16);padding:4px;font-size:12.5px}
+.menu div{padding:5px 8px;border-radius:6px;display:flex;justify-content:space-between}.menu div:first-child{background:var(--accent-soft)}
+.menu small{color:var(--muted)}.menu hr{border:0;border-top:1px solid var(--line);margin:3px 0}
+.ee{font-size:9.5px;color:var(--muted);vertical-align:super;font-weight:600}
+</style></head><body>
+
+<!-- A: domyślnie -->
+<div class="col"><div class="cap">A. Proponowana karta — domyślnie (dz. 27/1)</div>
+<div class="card">
+  <div class="head">
+    <div class="top-icons"><span class="icon">‹</span><span class="icon">⋯</span><span class="icon">✕</span></div>
+    <h1>Działka 27/1</h1>
+    <div class="sub">21,85 ha · Janowo · gm. Starogard Gdański</div>
+    <div class="hbtns"><span class="btn primary">Raport PDF</span><span class="btn">Do projektu</span><span class="btn">Analizy ▾</span></div>
+  </div>
+  <div class="sec">
+    <div class="lab">Planowanie</div>
+    <div class="row"><span class="dot">✓</span><span>MPZP</span><span class="v">obowiązuje</span><span class="chev">›</span></div>
+    <div class="row"><span class="dot">✓</span><span>Plan ogólny</span><span class="v">projekt · 107SO</span><span class="chev">›</span></div>
+  </div>
+  <div class="sec">
+    <div class="lab">Ograniczenia</div>
+    <div class="okline"><span class="dot no"></span><span>Brak: Natura 2000<span class="ee">EEA</span>, inne formy ochrony<span class="ee">EEA</span>, zabytek, powódź, las</span></div>
+    <div class="row"><span class="dot unk">?</span><span>Klasa gruntu</span><span class="v" style="font-weight:400;color:var(--muted)">brak w usłudze</span><span></span></div>
+  </div>
+  <div class="sec near">
+    <div class="lab">W okolicy · 500 m, 5 lat</div>
+    <div class="row"><span>Rynek (grunty)</span><a>za mało danych ›</a></div>
+    <div class="row"><span>Budowy i pozwolenia</span><a>pokaż ›</a></div>
+  </div>
+  <div class="sec"><div class="more"><span>Szczegóły i źródła</span><span>›</span></div>
+    <div class="status" style="margin-top:4px"><span>15 z 18 źródeł · <b>3 bez odpowiedzi</b></span><a>Ponów</a></div>
+  </div>
+</div></div>
+
+<!-- B: rozwinięty wiersz + menu -->
+<div class="col"><div class="cap">B. Wiersz MPZP rozwinięty w miejscu, menu „Analizy”</div>
+<div class="card">
+  <div class="head">
+    <div class="top-icons"><span class="icon">‹</span><span class="icon">⋯</span><span class="icon">✕</span></div>
+    <h1>Działka 27/1</h1>
+    <div class="sub">21,85 ha · Janowo · gm. Starogard Gdański</div>
+    <div class="hbtns"><span class="btn primary">Raport PDF</span><span class="btn">Do projektu</span><span class="btn" style="background:var(--accent-soft)">Analizy ▴</span></div>
+    <div class="menu">
+      <div><span>Otoczenie działki</span><small>screening</small></div>
+      <div><span>Ceny transakcyjne</span></div><div><span>Budowy i pozwolenia</span></div>
+      <div><span>Analiza działki (serwer)</span></div><hr>
+      <div><span>Bufor</span><small>B</small></div><div><span>Obszar analizowany WZ</span><small>Z</small></div>
+      <div><span>Wysokości i nachylenie</span></div><div><span>Profil terenu</span></div><div><span>Teren 3D</span></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="lab">Planowanie</div>
+    <div class="row"><span class="dot">✓</span><span>MPZP</span><span class="v">obowiązuje</span><span class="chev">⌄</span></div>
+    <div class="detail"><div><span>Źródło</span><span>rysunek planu (gmina)</span></div><div><span>Opis</span><span>brak w integracji</span></div><div style="margin-top:3px"><span></span><span style="color:var(--accent);font-weight:600">👁 Pokaż na mapie</span></div></div>
+    <div class="row"><span class="dot">✓</span><span>Plan ogólny</span><span class="v">projekt · 107SO</span><span class="chev">›</span></div>
+  </div>
+</div></div>
+
+<!-- C: działka z ograniczeniami -->
+<div class="col"><div class="cap">C. Działka z ograniczeniami — dane przykładowe (ilustracja)</div>
+<div class="card">
+  <div class="head">
+    <div class="top-icons"><span class="icon">‹</span><span class="icon">⋯</span><span class="icon">✕</span></div>
+    <h1>Działka 112</h1>
+    <div class="sub">0,12 ha · Truskaw · gm. Izabelin</div>
+    <div class="hbtns"><span class="btn primary">Raport PDF</span><span class="btn">Do projektu</span><span class="btn">Analizy ▾</span></div>
+  </div>
+  <div class="sec">
+    <div class="lab">Planowanie</div>
+    <div class="row"><span class="dot">✓</span><span>MPZP</span><span class="v">obowiązuje</span><span class="chev">›</span></div>
+    <div class="row"><span class="dot no"></span><span>Plan ogólny</span><span class="v" style="font-weight:400">brak planu</span><span class="chev"></span></div>
+  </div>
+  <div class="sec">
+    <div class="lab">Ograniczenia · 3</div>
+    <div class="row warn"><span class="dot warn">!</span><span>Natura 2000</span><span class="v">PLC140001</span><span class="chev">›</span></div>
+    <div class="row warn"><span class="dot warn">!</span><span>Park narodowy</span><span class="v">Kampinoski</span><span class="chev">›</span></div>
+    <div class="row warn"><span class="dot warn">!</span><span>Hałas (2017)</span><span class="v">55–59 dB</span><span class="chev">›</span></div>
+    <div class="okline"><span class="dot no"></span><span>Brak: zabytek, powódź, las, GZWP</span></div>
+  </div>
+  <div class="sec near">
+    <div class="lab">W okolicy · 500 m, 5 lat</div>
+    <div class="row"><span>Rynek (grunty)</span><a>310 zł/m² ›</a></div>
+    <div class="row"><span>Budowy i pozwolenia</span><a>4 ›</a></div>
+  </div>
+  <div class="sec"><div class="more"><span>Szczegóły i źródła</span><span>›</span></div>
+    <div class="status" style="margin-top:4px"><span>18 z 18 źródeł</span><span></span></div>
+  </div>
+</div></div>
+</body></html>

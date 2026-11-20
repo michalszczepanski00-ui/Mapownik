@@ -1,0 +1,45 @@
+/* Narzędzia rysowania i pomiarów: paleta, style, adnotacje
+   Wydzielone z dawnego 20-legacy.css (17.8.3, 2577 linii) — podział wyłącznie
+   mechaniczny, żadna reguła nie zmieniła treści. Kolejność reguł w tym pliku
+   jest zachowana z oryginału; tam gdzie ten sam selektor pojawiał się w
+   pliku dwukrotnie (np. późniejsza poprawka odstępów), obie deklaracje
+   trafiły do TEGO SAMEGO pliku w tej samej kolejności — kaskada więc działa
+   identycznie jak wcześniej. Ten plik nadal deklaruje warstwę „legacy"
+   (patrz 00-layers.css) — kolejność linków w index.html decyduje o
+   kolejności w warstwie, nie nazwa pliku.
+*/
+@layer legacy {
+
+/* Step 12 — ToolRegistry state */
+@keyframes tool-spin { to { transform: rotate(360deg); } }
+
+/* Floating tools */
+
+/* 15.0 — zaawansowane rysowanie */
+
+.color-palette-menu { min-width: 166px; }
+.preset-color-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 30px);
+  gap: 6px;
+  padding: 4px 6px 7px;
+}
+.preset-color-item {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  outline: none;
+  cursor: pointer;
+}
+.preset-color-item:hover,
+.preset-color-item[data-highlighted] { background: var(--surface-hover); }
+
+/* 16.5.0 — jawne ostrzeżenia uproszczonej analizy drogi */
+
+/* 18.10.4: paleta narzędzi to same ikony (nazwy i skróty w podpowiedzi po najechaniu). */
+
+/* 17.8.3 — Performance & Vendor Cleanup: authoritative UI spacing */
+/* Odstępy paska przejęły .app-bar i .selection-bar (sekcja Fazy 2). */
+}

@@ -1,0 +1,38 @@
+# msportal — monitoring dostępności co 15 minut (19.44.0).
+#
+# Sprawdza stronę, API, ULDK, wyszukiwarkę i kafel mapy (node tools/check_deploy.mjs --monitor).
+# Gdy portal nie odpowiada dwa razy z rzędu (odstęp 2 min), przebieg kończy się błędem, a GitHub wysyła
+# e-mail osobie, która ostatnio zmieniła harmonogram w tym pliku (Settings → Notifications → Actions).
+#
+# Wymagane: sekret repozytorium MONITOR_URL, np. https://mapownik.swiadectwa.net/test22
+# Uwaga: GitHub może opóźnić przebiegi harmonogramu o kilka–kilkanaście minut w godzinach szczytu.
+name: Monitoring dostępności
+
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+
+concurrency: monitor
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/check_deploy.mjs
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Kontrola dostępności
+        env:
+          MONITOR_URL: ${{ secrets.MONITOR_URL }}
+        run: |
+          if [ -z "$MONITOR_URL" ]; then echo "Brak sekretu MONITOR_URL — monitoring nieaktywny."; exit 0; fi
+          node tools/check_deploy.mjs "$MONITOR_URL" --monitor && exit 0
+          echo "Pierwsza próba nieudana — ponowienie za 2 minuty."
+          sleep 120
+          node tools/check_deploy.mjs "$MONITOR_URL" --monitor

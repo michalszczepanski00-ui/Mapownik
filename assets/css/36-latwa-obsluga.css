@@ -1,0 +1,188 @@
+/* 19.28.0 — audyt layoutu 19.27: treść mieści się w kompaktowych oknach (karta 260 px, panele 250 px),
+   czytelniejsze napisy i prostsza obsługa dla osób korzystających sporadycznie. Plik bez @layer — wygrywa
+   z warstwami i z 34-v2 / 35-workspace-1c. */
+
+/* A3/A4: sekcje-siatki miały kolumnę „auto” — najdłuższy przycisk lub lista rozpychały je poza okno. */
+.ui-section,
+.analysis-step,
+.screening-target-help,
+.export-section { grid-template-columns: minmax(0, 1fr); min-width: 0; }
+:is(.ui-panel, .workspace-card) :is(.ui-field, .ui-select, .ui-control, .ui-button, .analysis-run-row) { min-width: 0; max-width: 100%; }
+:is(.ui-panel, .workspace-card) .ui-field--number { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+/* Długie etykiety (Analizy, Eksport) łamią się w przycisku zamiast wychodzić poza okno; krótkie zostają w jednym wierszu. */
+:is(.screening-target-help, .analysis-run-row, .export-section) .ui-button { white-space: normal; height: auto; min-height: var(--control-height-sm, 30px); padding-block: 5px; line-height: 1.25; }
+:is(.screening-target-help, .analysis-run-row, .export-section) .ui-button-label { min-width: 0; overflow-wrap: break-word; white-space: normal; }
+:is(.ui-panel, .workspace-card) .ui-button-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.workspace-card-body { overflow-x: hidden; }
+
+/* A5: filtry warstw — od 19.54.0 jeden przełącznik segmentowy w 40-system-las.css. */
+
+/* A6: karta działki — fakty w wierszach „etykieta … wartość”, identyfikator w pełnej szerokości. */
+/* Werdykt: ikona · nazwa · wynik · (oko) w jednym wierszu. */
+/* Raport: „etykieta … wartość” — długi identyfikator może się łamać tylko w wartości. */
+.workspace-card .vps-stat { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 8px; min-width: 0; }
+.workspace-card .vps-stat > span { flex: 0 0 auto; white-space: nowrap; }
+.workspace-card .vps-stat > strong { flex: 0 1 auto; margin-left: auto; min-width: 0; text-align: right; overflow-wrap: anywhere; white-space: normal; }
+.vps-form-summary .ui-button { flex: none; white-space: nowrap; }
+
+/* A11: kontrast uwagi pod wynikami karty. */
+
+/* ------------------------------------------------------------------ etap 2 — łatwiejsza obsługa */
+
+/* B3: narzędzia Rysuj i Mierz z podpisami pod ikonami (szerokość przycisku wg podpisu, min. 50 px). */
+.app-shell.is-workspace-1c .tool-dock-tool { width: auto; min-width: 50px; height: 46px; padding: 3px 5px 2px; flex-direction: column; justify-content: center; gap: 2px; }
+.app-shell.is-workspace-1c .tool-dock-tools { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; }
+.app-shell.is-workspace-1c .tool-dock-sep { height: 30px; margin: 0 3px; }
+@media (pointer: coarse) { .app-shell.is-workspace-1c .tool-dock-tool { min-width: 56px; height: 56px; } }
+
+/* B4: karta — krótki „jak zacząć” zamiast dwóch powtórzonych instrukcji. */
+.workspace-start { display: grid; gap: 2px; padding: 8px 8px 10px; }
+.workspace-start-title { margin: 0 4px 4px; color: var(--text-muted); font-size: 12.5px; line-height: 1.35; }
+.workspace-start-item { display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 4px 8px; border: 0; border-radius: 6px; background: transparent; color: var(--text); font: inherit; font-size: 12.5px; text-align: left; cursor: pointer; }
+.workspace-start-item > svg { flex: none; color: var(--accent); }
+button.workspace-start-item:hover { background: var(--accent-soft); }
+button.workspace-start-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.workspace-start-item.is-static { cursor: default; color: var(--text-muted); }
+
+/* B5: Raport — zwinięty formularz po wyniku. */
+.vps-form-summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-solid); font-size: 12.5px; }
+.vps-form-summary > span { min-width: 0; overflow-wrap: anywhere; }
+
+/* B9: „Jak zacząć” pod przyciskiem „?” w górnym pasku. */
+.quick-help { position: relative; display: flex; }
+.map-topbar-end > .quick-help > .icon-button { width: 36px; height: 36px; flex-basis: 36px; border-radius: 10px; background: var(--surface-solid); box-shadow: var(--v2-float-shadow); }
+.quick-help-card { position: absolute; top: calc(100% + 8px); right: 0; z-index: 60; width: 292px; max-width: calc(100vw - 24px); padding: 4px 0 8px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-solid); color: var(--text); box-shadow: var(--v2-float-shadow, var(--shadow)); }
+.quick-help-head { display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 2px 12px; }
+.quick-help-head > strong { font-size: 12.5px; }
+.quick-help-steps { margin: 0; padding: 0 12px 0 32px; display: grid; gap: 7px; font-size: 12.5px; line-height: 1.35; }
+.quick-help-steps li::marker { color: var(--accent); font-weight: 700; }
+.quick-help-steps strong { display: block; font-size: 12.5px; }
+.quick-help-steps span { color: var(--text-muted); }
+.quick-help-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; padding: 8px 12px 0; border-top: 1px solid var(--border); }
+.quick-help-link { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; font-size: 12.5px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.quick-help-ok { height: 30px; padding: 0 14px; border: 0; border-radius: 6px; background: var(--accent); color: var(--on-accent); font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+
+/* C3: telefon — przyciski pliku projektu wprost. */
+.project-quick-actions { display: grid; }
+
+/* ------------------------------------------------------------------ etap 3 — czytelność */
+
+/* B10: zwinięty przełącznik podkładów z nazwą pod miniaturą; większa strzałka. */
+.app-shell.is-v2 .basemap-switcher.is-collapsed { height: auto; padding: 4px 4px 3px; }
+.app-shell.is-v2 .basemap-switcher.is-collapsed .basemap-option { gap: 2px; }
+.app-shell.is-v2 .basemap-switcher.is-collapsed .basemap-option-label { display: block; font-size: 11px; line-height: 1.1; }
+.app-shell.is-v2 .basemap-switcher-toggle { width: 28px; height: 36px; }
+.app-shell.is-v2 .map-scalebar { bottom: 72px; }
+
+/* B8: skala 13 / 12 / min. 11 px przy tych samych szerokościach okien (miejsce z mniejszych odstępów). */
+.workspace-card-head > strong { font-size: 12.5px; }
+.workspace-card .identify-fact > span,
+.workspace-card .vps-stat > span { font-size: 12.5px; }
+.workspace-card .identify-fact strong,
+.workspace-card .vps-stat > strong { font-size: 12.5px; }
+.app-shell.is-workspace-1c .layers-panel--v2 .layer-row-titleline strong { font-size: 12.5px; }
+.app-shell.is-v2 .layers-panel--v2 .layer-group-title { font-size: 12.5px; }
+.map-search input { font-size: 14px; }
+.map-search-result-copy > strong { font-size: 12.5px; }
+.map-search-result-copy > span { font-size: 12.5px; }
+.ui-panel :is(.ui-field-label, .ui-section-subtitle) { font-size: 12.5px; }
+.ui-panel .panel-footer { font-size: 11px; }
+.map-statusbar, .status-item { font-size: 11px; }
+
+/* ------------------------------------------------------------------ 19.29.0 — ceny transakcyjne RCN */
+.rcn-prices { display: grid; gap: 6px; min-width: 0; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-solid); }
+.rcn-head { display: grid; gap: 1px; }
+.rcn-head > strong { font-size: 12.5px; }
+.rcn-head > small, .rcn-note { color: var(--text-muted); font-size: 11px; line-height: 1.35; }
+.rcn-kind:focus-visible, .rcn-item:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.rcn-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.rcn-select { display: grid; gap: 2px; min-width: 0; font-size: 11px; color: var(--text-muted); }
+.rcn-select select { min-width: 0; width: 100%; height: 28px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-solid); color: var(--text); font: inherit; font-size: 12.5px; }
+.rcn-empty { margin: 0; color: var(--text-muted); font-size: 12.5px; }
+.rcn-result { display: grid; gap: 6px; min-width: 0; }
+.rcn-summary { display: grid; gap: 3px; padding: 7px 8px; border-radius: 6px; background: var(--accent-soft); }
+.rcn-main { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 6px; }
+.rcn-main > span { font-size: 12.5px; color: var(--text-muted); }
+.rcn-main > strong { font-size: 18px; color: var(--text); }
+.rcn-main > small { font-size: 11px; color: var(--text-muted); }
+.rcn-row { display: flex; flex-wrap: wrap; justify-content: space-between; column-gap: 8px; font-size: 12.5px; }
+.rcn-row > span { color: var(--text-muted); }
+.rcn-row > strong { margin-left: auto; text-align: right; font-weight: 600; }
+.rcn-list { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.rcn-item { display: grid; gap: 1px; width: 100%; padding: 5px 6px; border: 0; border-radius: 6px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+.rcn-item:hover { background: var(--surface-raised); }
+.rcn-item.is-selected { background: var(--accent-soft); box-shadow: inset 3px 0 0 #f59e0b; }
+.rcn-item.is-muted { opacity: .65; }
+.rcn-item-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; }
+.rcn-item-top > span { color: var(--text-muted); }
+.rcn-item-sub { font-size: 11px; color: var(--text-muted); overflow-wrap: anywhere; }
+.rcn-item-note { font-size: 11px; color: var(--warning, #9a6700); }
+.rcn-link { justify-self: start; padding: 0; border: 0; background: none; color: var(--accent); font: inherit; font-size: 12.5px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.rcn-actions { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* ------------------------------------------------------------------ 19.30.0 — nowe podkłady */
+.basemap-thumb img[src*="assets/basemaps/"] { object-fit: cover; }
+
+/* 19.32.0: narzędzia „Ceny transakcyjne” i „Pozwolenia na budowę” (prawa belka). */
+:is(.market-body, .permits-body) { display: grid; gap: 8px; padding: 8px 10px 12px; min-width: 0; font-size: 12.5px; }
+:is(.market-controls, .permits-controls) { display: grid; gap: 6px; }
+:is(.market-status, .permits-status) { color: var(--text-muted); }
+:is(.market-summary, .permits-summary) { display: grid; gap: 4px; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-solid); }
+:is(.market-summary, .permits-summary) small { color: var(--text-muted); }
+.market-stat { display: flex; justify-content: space-between; gap: 8px; }
+.market-stat span { color: var(--text-muted); }
+:is(.market-legend, .permits-legend) { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 11px; color: var(--text-muted); }
+:is(.market-legend-item, .permits-legend-item) { display: inline-flex; align-items: center; gap: 4px; }
+:is(.market-legend-item, .permits-legend-item, .market-row, .permits-row) > i { display: inline-block; flex: none; width: 10px; height: 10px; border-radius: 50%; border: 1px solid rgba(0,0,0,.35); }
+:is(.market-selected, .permits-selected) { display: grid; gap: 2px; padding: 8px; border-radius: 6px; border-left: 3px solid #1d4ed8; background: var(--accent-soft, rgba(29,78,216,.06)); overflow-wrap: anywhere; }
+:is(.market-selected, .permits-selected) small { color: var(--text-muted); }
+:is(.market-list, .permits-list) { display: grid; gap: 2px; min-width: 0; }
+:is(.market-list-head, .permits-list-head) { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 2px; }
+.market-row { display: grid; grid-template-columns: 10px 76px auto minmax(0, 1fr); align-items: center; gap: 6px; }
+.permits-row { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: start; gap: 2px 6px; }
+.permits-row > i { margin-top: 3px; }
+.permits-row > span { display: grid; gap: 1px; min-width: 0; }
+.permits-row > span > small { color: var(--text-muted); overflow-wrap: anywhere; }
+:is(.market-row, .permits-row) { width: 100%; padding: 5px 6px; border: 0; border-radius: 6px; background: transparent; color: var(--text); font: inherit; font-size: 12.5px; text-align: left; cursor: pointer; }
+:is(.market-row, .permits-row):hover, :is(.market-row, .permits-row).is-selected { background: var(--accent-soft, rgba(0,0,0,.05)); }
+.market-row small { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); }
+:is(.market-details, .permits-details) { color: var(--text-muted); font-size: 11px; }
+:is(.market-details, .permits-details) p { margin: 4px 0 0; }
+.permits-types { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; }
+
+/* ------------------------------------------------------------------ 19.33.0 — intuicyjny układ */
+/* 19.49.0: baner podpowiedzi zastąpiony paskiem kontekstowym (.map-context-bar, 38-ergonomia.css). */
+/* Nagłówek panelu w jednej linii — podtytuł skrócony, pełny w dymku. */
+.panel-title--compact > div { min-width: 0; }
+.panel-title--compact > div > span { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* Karta działki: „W okolicy”. */
+.identify-nearby { display: grid; gap: 2px; margin: 8px 0 2px; padding: 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-solid); }
+.identify-nearby-title { padding: 0 4px 2px; color: var(--text-muted); font-size: 11px; font-weight: 600; }
+.identify-nearby-item { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; width: 100%; padding: 5px 6px; border: 0; border-radius: 6px; background: transparent;
+  color: var(--text); font: inherit; font-size: 12.5px; text-align: left; cursor: pointer; }
+.identify-nearby-item:hover { background: var(--accent-soft); }
+.identify-nearby-item > span { min-width: 0; color: var(--text-muted); }
+.identify-nearby-item > strong { flex: none; color: var(--accent); }
+/* Wspólna legenda: dolna krawędź mapy, tuż na prawo od karty działki (i od rozwiniętego przełącznika podkładów);
+   karta legendy otwiera się w górę nad mapą. */
+.map-legend { position: absolute; left: calc(max(var(--work-card-inset-left, 272px), 104px) + 12px); bottom: 14px; z-index: 34; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; max-width: min(300px, calc(100vw - 24px)); }
+.app-shell.is-v2:has(.basemap-switcher:not(.is-collapsed)) .map-legend { left: calc(max(var(--work-card-inset-left, 272px), 316px) + 12px); }
+.map-legend-toggle { padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-solid); color: var(--text); font: inherit; font-size: 12.5px; font-weight: 600;
+  box-shadow: var(--v2-float-shadow, 0 2px 8px rgba(0,0,0,.12)); cursor: pointer; }
+.map-legend.is-open .map-legend-toggle { background: var(--accent-soft); }
+.map-legend-card { width: 280px; max-width: 100%; max-height: min(52vh, 460px); overflow: auto; padding: 8px 10px 10px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface-solid); box-shadow: var(--v2-float-shadow, 0 4px 14px rgba(0,0,0,.14)); font-size: 12.5px; }
+.map-legend-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.map-legend-close { border: 0; background: transparent; color: var(--text-muted); font-size: 18px; line-height: 1; cursor: pointer; }
+.map-legend-group { display: grid; gap: 3px; padding: 6px 0; border-top: 1px solid var(--border-soft, var(--border)); }
+.map-legend-title { font-weight: 600; }
+.map-legend-item { display: flex; align-items: center; gap: 6px; color: var(--text-muted); }
+.map-legend-item > i { flex: none; width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,.35); }
+.map-legend-group img { max-width: 100%; height: auto; background: #fff; border-radius: 6px; }
+/* Lista Budowy: nazwa zamierzenia w 2 liniach (pełna w szczegółach po kliknięciu). */
+.permits-row > span > strong { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* 19.34.0: wyszukiwarka — ostatnio sprawdzane działki. */
+.map-search-recent-clear { margin-left: auto; padding: 0 2px; border: 0; background: none; color: var(--accent); font: inherit; font-size: 12.5px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+
+/* 19.46.0: mediana z 1–2 transakcji — ostrzeżenie pod wartością. */
+.rcn-main .rcn-warning { display: block; margin-top: 4px; color: var(--warning); font-size: var(--fs-sm); line-height: 1.35; }

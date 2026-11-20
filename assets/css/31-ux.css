@@ -1,0 +1,342 @@
+/* 18.17 — kompaktowe zadania, jawne instrukcje i czytelne kontrolki. Bez dodatkowych bibliotek. */
+.app-shell:not(.is-mobile) { --topbar-height: 44px; --context-bar-height: 40px; min-height: 240px; }
+/* 19.0.0: ta reguła nie leży w warstwie CSS, więc wygrywałaby z regułami trybów „Sama mapa" i
+   wyboru kadru eksportu (jeden wiersz siatki). Dlatego wiersze ustawiamy tylko poza tymi trybami. */
+.app-shell:not(.is-mobile):not(.is-v2):not(.is-map-only):not(.is-export-selection) { grid-template-rows: auto minmax(0,1fr); }
+.app-shell:not(.is-mobile) .top-property-bar { position: relative; }
+.app-shell:not(.is-mobile) .context-bar { height: 40px; min-height: 40px; }
+.app-bar { height: 44px; min-height: 44px; padding-block: 4px; }
+.project-menu-wrap { display: flex; align-items: center; gap: 7px; flex: 0 0 auto; }
+.project-trigger,.export-map-trigger { height: 30px; padding: 0 9px; border: 1px solid var(--control-border-soft); border-radius: var(--radius-control); background: var(--surface-solid); color: var(--text); font-size: 12.5px; white-space: nowrap; }
+.export-map-trigger { color: var(--on-accent); background: var(--accent); border-color: var(--accent); font-weight: 600; }
+.project-save-status { font-size: 12.5px; white-space: nowrap; color: var(--text-muted); }
+.project-save-status.has-error { color: var(--danger); }
+.context-next-step { flex: 1 1 180px; min-width: 100px; color: var(--text-muted); font-size: 12.5px; line-height: 1.3; white-space: normal; max-height: 32px; overflow: auto; }
+.context-zone--tool { min-width: 0; }
+.context-tool-help { width: 28px; height: 28px; }
+.context-zone--object { max-width: 310px; }
+.context-zone--object .context-object-label { display: none; }
+.context-object-name { max-width: 125px; }
+.context-zone--object .ui-button { max-width: 150px; }
+.task-tools button:focus-visible,.project-trigger:focus-visible,.export-map-trigger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.ui-control,.ui-field select,.ui-field input:not([type=color]),.map-search-place,.map-search-parcel,.object-check,.ui-checkbox input { border-color: var(--control-border); }
+input[type=checkbox] { accent-color: var(--accent); } /* 18.18.1 A7: równe przyciski grup */
+.layer-group-toggle { min-height: 32px; } /* 18.18.1 C2: jeden rząd */
+.object-inspector { padding: 8px; border-block: 1px solid var(--border); background: var(--surface-raised); flex: 0 0 auto; }
+.object-inspector h3 { margin: 0 0 7px; font-size: 12.5px; overflow-wrap: anywhere; }
+.object-task-actions { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+.object-task-actions .ui-button { min-height: 28px; }
+.object-task-actions .ui-button-label { white-space: normal; }
+.object-inspector > .ui-field { display: flex; width: 100%; }
+.object-inspector > .ui-field input { min-width: 0; width: 100%; }
+.object-properties { margin-top: 6px; }
+.object-properties-fields { display: grid; gap: 7px; padding-block: 7px; }
+.object-properties-fields > .ui-field,.object-properties-fields .ui-field--rotate { width: 100%; flex-wrap: wrap; justify-content: space-between; }
+.object-properties-fields .ui-field-label { flex: 1; }
+.object-quality-note { font-size: 12.5px; color: var(--text-muted); line-height: 1.4; }
+.project-files { margin: 6px 8px; border-bottom: 1px solid var(--border); font-size: 12.5px; flex: 0 0 auto; }
+.project-files > summary { cursor: pointer; font-weight: 600; min-height: 30px; }
+.project-files .export-section { padding: 7px 0; }
+.project-share-row { display: flex; flex-wrap: wrap; gap: 5px; padding-block: 5px; }
+.project-share-row > span { flex: 1; }
+.objects-panel--compact { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.dock--right-panel > .objects-panel--compact { overflow-y: auto; }
+.dock--right-panel { max-height: calc(100% - var(--map-bottom-gap,0px) - 16px); }
+.dock--right-panel > .compact-panel { max-height: inherit; }
+.data-quality { display: inline-block; font-size: 12.5px; line-height: 1.4; color: var(--text-muted); border: 1px solid var(--border); border-radius: 6px; padding: 1px 5px; width: fit-content; }
+.data-quality.is-approximate,.data-quality.is-incomplete { color: var(--warning); }
+.screening-row .data-quality { grid-column: 1/-1; }
+.m-screening-row .data-quality { display: block; }
+.search-permanent-label { display: block; position: absolute; top: -7px; left: 9px; padding: 0 3px; background: var(--surface-solid); color: var(--text-muted); font-size: var(--fs-xs); line-height: 12px; pointer-events: none; }
+.map-search-place { position: relative; }
+.map-search { max-width: 510px; }
+.map-inline-text { max-width: calc(100% - 16px); display: flex; flex-wrap: wrap; gap: 4px; }
+.map-inline-text-input { min-width: 100px; max-width: 210px; flex: 1 1 100px; }
+.map-inline-text-cancel,.map-inline-text-ok { min-height: 32px; padding: 4px 8px; border: 1px solid var(--control-border-soft); border-radius: var(--radius-control); background: var(--surface-solid); color: var(--text); }
+.map-inline-text-ok { color: var(--on-accent); background: var(--accent); border-color: var(--accent); }
+.map-inline-text-hint { flex: 0 0 100%; }
+@media(max-width:1150px) { .project-save-status { display: none; } .context-zone--object { max-width: 250px; } .brand-copy { display: none; } }
+@media(max-width:950px) { .app-bar .toolbar-divider,.app-bar .brand { display: none; } .app-bar { gap: 3px; } .context-zone--object { max-width: 200px; } .context-zone--object .context-object-name { display: none; } }
+/* Mobile: quatre actions directes, menu complet et paramètres avant dessin. */
+.m-nav { grid-template-columns: repeat(4,1fr); }
+.m-nav button { min-width: 0; }
+.m-search { gap: 4px; }
+.m-more-trigger { flex: 0 0 44px; width: 44px; height: 44px; background: transparent; }
+.m-chip-container { display: contents; }
+.m-chip { min-height: 44px; padding-inline: 12px; }
+.m-utilities-sheet { position: fixed; }
+.m-utilities-sheet .m-card-head > strong { flex: 1; font-size: 18px; }
+.m-active-task { justify-self: stretch; border: 1px solid var(--border); border-radius: 10px; padding: 5px 8px; background: var(--surface-solid); box-shadow: var(--shadow-soft); max-height: min(38dvh,240px); overflow-y: auto; }
+.m-active-task .m-tool-pill { box-shadow: none; background: transparent; color: var(--accent); border-radius: 0; padding: 0; width: 100%; justify-content: space-between; }
+.m-next-step { margin: 2px 0 5px; font-size: 12.5px; color: var(--text-muted); }
+.m-task-options { display: flex; flex-wrap: wrap; gap: 7px; }
+.m-task-options .ui-field { flex: 1 1 100px; }
+.m-task-options input,.m-task-options select,.m-task-options button { min-height: 44px; }
+.m-peek-actions { display: flex; gap: 6px; margin-top: 4px; }
+.m-peek-actions button { flex: 1; min-height: 44px; border: 1px solid var(--control-border); border-radius: 6px; background: var(--surface-solid); color: var(--accent); font-size: 12.5px; padding: 5px; }
+.m-peek-actions button:first-child { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.m-parcel-card.m-sheet--peek .m-sheet-head { padding-bottom: 4px; }
+.m-parcel-card .m-card-title strong { font-size: 18px; }
+.m-parcel-card .m-card-title span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.m-sheet-grip { min-height: 28px; }
+.m-icon-button { width: 44px; height: 44px; flex-basis: 44px; }
+.m-sheet .ui-button,.m-sheet .m-list-button { min-height: 44px; }
+.m-sheet input,.m-sheet select { min-height: 44px; }
+.m-project-sheet .project-files { margin: 6px 0; }
+.app-shell.is-mobile .search-permanent-label { font-size: var(--fs-xs); top: 1px; }
+.app-shell.is-mobile .map-search-place input { padding-top: 9px; min-width: 0; }
+@media (prefers-reduced-motion:reduce) { .m-sheet { transition: none; } }
+
+.layer-row input[type=checkbox], .layer-group-checkbox, .object-check, .ui-check input[type=checkbox] { border-color: var(--control-border); }
+.app-shell.is-mobile .m-nav { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.app-shell.is-mobile .m-nav button { min-height: 48px; }
+@media (pointer:coarse) and (max-height:500px) { .app-shell.is-mobile .m-nav { grid-template-columns: repeat(4,minmax(0,1fr)); } .app-shell.is-mobile .m-nav button { display:flex; flex-direction:column; gap:2px; font-size: 12.5px; } .app-shell.is-mobile .m-nav button.is-active svg { padding:2px 5px; } }
+
+.export-raster-preview { margin: 8px 0; padding: 6px; border: 1px solid var(--border); border-radius: 6px; }
+.export-raster-preview img { display: block; width: 100%; max-height: 220px; object-fit: contain; }
+.export-raster-preview figcaption { font-size: 12.5px; color: var(--text-muted); margin-top: 5px; } /* 18.18.1 A5: kafelek obok miniatur */
+.m-temporary-toggle { display: flex; align-items:center; gap:7px; min-height:44px; font-size:12.5px; }
+.m-temporary-toggle input[type=checkbox] { width:22px; height:22px; min-height:22px; }
+.m-temporary-result { position:absolute; bottom:calc(var(--m-nav-h) + env(safe-area-inset-bottom,0px) + 8px); left:10px; right:10px; padding:9px; border:1px solid var(--border); border-radius:10px; background:var(--surface-solid); color:var(--text); box-shadow:var(--shadow-soft); }
+.m-temporary-result > div { display:flex; gap:5px; margin-top:6px; }
+.m-temporary-result button { flex:1; min-height:44px; border:1px solid var(--control-border); border-radius:6px; font-size:12.5px; background:var(--surface-raised); color:var(--text); }
+
+:root[data-theme=light] { color-scheme: light; }
+:root[data-theme=dark] { color-scheme: dark; }
+.app-shell input[type=checkbox] { appearance:none; border:1.5px solid var(--control-border); border-radius:3px; background:var(--surface-solid); color:var(--on-accent); display:inline-grid; place-content:center; flex-shrink:0; cursor:pointer; }
+.app-shell input[type=checkbox]:checked { background:var(--accent); border-color:var(--accent); }
+.app-shell input[type=checkbox]:checked::after { content:'✓'; font:700 12px/1 system-ui,sans-serif; }
+.app-shell input[type=checkbox]:indeterminate { background:var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+.app-shell input[type=checkbox]:indeterminate::after { content:'−'; font:700 12px/1 system-ui,sans-serif; }
+.app-shell input[type=checkbox]:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.app-shell input[type=checkbox]:disabled { opacity:.45; cursor:default; }
+.objects-panel--compact .object-row { grid-template-columns:15px 20px 24px minmax(0,1fr) 28px 28px; min-height:32px; padding:1px 3px; gap:3px; }
+.objects-panel--compact .object-row-action { width:28px; height:28px; }
+.objects-panel--compact .object-check { width:18px; height:18px; }
+.app-shell.is-mobile .objects-panel--compact .object-row { grid-template-columns:14px 30px 22px minmax(0,1fr) 40px 40px; min-height:44px; }
+.app-shell.is-mobile .objects-panel--compact .object-check { width:26px; height:26px; }
+.app-shell.is-mobile .objects-panel--compact .object-row-action { width:40px; height:44px; }
+.app-shell:not(.is-mobile) .objects-toolbar { min-height:32px; flex:0 0 auto; }
+.app-shell:not(.is-mobile) .objects-controls { flex:0 0 auto; }
+.app-shell:not(.is-mobile) .objects-panel--compact { min-height:120px; }
+
+.basemap-switcher,.task-tools,.dock--right-panel,.m-search { backdrop-filter:none; }
+.terrain-nodata-note::before { content:''; display:inline-block; width:18px; height:12px; margin-right:5px; border:1px solid #6b7280; background:repeating-linear-gradient(135deg,#e5e7eb 0 4px,#6b7280 4px 5px); vertical-align:middle; }
+
+.app-shell.is-mobile .toast-host { left:10px; right:10px; top:calc(env(safe-area-inset-top,0px) + 118px); bottom:auto; transform:none; justify-items:center; max-height:calc(100dvh - 300px); overflow-y:auto; }
+.app-shell.is-mobile .toast { min-width:0; max-width:100%; width:100%; font-size:12.5px; }
+.app-shell.is-mobile .toast-close { min-width:36px; min-height:36px; }
+
+.ui-button--secondary { border-color:var(--control-border-soft); } /* 18.18.1 B1: lżejsza ramka przycisków z podpisem */
+.object-inspector > .ui-field { flex-direction:column; align-items:stretch; gap:4px; }
+.object-inspector > .ui-field .ui-field-label { white-space:nowrap; }
+.object-inspector > .ui-field input { min-height:28px; }
+
+.app-shell.is-mobile .toast-host { top:40dvh; }
+.app-shell.is-mobile .toast { pointer-events:none; }
+.app-shell.is-mobile .toast button { pointer-events:auto; }
+
+/* 18.18: keep NMT usable after results, undocking, hydration and browser zoom. */
+.dock--bottom { max-height:55%; }
+.terrain-profile-panel:not(.is-docked) {
+  display:flex; flex-direction:column; left:12px; top:12px; right:auto; bottom:auto;
+  width:720px; height:560px; min-width:0; max-width:calc(100% - 24px);
+  max-height:calc(100% - 24px); min-height:0;
+}
+.terrain-profile-panel .terrain-profile-header,
+.terrain-profile-panel .terrain-fetch-progress,
+.terrain-profile-panel > .terrain-profile-loading,
+.terrain-profile-panel > .terrain-profile-error { flex-shrink:0; }
+.terrain-profile-panel .terrain-area-body,
+.terrain-profile-panel .terrain-profile-body { flex:1 1 auto; min-height:0; overflow:auto; overscroll-behavior:contain; }
+.terrain-profile-panel .terrain-report-actions { position:sticky; bottom:-11px; z-index:2; background:var(--surface-solid); padding:8px 0; border-top:1px solid var(--border); }
+.terrain-result-section { border-top:1px solid var(--border); padding:6px 0; }
+.terrain-result-section > summary { cursor:pointer; font-size:var(--fs-md); font-weight:600; padding:5px 0; }
+.terrain-layer-action { margin:6px 10px; }
+.layer-group[aria-label="Archiwum"] { opacity:.88; }
+
+.terrain-area-footer { flex:0 0 auto; padding:6px 11px; border-top:1px solid var(--border); background:var(--surface-solid); }
+.terrain-profile-panel .terrain-area-footer .terrain-report-actions {position:static; padding:0; border:0;}
+.terrain-area-footer .terrain-report-actions small {font-size:var(--fs-xs);}
+
+/* ==== 18.18.1 — poprawki layoutu z audytu 18.18.0 ===========================
+   Ten plik jest poza @layer, więc wygrywa z warstwami bez !important.
+   Numery bloków (A = usterki, B = spójność, C = ergonomia) odpowiadają raportowi. */
+
+/* ==== A1. Prawy dok nie zachodzi na pasek stanu ============================ */
+.app-shell:not(.is-mobile) .workspace .dock--right-panel {
+  top: var(--dock-top);
+  max-height: calc(100% - var(--map-bottom-gap, 0px) - var(--statusbar-height) - var(--dock-top) - 8px);
+}
+/* C11: panel przylega do szyny ikon — prawe rogi proste, bez „klinów” mapy */
+.app-shell:not(.is-mobile) .dock--right-panel {
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.app-shell:not(.is-mobile) .dock--right-panel > .compact-panel {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* ==== A8. Pasek stanu: stary odstęp 62 px na paletę (która już nie sięga dołu) */
+.app-shell:not(.is-mobile) .map-statusbar { padding-left: 12px; }
+
+/* ==== C9. Dolna krawędź: przełącznik podkładów i kontrolki widoku w jednej linii.
+   Lewy odstęp przełącznika (88 px) zostaje — to świadoma decyzja z 18.4 (obok palety). */
+.app-shell:not(.is-mobile) .basemap-switcher { bottom: calc(var(--statusbar-height) + 14px); }
+.app-shell:not(.is-mobile) .map-view-controls { bottom: calc(var(--statusbar-height) + 14px + var(--dock-inset-bottom)); }
+/* A5: przycisk „Zdjęcia ▾” (reguła bazowa wyżej) — stan najechania */
+
+/* ==== A3. Zakładki w dolnym doku nie ucinają etykiet ======================= */
+.ui-tab { flex: 1 1 auto; min-width: max-content; text-overflow: clip; }
+
+/* ==== A4. Elementy bez stylu: linki w menu, <summary>, notatka eksportu ===== */
+a.dropdown-item,
+a.dropdown-item:visited { color: var(--text); text-decoration: none; }
+a.ui-button,
+a.ui-button:visited {
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface-solid);
+  border-color: var(--control-border-soft);
+}
+a.ui-button:hover { background: var(--surface-hover); }
+.object-properties > summary,
+.object-inspector summary,
+.project-files > summary {
+  font-size: var(--fs-md);
+  font-weight: var(--fw-semibold);
+  color: var(--text);
+}
+.export-project-hint {
+  margin: 0;
+  padding: 0 12px 8px;
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-normal);
+}
+
+/* ==== A6/A7. Wiersze warstw: jedna siatka 28 px, równe przyciski grup ====== */
+.layer-row-main > .icon-button {
+  width: var(--icon-button);
+  height: var(--icon-button);
+  flex-basis: var(--icon-button);
+}
+/* C1: długie nazwy warstw w dwóch liniach zamiast „…” (7 z 55 było ucinanych) */
+.app-shell:not(.is-mobile) .layer-row-titleline strong {
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  line-height: 1.25;
+}
+.app-shell:not(.is-mobile) .layer-row--compact { padding-block: 4px; }
+
+/* ==== C2. Zestawy warstw w jednym rzędzie, lżejszy styl ==================== */
+
+/* ==== B1/B2. Przyciski i pola: lżejsza ramka przycisków tekstowych ========= */
+/* Pola, listy i pola wyboru zachowują ramkę 3:1 (--control-border) — tam ramka
+   jest jedynym wskazaniem, że to kontrolka. Przyciski z podpisem go nie
+   potrzebują: rozpoznaje się je po tekście. */
+.ui-button,
+.ui-control,
+.ui-search,
+.layers-filter { border-radius: var(--radius-control); }
+
+/* ==== B4. Minimum 11 px (wcześniej 9–10 px) ================================ */
+.activity-bar-heading,
+.layers-filter small,
+.floating-tools-heading { font-size: var(--fs-xs); }
+
+/* ==== B? Nagłówki i stopki paneli w doku: jedna wysokość i oddech ========== */
+.dock--right-panel .panel-header,
+.dock--right-panel .panel-header--compact,
+.dock--right-panel .identify-panel-header { min-height: 44px; }
+.dock--right-panel .panel-footer,
+.dock--right-panel .panel-footer--compact {
+  min-height: 30px;
+  height: auto;
+  padding: 6px 12px;
+  line-height: 1.35;
+  font-size: var(--fs-xs);
+}
+
+/* ==== B6. Etykiety menu: pisownia zwykła we wszystkich menu (było: wersaliki w menu Projekt) */
+.dropdown-content .dropdown-label {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+}
+
+/* ==== M. Widok mobilny (audyt 18.18.2) ===================================== */
+/* M1: placeholder wyszukiwarki kończy się wielokropkiem zamiast ucięcia w pół słowa */
+.m-search input { text-overflow: ellipsis; }
+/* M2/M4: wiersze arkusza „Więcej" — link jak przycisk, stały slot na ikonę/✓ */
+a.m-list-button,
+a.m-list-button:visited { color: var(--text); text-decoration: none; }
+.m-list-icon-slot { display: inline-flex; flex: 0 0 18px; width: 18px; height: 18px; align-items: center; justify-content: center; color: var(--accent); }
+/* M3: odstęp między miniaturami podkładów a następnym nagłówkiem w arkuszu Warstwy */
+.m-layers-sheet .basemap-switcher { margin-bottom: 10px; }
+/* M5: uchwyt arkusza ma cel dotyku 44 px bez zmiany układu (rysunek uchwytu bez zmian) */
+.m-sheet-grip::before { content: ''; position: absolute; left: 0; right: 0; top: -8px; bottom: -8px; }
+
+/* ==== 18.18.3 — okno informacji: nazwa obszaru chronionego w podsumowaniu ==== */
+
+/* 19.0.0: podziałka mapy (lewy dolny róg) i skala w pasku stanu. */
+.map-scalebar {
+  position: absolute;
+  left: 12px;
+  bottom: calc(var(--statusbar-height, 26px) + 10px);
+  z-index: var(--z-map-controls, 5);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 3px 6px 4px;
+  border-radius: var(--radius-control, 6px);
+  background: color-mix(in srgb, var(--surface-solid, #fff) 86%, transparent);
+  color: var(--text, #1a1f2b);
+  font-size: 12.5px;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.map-scalebar-line {
+  display: block;
+  height: 6px;
+  border: 2px solid var(--text, #1a1f2b);
+  border-top: 0;
+  box-sizing: border-box;
+}
+.app-shell.is-mobile .map-scalebar { display: none; }
+.app-shell.is-export-selection .map-scalebar { display: none; }
+@media print { .map-scalebar { display: none; } }
+
+/* 19.0.0: pole/obwód/długość zaznaczonego obiektu w pasku kontekstu i w panelu Obiekty. */
+.context-zone--object.has-measures { max-width: 560px; }
+.context-zone--object .context-readouts--object { padding: 0 var(--space-2, 8px); gap: var(--space-3, 12px); white-space: nowrap; }
+.context-zone--object .context-readouts--object .ui-readout { display: inline-flex; align-items: baseline; gap: 5px; }
+.object-inspector .context-readouts--object { display: flex; flex-wrap: wrap; gap: 2px 14px; margin: -2px 0 8px; padding: 0; border-left: 0; }
+.object-inspector .context-readouts--object .ui-readout { display: inline-flex; align-items: baseline; gap: 5px; font-size: 12.5px; }
+@media(max-width:1150px) { .context-zone--object.has-measures { max-width: 440px; } .context-zone--object .context-readouts--object .ui-field-label { display: none; } }
+@media(max-width:950px) { .context-zone--object.has-measures { max-width: 320px; } }
+
+/* 19.0.0: informacja o działce — komunikat, gdy w punkcie nie odczytano działki. */
+
+/* 19.0.0: telefon — karta wyniku i arkusze. */
+/* Pasek: jeden przewijany rząd z wyblakłą prawą krawędzią jako wskazówką, że jest ciąg dalszy. */
+/* Rozwinięta karta: dwie kolumny jak w panelu na komputerze, wartość „w obszarze: …" na całą szerokość. */
+/* Arkusze (Warstwy, Narzędzia, Więcej, Projekt, Uzbrojenie) nie zasłaniają dolnej nawigacji:
+   można przejść do Sprawdź / Mierz / Projekt bez zamykania arkusza. Treść arkusza przewija się nad paskiem. */
+.m-shell:not(.has-card) .m-nav { z-index: 5; }
+.m-shell:not(.has-card) .m-sheet:not(.m-parcel-card) .m-sheet-body { padding-bottom: calc(var(--m-nav-h) + env(safe-area-inset-bottom, 0px) + 16px); } /* 19.0.0: etykiety 12 px ("Sprawdź" ma 50 px) mieszczą się bez wychodzenia poza przycisk */
+
+/* 19.3.1: panele doku mają jedną kolumnę o szerokości panelu. Bez tego kolumna siatki
+   dopasowywała się do treści (np. 356 px w panelu 329 px po zaznaczeniu obiektu w Obiektach)
+   i ucinała przycisk zamknięcia oraz pola inspektora. */
+aside.ui-panel { grid-template-columns: minmax(0, 1fr); }
+aside.ui-panel > * { min-width: 0; }
