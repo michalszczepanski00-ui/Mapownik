@@ -1,0 +1,37 @@
+{
+  "name": "msportal",
+  "version": "19.56.0",
+  "private": true,
+  "type": "module",
+  "description": "MSportal — portal mapowy (frontend React + OpenLayers budowany Vite, backend PHP)",
+  "scripts": {
+    "dev": "vite",
+    "build": "node tools/build.mjs",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "check": "python3 tools/check_release.py"
+  },
+  "dependencies": {
+    "@radix-ui/react-dropdown-menu": "2.1.16",
+    "@radix-ui/react-tooltip": "1.2.8",
+    "@tanstack/query-core": "5.104.5",
+    "lucide-react": "1.47.0",
+    "maplibre-contour": "0.1.0",
+    "ol": "10.10.0",
+    "ol-mapbox-style": "13.5.1",
+    "proj4": "2.22.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "three": "0.170.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "postcss": "8.5.31",
+    "postcss-selector-parser": "7.1.7",
+    "typescript": "7.0.2",
+    "vite": "8.3.7",
+    "vitest": "5.1.0"
+  }
+}

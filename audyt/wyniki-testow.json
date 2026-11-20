@@ -1,0 +1,273 @@
+{
+  "version": "18.16.1",
+  "unit": [
+    {
+      "name": "Katalog: 34 poprawne warstwy, unikalne ID",
+      "ok": true
+    },
+    {
+      "name": "Projekcja 2180 → 3857 → 2180",
+      "ok": true
+    },
+    {
+      "name": "Telemetria: abort i powtórzone późne zdarzenia nie zamykają innego kafla",
+      "ok": true
+    },
+    {
+      "name": "Telemetria: reset licznika izoluje stare zdarzenia",
+      "ok": true
+    },
+    {
+      "name": "Historia komend: undo, redo, limit 3",
+      "ok": true
+    },
+    {
+      "name": "Topologia: poprawny wielokąt",
+      "ok": true
+    },
+    {
+      "name": "Topologia: samoprzecięcie jest odrzucone",
+      "ok": true
+    },
+    {
+      "name": "Topologia: otwór poza wielokątem jest odrzucony",
+      "ok": true
+    },
+    {
+      "name": "Bufor punktu 10 m: poprawna geometria",
+      "ok": true
+    },
+    {
+      "name": "Bufor: zero i NaN są odrzucone",
+      "ok": true
+    },
+    {
+      "name": "Odległość do krawędzi działki 5 m",
+      "ok": true
+    },
+    {
+      "name": "Odległość geometrii nakładających się wynosi zero",
+      "ok": true
+    },
+    {
+      "name": "requestScope: limit czasu obejmuje oczekiwanie",
+      "ok": true
+    },
+    {
+      "name": "requestScope: już anulowany rodzic jest respektowany",
+      "ok": true
+    },
+    {
+      "name": "NMT: dopasowanie identyfikatorów i limit 2 równoległych pakietów",
+      "ok": true
+    },
+    {
+      "name": "NMT: błędne sampleIds nie stają się wysokością",
+      "ok": true
+    },
+    {
+      "name": "Monitor: historia max. 20, wynik z cache nie mnoży prób",
+      "ok": true
+    },
+    {
+      "name": "Monitor: maksymalnie dwie równoległe próby",
+      "ok": true
+    },
+    {
+      "name": "Monitor: limit czasu obejmuje również pobieranie JSON",
+      "ok": true
+    },
+    {
+      "name": "Monitor: HTML/nieprawidłowy JSON jest odrzucony",
+      "ok": true
+    },
+    {
+      "name": "Monitor: CSV neutralizuje formuły",
+      "ok": true
+    },
+    {
+      "name": "GeoJSON: błędny JSON jest odrzucony",
+      "ok": true
+    },
+    {
+      "name": "GeoJSON: pusty zbiór jest obsługiwany",
+      "ok": true
+    },
+    {
+      "name": "GeoJSON: punkt 2180 przechodzi eksport i import",
+      "ok": true
+    },
+    {
+      "name": "Droga: łuk, obrys drogi i ślady kół są skończone",
+      "ok": true
+    },
+    {
+      "name": "Interpolacja płaszczyzny: brak NaN",
+      "ok": true
+    },
+    {
+      "name": "Geometria działki: WKT Polygon i MultiPolygon",
+      "ok": true
+    },
+    {
+      "name": "Droga: linia 100 km jest odrzucona przed próbkowaniem",
+      "ok": true
+    }
+  ],
+  "browser": {
+    "results": [
+      {
+        "name": "Start aplikacji i sześć paneli doku",
+        "ok": true
+      },
+      {
+        "name": "Punkt: utworzenie, undo i redo",
+        "ok": true
+      },
+      {
+        "name": "Prostokąt: dwa narożniki",
+        "ok": true
+      },
+      {
+        "name": "Pomiar długości: zakończenie Enter",
+        "ok": true
+      },
+      {
+        "name": "Poligon: trzy wierzchołki i Enter",
+        "ok": true
+      },
+      {
+        "name": "Pomiary powierzchni: utworzenie",
+        "ok": true
+      },
+      {
+        "name": "Linia: dwa punkty i Enter",
+        "ok": true
+      },
+      {
+        "name": "Okrąg: punkt środka",
+        "ok": true
+      },
+      {
+        "name": "Strzałka: dwa punkty i Enter",
+        "ok": true
+      },
+      {
+        "name": "Tekst: formularz przy mapie i Enter",
+        "ok": true
+      },
+      {
+        "name": "Droga: zbyt długa trasa pokazuje komunikat zamiast zawieszenia",
+        "ok": true
+      },
+      {
+        "name": "Wszystkie 18 narzędzi dają się aktywować",
+        "ok": true
+      },
+      {
+        "name": "Panele: warstwy, obiekty, informacje, orto, analizy, eksport",
+        "ok": true
+      },
+      {
+        "name": "Autosave i odtworzenie po przeładowaniu",
+        "ok": true
+      },
+      {
+        "name": "Menu ustawień zawiera monitor",
+        "ok": true
+      },
+      {
+        "name": "Telefon 390×844: brak poziomego przepełnienia strony",
+        "ok": true
+      },
+      {
+        "name": "Telefon: dostęp do monitora przez Więcej",
+        "ok": true
+      },
+      {
+        "name": "Monitor: 41 pozycji i układ mobilny bez przewijania w bok",
+        "ok": true
+      },
+      {
+        "name": "Monitor: szerokości 320, 768 i 1440 px bez przepełnienia strony",
+        "ok": true
+      },
+      {
+        "name": "Monitor: poprawny serwer + brak bazy BDOT są rozróżnione",
+        "ok": true
+      },
+      {
+        "name": "Monitor: historia utrzymuje się po przeładowaniu",
+        "ok": true
+      },
+      {
+        "name": "Monitor: filtrowanie gazu",
+        "ok": true
+      },
+      {
+        "name": "Monitor: pobranie raportu JSON",
+        "ok": true
+      },
+      {
+        "name": "Monitor: pobranie CSV",
+        "ok": true
+      },
+      {
+        "name": "Monitor: Stop przerywa aktywne żądanie i przywraca przyciski",
+        "ok": true
+      },
+      {
+        "name": "API monitor: nieznane źródło HTTP 400",
+        "ok": true
+      },
+      {
+        "name": "API monitor: zły punkt i zła metoda są odrzucone",
+        "ok": true
+      },
+      {
+        "name": "API WMS/ULDK: nieprawidłowe parametry są odrzucone",
+        "ok": true
+      },
+      {
+        "name": "API NMT: błędne żądanie nie przechodzi walidacji",
+        "ok": true
+      },
+      {
+        "name": "API udostępniania: nieprawidłowy JSON i ID są odrzucone",
+        "ok": true
+      },
+      {
+        "name": "Brak wyjątków JavaScript w badanych scenariuszach",
+        "ok": true
+      }
+    ],
+    "errors": [],
+    "externalTiles": "blocked intentionally: local UI tests do not verify upstream raster coverage"
+  },
+  "php": [
+    {
+      "name": "WMS Capabilities: zagnieżdżone warstwy",
+      "ok": true
+    },
+    {
+      "name": "Raster: HTML 200 nie jest mapą",
+      "ok": true
+    },
+    {
+      "name": "Raster: obraz PNG jest rozpoznany",
+      "ok": true
+    },
+    {
+      "name": "NMT: współrzędne mapowane niezależnie od kolejności",
+      "ok": true
+    },
+    {
+      "name": "NMT: nodata nie staje się zerem",
+      "ok": true
+    }
+  ],
+  "summary": {
+    "passed": 64,
+    "total": 64
+  }
+}

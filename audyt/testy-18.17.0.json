@@ -1,0 +1,349 @@
+{
+  "version": "18.17.0",
+  "scope": "Local Chrome 155; controlled API fixtures; PHP 8.3.6 fixtures and syntax; no production deployment or current upstream availability claim.",
+  "suites": [
+    {
+      "suite": "unit-tests.json",
+      "passed": 28,
+      "total": 28
+    },
+    {
+      "suite": "new-unit-tests.json",
+      "passed": 8,
+      "total": 8
+    },
+    {
+      "suite": "integration-results.json",
+      "passed": 26,
+      "total": 26
+    },
+    {
+      "suite": "extended-results.json",
+      "passed": 12,
+      "total": 12
+    },
+    {
+      "suite": "php-tests.json",
+      "passed": 5,
+      "total": 5
+    }
+  ],
+  "tests": [
+    {
+      "name": "Katalog: 34 poprawne warstwy, unikalne ID",
+      "ok": true
+    },
+    {
+      "name": "Projekcja 2180 → 3857 → 2180",
+      "ok": true
+    },
+    {
+      "name": "Telemetria: abort i powtórzone późne zdarzenia nie zamykają innego kafla",
+      "ok": true
+    },
+    {
+      "name": "Telemetria: reset licznika izoluje stare zdarzenia",
+      "ok": true
+    },
+    {
+      "name": "Historia komend: undo, redo, limit 3",
+      "ok": true
+    },
+    {
+      "name": "Topologia: poprawny wielokąt",
+      "ok": true
+    },
+    {
+      "name": "Topologia: samoprzecięcie jest odrzucone",
+      "ok": true
+    },
+    {
+      "name": "Topologia: otwór poza wielokątem jest odrzucony",
+      "ok": true
+    },
+    {
+      "name": "Bufor punktu 10 m: poprawna geometria",
+      "ok": true
+    },
+    {
+      "name": "Bufor: zero i NaN są odrzucone",
+      "ok": true
+    },
+    {
+      "name": "Odległość do krawędzi działki 5 m",
+      "ok": true
+    },
+    {
+      "name": "Odległość geometrii nakładających się wynosi zero",
+      "ok": true
+    },
+    {
+      "name": "requestScope: limit czasu obejmuje oczekiwanie",
+      "ok": true
+    },
+    {
+      "name": "requestScope: już anulowany rodzic jest respektowany",
+      "ok": true
+    },
+    {
+      "name": "NMT: dopasowanie identyfikatorów i limit 2 równoległych pakietów",
+      "ok": true
+    },
+    {
+      "name": "NMT: błędne sampleIds nie stają się wysokością",
+      "ok": true
+    },
+    {
+      "name": "Monitor: historia max. 20, wynik z cache nie mnoży prób",
+      "ok": true
+    },
+    {
+      "name": "Monitor: maksymalnie dwie równoległe próby",
+      "ok": true
+    },
+    {
+      "name": "Monitor: limit czasu obejmuje również pobieranie JSON",
+      "ok": true
+    },
+    {
+      "name": "Monitor: HTML/nieprawidłowy JSON jest odrzucony",
+      "ok": true
+    },
+    {
+      "name": "Monitor: CSV neutralizuje formuły",
+      "ok": true
+    },
+    {
+      "name": "GeoJSON: błędny JSON jest odrzucony",
+      "ok": true
+    },
+    {
+      "name": "GeoJSON: pusty zbiór jest obsługiwany",
+      "ok": true
+    },
+    {
+      "name": "GeoJSON: punkt 2180 przechodzi eksport i import",
+      "ok": true
+    },
+    {
+      "name": "Droga: łuk, obrys drogi i ślady kół są skończone",
+      "ok": true
+    },
+    {
+      "name": "Interpolacja płaszczyzny: brak NaN",
+      "ok": true
+    },
+    {
+      "name": "Geometria działki: WKT Polygon i MultiPolygon",
+      "ok": true
+    },
+    {
+      "name": "Droga: linia 100 km jest odrzucona przed próbkowaniem",
+      "ok": true
+    },
+    {
+      "name": "Nowy użytkownik: jednorazowe rysowanie zachowane po ponownym uruchomieniu",
+      "ok": true
+    },
+    {
+      "name": "Istniejący użytkownik: migracja zachowuje seryjne rysowanie",
+      "ok": true
+    },
+    {
+      "name": "Jawny wybór jednorazowy ma pierwszeństwo przy migracji",
+      "ok": true
+    },
+    {
+      "name": "System reaguje na motyw, ręczny wybór ignoruje późniejszą zmianę systemu",
+      "ok": true
+    },
+    {
+      "name": "Próbkowanie zerowe nie jest potwierdzonym brakiem, także dla statusu inconclusive",
+      "ok": true
+    },
+    {
+      "name": "Niepełne i przerwane dane nigdy nie zwiększają clear",
+      "ok": true
+    },
+    {
+      "name": "Spadki: granice klas pozostają 2 / 5 / 10 / 15%",
+      "ok": true
+    },
+    {
+      "name": "NoData wewnątrz obszaru ma kreskowanie, poza obszarem pozostaje przezroczyste",
+      "ok": true
+    },
+    {
+      "name": "Sześć grup z podpisami i wszystkie 18 narzędzi",
+      "ok": true
+    },
+    {
+      "name": "Punkt zapisuje się raz i wraca do neutralnego zaznaczania",
+      "ok": true
+    },
+    {
+      "name": "Undo i redo zachowują nowy obiekt",
+      "ok": true
+    },
+    {
+      "name": "Neutralny wybór nie włącza edycji geometrii",
+      "ok": true
+    },
+    {
+      "name": "Prostokąt i obszar tworzą poprawne obiekty",
+      "ok": true
+    },
+    {
+      "name": "Linia wymaga dwóch wstawionych punktów",
+      "ok": true
+    },
+    {
+      "name": "Okrąg: zmiana promienia 25→40 m i jedno cofnięcie",
+      "ok": true
+    },
+    {
+      "name": "Strzałka kończy się drugim punktem; wariant łamany pozostaje dostępny",
+      "ok": true
+    },
+    {
+      "name": "Tekst nie zapisuje się po utracie fokusu; Anuluj porzuca formularz",
+      "ok": true
+    },
+    {
+      "name": "Bufor: tylko podgląd, zmiana odległości, zapis i undo",
+      "ok": true
+    },
+    {
+      "name": "Bufor: anulowanie i niepoprawny dystans nic nie zapisują",
+      "ok": true
+    },
+    {
+      "name": "Pomiar tymczasowy nie zaśmieca projektu; zapis jest odwracalny",
+      "ok": true
+    },
+    {
+      "name": "Screening: przybliżony brak i niepełny wynik nie liczą się jako potwierdzony brak",
+      "ok": true
+    },
+    {
+      "name": "Powiązana etykieta: kotwica podąża za celem, undo odtwarza; odłączenie działa",
+      "ok": true
+    },
+    {
+      "name": "Nowe parametry przetrwają zapis i import pliku projektu",
+      "ok": true
+    },
+    {
+      "name": "Eksport: OSM wymaga wyboru; bez podkładu ma null w żądaniu",
+      "ok": true
+    },
+    {
+      "name": "Eksport: jawnie wybrana topografia trafia do renderowania",
+      "ok": true
+    },
+    {
+      "name": "Projekt ma bezpośredni zapis pliku i import; GIS poza Eksportem mapy",
+      "ok": true
+    },
+    {
+      "name": "Motyw systemowy reaguje na zmianę; ręczny wybór pozostaje po reload",
+      "ok": true
+    },
+    {
+      "name": "Autosave odtwarza obiekty po przeładowaniu",
+      "ok": true
+    },
+    {
+      "name": "Pełna paleta zaawansowana jest opcjonalna i ma wszystkie 18 narzędzi",
+      "ok": true
+    },
+    {
+      "name": "Layout desktop 1280×720, 768×1024 i 844×390 nie przepełnia strony",
+      "ok": true
+    },
+    {
+      "name": "Telefon: cztery akcje w jednym wierszu, pomiar dostępny bez Więcej",
+      "ok": true
+    },
+    {
+      "name": "Telefon: wszystkie narzędzia, 7 kategorii uzbrojenia, brak overflow przy 320 px",
+      "ok": true
+    },
+    {
+      "name": "Monitor nadal udostępnia 41 źródeł",
+      "ok": true
+    },
+    {
+      "name": "Brak błędów JavaScript podczas powyższych ścieżek",
+      "ok": true
+    },
+    {
+      "name": "Podgląd okręgu pokazuje rzeczywisty promień przed kliknięciem",
+      "ok": true
+    },
+    {
+      "name": "Etykieta powiązana tworzona w prawdziwej ścieżce dwóch kliknięć",
+      "ok": true
+    },
+    {
+      "name": "Zatrzymanie screeningu zachowuje gotowy wynik i oznacza braki",
+      "ok": true
+    },
+    {
+      "name": "Układ inspektora i lista obiektów mają oddzielne pola bez nakładania",
+      "ok": true
+    },
+    {
+      "name": "Klawiatura: nagłówek nowego panelu i powrót do przycisku po Escape",
+      "ok": true
+    },
+    {
+      "name": "Widoczne kontrolki w obu motywach korzystają z obrysu ≥3:1",
+      "ok": true
+    },
+    {
+      "name": "Telefon: karta 156 px pokazuje trzy główne akcje i nie dubluje działki",
+      "ok": true
+    },
+    {
+      "name": "Telefon: Bufor z karty daje podgląd i jawny zapis",
+      "ok": true
+    },
+    {
+      "name": "Telefon: celownik zapisuje pomiar tymczasowy dopiero na żądanie",
+      "ok": true
+    },
+    {
+      "name": "Telefon: Wstecz zamyka wybór uzbrojenia",
+      "ok": true
+    },
+    {
+      "name": "Telefon z dotykiem w poziomie zachowuje cztery akcje i brak overflow",
+      "ok": true
+    },
+    {
+      "name": "Brak błędów JS w dodatkowych ścieżkach",
+      "ok": true
+    },
+    {
+      "name": "WMS Capabilities: zagnieżdżone warstwy",
+      "ok": true
+    },
+    {
+      "name": "Raster: HTML 200 nie jest mapą",
+      "ok": true
+    },
+    {
+      "name": "Raster: obraz PNG jest rozpoznany",
+      "ok": true
+    },
+    {
+      "name": "NMT: współrzędne mapowane niezależnie od kolejności",
+      "ok": true
+    },
+    {
+      "name": "NMT: nodata nie staje się zerem",
+      "ok": true
+    }
+  ]
+}

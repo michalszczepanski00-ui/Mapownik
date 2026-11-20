@@ -1,0 +1,71 @@
+{
+  "_opis": "Przykład konfiguracji raportu działki PDF. Skopiuj jako raport-pdf.json (w tym samym katalogu) i zmień. Usuń klucze, których nie zmieniasz. Aktualizacje portalu nie nadpisują pliku raport-pdf.json.",
+  "tytul": "Raport działki",
+  "kolor": "#2e6b3f",
+  "naglowek": {
+    "nazwa": "Biuro Nieruchomości Przykład",
+    "kontakt": "tel. 600 000 000 · biuro@example.pl · www.example.pl",
+    "logo": "./konfiguracja/logo.png"
+  },
+  "stopka": "Dane informacyjne — wiążący jest akt i rejestr",
+  "zastrzezenia": "Raport ma charakter informacyjny i nie zastępuje wypisu i wyrysu z planu ani dokumentów z urzędu.",
+  "domyslnySzablon": "kupujacy",
+  "sekcje": {
+    "ceny": {
+      "nazwa": "Ceny działek w okolicy",
+      "opis": "mediana zł/m², mapa i lista transakcji"
+    }
+  },
+  "szablony": [
+    {
+      "id": "karta",
+      "ukryty": true
+    },
+    {
+      "id": "kupujacy",
+      "promien": 300
+    },
+    {
+      "id": "biuro-standard",
+      "nazwa": "Oferta biura",
+      "opis": "Mapa, plan ogólny, ceny i budowy w 500 m.",
+      "sekcje": [
+        "dzialka",
+        "mapa",
+        "pog",
+        "mpzp",
+        "ceny",
+        "budowy",
+        "powodz",
+        "zrodla"
+      ],
+      "promien": 500,
+      "lata": 3,
+      "podklad": "orto",
+      "rodzajCen": "grunty"
+    },
+    {
+      "id": "oze",
+      "typInwestycji": "pv",
+      "buforUzbrojenia": 500
+    }
+  ],
+  "reguly": {
+    "_opis": "19.40.0: progi reguł wniosków (zasady praktyczne) i reguły wyłączone. Pomiń klucze, których nie zmieniasz.",
+    "progi": {
+      "zabudowaMieszkaniowaM": 300,
+      "spadekProcent": 5,
+      "spadekUdzial": 20,
+      "spadekPvProcent": 15,
+      "naturaBliskoM": 1000,
+      "lasBliskoM": 30,
+      "minBokProstokataM": {
+        "biometan": 60,
+        "przemysl": 40
+      }
+    },
+    "wylaczone": [
+      "ksztalt.prostokat"
+    ]
+  }
+}

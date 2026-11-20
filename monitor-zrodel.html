@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>Monitor źródeł · msportal</title>
+<link rel="stylesheet" href="./assets/css/monitor.css?v=19.56.0"></head>
+<body><header><div><a href="./">← msportal</a><h1>Monitor źródeł danych</h1><p>Stan usług, próbki mapy i historia kontroli · <strong>19.56.0</strong></p></div><a href="./diagnostyka.html">Testy narzędzi</a></header>
+<main><section class="notice"><strong>Jak czytać wyniki?</strong> „Usługa odpowiada” sprawdza połączenie serwera i nazwy warstw WMS. „Obraz” sprawdza małą próbkę w podanym punkcie. Wynik nie potwierdza kompletności danych w terenie. Historia obejmuje tylko próby wykonane w tej przeglądarce; monitoring działa przy otwartej karcie.</section>
+<section class="controls" aria-label="Sterowanie monitorem">
+<label>Szukaj źródła<input id="search" type="search" placeholder="np. gaz, MPZP, KOWR"></label>
+<label>Wyniki<select id="filter"><option value="all">Wszystkie</option><option value="issues">Problemy i ograniczenia</option><option value="unchecked">Niesprawdzone</option></select></label>
+<label>Powtarzanie<select id="interval"><option value="0">Wyłączone</option><option value="300000">Co 5 minut</option><option value="900000">Co 15 minut</option><option value="1800000">Co 30 minut</option></select></label>
+<button id="check" class="primary" type="button">Sprawdź widoczne</button><button id="checkImages" type="button" title="Próbka obrazu WMS w punktach, w których dane były potwierdzone; pusty lub jednolity obraz = awaria źródła">Sprawdź obrazy (punkty wzorcowe)</button><button id="stop" type="button" disabled>Zatrzymaj</button>
+<button id="export" type="button">Raport JSON</button><button id="csv" type="button">Tabela CSV</button>
+</section><details class="settings"><summary>Punkt kontrolny obrazu WMS i ustawienia</summary><div class="controls">
+<label>X / easting · EPSG:2180<input id="x" type="number" value="660123.559" min="100000" max="950000" step="any"></label>
+<label>Y / northing · EPSG:2180<input id="y" type="number" value="486518.564" min="50000" max="1000000" step="any"></label>
+<button id="clear" type="button">Wyczyść historię</button></div><p>Próbka WMS: 300 × 300 m, 128 × 128 px, wersja WMS zgodna ze źródłem / EPSG:2180. OSM, WMTS, ULDK i NMT mają stałe próbki kontrolne. „Sprawdź widoczne” wykonuje test usługi, a „Obraz” dodatkowy test przy konkretnym źródle. „Sprawdź obrazy (punkty wzorcowe)” pobiera próbkę w miejscu, gdzie dane źródła były potwierdzone (źródła bez punktu wzorcowego — w punkcie powyżej); pusty lub jednolity obraz jest wtedy błędem. Serwer zachowuje wyniki testu usług przez 5 minut, obrazów przez minutę.</p></details>
+<div id="summary" class="summary" aria-label="Podsumowanie"></div><p id="progress" role="status" aria-live="polite">Wybierz źródła i uruchom kontrolę.</p>
+<div class="table-wrap"><table><caption class="sr-only">Źródła danych msportalu i wyniki diagnostyki</caption><thead><tr><th scope="col">Źródło / typ</th><th scope="col">Ostatni wynik</th><th scope="col">Czas / HTTP</th><th scope="col">Ostatnia próba</th><th scope="col">Historia</th><th scope="col">Działania</th></tr></thead><tbody id="rows"></tbody></table></div>
+<section id="detail" class="detail" hidden aria-live="polite"></section>
+<footer>Maks. 2 równoległe próby · limit 15 s · do 20 wpisów na źródło · pauza w tle i offline · brak bibliotek i animacji.</footer></main>
+<noscript>Włącz JavaScript, aby wykonać kontrolę źródeł.</noscript><script type="module" src="./monitor/monitor.js?v=19.56.0"></script></body></html>

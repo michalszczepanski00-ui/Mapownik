@@ -1,0 +1,156 @@
+/* 19.20.0 — two independent desktop panels; existing mobile shell remains in use. */
+.app-shell.is-workspace-1c .workspace-card {
+  position: absolute; z-index: var(--z-dock-overlay); left: 8px; top: 52px; /* 19.54.0 (L2): wspólna linia drugiego rzędu z dokiem i kolumną ikon */
+  width: var(--work-card-width, 260px); max-height: calc(100% - 164px);
+  display: flex; flex-direction: column; min-height: 40px; min-width: 0;
+  background: var(--surface-solid); color: var(--text); border: 1px solid var(--border);
+  border-radius: 10px; box-shadow: var(--v2-float-shadow);
+}
+.app-shell.is-workspace-1c .workspace-card.is-collapsed { width: auto; max-height: 44px; } /* 19.54.0 (L6): przycisk z nazwą działki */
+.workspace-card-head { display: flex; align-items: center; gap: 2px; min-height: 38px; padding: 3px 5px 3px 10px; border-bottom: 1px solid var(--border); flex: none; }
+.workspace-card-head > strong { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 600; }
+.workspace-card-head .icon-button { width: 28px; height: 28px; flex: 0 0 28px; }
+.workspace-card.is-collapsed .workspace-card-head { padding: 3px; border: 0; justify-content: center; }
+.workspace-card-body { overflow: auto; min-height: 0; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.workspace-card [hidden] { display: none !important; }
+.workspace-card-resizer { position: absolute; right: -4px; top: 0; bottom: 0; width: 8px; cursor: ew-resize; touch-action: none; border-radius: 6px; }
+.workspace-card-resizer:hover, .workspace-card-resizer:focus-visible { background: var(--accent); outline: 2px solid var(--surface-solid); }
+/* Old floating-panel geometry must not escape the stable left card. */
+.app-shell.is-v2.is-workspace-1c .workspace-card .ui-panel {
+  position: static !important; inset: auto !important; width: 100% !important;
+  min-width: 0 !important; max-width: 100% !important; height: auto !important;
+  max-height: none !important; transform: none !important; border: 0; border-radius: 0;
+  box-shadow: none; margin: 0; overflow: visible;
+}
+.app-shell.is-v2.is-workspace-1c .workspace-card .ui-panel > :not(.panel-header):not(.panel-footer) { overflow: visible; min-height: 0; }
+.app-shell.is-workspace-1c .workspace-card .panel-header,
+.app-shell.is-workspace-1c .workspace-card .panel-drag-handle,
+.app-shell.is-workspace-1c .workspace-card .panel-resizer,
+.app-shell.is-workspace-1c .workspace-card .panel-height-resizer { display: none; }
+.workspace-card .analysis-mode-tabs { flex-wrap: wrap; }
+/* Reuse the existing live metric/parameter descriptors, in one vertical card. */
+.app-shell.is-workspace-1c .workspace-context .context-bar {
+  position: static; display: block; width: 100%; height: auto; min-height: 0;
+  max-height: none; overflow: visible; border: 0; padding: 12px; background: transparent;
+}
+.workspace-context .context-zone { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; min-width: 0; width: 100%; padding: 0; border: 0; }
+.workspace-context .context-zone--object { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.workspace-context .context-tool-name { color: var(--text); white-space: normal; font-size: 12.5px; }
+.workspace-context .context-tool-icon { display: none; }
+.workspace-context .context-next-step { display: block; width: 100%; min-width: 0; max-width: none; max-height: none; white-space: normal; overflow: visible; font-size: 11px; line-height: 1.5; color: var(--text-muted); }
+.workspace-context .context-fields { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; min-width: 0; }
+.workspace-context .context-fields .ui-field { min-width: 0; max-width: 100%; flex-wrap: wrap; }
+.workspace-context .context-fields input, .workspace-context .context-fields select { max-width: 100%; }
+.workspace-context .context-sketch { position: static; inset: auto; display: flex; flex-wrap: wrap; gap: 6px; width: 100%; min-width: 0; border: 0; box-shadow: none; padding: 0; background: transparent; }
+.workspace-context .context-readouts { display: flex; flex-wrap: wrap; gap: 7px; width: 100%; }
+.workspace-context .ui-readout { display: flex; flex: 1 1 90px; flex-direction: column; align-items: flex-start; gap: 2px; padding: 7px 8px; border-radius: 6px; background: var(--accent-soft); color: var(--text); }
+.workspace-context .ui-readout strong { font-size: 14px; font-variant-numeric: tabular-nums; }
+.workspace-context .ui-field-label { color: var(--text-muted); font-size: 11px; }
+.workspace-context .context-object-name { max-width: 100%; white-space: normal; overflow-wrap: anywhere; font-size: 12.5px; }
+.workspace-context .context-object-label { font-size: 11px; }
+.workspace-context .context-tool-help { margin-left: auto; }
+/* The right dock stays independent of result/tool changes on the left. */
+.app-shell.is-workspace-1c .dock--right-panel { width: var(--dock-panel-width, 250px); max-width: min(420px, 42vw); top: 52px; max-height: calc(100% - 164px); }
+.app-shell.is-workspace-1c .dock--right-panel .ui-panel { min-width: 0; max-width: 100%; }
+.app-shell.is-workspace-1c .layers-panel--v2 .layer-row-main { padding-left: 7px; }
+.app-shell.is-workspace-1c .layers-panel--v2 .layer-row-titleline strong { font-size: 11px; }
+/* Only four primary actions carry persistent labels; details keep names in tooltips/ARIA. */
+.app-shell.is-workspace-1c .tool-dock { left: calc(var(--work-card-inset-left, 272px) + 8px); }
+.app-shell.is-workspace-1c .tool-dock-main { overflow-x: auto; max-width: 100%; flex-wrap: nowrap; }
+.app-shell.is-workspace-1c .tool-dock-groups { display: flex; flex: none; }
+.app-shell.is-workspace-1c .tool-dock .tool-dock-main .tool-dock-group { width: auto; padding: 0 9px; min-width: 0; height: 36px; flex: none; font-size: 12.5px; justify-content: center; }
+.app-shell.is-workspace-1c .tool-dock.is-expanded .tool-dock-main .tool-dock-group > span { display: inline; }
+.app-shell.is-workspace-1c .tool-dock-tool { width: 42.5px; height: 42.5px; padding: 0; justify-content: center; }
+
+.app-shell.is-workspace-1c .tool-dock-tool kbd{ display: none; }
+.app-shell.is-workspace-1c .tool-dock-group:disabled { opacity: .5; cursor: default; }
+@media (max-width: 1150px) {
+  /* The toolbar uses the bottom strip rather than squeezing into a narrow center. */
+  .app-shell.is-workspace-1c .tool-dock { left: 8px; right: 70px; }
+}
+@media (pointer: coarse) {
+  .workspace-card-head .icon-button { width: 36px; height: 36px; flex-basis: 36px; }
+    .app-shell.is-workspace-1c .tool-dock-tool { width: 55px; height: 55px; }
+  .app-shell.is-workspace-1c .tool-dock .tool-dock-main .tool-dock-group { min-height: 44px; }
+  .app-shell.is-workspace-1c .workspace-card, .app-shell.is-workspace-1c .dock--right-panel { max-height: calc(100% - 186px); }
+}
+@media (prefers-reduced-motion: reduce) { .workspace-card .panel-enter { animation: none; } }
+
+/* Stable panels do not animate over a running sketch. */
+.app-shell.is-workspace-1c .workspace-card .panel-enter { animation: none; }
+
+/* Selected object: the complete inspector lives in the left workspace. */
+:is(.workspace-card, .object-window) .object-inspector--workspace { box-sizing: border-box; padding: 10px 12px 12px; margin-top: 10px; border: 0; border-top: 1px solid var(--border); background: transparent; }
+:is(.workspace-card, .object-window) .object-inspector-head { flex-wrap: wrap; align-items: flex-start; }
+:is(.workspace-card, .object-window) .object-inspector-title { flex: 1 1 100%; }
+:is(.workspace-card, .object-window) .object-inspector-title h3 { white-space: normal; overflow-wrap: anywhere; }
+:is(.workspace-card, .object-window) .object-properties-fields { min-width: 0; }
+:is(.workspace-card, .object-window) .object-properties-fields > * { min-width: 0; max-width: 100%; }
+:is(.workspace-card, .object-window) .object-properties-fields .ui-field { width: 100%; min-width: 0; }
+:is(.workspace-card, .object-window) .object-properties-fields input,
+:is(.workspace-card, .object-window) .object-properties-fields select { min-width: 0; max-width: 100%; box-sizing: border-box; }
+:is(.workspace-card, .object-window) .object-properties-fields .ui-field-label { white-space: normal; }
+:is(.workspace-card, .object-window) .object-quality-note { white-space: normal; font-size: 11px; }
+
+/* 19.24.0 — pasek stylu zaznaczonego obiektu (nad dokiem narzędzi) i okno „Zaawansowane”. */
+.tool-dock-row.object-style-bar {
+  background: var(--surface-solid); color: var(--text); border: 1px solid var(--border);
+  box-shadow: var(--v2-float-shadow); gap: 8px; padding: 4px 4px 4px 12px; flex-wrap: nowrap; justify-content: center;
+  max-width: min(100%, 980px); row-gap: 4px;
+}
+.object-style-name { flex: 0 1 auto; min-width: 36px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12.5px; font-weight: 600; }
+.object-style-fields { display: flex; align-items: center; flex-wrap: nowrap; gap: 4px 10px; min-width: 0; }
+.object-style-fields input[role="spinbutton"] { width: 46px; }
+.object-style-fields select { width: 118px !important; }
+/* Wąskie okno: podpisy pól i napis przycisku chowane wizualnie (nazwy dostępne zostają w aria-label). */
+@media (max-width: 1400px) { .object-style-fields .ui-field-label { display: none; } }
+@media (max-width: 1180px) { .object-style-advanced > span { display: none; } .object-style-advanced { padding: 0 8px; } }
+.object-style-fields .ui-field-label { font-size: 11px; color: var(--text-muted); white-space: nowrap; }
+.object-style-advanced {
+  display: inline-flex; align-items: center; gap: 5px; height: 30px; padding: 0 10px; border-radius: 6px;
+  border: 1px solid var(--border); background: transparent; color: var(--text); font: inherit; font-size: 12.5px; cursor: pointer;
+}
+.object-style-advanced:hover { border-color: var(--border-strong); }
+.object-style-advanced.is-active { background: var(--v2-dock-active-bg, #2f6b45); border-color: transparent; color: var(--v2-dock-active-text, #fff); }
+.object-style-advanced:focus-visible { outline: 2px solid var(--v2-dock-focus, currentColor); outline-offset: 2px; }
+.object-style-close { width: 30px; height: 30px; flex: 0 0 30px; }
+.object-window {
+  position: absolute; z-index: var(--z-dock-top); display: flex; flex-direction: column;
+  max-height: calc(100% - 140px); min-height: 0; box-sizing: border-box;
+  background: var(--surface-solid); color: var(--text); border: 1px solid var(--border);
+  border-radius: 10px; box-shadow: var(--v2-dock-shadow); outline: none;
+}
+.object-window-head {
+  display: flex; align-items: center; gap: 4px; min-height: 38px; padding: 3px 5px 3px 4px;
+  border-bottom: 1px solid var(--border); cursor: move; touch-action: none; user-select: none; flex: none;
+}
+.object-window-head > strong { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 600; }
+.object-window-head .icon-button { width: 28px; height: 28px; flex: 0 0 28px; cursor: pointer; }
+.object-window-grip { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 28px; color: var(--text-muted); border-radius: 6px; }
+.object-window-grip:focus-visible { outline: 2px solid var(--v2-dock-focus, currentColor); }
+.object-window-body { overflow: auto; min-height: 0; overscroll-behavior: contain; }
+.object-window .object-inspector--workspace { margin-top: 0; border-top: 0; }
+
+/* 19.25.0 — okno „Zaawansowane” w układzie poziomym: nagłówek obiektu w jednym wierszu,
+   pola w kolumnach (nazwa i tekst na dwie kolumny). */
+.object-window .object-inspector-head { flex-wrap: nowrap; align-items: center; gap: 10px; }
+.object-window .object-inspector-title { flex: 1 1 auto; flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 14px; }
+.object-window .object-inspector-title h3 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 260px; }
+.object-window .object-properties-fields {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); column-gap: 14px; row-gap: 10px; align-items: start;
+}
+.object-window .object-properties-fields > .ui-field:first-child,
+.object-window .object-properties-fields > .ui-field:has(input[type="text"]:not([role="spinbutton"])) { grid-column: span 2; }
+.object-window .object-properties-fields .ui-field--rotate { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px; }
+.object-window .object-properties-fields .ui-field--rotate > .ui-field-label { flex: 0 0 100%; }
+.object-window .object-properties-fields .ui-field--rotate .ui-field { width: auto; flex: 1 1 60px; }
+@media (max-width: 760px) { .object-window .object-properties-fields > .ui-field:first-child { grid-column: auto; } }
+.object-window .object-properties-fields > .ui-field--color { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.object-window .object-properties-fields > .ui-field--color > .ui-field-label { flex: 0 0 100%; }
+.object-window .object-properties-fields > .ui-field--color .ui-color-input { flex: 1 1 40px; min-width: 0; width: auto; }
+
+/* 19.27.0 — okna odpięte bez własnych reguł położenia („Wyniki analizy”, „Ortofotomapy”).
+   Wcześniej wpadały w zwykły przepływ strony: (0,0), pod paskiem aplikacji, na całą szerokość.
+   Pozycję (left/top) i rozmiar ustawia usePanel; tu tylko warstwa, wymiary domyślne i wygląd. */
+.map-area > .analysis-results-panel:not(.is-docked) { height: 320px; }
+.map-area > .analysis-results-panel:not(.is-docked) > :not(.panel-header):not(.panel-footer) { min-height: 0; overflow: auto; }

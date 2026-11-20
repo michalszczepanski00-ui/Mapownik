@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Polityka prywatności — MSportal</title>
+<style>
+  :root { color-scheme: light dark; --ink: #18202c; --muted: #5b6573; --bg: #ffffff; --line: #d8dee8; --fill: #fff4cc; --fill-ink: #5a4300; }
+  @media (prefers-color-scheme: dark) { :root { --ink: #e6ebf1; --muted: #9aa6b4; --bg: #151a20; --line: #2d3540; --fill: #3b2f0b; --fill-ink: #fff1c2; } }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 Inter, "Segoe UI", Arial, sans-serif; }
+  main { max-width: 780px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 28px; line-height: 1.25; margin: 0 0 8px; }
+  h2 { font-size: 19px; margin: 32px 0 8px; padding-top: 16px; border-top: 1px solid var(--line); }
+  p, li { margin: 6px 0; }
+  .muted { color: var(--muted); font-size: 14px; }
+  mark { background: var(--fill); color: var(--fill-ink); padding: 0 3px; border-radius: 3px; }
+  .draft { border: 2px solid #b54708; border-radius: 10px; padding: 12px 16px; margin: 16px 0 24px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; margin: 8px 0; }
+  th, td { border: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+<main>
+<!--
+  SZKIC (msportal 19.56.0). Przed publikacją:
+   1. Uzupełnij wszystkie pola oznaczone <mark>…</mark> i usuń ramkę „SZKIC”.
+   2. Daj tekst do sprawdzenia prawnikowi (podstawy prawne, okresy przechowywania, dane z rejestrów publicznych).
+   3. Zapisz plik jako konfiguracja/polityka-prywatnosci.html — wtedy w pomocy portalu pojawi się link.
+  Opis przetwarzania odpowiada działaniu portalu w wersji 19.44.0 (patrz README_PROGRAMISTY.md i ZMIANY_*.md).
+-->
+<div class="draft"><strong>SZKIC — nie publikować bez uzupełnienia i weryfikacji prawnej.</strong>
+Pola do uzupełnienia są <mark>wyróżnione</mark>.</div>
+
+<h1>Polityka prywatności portalu MSportal</h1>
+<p class="muted">Obowiązuje od <mark>[data]</mark>. Adres portalu: <mark>[adres strony]</mark>.</p>
+
+<h2>1. Kto odpowiada za Twoje dane</h2>
+<p>Administratorem danych osobowych jest <mark>[nazwa firmy / imię i nazwisko przedsiębiorcy]</mark>, <mark>[adres siedziby]</mark>,
+NIP <mark>[NIP]</mark>. Kontakt w sprawach danych osobowych: <mark>[adres e-mail]</mark><mark>[, inspektor ochrony danych: imię, nazwisko, e-mail — jeśli wyznaczono]</mark>.</p>
+
+<h2>2. Najważniejsze w skrócie</h2>
+<ul>
+  <li>Portal nie wymaga zakładania konta i nie używa plików cookies.</li>
+  <li>Twój projekt (narysowane obiekty, notatki, ustawienia) jest zapisywany <strong>tylko w Twojej przeglądarce</strong>.
+      Na serwer trafia wyłącznie wtedy, gdy sam utworzysz link udostępniania.</li>
+  <li>Aby pokazać mapę i informacje o działce, portal łączy się z publicznymi usługami (m.in. GUGiK, GDOŚ, Lasy Państwowe)
+      oraz — bezpośrednio z Twojej przeglądarki — z OpenStreetMap i kilkoma dostawcami map opisanymi w punkcie 6.</li>
+</ul>
+
+<h2>3. Dane zapisywane w Twojej przeglądarce</h2>
+<p>Na Twoim urządzeniu (pamięć przeglądarki: IndexedDB, localStorage i pamięć podręczna trybu offline) zapisujemy:
+projekt, ustawienia wyglądu i paneli, ostatnio sprawdzane działki, ustawienia raportu PDF (w tym nazwę i logo biura, jeśli je wpiszesz),
+klucze usuwania utworzonych przez Ciebie linków udostępniania, dziennik błędów aplikacji oraz kopię plików aplikacji do pracy bez internetu.
+Te dane nie są wysyłane do nas. Możesz je usunąć, czyszcząc dane witryny w ustawieniach przeglądarki — spowoduje to także utratę
+projektu, jeśli nie zapisałeś go wcześniej do pliku.</p>
+<p>Zapis tych informacji jest niezbędny do świadczenia usługi, o którą prosisz (praca z projektem i mapą), dlatego nie wymaga zgody.
+<mark>[Prawnik: potwierdzić podstawę z ustawy Prawo komunikacji elektronicznej dotyczącą przechowywania informacji w urządzeniu końcowym.]</mark></p>
+
+<h2>4. Dane przetwarzane na serwerze</h2>
+<table>
+  <thead><tr><th>Co</th><th>Po co</th><th>Jak długo</th><th>Podstawa</th></tr></thead>
+  <tbody>
+    <tr><td>Dzienniki serwera WWW: adres IP, data i godzina, adres strony, przeglądarka</td><td>działanie i bezpieczeństwo serwisu</td>
+        <td><mark>[okres — zgodnie z ustawieniami hostingu]</mark></td><td>prawnie uzasadniony interes (art. 6 ust. 1 lit. f RODO) <mark>[do potwierdzenia]</mark></td></tr>
+    <tr><td>Skrót (SHA-256) adresu IP w plikach limitów zapytań</td><td>ochrona przed nadużyciami (np. masowym eksportem)</td>
+        <td>do 2 dni (pliki usuwane automatycznie)</td><td>art. 6 ust. 1 lit. f RODO <mark>[do potwierdzenia]</mark></td></tr>
+    <tr><td>Projekt udostępniony przez link (obiekty, nazwy, notatki — to, co sam zapisałeś w projekcie)</td><td>udostępnienie projektu osobom, którym przekażesz link</td>
+        <td>90 dni od ostatniego otwarcia linku albo do usunięcia linku przez Ciebie</td><td>wykonanie usługi na Twoje żądanie (art. 6 ust. 1 lit. b RODO) <mark>[do potwierdzenia]</mark></td></tr>
+    <tr><td>Zgłoszenia błędów aplikacji: treść błędu, wersja aplikacji, rodzaj przeglądarki, adres strony bez parametrów (bez adresu IP i bez treści projektu)</td>
+        <td>wykrywanie i naprawa awarii</td><td>30 dni</td><td>art. 6 ust. 1 lit. f RODO <mark>[do potwierdzenia]</mark></td></tr>
+    <tr><td>Współrzędne wskazanych miejsc i wpisane wyszukiwania (bez danych identyfikujących użytkownika)</td>
+        <td>pobranie informacji z usług publicznych; krótkotrwała pamięć podręczna przyspieszająca odpowiedzi</td><td>od kilku dni do 90 dni (pamięć podręczna, usuwana automatycznie)</td><td>—</td></tr>
+  </tbody>
+</table>
+<p>Serwer działa u dostawcy hostingu <mark>[nazwa hostingu, np. OVH — siedziba, kraj]</mark>, który przetwarza dane w naszym imieniu na podstawie umowy powierzenia.</p>
+
+<h2>5. Dane z rejestrów publicznych</h2>
+<p>Portal pokazuje informacje z publicznych rejestrów: ewidencji gruntów (GUGiK), Rejestru Cen Nieruchomości, rejestru wniosków,
+decyzji i zgłoszeń budowlanych (GUNB), rejestrów planistycznych i środowiskowych. W rejestrze GUNB nazwy inwestorów będących osobami
+fizycznymi są ukrywane — portal pokazuje je tylko dla firm, gmin i instytucji. <mark>[Prawnik: podstawa ponownego wykorzystania danych
+z rejestrów i zakres prezentacji; ewentualnie obowiązek informacyjny z art. 14 RODO.]</mark></p>
+
+<h2>6. Połączenia Twojej przeglądarki z innymi usługami</h2>
+<p>Część map pobiera bezpośrednio Twoja przeglądarka. Dostawcy tych usług otrzymują wtedy Twój adres IP i informacje techniczne
+o przeglądarce, tak jak przy każdym wejściu na stronę:</p>
+<ul>
+  <li>OpenStreetMap Foundation (Wielka Brytania) — mapa standardowa i podpowiedzi wyszukiwarki (tile.openstreetmap.org, nominatim.openstreetmap.org);</li>
+  <li>OpenFreeMap — podkłady wektorowe (tiles.openfreemap.org);</li>
+  <li>Amazon Web Services — model wysokości do warstwic i podkładów (s3.amazonaws.com);</li>
+  <li>Główny Urząd Geodezji i Kartografii — ortofotomapa i usługi Geoportalu (mapy.geoportal.gov.pl, integracja.gugik.gov.pl);</li>
+  <li>inne urzędy i instytucje publiczne udostępniające warstwy mapy (m.in. GDOŚ, PIG-PIB, Wody Polskie/ISOK, NID, Lasy Państwowe);</li>
+  <li>Google — tylko gdy sam klikniesz „Nawiguj” albo link do Map Google.</li>
+</ul>
+<p>Zasady tych usług opisują ich polityki prywatności. <mark>[Prawnik: przekazanie do państw trzecich — OSMF (Wielka Brytania, decyzja
+stwierdzająca odpowiedni stopień ochrony), AWS.]</mark></p>
+
+<h2>7. Twoje prawa</h2>
+<p>Masz prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania, przeniesienia oraz wniesienia sprzeciwu
+wobec przetwarzania opartego na prawnie uzasadnionym interesie. Masz też prawo wnieść skargę do Prezesa Urzędu Ochrony Danych Osobowych
+(ul. Stawki 2, 00-193 Warszawa). Link udostępniania usuniesz sam: menu Projekt → Obiekty i pliki GIS → „Import i eksport plików GIS” → „Udostępnione kopie” → „Wyłącz link”; w innych sprawach
+napisz na <mark>[adres e-mail]</mark>.</p>
+<p>Ponieważ portal nie ma kont użytkowników, w odpowiedzi na żądanie możemy poprosić o informacje pozwalające wskazać Twoje dane
+(np. link udostępniania).</p>
+
+<h2>8. Zmiany polityki</h2>
+<p>O zmianach informujemy na tej stronie, podając datę obowiązywania nowej wersji.</p>
+</main>
+</body>
+</html>

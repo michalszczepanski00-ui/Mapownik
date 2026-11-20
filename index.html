@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <!-- 19.41.4-b (audyt B5): Content-Security-Policy. Od 19.42.0 strona nie ma skryptów wbudowanych, więc
+       script-src to tylko 'self'. Politykę zapisuje tools/csp_hashes.py (wywoływany przez bump_version.py
+       i sprawdzany przez check_release.py); gdyby wrócił skrypt wbudowany, narzędzie dopisze jego sumę. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' data:; img-src 'self' data: blob: https:; connect-src 'self' https:; font-src 'self' data:; worker-src 'self' blob: data:; child-src 'self' blob: data:; media-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#f2f4f8" />
+  <title>MSportal — działki, plany i teren</title>
+  <meta name="description" content="MSportal: sprawdzenie działki ewidencyjnej — plany miejscowe i ogólne, ograniczenia przyrodnicze i powodziowe, ceny transakcyjne, wysokości terenu, raport PDF." />
+  <link rel="icon" type="image/png" href="./assets/mapownik-logo-icon.png?v=19.56.0" />
+  <!-- 19.42.0: style OpenLayers z pakietu npm „ol” (ta sama wersja 10.10.0 co dawny vendor/static/openlayers.css). -->
+  <link rel="stylesheet" href="./node_modules/ol/ol.css" />
+  <!-- Arkusz podzielony na warstwy kaskady. Kolejność <link> ma znaczenie:
+       00-layers.css deklaruje kolejność warstw i musi być pierwszy. Pliki
+       21–27 to dawny 20-legacy.css rozdzielony tematycznie (patrz nagłówek
+       każdego pliku) — wszystkie nadal deklarują warstwę „legacy", więc ich
+       kolejność względem 30-shell.css/90-utilities.css się nie zmieniła;
+       kolejność MIĘDZY nimi (21..27) też nie jest przypadkowa, bo część
+       reguł powtarza ten sam selektor w dwóch plikach (np. odstępy paska
+       narzędzi poprawione później) — zamieniona kolejność linków zmieniłaby,
+       która deklaracja wygrywa. -->
+  <link rel="stylesheet" href="./assets/css/00-layers.css" />
+  <link rel="stylesheet" href="./assets/css/10-tokens.css" />
+  <link rel="stylesheet" href="./assets/css/21-legacy-shell.css" />
+  <link rel="stylesheet" href="./assets/css/22-legacy-panels.css" />
+  <link rel="stylesheet" href="./assets/css/23-legacy-catalog.css" />
+  <link rel="stylesheet" href="./assets/css/24-legacy-tools.css" />
+  <link rel="stylesheet" href="./assets/css/25-legacy-export.css" />
+  <link rel="stylesheet" href="./assets/css/26-legacy-identify.css" />
+  <link rel="stylesheet" href="./assets/css/27-legacy-analysis.css" />
+  <link rel="stylesheet" href="./assets/css/30-shell.css" />
+  <link rel="stylesheet" href="./assets/css/31-ux.css" />
+  <link rel="stylesheet" href="./assets/css/32-vps.css" />
+  <link rel="stylesheet" href="./assets/css/33-compact-layout.css" />
+  <link rel="stylesheet" href="./assets/css/34-v2.css" />
+  <link rel="stylesheet" href="./assets/css/35-workspace-1c.css" />
+  <link rel="stylesheet" href="./assets/css/36-latwa-obsluga.css" />
+  <link rel="stylesheet" href="./assets/css/37-raport-pdf.css" />
+  <link rel="stylesheet" href="./assets/css/38-ergonomia.css" />
+  <link rel="stylesheet" href="./assets/css/39-teren-3d.css" />
+  <link rel="stylesheet" href="./assets/css/40-system-las.css" />
+  <link rel="stylesheet" href="./assets/css/90-utilities.css" />
+  <!-- 19.42.0: kod aplikacji budowany narzędziem Vite (npm run build) — bez mapy importów i bez skryptów
+       wbudowanych. Biblioteki (React, OpenLayers, zod…) pochodzą z npm (package.json) i są dołączane
+       do paczek w assets/build/. assets/js/boot.js ustawia wersję i pokazuje komunikat, gdy start się nie uda. -->
+  <script src="./assets/js/boot.js?v=19.56.0"></script>
+  <style>
+    .boot-screen{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font:14px/1.4 Inter,"Segoe UI",Arial,sans-serif;color:#33413a;background:#eef2ee}
+    .boot-screen strong{font-size:18px;color:#1f3a2b}
+    .boot-screen span{color:#5b6b62}
+    .boot-screen img{animation:boot-pulse 1.4s ease-in-out infinite}
+    @keyframes boot-pulse{50%{opacity:.45}}
+    @media (prefers-reduced-motion:reduce){.boot-screen img{animation:none}}
+    @media (prefers-color-scheme:dark){.boot-screen{background:#151a17;color:#d6ded9}.boot-screen strong{color:#e8efe9}.boot-screen span{color:#9fb0a6}}
+    .skip-link{position:absolute;left:8px;top:-60px;z-index:10000;padding:8px 12px;border-radius:8px;background:#1f5135;color:#fff;font:600 13px Inter,"Segoe UI",Arial,sans-serif;text-decoration:none}
+    .skip-link:focus{top:8px}
+  </style>
+</head>
+<body>
+  <!-- 19.28.0: pierwszy element dla klawiatury — od razu do wyszukiwarki (przyciski mapy są w kodzie strony wcześniej). -->
+  <a class="skip-link" href="#map-search-input">Przejdź do wyszukiwarki</a>
+  <!-- 19.28.0: ekran wczytywania zamiast pustej białej strony; React zastępuje go przy pierwszym renderze. -->
+  <div id="root"><div class="boot-screen" role="status" aria-live="polite"><img src="./assets/mapownik-logo-icon.png?v=19.56.0" alt="" width="44" height="44" /><strong>MSportal</strong><span>Wczytywanie mapy…</span></div></div>
+  <script type="module" src="./app-19.56.0/main.js"></script>
+</body>
+</html>

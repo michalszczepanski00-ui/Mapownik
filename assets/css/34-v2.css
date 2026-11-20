@@ -1,0 +1,622 @@
+/* 19.9.0 — układ v2 na komputerze: mapa pierwsza, wszystko inne pływa nad nią
+   w 8 px od krawędzi. Bez pasków na całą szerokość (pasek aplikacji, pasek
+   trybu i stopka zamieniły się w pływające elementy), dok narzędzi na dole
+   (Sprawdź · Szkic · Pomiar), wyszukiwarka na stałe w lewym górnym rogu.
+   Dotyczy tylko `.app-shell.is-v2` (telefon ma własną powłokę). */
+
+
+@layer tokens {
+  /* Czcionka z paczki — ten sam wygląd na Windows, macOS, Linuksie i Androidzie. */
+  /* 19.54.0: krój Fira Sans — 40-system-las.css */
+  .app-shell.is-v2 {
+    --v2-gap: 8px;
+    --v2-ink: #12161c;
+    --v2-ink-line: #374151;
+    --v2-ink-text: #e5e7eb;
+    --v2-ink-muted: #b8bfca;
+    --v2-float-shadow: 0 1px 2px rgba(18, 22, 28, .12), 0 4px 12px rgba(18, 22, 28, .14);
+    --v2-dock-shadow: 0 8px 24px rgba(18, 22, 28, .28);
+    --activity-bar-width: 62px;
+    --statusbar-height: 40px;
+    /* 19.16.0: jeden zestaw znaczków stanu (maski SVG w kolorze tekstu):
+       jest · brak · ograniczenie/błąd · sprawdzanie. */
+    --icon-state-yes: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.6 5.6-4.3 4.9L4.4 8l1-1.1 1.9 1.6 3.3-3.8z'/%3E%3C/svg%3E");
+    --icon-state-no: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm0 1.6a6.4 6.4 0 1 1 0 12.8A6.4 6.4 0 0 1 8 1.6zM4.5 7.2h7v1.6h-7z'/%3E%3C/svg%3E");
+    --icon-state-warn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 .8 15.6 15H.4zm-.8 5v4.6h1.6V5.8zm0 6v1.6h1.6v-1.6z'/%3E%3C/svg%3E");
+    --icon-state-wait: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.6' stroke-dasharray='2.4 2'%3E%3Ccircle cx='8' cy='8' r='6.6'/%3E%3C/svg%3E");
+    --state-warn: #b45309;
+  }
+  /* 19.16.0: jeden odcień akcentu (projekt v2); ciemny motyw bez zmian. */
+  /* 19.17.0: paleta „Leśna zieleń na jasnej belce” (płótno, tablice 14–15).
+     Dok, zakładki karty i znak: jasne z ramką; aktywne narzędzie i akcent — leśna zieleń.
+     Wszystkie kolory doku są zmiennymi (--v2-dock-*), więc paletę zmienia się tylko tutaj. */
+  .app-shell.is-v2:not([data-theme="dark"]) {
+    --accent: #2f6b45; --accent-soft: #e6f0e9; --on-accent: #ffffff;
+    --state-warn: #a1460c;
+    --v2-ink: #ffffff;
+    --v2-ink-text: #16261e;
+    --v2-ink-muted: #5f6b62;
+    --v2-ink-line: #dfe4dc;
+    --v2-dock-strong: #16261e;
+    --v2-dock-hover: #eef3ef;
+    --v2-dock-hover-solid: #eef3ef;
+    --v2-dock-active-bg: #2f6b45;
+    --v2-dock-active-text: #ffffff;
+    --v2-dock-active-muted: #cfe3d6;
+    --v2-dock-field-bg: #ffffff;
+    --v2-dock-focus: #2f6b45;
+    --v2-dock-border: 1px solid #dfe4dc;
+    --v2-dock-shadow: 0 1px 2px rgba(22, 38, 30, .10), 0 6px 18px rgba(22, 38, 30, .16);
+  }
+  /* Telefon: ten sam akcent (pasek dolny, przyciski, aktywne pozycje). */
+  .app-shell.is-mobile:not([data-theme="dark"]) { --accent: #2f6b45; --accent-soft: #e6f0e9; --on-accent: #ffffff; }
+  .app-shell.is-mobile[data-theme="dark"] { --accent: #86c79d; --accent-soft: #1f3a2a; --on-accent: #0b1a12; }
+  /* Ciemny motyw: ciemnozielona belka, jasna zieleń jako akcent. */
+  .app-shell.is-v2[data-theme="dark"] {
+    --accent: #86c79d; --accent-soft: #1f3a2a; --on-accent: #0b1a12;
+    --state-warn: #fbbf24;
+    --v2-ink: #142019;
+    --v2-ink-text: #e3ebe5;
+    --v2-ink-muted: #97a79c;
+    --v2-ink-line: #2e4537;
+    --v2-dock-strong: #ffffff;
+    --v2-dock-hover: rgba(255, 255, 255, .08);
+    --v2-dock-hover-solid: #1d2c23;
+    --v2-dock-active-bg: #86c79d;
+    --v2-dock-active-text: #0b1a12;
+    --v2-dock-active-muted: #2e4537;
+    --v2-dock-field-bg: #1d2c23;
+    --v2-dock-focus: #86c79d;
+    --v2-dock-border: 1px solid #2e4537;
+  }
+  .app-shell.is-v2[data-theme="dark"] {
+    --v2-float-shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 12px rgba(0, 0, 0, .35);
+  }
+}
+
+/* Bez warstwy kaskady (jak 31-ux.css i 33-compact-layout.css, które też są poza
+   warstwami): reguły nieuwarstwione wygrywają z każdą warstwą, a ten plik jest
+   wczytywany po nich, więc przy równej specyficzności wygrywa kolejność. */
+
+/* ------------------------------------------------------------ powłoka */
+.app-shell.is-v2:not(.is-mobile) { grid-template-rows: minmax(0, 1fr); }
+.app-shell.is-v2 .workspace { --activity-bar-width: 62px; --dock-top: 52px; grid-row: 1; }
+/* Mapa sięga prawej krawędzi — szyna paneli pływa nad nią. */
+.app-shell.is-v2 .map-column { width: 100%; }
+
+/* ------------------------------------------------------- górny pasek */
+.map-topbar {
+  position: absolute;
+  z-index: var(--z-appbar);
+  inset: var(--v2-gap) var(--v2-gap) auto var(--v2-gap);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--v2-gap);
+  pointer-events: none;
+}
+.map-topbar > * { pointer-events: auto; }
+.map-topbar-start,
+.map-topbar-end { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.map-topbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 36px;
+  padding: 0 2px;
+  border-radius: 10px;
+  background: var(--surface-solid);
+  box-shadow: var(--v2-float-shadow);
+}
+.map-topbar .icon-button.topbar-primary-action { width: 32px; height: 32px; flex-basis: 32px; border-radius: 6px; }
+.map-topbar-end > .settings-menu-trigger,
+.map-topbar-end > .icon-button {
+  width: 36px; height: 36px; flex-basis: 36px; border-radius: 10px;
+  background: var(--surface-solid); box-shadow: var(--v2-float-shadow);
+}
+.map-topbar-project .project-trigger { height: 32px; border: 0; box-shadow: none; background: transparent; padding: 0 8px; }
+.map-topbar .export-map-trigger {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  box-shadow: var(--v2-float-shadow);
+  font-size: 12.5px;
+}
+.map-brand-button.icon-button {
+  width: 40px; height: 40px; flex: 0 0 40px;
+  border-radius: 10px;
+  background: var(--v2-ink);
+  border: var(--v2-dock-border, 0);
+  box-shadow: var(--v2-float-shadow);
+}
+.map-brand-button.icon-button:hover { background: var(--v2-dock-hover-solid); }
+.map-brand-button img { width: 24px; height: 24px; border-radius: 6px; display: block; }
+
+/* Wyszukiwarka: 440 × 40, zawsze widoczna. */
+.map-topbar .map-search {
+  width: 440px;
+  max-width: calc(100vw - 520px);
+  min-width: 260px;
+  margin: 0;
+}
+.map-topbar .map-search-fields {
+  display: flex;
+  gap: 0;
+  border-radius: 10px;
+  background: var(--surface-solid);
+  box-shadow: var(--v2-float-shadow);
+}
+.map-topbar .map-search-place,
+.map-topbar .map-search-parcel {
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+}
+.map-topbar .map-search-place { flex: 1 1 auto; min-width: 0; }
+.map-topbar .map-search-parcel { flex: 0 0 130px; border-left: 1px solid var(--border); border-radius: 0 10px 10px 0; }
+.map-topbar .map-search input { border: 0; background: transparent; font-size: 12.5px; }
+.map-topbar .search-permanent-label {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+/* ------------------------------------------------- szyna paneli (prawa) */
+.app-shell.is-v2 .activity-bar {
+  inset-block: auto;
+  top: 52px;
+  right: var(--v2-gap);
+  width: 48px;
+  max-height: calc(100% - 52px - 96px);
+  overflow-y: auto;
+  padding: 4px 0;
+  gap: 2px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface-solid);
+  box-shadow: var(--v2-float-shadow);
+}
+.app-shell.is-v2 .activity-bar-heading { display: none; }
+.app-shell.is-v2 .activity-bar-button.has-label { width: 42px; height: 42px; border-radius: 6px; }
+
+/* Karta panelu przy szynie, pod górnym paskiem. */
+.app-shell.is-v2 .dock--right-panel {
+  top: 52px;
+  right: var(--activity-bar-width);
+  max-height: calc(100% - 52px - 64px);
+  border: 0;
+  border-radius: 10px;
+  box-shadow: var(--v2-float-shadow);
+}
+
+/* ------------------------------------------------------- dok narzędzi */
+.tool-dock {
+  position: absolute;
+  z-index: var(--z-tools);
+  /* Środek wolnej części mapy: przy otwartej karcie panelu dok przesuwa się
+     w lewo (RightPanelDock ustawia --dock-inset-right). */
+  left: var(--v2-gap);
+  right: calc(var(--dock-inset-right, 0px) + var(--activity-bar-width, 62px) + var(--v2-gap));
+  bottom: var(--v2-gap);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  font-size: 12.5px;
+}
+.tool-dock-row {
+  pointer-events: auto;
+  border: var(--v2-dock-border, 0);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 100%;
+  padding: 4px;
+  border-radius: 10px;
+  background: var(--v2-ink);
+  color: var(--v2-ink-text);
+  box-shadow: var(--v2-dock-shadow);
+}
+.tool-dock-tools { flex-wrap: wrap; justify-content: center; row-gap: 2px; }
+/* Wąskie okno z otwartą kartą: bez skrótów w przyciskach (zostają w podpowiedzi). */
+@media (max-width: 1500px) {
+  .workspace:has(.dock--right-panel) .tool-dock-tool kbd { display: none; }
+}
+.tool-dock-main { max-width: min(100%, 980px); }
+.tool-dock-main .context-bar { flex: 0 1 auto; }
+.tool-dock-sep { flex: 0 0 1px; width: 1px; height: 22px; margin: 0 5px; background: var(--v2-ink-line); }
+.tool-dock-groups { display: flex; align-items: center; gap: 2px; flex: 0 0 auto; }
+.tool-dock-group,
+.tool-dock-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--v2-ink-text);
+  font: inherit;
+  font-weight: 400;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.tool-dock-group { height: 36px; padding: 0 12px 0 10px; font-size: 12.5px; }
+.tool-dock-tool { height: 34px; padding: 0 8px 0 7px; gap: 5px; font-size: 12.5px; }
+.tool-dock-group:hover,
+.tool-dock-tool:hover { background: var(--v2-dock-hover); }
+.tool-dock-group.is-active,
+.tool-dock-tool.is-active { background: var(--v2-dock-active-bg); color: var(--v2-dock-active-text); font-weight: 600; }
+.tool-dock-group:focus-visible,
+.tool-dock-tool:focus-visible { outline: 2px solid var(--v2-dock-focus); outline-offset: 1px; }
+.tool-dock-tool:disabled { opacity: .5; cursor: default; }
+.tool-dock-tool kbd {
+  font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--v2-ink-muted);
+  background: none; border: 0; padding: 0; box-shadow: none;
+}
+.tool-dock-tool.is-active kbd { color: var(--v2-dock-active-muted); }
+/* Przy rozwiniętej grupie pozostałe grupy są samymi ikonami (podpis w title). */
+.tool-dock.is-expanded .tool-dock-group:not(.is-active) { width: 36px; padding: 0; justify-content: center; }
+.tool-dock.is-expanded .tool-dock-group:not(.is-active) > span { display: none; }
+
+/* Pasek kontekstu w doku: instrukcja, parametry, odczyt szkicu, Zakończ/Anuluj. */
+.tool-dock .context-bar {
+  position: static;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 36px;
+  height: auto;
+  padding: 0 4px 0 2px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--v2-ink-text);
+  font-size: 12.5px;
+  overflow: hidden;
+}
+.tool-dock .context-zone { display: flex; align-items: center; gap: 8px; min-width: 0; border: 0; padding: 0; background: transparent; }
+.tool-dock .context-zone--object { margin-left: 8px; padding-left: 10px; border-left: 1px solid var(--v2-ink-line); }
+.tool-dock .context-tool-icon { display: none; }
+.tool-dock .context-tool-name { color: var(--v2-dock-strong); font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.tool-dock .context-next-step,
+.tool-dock .context-object-label { color: var(--v2-ink-muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; max-width: 360px; }
+.tool-dock .context-object-name { color: var(--v2-dock-strong); font-weight: 600; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tool-dock .context-tool-help { color: var(--v2-ink-muted); width: 24px; height: 24px; flex-basis: 24px; }
+.tool-dock .context-fields { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+.tool-dock .context-fields label,
+.tool-dock .context-fields span { color: var(--v2-ink-muted); }
+.tool-dock input,
+.tool-dock select {
+  height: 28px;
+  border: 1px solid var(--v2-ink-line);
+  border-radius: 6px;
+  background: var(--v2-dock-field-bg);
+  color: var(--v2-dock-strong);
+  font-size: 12.5px;
+}
+.tool-dock .context-sketch {
+  position: static;
+  display: flex; align-items: center; gap: 6px;
+  margin: 0; padding: 0; border: 0; background: transparent; box-shadow: none;
+  color: var(--v2-dock-strong);
+}
+/* 19.15.0: przyciski w doku (Cofnij punkt, Zakończ, Anuluj, Działania i właściwości) —
+   klasy ui-button z app/ui; wcześniej reguły celowały w nieużywane .button i przyciski
+   zostawały jasne. */
+.tool-dock .ui-button { height: 28px; min-height: 28px; padding: 0 10px; border-radius: 6px; font-size: 12.5px; font-weight: 400; white-space: nowrap; box-shadow: none; }
+.tool-dock .ui-button--secondary,
+.tool-dock .ui-button--ghost { background: transparent; color: var(--v2-dock-strong); border: 1px solid var(--v2-ink-line); }
+.tool-dock .ui-button--secondary:hover:not(:disabled),
+.tool-dock .ui-button--ghost:hover:not(:disabled) { background: var(--v2-dock-hover); }
+.tool-dock .ui-button--primary { background: var(--accent); color: var(--on-accent); border: 1px solid var(--accent); }
+.tool-dock .ui-button--primary:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 86%, #ffffff); }
+.tool-dock .ui-button:disabled { opacity: .45; }
+.tool-dock .ui-button-label { white-space: nowrap; }
+/* 19.15.0: odczyty (miary obiektu, odczyt szkicu) — etykieta zwykłym krojem, wartość
+   cyframi o stałej szerokości. Wcześniej selektor [class*="measure"] łapał całą strefę
+   obiektu (.has-measures) i przycisk „Działania i właściwości” wypadał poza dok. */
+.tool-dock .ui-readout { display: inline-flex; align-items: baseline; gap: 5px; padding: 0; border: 0; background: transparent; color: var(--v2-dock-strong); white-space: nowrap; }
+.tool-dock .ui-readout .ui-field-label { color: var(--v2-ink-muted); font-size: 11px; }
+.tool-dock .ui-readout strong { font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; font-weight: 400; color: var(--v2-dock-strong); }
+.tool-dock .context-readouts { display: inline-flex; gap: 10px; align-items: baseline; }
+.tool-dock .context-zone--object { flex: 0 1 auto; min-width: 0; }
+.tool-dock .context-zone--object .ui-button { flex: 0 0 auto; height: 26px; min-height: 26px; padding: 0 10px; border: 1px solid var(--v2-ink-line); border-radius: 6px; background: transparent; color: var(--v2-dock-strong); font-size: 12.5px; font-weight: 400; white-space: nowrap; }
+
+/* -------------------------------------------- elementy w rogach mapy */
+.app-shell.is-v2 .map-statusbar {
+  left: auto;
+  right: var(--v2-gap);
+  bottom: var(--v2-gap);
+  height: 24px;
+  max-width: 300px;
+  gap: 6px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--surface-solid) 88%, transparent);
+  box-shadow: none;
+  font-size: 11px;
+}
+.app-shell.is-v2 .map-statusbar > .status-separator,
+.app-shell.is-v2 .map-statusbar .status-crs,
+.app-shell.is-v2 .map-statusbar .status-coordinate,
+.app-shell.is-v2 .map-statusbar .status-zoom,
+.app-shell.is-v2 .map-statusbar .status-layers,
+.app-shell.is-v2 .map-statusbar .status-center,
+.app-shell.is-v2 .map-statusbar .status-mode,
+.app-shell.is-v2 .map-statusbar .status-spacer,
+.app-shell.is-v2 .map-statusbar .status-label { display: none; }
+.app-shell.is-v2 .map-statusbar .status-attributions { max-width: 120px; }
+.app-shell.is-v2 .map-view-controls {
+  /* Pod szyną paneli, nad paskiem stanu — niezależnie od otwartej karty. */
+  right: calc(var(--v2-gap) + 4px);
+  bottom: 40px;
+  border: 0;
+  border-radius: 10px;
+  box-shadow: var(--v2-float-shadow);
+}
+.app-shell.is-v2 .basemap-switcher {
+  left: var(--v2-gap);
+  bottom: var(--v2-gap);
+  padding: 4px;
+  gap: 4px;
+  border: 0;
+  box-shadow: var(--v2-float-shadow);
+}
+.app-shell.is-v2 .basemap-switcher.is-collapsed .basemap-thumb { width: 44px; height: 32px; }
+.app-shell.is-v2 .basemap-switcher.is-collapsed .basemap-option { width: 44px; font-size: 11px; }
+.app-shell.is-v2 .map-scalebar { left: var(--v2-gap); bottom: 56px; }
+
+/* ------------------------------------------------ warstwy — kompaktowo */
+/* Nazwa w jednym wierszu (pełna w podpowiedzi); uchwyt przeciągania,
+   „informacja” i „więcej” pojawiają się po najechaniu albo przy fokusie. */
+.app-shell.is-v2 .layers-panel--v2 .layer-row-titleline strong { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; min-width: 0; }
+.app-shell.is-v2 .layers-panel--v2 .layer-row-titleline { min-width: 0; flex-wrap: nowrap; }
+.app-shell.is-v2 .layers-panel--v2 .layer-row-main { display: flex; align-items: center; gap: 2px; padding-left: 14px; padding-right: 4px; }
+.app-shell.is-v2 .layers-panel--v2 .layer-row-copy { flex: 1 1 auto; min-width: 0; cursor: pointer; }
+.app-shell.is-v2 .layers-panel--v2 .layer-drag-handle,
+.app-shell.is-v2 .layers-panel--v2 .layer-info-toggle:not(.is-active),
+.app-shell.is-v2 .layers-panel--v2 .layer-row-more { display: none; }
+.app-shell.is-v2 .layers-panel--v2 .layer-row:hover > .layer-row-main .layer-drag-handle,
+.app-shell.is-v2 .layers-panel--v2 .layer-row:focus-within > .layer-row-main .layer-drag-handle,
+.app-shell.is-v2 .layers-panel--v2 .layer-row:hover > .layer-row-main .layer-info-toggle,
+.app-shell.is-v2 .layers-panel--v2 .layer-row:focus-within > .layer-row-main .layer-info-toggle,
+.app-shell.is-v2 .layers-panel--v2 .layer-row:hover > .layer-row-main .layer-row-more,
+.app-shell.is-v2 .layers-panel--v2 .layer-row:focus-within > .layer-row-main .layer-row-more,
+.app-shell.is-v2 .layers-panel--v2 .layer-row.is-dragging .layer-drag-handle { display: inline-flex; }
+.app-shell.is-v2 .layers-panel--v2 .layer-row:hover > .layer-row-main .layer-drag-handle { position: absolute; left: 0; }
+.app-shell.is-v2 .layers-panel--v2 .layer-row { position: relative; }
+.app-shell.is-v2 .layers-panel--v2 .layer-row-main { min-height: 28px; }
+.app-shell.is-v2 .layers-panel--v2 .layer-group-title { min-height: 30px; }
+.app-shell.is-v2 .basemap-switcher.is-collapsed .basemap-option-label { display: none; }
+.app-shell.is-v2 .basemap-switcher.is-collapsed { align-items: center; height: 40px; min-height: 0; padding: 4px; }
+.app-shell.is-v2 .basemap-switcher.is-collapsed .basemap-option { gap: 0; }
+.app-shell.is-v2 .basemap-switcher-toggle { height: 32px; min-height: 0; width: 22px; align-self: center; }
+
+/* ------------------------------------------- 19.10.0: karta miejsca (lewa) */
+/* Wynik „Sprawdź” stoi pod wyszukiwarką, do wysokości doku narzędzi.
+   19.11.0: wspólna karta z zakładkami Działka · Raport · Analizy (PlaceCardTabs
+   nad kartą). Położenie jest stałe (bez przeciągania i zmiany rozmiaru) —
+   !important przebija geometrię okna pływającego z usePanel (styl w linii). */
+.app-shell.is-v2 { --place-card-width: 360px; --place-card-top: 90px; }
+.app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) {
+  position: absolute;
+  z-index: var(--z-dock-overlay);
+  left: var(--v2-gap) !important;
+  top: var(--place-card-top) !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: var(--place-card-width) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: auto !important;
+  max-height: calc(100% - var(--place-card-top) - 112px) !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0 0 10px 10px;
+  box-shadow: var(--v2-float-shadow);
+}
+.app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) .panel-drag-handle,
+.app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) .panel-resizer,
+.app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) .panel-height-resizer { display: none; }
+.app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) .panel-header { cursor: default; }
+.app-shell.is-v2 :is(.vps-data-panel, .analysis-panel):not(.is-docked) > :not(.panel-header):not(.panel-footer) { min-height: 0; overflow: auto; }
+
+/* --------------------------- 19.10.0: rodziny statusów MPZP / POG (Warstwy) */
+.layers-panel--v2 .layer-family { display: block; }
+.layers-panel--v2 .layer-family .layer-row-titleline { display: flex; align-items: center; gap: 6px; }
+.layers-panel--v2 .layer-family-count { flex: 0 0 auto; font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 11px; color: var(--text-muted); }
+.layers-panel--v2 .layer-family-statuses {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  padding: 2px 8px 6px 40px;
+}
+.layers-panel--v2 .layer-status-chip {
+  height: 22px; padding: 0 8px;
+  border: 1px solid var(--border-strong); border-radius: 10px;
+  background: var(--surface-solid); color: var(--text);
+  font: inherit; font-size: 11px; font-weight: 600; cursor: pointer;
+}
+.layers-panel--v2 .layer-status-chip:hover { border-color: var(--text-faint); }
+.layers-panel--v2 .layer-status-chip.is-active { background: var(--text); border-color: var(--text); color: var(--surface-solid); }
+.layers-panel--v2 .layer-status-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.layers-panel--v2 .layer-family-members { margin-left: 18px; border-left: 2px solid var(--border); }
+.app-shell.is-v2 .layers-panel--v2 .layer-family-expand { display: inline-flex; }
+
+/* 19.11.0: dolna belka bez długiej instrukcji narzędzia — zajmowała ~3/4 belki.
+   Instrukcja i opis zostają w podpowiedzi przycisku „i” obok nazwy narzędzia. */
+.tool-dock .context-next-step { display: none; }
+
+/* ------------------------ 19.12.0: werdykt karty Działka — lista ze znaczkami */
+/* Jeden wiersz na pytanie (MPZP, plan ogólny, Natura 2000, inne formy ochrony,
+   klasa gruntu): znaczek stanu, nazwa, odpowiedź, „Pokaż na mapie”. Znaczki
+   (maska SVG w kolorze tekstu — działa w obu motywach):
+   ● z ptaszkiem — jest / obowiązuje · ○ z kreską — brak / poza ·
+   ▲ bursztynowy — ograniczenie albo nie sprawdzono · ◌ — sprawdzanie. */
+
+/* ------------------------------- 19.13.0: telefon — pięć pozycji dolnego paska */
+.app-shell.is-mobile .m-nav.m-nav--five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.app-shell.is-mobile .m-nav.m-nav--five button { min-width: 0; font-size: 11px; }
+.app-shell.is-mobile .m-nav.m-nav--five button.is-active svg { padding: 3px 10px; }
+@media (pointer: coarse) and (max-height: 500px) {
+  .app-shell.is-mobile .m-nav.m-nav--five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .app-shell.is-mobile .m-nav.m-nav--five button.is-active svg { padding: 2px 5px; }
+}
+.m-tool-section + .m-tool-section { margin-top: 4px; }
+
+/* --------------------- 19.14.0: „dane w widoku” (warstwy MPZP / POG, layerCoverage.js) */
+/* ● pełna — są dane w kadrze, ○ pusta — brak, ◌ przerywana — sprawdzanie,
+   ? szara — nie udało się sprawdzić. Bez kropki: poza zakresem skali. */
+.layer-coverage-dot {
+  flex: 0 0 8px;
+  width: 8px;
+  height: 8px;
+  margin-right: 2px;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+.layer-coverage-dot--yes { background: var(--text); }
+.layer-coverage-dot--no { border: 1.5px solid var(--text-faint); }
+.layer-coverage-dot--loading { border: 1.5px dashed var(--text-faint); animation: layer-coverage-pulse 1.2s ease-in-out infinite; }
+.layer-coverage-dot--unknown { border: 1.5px dotted var(--warning); }
+@keyframes layer-coverage-pulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .layer-coverage-dot--loading { animation: none; } }
+.layers-panel--v2 .layer-status-chip[data-coverage="yes"]::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: 1px;
+}
+.layers-panel--v2 .layer-status-chip[data-coverage="no"] { opacity: .65; }
+
+/* ------------------------------ 19.15.0: zaznaczony obiekt w panelu Obiekty — zwarto */
+.object-inspector.object-inspector--compact { padding: 6px 8px; }
+.object-inspector-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.object-inspector-title { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.object-inspector--compact .object-inspector-title h3 { margin: 0; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
+.object-inspector--compact .context-readouts { display: flex; flex-wrap: wrap; gap: 0 10px; font-size: 11px; }
+.object-inspector--compact .ui-readout { display: inline-flex; gap: 4px; align-items: baseline; padding: 0; border: 0; background: transparent; }
+.object-inspector--compact .ui-readout .ui-field-label { color: var(--text-muted); font-size: 11px; }
+.object-inspector--compact .ui-readout strong { font-size: 12.5px; font-weight: 600; }
+.object-actions-trigger {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 28px; padding: 0 8px 0 10px;
+  border: 1px solid var(--border-strong); border-radius: 6px;
+  background: var(--surface-solid); color: var(--text);
+  font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+}
+.object-actions-trigger:hover { background: var(--surface-hover); }
+.object-actions-trigger[data-state="open"] { border-color: var(--accent); color: var(--accent); }
+.object-inspector--compact .object-properties { margin-top: 4px; }
+.object-inspector--compact .object-properties > summary { font-size: 12.5px; }
+.object-inspector--compact .object-properties-fields > .ui-field { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
+.object-inspector--compact .object-properties-fields > .ui-field input { min-height: 28px; width: 100%; }
+
+/* =====================================================================
+   19.16.0 — spójność układu: jedna rama panelu, trzy rodzaje przycisków,
+   jeden język stanów, jedna skala (tekst 11/12/13/15, wiersze 28–30 px,
+   odstępy 4/8/12). Dotyczy komputera (.is-v2).
+   ===================================================================== */
+
+/* --- 1. Rama panelu: karta po lewej i panel po prawej wyglądają tak samo --- */
+.app-shell.is-v2 .ui-panel { border: 0; border-radius: 10px; box-shadow: var(--v2-float-shadow); background: var(--surface-solid); font-size: 12.5px; }
+.app-shell.is-v2 .ui-panel > .panel-header {
+  min-height: 44px; padding: 6px 8px 6px 12px; gap: 8px;
+  border-bottom: 1px solid var(--border); background: var(--surface-solid);
+}
+.app-shell.is-v2 .ui-panel .panel-title { gap: 8px; }
+.app-shell.is-v2 .ui-panel .panel-title > svg { width: 16px; height: 16px; color: var(--text); }
+.app-shell.is-v2 .ui-panel .panel-title strong { font-size: 12.5px; font-weight: 600; line-height: 1.25; }
+.app-shell.is-v2 .ui-panel .panel-title span { margin-top: 1px; font-size: 11px; color: var(--text-muted); }
+.app-shell.is-v2 .ui-panel .panel-actions { gap: 2px; }
+.app-shell.is-v2 .ui-panel .panel-actions .icon-button { width: 28px; height: 28px; flex-basis: 28px; border-radius: 6px; }
+.app-shell.is-v2 .ui-panel > .panel-footer { min-height: 26px; padding: 4px 12px; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border); }
+/* Karta miejsca: zakładka jest tytułem — bez drugiego nagłówka i stopki. */
+.app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) > .panel-header,
+.app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) > .panel-footer { display: none; }
+
+/* --- 2. Przyciski: główny, zwykły, tekstowy (+ chip do filtrów i statusów) --- */
+.app-shell.is-v2 .ui-panel .ui-button,
+.app-shell.is-v2 .dropdown-content .ui-button {
+  height: 30px; min-height: 30px; padding: 0 12px; gap: 6px;
+  border-radius: 6px; font-size: 12.5px; font-weight: 600; box-shadow: none;
+}
+.app-shell.is-v2 .ui-panel .ui-button--sm { height: 28px; min-height: 28px; padding: 0 10px; }
+.app-shell.is-v2 .ui-panel .ui-button--primary { background: var(--accent); border: 1px solid var(--accent); color: var(--on-accent); }
+.app-shell.is-v2 .ui-panel .ui-button--secondary { background: var(--surface-solid); border: 1px solid var(--border-strong); color: var(--text); }
+.app-shell.is-v2 .ui-panel .ui-button--ghost { background: transparent; border: 1px solid transparent; color: var(--accent); }
+.app-shell.is-v2 .ui-panel .ui-button--ghost:hover:not(:disabled) { background: var(--accent-soft); }
+.app-shell.is-v2 .object-actions-trigger { height: 28px; border-radius: 6px; font-size: 12.5px; }
+/* „Pokaż na mapie” — przycisk tekstowy, nie kolejna pigułka. */
+/* Akcje karty Działka: akcja główna rozciągnięta, „Działania” obok. */
+
+/* --- 3. Jeden język stanów: ● jest · ○ brak · ▲ ograniczenie/błąd · ◌ sprawdzanie --- */
+.app-shell.is-v2 .identify-layer-dot {
+  flex: 0 0 12px; width: 12px; height: 12px; border-radius: 0;
+  background: var(--text-faint);
+  -webkit-mask: var(--icon-state-no) center / contain no-repeat; mask: var(--icon-state-no) center / contain no-repeat;
+}
+.app-shell.is-v2 .identify-layer-dot--ready { background: var(--text); -webkit-mask-image: var(--icon-state-yes); mask-image: var(--icon-state-yes); }
+.app-shell.is-v2 .identify-layer-dot--error { background: var(--state-warn); -webkit-mask-image: var(--icon-state-warn); mask-image: var(--icon-state-warn); }
+.app-shell.is-v2 .identify-layer-dot--loading { background: var(--text-faint); -webkit-mask-image: var(--icon-state-wait); mask-image: var(--icon-state-wait); }
+/* Napis stanu bez kolorowych plakietek — znaczenie niesie znaczek. */
+.app-shell.is-v2 .parcelplus-status { padding: 0; background: transparent; color: var(--text-muted); font-size: 11px; font-weight: 400; }
+.app-shell.is-v2 .parcelplus-status--ready { color: var(--text); font-weight: 600; }
+.app-shell.is-v2 .parcelplus-status--error { color: var(--state-warn); font-weight: 600; }
+/* Werdykt (karta Działka) i podsumowanie screeningu — te same znaczki. */
+.app-shell.is-v2 .screening-summary-item {
+  position: relative; padding-left: 26px; border-left: 0;
+}
+.app-shell.is-v2 .screening-summary-item::before {
+  content: ""; position: absolute; left: 8px; top: 50%; width: 12px; height: 12px; margin-top: -6px;
+  background: var(--text-faint);
+  -webkit-mask: var(--icon-state-no) center / contain no-repeat; mask: var(--icon-state-no) center / contain no-repeat;
+}
+.app-shell.is-v2 :is(.screening-summary-item--info, .screening-summary-item--ok) { border-left: 0; }
+.app-shell.is-v2 .screening-summary-item--info::before { background: var(--text); -webkit-mask-image: var(--icon-state-yes); mask-image: var(--icon-state-yes); }
+.app-shell.is-v2 :is(.screening-summary-item--warning, .screening-summary-item--danger) { border-left: 0; }
+.app-shell.is-v2 :is(.screening-summary-item--warning, .screening-summary-item--danger)::before { background: var(--state-warn); -webkit-mask-image: var(--icon-state-warn); mask-image: var(--icon-state-warn); }
+.app-shell.is-v2 :is(.screening-summary-item--warning, .screening-summary-item--danger) > strong { color: var(--state-warn); }
+/* „Dane w widoku” w Warstwach — te same znaczki, mniejsze. */
+.app-shell.is-v2 .layer-coverage-dot { flex-basis: 10px; width: 10px; height: 10px; border: 0; border-radius: 0; animation: none; background: var(--text-faint);
+  -webkit-mask: var(--icon-state-no) center / contain no-repeat; mask: var(--icon-state-no) center / contain no-repeat; }
+.app-shell.is-v2 .layer-coverage-dot--yes { background: var(--text); -webkit-mask-image: var(--icon-state-yes); mask-image: var(--icon-state-yes); }
+.app-shell.is-v2 .layer-coverage-dot--unknown { background: var(--state-warn); -webkit-mask-image: var(--icon-state-warn); mask-image: var(--icon-state-warn); }
+.app-shell.is-v2 .layer-coverage-dot--loading { -webkit-mask-image: var(--icon-state-wait); mask-image: var(--icon-state-wait); }
+
+/* --- 4. Skala: wiersze 28–30 px, tekst 11/12/13, odstępy 4/8/12 --- */
+.app-shell.is-v2 .identify-panel-body { padding: 8px; gap: 8px; }
+.app-shell.is-v2 .parcelplus-row > summary { min-height: 30px; padding: 4px 8px; gap: 8px; align-items: center; }
+.app-shell.is-v2 .parcelplus-row .identify-layer-copy strong { font-size: 12.5px; font-weight: 600; }
+.app-shell.is-v2 .parcelplus-row .identify-layer-preview { font-size: 11px; }
+.app-shell.is-v2 .parcelplus-row { border-radius: 0; border-width: 0 0 1px; }
+.app-shell.is-v2 .parcelplus-row:last-child { border-bottom: 0; }
+.app-shell.is-v2 .identify-fact span { font-size: 11px; }
+.app-shell.is-v2 .identify-fact strong { font-size: 12.5px; }
+.app-shell.is-v2 .ui-panel :is(input, select):not([type="checkbox"]):not([type="radio"]):not([type="range"]) { min-height: 28px; font-size: 12.5px; border-radius: 6px; }
+.app-shell.is-v2 .ui-panel .ui-field-label { font-size: 11px; color: var(--text-muted); }
+.app-shell.is-v2 .objects-panel .object-row,
+.app-shell.is-v2 .objects-panel [role="listitem"] { min-height: 30px; }
+.app-shell.is-v2 .ui-panel details > summary { font-size: 12.5px; }
+/* Telefon: kafle werdyktu w podglądzie karty są niskie — „Pokaż na mapie” się nie mieściło. */
+
+/* 19.19.0: bounded cards and usable controls on small laptops / forced desktop. */
+.app-shell.is-v2 .workspace { --place-card-width: min(360px, max(220px, calc(100vw - var(--dock-inset-right, 0px) - 86px))); }
+.app-shell.is-v2 .map-topbar .map-search { min-width: 0; width: clamp(160px, 32vw, 440px); max-width: max(160px, calc(100vw - 470px)); }
+.app-shell.is-v2 :is(.identify-panel, .vps-data-panel, .analysis-panel):not(.is-docked) { max-height: max(100px, calc(100% - var(--place-card-top) - 112px)) !important; }
+@media (max-width: 1100px) {
+ .app-shell.is-v2 .map-topbar { flex-wrap: wrap; }
+ .app-shell.is-v2 .map-topbar-end { margin-left: auto; }
+ .app-shell.is-v2 .map-topbar .map-search { min-width: 0; width: clamp(160px, 32vw, 320px); max-width: calc(100vw - 72px); }
+}
+@media (pointer: coarse) {
+ .app-shell.is-v2 { --place-card-top: 106px; }
+}

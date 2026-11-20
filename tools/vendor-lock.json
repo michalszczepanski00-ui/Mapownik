@@ -1,0 +1,12 @@
+{
+ "vendor/.htaccess": "55d7d37c3ca54bf261b6b14838b7c2060dca56dcbca9a3e21d6e20bebb768f03",
+ "vendor/geometry/.htaccess": "a20397fa6d54ed92092aa3ffa9c495e0704fecf0259d25c542c7a2ebb5b55453",
+ "vendor/geometry/README.txt": "00638487be6f380859f9501ade9d9153704b6af9c41ccfe6e231cb28e12685ed",
+ "vendor/geometry/jsts-buffer.esm.js": "7d855be824a9f5413d1e87bd25ca0f12aa6443f27e8f3bb0f1a0f031469a92e2",
+ "vendor/pdf/.htaccess": "a20397fa6d54ed92092aa3ffa9c495e0704fecf0259d25c542c7a2ebb5b55453",
+ "vendor/pdf/Inter-LICENSE-OFL.txt": "3b0a5fca3d17942cde889069889dedbbbd075e9b599968c82a95f4d944e9b345",
+ "vendor/pdf/Inter_400Regular.ttf": "a414b48aa577ef2c62ebb135341ddeef33ee26a4f5dc9f787f93c1aab08ebb50",
+ "vendor/pdf/Inter_700Bold.ttf": "fbe825cbfc749317f57a1433d3905aa9d3f388732fd29b8e8a36f34845e3bc3e",
+ "vendor/pdf/README.txt": "4278d8fa6651c56e94a61bc60133e60c51b85d9ff4edc541ff51cd7f245da083",
+ "vendor/pdf/jspdf.umd.min.js": "e6551fcdc32f09d6853b2c5126d18d01d9447e0da618a41a11ebeee0f6c20d54"
+}

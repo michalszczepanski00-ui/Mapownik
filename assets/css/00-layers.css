@@ -1,0 +1,21 @@
+/* Kolejność warstw kaskady — ten arkusz musi być wczytany jako pierwszy.
+
+   tokens     zmienne motywu, promienie, pasma z-index
+   base       reset i typografia (zarezerwowana, na razie pusta)
+   legacy     historyczny arkusz 17.8.3, dziś rozdzielony tematycznie na
+              siedem plików (21-legacy-shell … 27-legacy-analysis) —
+              wszystkie razem tworzą tę samą warstwę „legacy", więc dla
+              kaskady nic się nie zmieniło
+   shell      układ powłoki: paski, doki, szyna ikon, panele w doku
+   utilities  drobne pomocniki, które mają wygrywać ze wszystkim
+
+   Warstwa późniejsza wygrywa z wcześniejszą NIEZALEŻNIE od specyficzności
+   selektora. Dzięki temu reguła powłoki nie przegrywa z historyczną regułą
+   o dłuższym selektorze — a właśnie takie kolizje kosztowały najwięcej czasu
+   w Fazie 2.
+
+   Wyjątek do zapamiętania: `!important` ODWRACA kolejność warstw, więc
+   `!important` w legacy nadal bije zwykłą deklarację w shell. Nowych
+   `!important` nie dopisujemy.
+*/
+@layer tokens, base, legacy, shell, utilities;

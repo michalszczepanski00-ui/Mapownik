@@ -1,0 +1,186 @@
+/* 19.54.0 — system „Las”: tokeny i wspólne komponenty po audycie layoutu (AUDYT_LAYOUTU_19.53.0.md).
+   Arkusz bez warstwy (@layer), wczytywany po wszystkich innych — ustala jedną wersję komponentów,
+   które wcześniej miały kilka nadpisań w plikach 21–38. Nowe poprawki wyglądu trafiają tutaj,
+   a nie jako kolejne nadpisanie w starszych plikach. */
+
+/* ------------------------------------------------------------------ L1 górny pasek: jedna wysokość 36 px */
+.map-topbar { align-items: flex-start; }
+.map-brand-button.icon-button { width: 36px; height: 36px; flex: 0 0 36px; }
+.map-topbar .map-search-place,
+.map-topbar .map-search-parcel { height: 36px; }
+.map-topbar-end > .icon-button,
+.map-topbar-end > .topbar-primary-action,
+.map-topbar-end > .quick-help > .icon-button { width: 36px; height: 36px; flex: 0 0 36px; margin: 0; border-radius: 10px; }
+
+/* ------------------------------------------------------------------ L5 pasek trybów: środek okna, nie widocznej mapy */
+@media (min-width: 1151px) {
+  .app-shell.is-workspace-1c .tool-dock { left: 280px; right: 280px; }
+}
+
+/* ------------------------------------------------------------------ L6 zwinięta karta z nazwą */
+.workspace-card-toggle--named {
+  display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 8px 0 12px;
+  border: 0; border-radius: 10px; background: none; color: var(--text); font: inherit; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.workspace-card-toggle--named:hover { background: var(--accent-soft); }
+.workspace-card-toggle--named:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ------------------------------------------------------------------ K1 jeden przełącznik segmentowy
+   Filtry Warstw, „Wokół działki | W widoku mapy”, „Grunty | Domy | Mieszkania”. */
+.layers-filter-bar,
+.market-scope,
+.rcn-kinds {
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); grid-template-columns: none;
+  gap: 1px; padding: 2px; margin: 6px 8px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface-solid); overflow: visible;
+}
+.market-scope, .rcn-kinds { margin: 0 0 8px; }
+.layers-filter,
+.market-scope-option,
+.market-scope-option + .market-scope-option,
+.rcn-kind {
+  display: inline-flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px;
+  min-width: 0; width: auto; height: 26px; min-height: 26px; padding: 0 4px; border: 0; border-radius: 6px;
+  background: none; color: var(--text-muted); font: inherit; font-size: 12.5px; font-weight: 400; line-height: 1;
+  white-space: nowrap; cursor: pointer;
+}
+.layers-filter:hover, .market-scope-option:hover, .rcn-kind:hover { background: var(--surface-hover, #eef3ef); color: var(--text); }
+.layers-filter.is-active, .market-scope-option.is-active, .rcn-kind.is-active {
+  background: var(--accent-soft); color: var(--accent); font-weight: 600; box-shadow: none; border: 0;
+}
+.layers-filter small {
+  display: inline; min-width: 0; padding: 0; border: 0; border-radius: 0; background: none;
+  color: inherit; opacity: .75; font-size: 11px; font-weight: 400; line-height: 1;
+}
+.layers-filter:focus-visible, .market-scope-option:focus-visible, .rcn-kind:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ------------------------------------------------------------------ T1 paleta „Las” jako bazowa (motyw jasny)
+   Sześć kolorów + jeden kolor wyłącznie mapowy. Dotąd Las nadpisywał tylko akcent i pasek narzędzi,
+   a tekst i linie brały niebieskawą szarość z 10-tokens.css. Zdefiniowane na :root i na powłoce,
+   żeby objęły też okna i menu wyświetlane poza .app-shell (portale). */
+:root:not([data-theme="dark"]),
+.app-shell:not([data-theme="dark"]) {
+  --las: #2f6b45;      /* akcent, jedyny wypełniony przycisk, aktywny tryb */
+  --bor: #16261e;      /* tekst */
+  --mech: #5f6b62;     /* tekst pomocniczy, ikony nieaktywne */
+  --szron: #dfe4dc;    /* linie, ramki kontrolek na mapie */
+  --polana: #e6f0e9;   /* tło wyniku, aktywna pozycja przełącznika */
+  --rdza: #a1460c;     /* ostrzeżenie */
+  --zaznaczenie: #1d4ed8; /* T2: tylko na mapie (obrys wybranej działki, celownik) — nigdy w panelach */
+
+  --accent: var(--las); --accent-soft: var(--polana); --on-accent: #ffffff; --info: var(--las);
+  --text: var(--bor); --text-muted: var(--mech); --text-faint: #66716a;
+  --border: var(--szron); --border-strong: #c9d1c6; --border-soft: var(--szron);
+  --control-border: #7d8a80;
+  --surface-hover: #eef3ef; --surface-raised: #f6f8f5; --surface-active: var(--polana);
+  --bg: #f3f5f1;
+  --warning: var(--rdza); --state-warn: var(--rdza);
+  --v2-ink-text: var(--bor); --v2-ink-muted: var(--mech); --v2-ink-line: var(--szron);
+
+  /* T5: dwa cienie — powierzchnia z treścią i menu rozwijane; małe kontrolki mapy mają linię zamiast cienia. */
+  --shadow-surface: 0 1px 2px rgba(22, 38, 30, .10), 0 6px 18px rgba(22, 38, 30, .14);
+  --shadow-menu: 0 8px 28px rgba(22, 38, 30, .18);
+  --shadow: var(--shadow-menu); --shadow-soft: var(--shadow-surface);
+  --v2-float-shadow: var(--shadow-surface); --v2-dock-shadow: var(--shadow-surface);
+  --shadow-sm: var(--shadow-surface); --shadow-panel: var(--shadow-surface);
+}
+
+/* ------------------------------------------------------------------ T3 skala tekstu: 11 / 12,5 / 14 / 18 px, grubości 400 i 600 (700 — numer działki) */
+:root, .app-shell {
+  --fs-xs: 11px; --fs-sm: 12.5px; --fs-md: 12.5px; --fs-lg: 14px; --fs-xl: 14px; --fs-2xl: 18px;
+  --fw-medium: 400;
+}
+
+/* ------------------------------------------------------------------ T5 promienie: 6 kontrolki · 10 powierzchnie · pełne pigułki */
+:root, .app-shell { --radius-control: 6px; --control-radius: 6px; --radius-sm: 6px; --radius-md: 6px; --radius: 10px; --panel-radius: 10px; }
+
+/* T5: małe kontrolki na mapie — linia zamiast cienia (cień zostaje dla karty, doku, paska trybów i menu). */
+.map-view-controls,
+.basemap-switcher.is-collapsed,
+.map-scalebar { box-shadow: none; border: 1px solid var(--szron, var(--border)); }
+
+
+/* ------------------------------------------------------------------ Typografia: Fira Sans + Fira Sans Condensed (OFL, assets/fonts/Fira-LICENSE-OFL.txt)
+   Fira Sans — tytuły, przyciski, tekst; Fira Sans Condensed — wiersze wartości w wąskich kolumnach
+   (karta 260 px, dok 250 px), żeby wartości mieściły się bez obcinania. Cyfry tabelaryczne w liczbach. */
+@font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/fira-sans-latin-400.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/fira-sans-latin-ext-400.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/fira-sans-latin-600.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/fira-sans-latin-ext-600.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 700; font-display: swap; src: url("../fonts/fira-sans-latin-700.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Fira Sans"; font-style: normal; font-weight: 700; font-display: swap; src: url("../fonts/fira-sans-latin-ext-700.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Fira Sans Condensed"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/fira-sans-condensed-latin-400.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Fira Sans Condensed"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/fira-sans-condensed-latin-ext-400.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Fira Sans Condensed"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/fira-sans-condensed-latin-600.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Fira Sans Condensed"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/fira-sans-condensed-latin-ext-600.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+:root, .app-shell, body { font-family: "Fira Sans", "Segoe UI", ui-sans-serif, system-ui, -apple-system, sans-serif; }
+.parcel-card .pc-row, .parcel-card .pc-absent, .parcel-card .pc-sub, .parcel-card .pc-detail, .parcel-card .pc-facts,
+.identify-nearby, .layer-row, .layer-group-title, .layers-filter, .market-scope-option, .rcn-kind,
+.analyses-item small, .rcn-list, .rcn-summary, .market-panel .market-list, .vps-panel dl, .objects-panel--compact .object-row,
+.panel-title--compact > div > span {
+  font-family: "Fira Sans Condensed", "Fira Sans", "Segoe UI", ui-sans-serif, sans-serif;
+}
+.pc-value, .pc-sub, .pc-status, .layer-group-count, .layers-filter small, .rcn-summary, .rcn-list, .market-panel, .map-scalebar, .map-status, .identify-nearby strong {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------------ Karta działki: numer jako ułamek (jedyny wyrazisty element)
+   Siatka: ułamek na dwa wiersze; powierzchnia w pierwszym (obok przycisków karty), położenie w drugim na całą szerokość. */
+.pc-ident { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; row-gap: 2px; align-items: center; padding-right: 0; }
+.pc-title--fraction { grid-row: 1 / span 2; margin: 0; line-height: 1; }
+.pc-place { display: contents; }
+.pc-area { grid-column: 2; padding-right: 84px; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text); white-space: nowrap; }
+.workspace-card:not(:has(.workspace-card-head.is-bare)) .pc-area { padding-right: 0; }
+.pc-where { grid-column: 2; font-family: "Fira Sans Condensed", "Fira Sans", sans-serif; font-size: 12.5px; color: var(--text-muted); line-height: 1.3; }
+.pc-num { display: inline-grid; justify-items: center; min-width: 28px; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums lining-nums; color: var(--text); }
+.pc-num-top { padding: 0 3px 2px; border-bottom: 2px solid currentColor; line-height: 1; }
+.pc-num-bot { padding-top: 2px; line-height: 1; }
+.workspace-card:has(.workspace-card-head.is-bare) .pc-head:has(.pc-ident) { padding-top: 12px; }
+
+/* Przycisk powrotu do listy grupy (dok Analizy) — sama strzałka. */
+.panel-back-button.icon-button { width: 28px; height: 28px; padding: 0; margin: 0; justify-content: center; color: var(--accent); }
+
+/* ------------------------------------------------------------------ L4 wiersz wyniku: wartość zawija się zamiast obcinać */
+.pc-row { grid-template-columns: 14px max-content minmax(0, 1fr) 12px; align-items: start; padding-top: 3px; padding-bottom: 3px; }
+.pc-row > .pc-dot { margin-top: 1px; }
+.pc-label { white-space: nowrap; }
+.pc-value { max-width: none; min-width: 0; white-space: normal; overflow: visible; text-overflow: clip; text-align: right; overflow-wrap: anywhere; line-height: 1.3; }
+.pc-row .pc-chev { margin-top: 2px; }
+
+/* ------------------------------------------------------------------ K2 bez kart w kartach */
+.parcel-card .identify-nearby { margin: 0; padding: 8px 10px; border: 0; border-top: 1px solid var(--border); border-radius: 0; background: none; box-shadow: none; }
+.parcel-card .identify-nearby-title { padding: 0 0 3px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.parcel-card .identify-nearby-item { padding: 4px 0; }
+.analyses-list { gap: 0; }
+.analyses-item { border: 0; border-radius: 0; border-bottom: 1px solid var(--border); background: none; padding: 9px 10px; }
+.analyses-list li:last-child .analyses-item { border-bottom: 0; }
+.analyses-item:hover, .analyses-item:focus-visible { border-color: var(--border); background: var(--surface-hover); }
+.rcn-prices { padding: 0; border: 0; border-radius: 0; background: none; }
+.analyses-body { padding: 2px 0 6px; gap: 0; }
+.analyses-context { padding: 8px 12px; }
+.workspace-card:has(.workspace-card-head.is-bare) .pc-title.pc-title--fraction { padding-right: 0; }
+
+/* ------------------------------------------------------------------ 19.56.0: wyszukiwarka nie ucina nazwy miejscowości
+   Po wybraniu miejscowości pole rośnie (miejsce na chip i pole numeru działki); chip i wyniki mają pełną nazwę
+   (do dwóch linii w wynikach), a pełny tekst jest też w podpowiedzi po najechaniu. */
+.app-shell.is-v2 .map-topbar .map-search:has(.map-search-chip) { width: clamp(160px, 44vw, 600px); max-width: max(160px, calc(100vw - 470px)); }
+.map-search--refined .map-search-chip { max-width: none; flex: 0 0 auto; }
+.map-search-chip > span { overflow: visible; text-overflow: clip; white-space: nowrap; }
+.map-search-result-copy strong, .map-search-result-copy span { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.3; }
+.map-topbar .map-search-dropdown { min-width: 100%; width: max(100%, 420px); }
+
+/* 19.56.0: biała obwódka pod rysunkiem warstw działek i klas gruntów (numery, klasy, granice) — czytelne na zdjęciach i mapie. */
+.ol-layer--halo { filter: drop-shadow(0 0 0.6px #fff) drop-shadow(0 0 0.6px #fff) drop-shadow(0 0 1.2px rgba(255, 255, 255, .9)); }
+
+/* 19.56.0: strefy planu ogólnego w granicy działki — pod wierszem „Plan ogólny”. */
+.pc-zones { display: grid; gap: 6px; margin: 2px 0 4px 19px; font-size: 12.5px; }
+.pc-zone { padding-left: 8px; border-left: 2px solid var(--szron, var(--border)); }
+.pc-zone-head { display: flex; justify-content: space-between; gap: 8px; }
+.pc-zone-head strong { font-weight: 600; }
+.pc-zone-head span { color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.pc-zone-name { color: var(--text); }
+.pc-zone-line { color: var(--text); font-family: "Fira Sans Condensed", "Fira Sans", sans-serif; line-height: 1.35; }
+.pc-zone-line b { font-weight: 600; }
+.pc-zone-muted { color: var(--text-muted); }
+.map-search-place > svg { flex: 0 0 15px; width: 15px; height: 15px; }
+.map-search--refined .map-search-chip { margin-right: 6px; }
